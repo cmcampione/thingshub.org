@@ -1,7 +1,7 @@
 {
   "name": "thingshub.org",
   "version": "1.0.0",
-  "description": "",
+  "description": "Hope",
   "main": "app.js",
   "scripts": {
     "start": "node server.js",
