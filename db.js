@@ -1,5 +1,16 @@
 var mongoose = require('mongoose');
-mongoose.connect('omngodb://user:password@server1.carmelocampione.it:27017/securing-rest-apis-with-jwt', 
+var User = require('./user/User');
+
+mongoose.Promise = global.Promise;
+
+var promise = mongoose.connect('mongodb://server:port/dbname', 
 { 
-    useMongoClient: true
+    useMongoClient: true,
+    auth: {authSource: "admin"},
+    user: "username",
+    pass: "password"
 });
+
+promise.catch(function(err) {
+    console.log(err);
+})
