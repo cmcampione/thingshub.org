@@ -28,6 +28,8 @@ mongoose.connect(process.env.MONGODB_URI,
 });
 
 const app = express();
+
+// This line must be immediately after any of the bodyParser middlewares!
 app.use(expressValidator());
 
 app.get("/api", function (req, res) {

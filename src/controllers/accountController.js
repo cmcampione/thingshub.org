@@ -1,18 +1,17 @@
 "use strict";
 
-const HttpStatus = require("http-status-codes");
-const nodemailer = require("nodemailer");
-var express = require("express");
+const path  			= require("path");
+const HttpStatus 		= require("http-status-codes");
+const nodemailer 		= require("nodemailer");
+const express 			= require("express");
+const ejs 				= require("ejs");
 
-var router = express.Router();
+const utils 			= require("../utils.js");
+const usersMngr 		= require("../bl/usersMngr.js");
+const usersPendingMngr 	= require("../bl/usersPendingMngr.js");
+const dtos 				= require("../dtos");
 
-const utils = require("../utils.js");
-const usersMngr = require("../bl/usersMngr.js");
-const usersPendingMngr = require("../bl/usersPendingMngr.js");
-const registerByOnlyEmailDTOs = require("../dto");
-
-// TODO: To fix
-const mainModule = express();
+const router = express.Router();
 
 // create reusable transporter object using the default SMTP transport
 let transporter = null;
@@ -43,7 +42,8 @@ async function SendConfirmationEmailByOnlyEmail(email, culture, confirmationToke
 	}
 
 	const html = await new Promise((resolve, reject) => {
-		mainModule.render(`confirmByOnlyEmail-${culture}`, {
+		var ejsFile = path.join(__dirname, "../views/confirmByOnlyEmail-" + culture);
+		ejs.renderFile(ejsFile, {
 			title: process.env.APPLICATION_NAME,
 			confirmByOnlyEmailUrl : ConfirmationByOnlyEmailUrl,
 			email : process.env.SUPPORT_EMAIL,
@@ -104,7 +104,7 @@ router.get("/registerByOnlyEmail/:email/:culture", async (req, res, next) => {
 		const user = await usersMngr.findUserByUsername(email);
 		if (user) {
 			// The client can redirect user to login page and recovery password
-			res.json(new registerByOnlyEmailDTOs.RegisterByOnlyEmailDTO(email, "", registerByOnlyEmailDTOs.RegisterByOnlyEmailStatus.UserAlreadyRegistered));
+			res.json(new dtos.RegisterByOnlyEmailDTO(email, "", dtos.RegisterByOnlyEmailStatus.UserAlreadyRegistered));
 			return;
 		}
 
@@ -124,7 +124,7 @@ router.get("/registerByOnlyEmail/:email/:culture", async (req, res, next) => {
 			// The e-mail link should point to the client and submit a registration page
 			// with Name = "No Name", Surname = "No Surname", email / username =
 			// and the Password field to be entered
-			res.json(new registerByOnlyEmailDTOs.RegisterByOnlyEmailDTO(email, "", registerByOnlyEmailDTOs.RegisterByOnlyEmailStatus.ConfirmPendingEmailSent));
+			res.json(new dtos.RegisterByOnlyEmailDTO(email, "", dtos.RegisterByOnlyEmailStatus.ConfirmPendingEmailSent));
 			return;
 		}
 
@@ -142,7 +142,7 @@ router.get("/registerByOnlyEmail/:email/:culture", async (req, res, next) => {
 		// The e-mail link should point to the client and submit a registration page
 		// with Name = "No Name", Surname = "No Surname", email / username =
 		// and the Password field to be entered
-		res.json(new registerByOnlyEmailDTOs.RegisterByOnlyEmailDTO(email, "", registerByOnlyEmailDTOs.RegisterByOnlyEmailStatus.ConfirmPendingEmailSent));
+		res.json(new dtos.RegisterByOnlyEmailDTO(email, "", dtos.RegisterByOnlyEmailStatus.ConfirmPendingEmailSent));
 	}  catch (e)  {
 		if (e instanceof utils.ErrorCustom) {
 			next(e);
