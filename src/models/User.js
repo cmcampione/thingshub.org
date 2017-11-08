@@ -62,7 +62,16 @@ exports.findUserById = _id => User.findById(_id).exec();
  * @returns {Promise} resolved user if found, otherwise resolves undefined
  */
 exports.findUserByUsername =
-  username => User.findOne({ $or: [{ username }, { "emails.email": { $in: [username] } }] }).exec();
+		username => User.findOne({ $or: [{ username }, { "emails.email": { $in: [username] } }] }).exec();
+
+/**
+ * Returns a user if it finds one, otherwise returns null if a user is not found.
+ * @param   {String}   masterApiKey - The unique user name to find
+ * @param   {Function} done     	- The user if found, otherwise returns undefined
+ * @returns {Promise} resolved user if found, otherwise resolves undefined
+ */
+exports.findUserByMasterApiKey =
+	masterApiKey => User.findOne({ $or: [{ masterApiKey }, { "masterApiKey": { $in: [masterApiKey] } }] }).exec();
 
 exports.save = user => user.save(user);
 

@@ -6,11 +6,14 @@ const dotenv  			= require("dotenv");
 const https   			= require("https");
 const express 			= require("express");
 const expressValidator 	= require("express-validator");
-var mongoose  			= require("mongoose");
+const passport 			= require("passport");
+const LocalStrategy 	= require("passport-localapikey").Strategy;
+const mongoose  		= require("mongoose");
+
+const usersManager		= require("./bl/usersMngr");
 
 const configPath = path.join(__dirname, "../", "thingsHub.env");
 dotenv.config({ path: configPath });
-
 
 // DB Connection
 
@@ -31,6 +34,30 @@ const app = express();
 
 // This line must be immediately after any of the bodyParser middlewares!
 app.use(expressValidator());
+
+// Passport setup
+passport.use(new LocalStrategy(
+	function(apikey, done) {
+		// asynchronous verification, for effect...
+		process.nextTick(function () {
+		
+			// Find the user by username.  If there is no user with the given
+			// username, or the password is not correct, set the user to `false` to
+			// indicate failure and set a flash message.  Otherwise, return the
+			// authenticated `user`.
+			usersManager.findUserByMasterApiKey(apikey, function(err, user) {
+				if (err) { 
+					return done(err); 
+				}
+				if (!user) { 
+					return done(null, false, { message: "Unknown apikey : " + apikey }); 
+				}
+				return done(null, user);
+			});
+		});
+	}
+));
+app.use(passport.initialize());
 
 app.get("/api", function (req, res) {
 	res.status(200).send("the bees are laborious");
