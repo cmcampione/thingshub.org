@@ -42,7 +42,7 @@ async function SendConfirmationEmailByOnlyEmail(email, culture, confirmationToke
 	}
 
 	const html = await new Promise((resolve, reject) => {
-		var ejsFile = path.join(__dirname, "../views/confirmByOnlyEmail-" + culture);
+		var ejsFile = path.join(__dirname, "../views/confirmByOnlyEmail-" + culture + ".ejs");
 		ejs.renderFile(ejsFile, {
 			title: process.env.APPLICATION_NAME,
 			confirmByOnlyEmailUrl : ConfirmationByOnlyEmailUrl,
