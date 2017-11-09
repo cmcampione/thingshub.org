@@ -1,6 +1,6 @@
 "use strict";
 
-const UserDTO = require("./dto").UserDTO;
+const UserDTO = require("./dtos").UserDTO;
 
 // Errors support
 
