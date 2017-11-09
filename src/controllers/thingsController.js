@@ -1,13 +1,11 @@
 "use strict";
 
-const path  			= require("path");
 const HttpStatus 		= require("http-status-codes");
 const express 			= require("express");
 const passport 			= require("passport");
 
 const utils 			= require("../utils.js");
 const usersMngr 		= require("../bl/usersMngr.js");
-const usersPendingMngr 	= require("../bl/usersPendingMngr.js");
 const dtos 				= require("../dtos");
 
 const router = express.Router();
@@ -22,7 +20,7 @@ const router = express.Router();
 
 router.get("/things", 
 	passport.authenticate("localapikey", { session: false, failureRedirect: "/api/unauthorized" }),
-	async (req, res, next) => {
+	(req, res, next) => {
 		try {
 			res.json("first thing");
 		}  catch (e)  {
