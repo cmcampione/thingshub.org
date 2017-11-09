@@ -6,6 +6,7 @@ const dotenv  			= require("dotenv");
 const https   			= require("https");
 const express 			= require("express");
 const expressValidator 	= require("express-validator");
+const bodyParser 		= require("body-parser");
 const passport 			= require("passport");
 const LocalApiStrategy 	= require("passport-localapikey-update").Strategy;
 const mongoose  		= require("mongoose");
@@ -35,6 +36,12 @@ mongoose.connect(process.env.MONGODB_URI,
 // HTTP server configuration
 
 const app = express();
+
+// parse application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({ extended: false }));
+
+// parse application/json
+app.use(bodyParser.json());
 
 // This line must be immediately after any of the bodyParser middlewares!
 app.use(expressValidator());

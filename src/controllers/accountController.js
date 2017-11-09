@@ -152,7 +152,7 @@ router.get("/registerByOnlyEmail/:email/:culture", async (req, res, next) => {
 	}
 });
 
-router.post("confirmAccountByOnlyEmail", async (req, res, next) => {
+router.post("/confirmAccountByOnlyEmail", async (req, res, next) => {
 	try {
 		req.checkBody("email", "Email is not valid").isEmail();
 		req.checkBody("name", "Name is not valid").notEmpty();
