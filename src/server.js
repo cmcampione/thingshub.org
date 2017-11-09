@@ -7,10 +7,12 @@ const https   			= require("https");
 const express 			= require("express");
 const expressValidator 	= require("express-validator");
 const passport 			= require("passport");
-const LocalStrategy 	= require("passport-localapikey").Strategy;
+const LocalApiStrategy 	= require("passport-localapikey-update").Strategy;
 const mongoose  		= require("mongoose");
 
 const usersManager		= require("./bl/usersMngr");
+
+// Env configuration
 
 const configPath = path.join(__dirname, "../", "thingsHub.env");
 dotenv.config({ path: configPath });
@@ -30,13 +32,21 @@ mongoose.connect(process.env.MONGODB_URI,
 	process.exit();
 });
 
+// HTTP server configuration
+
 const app = express();
 
 // This line must be immediately after any of the bodyParser middlewares!
 app.use(expressValidator());
 
 // Passport setup
-passport.use(new LocalStrategy(
+
+var localApiStrategyOptions = { 
+	apiKeyField: "THApiKey",
+	apiKeyHeader: "THApiKey"
+};
+
+passport.use(new LocalApiStrategy(localApiStrategyOptions,
 	function(apikey, done) {
 		// asynchronous verification, for effect...
 		process.nextTick(function () {
@@ -59,12 +69,16 @@ passport.use(new LocalStrategy(
 ));
 app.use(passport.initialize());
 
+// Routers
+
 app.get("/api", function (req, res) {
 	res.status(200).send("the bees are laborious");
 });
 
 const AccountController = require(__dirname + "/controllers/accountController");
 app.use("/api/account", AccountController);
+
+// Errors support
 
 // Catch all for error messages.  Instead of a stack
 // trace, this will log the json of the error message
@@ -84,6 +98,8 @@ app.use((err, req, res, next) => {
 		next();
 	}
 });
+
+// HTTPS Server start
 
 // TODO: Change these for your own certificates.  This was generated through the commands:
 // openssl genrsa -out privatekey.pem 2048
