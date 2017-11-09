@@ -71,7 +71,7 @@ exports.findUserByUsername =
  * @returns {Promise} resolved user if found, otherwise resolves undefined
  */
 exports.findUserByMasterApiKey =
-	masterApiKey => User.findOne({ $or: [{ masterApiKey }, { "masterApiKey": { $in: [masterApiKey] } }] }).exec();
+	masterApiKey => User.findOne({ "masterApiKey": masterApiKey }).exec();
 
 exports.save = user => user.save(user);
 
