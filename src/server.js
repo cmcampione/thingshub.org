@@ -3,6 +3,7 @@
 const fs      			= require("fs");
 const path    			= require("path");
 const dotenv  			= require("dotenv");
+const httpStatus 		= require("http-status-codes");
 const https   			= require("https");
 const express 			= require("express");
 const expressValidator 	= require("express-validator");
@@ -11,6 +12,7 @@ const passport 			= require("passport");
 const LocalApiStrategy 	= require("passport-localapikey-update").Strategy;
 const mongoose  		= require("mongoose");
 
+const utils				= require("./utils");
 const usersManager		= require("./bl/usersMngr");
 
 // Env configuration
@@ -86,6 +88,10 @@ app.use("/api/things", ThingsController);
 
 // Errors support
 
+app.use(function(req, res, next) {
+	throw new utils.ErrorCustom(httpStatus.NOT_FOUND, httpStatus.getStatusText(httpStatus.NOT_FOUND), 1);
+});
+  
 // Catch all for error messages.  Instead of a stack
 // trace, this will log the json of the error message
 // to the browser and pass along the status with it
@@ -93,9 +99,8 @@ app.use("/api/things", ThingsController);
 app.use((err, req, res, next) => {
 	if (err) {
 		if (err.statusCode == null) {
-			console.error("Internal unexpected error from:", err.stack);
-			res.status(500);
-			res.json(err);
+			res.status(httpStatus.INTERNAL_SERVER_ERROR);
+			res.json(httpStatus.getStatusText(httpStatus.httpStatus.INTERNAL_SERVER_ERROR) + " : " + err);
 		} else {
 			res.status(err.statusCode);
 			res.json(err.message);
