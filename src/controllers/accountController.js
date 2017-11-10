@@ -95,7 +95,7 @@ router.get("/registerByOnlyEmail/:email/:culture", async (req, res, next) => {
 			const result = await req.getValidationResult();
 			result.throw();
 		} catch (e) {
-			throw (new utils.ErrorCustom(httpStatus.BAD_REQUEST, e.mapped(), 4098));
+			throw (new utils.ErrorCustom(httpStatus.BAD_REQUEST, e.mapped(), 2));
 		}
 
 		const email = req.params.email;
@@ -148,7 +148,7 @@ router.get("/registerByOnlyEmail/:email/:culture", async (req, res, next) => {
 			next(e);
 			return;
 		}
-		next(new utils.ErrorCustom(httpStatus.INTERNAL_SERVER_ERROR, e.message, 4099));
+		next(new utils.ErrorCustom(httpStatus.INTERNAL_SERVER_ERROR, e.message, 3));
 	}
 });
 
@@ -166,7 +166,7 @@ router.post("/confirmAccountByOnlyEmail", async (req, res, next) => {
 			const result = await req.getValidationResult();
 			result.throw();
 		} catch (e) {
-			throw (new utils.ErrorCustom(httpStatus.BAD_REQUEST, e.mapped(), 4101));
+			throw (new utils.ErrorCustom(httpStatus.BAD_REQUEST, e.mapped(), 4));
 		}
 
 		const email = req.body.email;
@@ -176,13 +176,13 @@ router.post("/confirmAccountByOnlyEmail", async (req, res, next) => {
 
 		let user = await usersMngr.findUserByUsername(email);
 		if (user) {
-			throw new utils.ErrorCustom(httpStatus.UNAUTHORIZED, "User registration already exists", 9000);
+			throw new utils.ErrorCustom(httpStatus.UNAUTHORIZED, "User registration already exists", 5);
 		}
 
 		const userPending = await usersPendingMngr.findUserByEmailAndConfirmToken(email,
 			confirmationToken);
 		if (!userPending) {
-			throw new utils.ErrorCustom(httpStatus.NOT_FOUND, "User pending registration does not exist", 4102);
+			throw new utils.ErrorCustom(httpStatus.NOT_FOUND, "User pending registration does not exist", 6);
 		}
 
 		user = await usersMngr.createUser(email, name, password, userPending.registrationDate, true,
@@ -197,7 +197,7 @@ router.post("/confirmAccountByOnlyEmail", async (req, res, next) => {
 			next(e);
 			return;
 		}
-		next(new utils.ErrorCustom(httpStatus.INTERNAL_SERVER_ERROR, e.message, 4100));
+		next(new utils.ErrorCustom(httpStatus.INTERNAL_SERVER_ERROR, e.message, 7));
 	}
 });
 
