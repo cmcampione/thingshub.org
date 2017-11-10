@@ -28,7 +28,7 @@ router.get("/things",
 				next(e);
 				return;
 			}
-			next(new utils.ErrorCustom(HttpStatus.INTERNAL_SERVER_ERROR, e.message, 4099));
+			next(new utils.ErrorCustom(HttpStatus.INTERNAL_SERVER_ERROR, e.message, 8));
 		}
 	});
 
