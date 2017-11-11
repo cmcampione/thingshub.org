@@ -1,6 +1,6 @@
 "use strict";
 
-const HttpStatus 		= require("http-status-codes");
+const httpStatus 		= require("http-status-codes");
 const express 			= require("express");
 const passport 			= require("passport");
 
@@ -10,26 +10,24 @@ const dtos 				= require("../dtos");
 
 const router = express.Router();
 
-/**
- * Render the index.ejs or index-with-code.js depending on if query param has code or not
- * @param   {Object} req - The request
- * @param   {Object} res - The response
- * @param   {Object} next - The next
- * @returns {undefined}
- */
-
-router.get("/things", 
-	passport.authenticate("localapikey", { session: false, failureRedirect: "/api/unauthorized" }),
-	(req, res, next) => {
+router.get("/things", function(req, res, next) {
+	passport.authenticate("localapikey", function(err, user, info) {
 		try {
+			if (err) { 
+				return next(err); 
+			}
+			if (!user) { 
+				return next(new utils.ErrorCustom(httpStatus.UNAUTHORIZED, httpStatus.getStatusText(httpStatus.UNAUTHORIZED), 10));
+			}
 			res.json("first thing");
 		}  catch (e)  {
 			if (e instanceof utils.ErrorCustom) {
 				next(e);
 				return;
 			}
-			next(new utils.ErrorCustom(HttpStatus.INTERNAL_SERVER_ERROR, e.message, 8));
+			next(new utils.ErrorCustom(httpStatus.INTERNAL_SERVER_ERROR, e.message, 8));
 		}
-	});
+	})(req, res, next);
+});
 
 module.exports = router;

@@ -51,8 +51,8 @@ app.use(expressValidator());
 // Passport setup
 
 var localApiStrategyOptions = { 
-	apiKeyField: "thapikey",
-	apiKeyHeader: "thapikey"
+	apiKeyField: process.env.APIKEY_NAME,
+	apiKeyHeader: process.env.APIKEY_NAME
 };
 
 passport.use(new LocalApiStrategy(localApiStrategyOptions,
@@ -100,7 +100,7 @@ app.use((err, req, res, next) => {
 	if (err) {
 		if (err.statusCode == null) {
 			res.status(httpStatus.INTERNAL_SERVER_ERROR);
-			res.json(httpStatus.getStatusText(httpStatus.httpStatus.INTERNAL_SERVER_ERROR) + " : " + err);
+			res.json(utils.ErrorCustom.formatMessage(9, err));
 		} else {
 			res.status(err.statusCode);
 			res.json(err.message);
