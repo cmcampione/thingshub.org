@@ -12,6 +12,12 @@ class ErrorCustom {
 			message,
 		};
 	}
+	static formatMessage(internalCode, message) {
+		return {
+			internalCode,
+			message
+		};
+	}
 }
 exports.ErrorCustom = ErrorCustom;
 
