@@ -1,7 +1,12 @@
 {
     "compilerOptions": {
-        "module": "",
-        "target": "",
+        "outDir": "./dist",
+        
+        "declaration": true,
+        "declarationDir": ".",
+
+        "module": "system",
+        "target": "es2017",
         "sourceMap": true
     }
 }
