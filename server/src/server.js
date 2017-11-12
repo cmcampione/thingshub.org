@@ -134,8 +134,19 @@ httpsServer.listen(port, (err) => {
 
 // Socket.io support
 
+const Connections = new Map();
+
 const io = require("socket.io")(httpsServer);
+// middleware
+/* io.use((socket, next) => {
+	let token = socket.handshake.query.token;
+	if (isValid(token)) {
+		return next();
+	}
+	return next(new Error("authentication error"));
+}); */
 io.on("connection", function (socket) {
+
 	socket.emit("news", { hello: "world" });
 	socket.on("my other event", function (data) {
 		console.log(data);
