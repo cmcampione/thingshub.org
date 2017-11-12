@@ -4,8 +4,8 @@
   "description": "Hope",
   "main": "server.js",
   "scripts": {
-    "start": "node src/server.js",
-    "dev": "nodemon src/server.js",
+    "start": "node server/src/server.js",
+    "dev": "nodemon server/src/server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
@@ -17,17 +17,18 @@
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "body-parser": "~1.18.2",
-    "express": "^4.16.2",
-    "express-validator": "^4.3.0",
-    "jsonwebtoken": "^7.4.3",
-    "mongoose": "^4.13.0",
-    "http-status-codes": "^1.3.0",
-    "nodemailer": "^4.3.1",
-    "uuid": "^3.1.0",
     "dotenv": "^4.0.0",
     "ejs": "^2.5.7",
+    "express": "^4.16.2",
+    "express-validator": "^4.3.0",
+    "http-status-codes": "^1.3.0",
+    "jsonwebtoken": "^7.4.3",
+    "mongoose": "^4.13.0",
+    "nodemailer": "^4.3.1",
     "passport": "~0.4.0",
-    "passport-localapikey-update": "~0.5.0"
+    "passport-localapikey-update": "~0.5.0",
+    "socket.io": "^2.0.4",
+    "uuid": "^3.1.0"
   },
   "devDependencies": {}
 }

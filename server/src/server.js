@@ -122,7 +122,7 @@ const options = {
 };
 const httpsServer = https.createServer(options, app);
 
-var port = process.env.PORT || 3000;
+const port = process.env.PORT || 3000;
 httpsServer.listen(port, (err) => {
 	if (err) {
 		console.log(err);
@@ -132,3 +132,12 @@ httpsServer.listen(port, (err) => {
 	console.log("ThingsHub - Server started on port " + port);
 });
 
+// Socket.io support
+
+const io = require("socket.io")(httpsServer);
+io.on("connection", function (socket) {
+	socket.emit("news", { hello: "world" });
+	socket.on("my other event", function (data) {
+		console.log(data);
+	});
+});
