@@ -110,7 +110,7 @@ app.use((err, req, res, next) => {
 	}
 });
 
-// HTTPS Server start
+// HTTPS Server config
 
 // TODO: Change these for your own certificates.  This was generated through the commands:
 // openssl genrsa -out privatekey.pem 2048
@@ -139,36 +139,53 @@ class IClientsConnector {
 	// Typically have a list of specific connections
 }
 
+// Socket.io support
 class ClientsConnectorSocketIO extends IClientsConnector {
 	constructor(server) {
 		super();
+
+		let self = this;
+		
+		this.connections = new Map();
+
 		this.io = require("socket.io")(server);
+
+		this.io.use(async (socket, next) => {
+			let token = socket.handshake.query.token;
+			if (!token)
+				return next(new utils.ErrorCustom(httpStatus.UNAUTHORIZED, httpStatus.getStatusText(httpStatus.UNAUTHORIZED), 11));
+
+			let user = await usersManager.findUserByMasterApiKey(token);
+			if (!user)
+				return next(new utils.ErrorCustom(httpStatus.UNAUTHORIZED, httpStatus.getStatusText(httpStatus.UNAUTHORIZED), 12));
+
+			let userId = user._id.toString();
+			let connection = self.connections.get(userId);
+			if (!connection) {
+				self.connections.set(userId, new Array());
+				connection = self.connections.get(userId);
+			}
+			connection.push(socket);
+
+			return next();
+		});
+		
+		this.io.on("connection", function (socket) {
+			
+			socket.emit("news", { hello: "world" });
+			socket.on("my other event", function (data) {
+				console.log(data);
+			});
+		});
 	}
 }
 
-class ClientsManager {
-	constructor() {
-		this.ClientsConnectors = []; // List of ClientsConnectors
+class ClientsConnectionsManager {
+	static init(server) {
+		ClientsConnectionsManager.ClientsConnectors = []; // List of ClientsConnectors
+
+		ClientsConnectionsManager.ClientsConnectors.push(new ClientsConnectorSocketIO(server));
 	}
 }
+ClientsConnectionsManager.init(httpsServer);
 
-// Socket.io support
-
-//const Connections = new Map();
-
-const io = require("socket.io")(httpsServer);
-// middleware
-/* io.use((socket, next) => {
-	let token = socket.handshake.query.token;
-	if (isValid(token)) {
-		return next();
-	}
-	return next(new Error("authentication error"));
-}); */
-io.on("connection", function (socket) {
-
-	socket.emit("news", { hello: "world" });
-	socket.on("my other event", function (data) {
-		console.log(data);
-	});
-});
