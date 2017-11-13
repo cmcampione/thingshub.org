@@ -139,6 +139,13 @@ class IClientsConnector {
 	// Typically have a list of specific connections
 }
 
+class ClientsConnectorSocketIO extends IClientsConnector {
+	constructor(server) {
+		super();
+		this.io = require("socket.io")(server);
+	}
+}
+
 class ClientsManager {
 	constructor() {
 		this.ClientsConnectors = []; // List of ClientsConnectors
