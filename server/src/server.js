@@ -132,9 +132,22 @@ httpsServer.listen(port, (err) => {
 	console.log("ThingsHub - Server started on port " + port);
 });
 
+// Realtime communication support
+
+// SignalR, Socket.io, Internal, ...
+class IClientsConnector {
+	// Typically have a list of specific connections
+}
+
+class ClientsManager {
+	constructor() {
+		this.ClientsConnectors = []; // List of ClientsConnectors
+	}
+}
+
 // Socket.io support
 
-const Connections = new Map();
+//const Connections = new Map();
 
 const io = require("socket.io")(httpsServer);
 // middleware
