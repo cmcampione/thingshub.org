@@ -1,6 +1,6 @@
 <script src="socket.io.js"></script>
 <script>
-  var socket = io.connect('https://localhost:3000');
+  var socket = io.connect('https://localhost:3000?token=5e4ff11c-5391-465b-a9c4-9803e0b787991');
   socket.on('news', function (data) {
     console.log(data);
     socket.emit('my other event', { my: 'data' });
