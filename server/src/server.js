@@ -160,17 +160,24 @@ class ClientsConnectorSocketIO extends IClientsConnector {
 				return next(new utils.ErrorCustom(httpStatus.UNAUTHORIZED, httpStatus.getStatusText(httpStatus.UNAUTHORIZED), 12));
 
 			let userId = user._id.toString();
-			let connection = self.connections.get(userId);
-			if (!connection) {
+			let userConnections = self.connections.get(userId);
+			if (!userConnections) {
 				self.connections.set(userId, new Array());
-				connection = self.connections.get(userId);
+				userConnections = self.connections.get(userId);
 			}
-			connection.push(socket);
+			userConnections.push(socket);
 
 			return next();
 		});
 		
 		this.io.on("connection", function (socket) {
+
+			socket.on("disconnect", (reason) => {
+				self.connections.forEach((userConnections, userId, mapObj) => {
+					
+				});	
+				// ...
+			});
 			
 			socket.emit("news", { hello: "world" });
 			socket.on("my other event", function (data) {

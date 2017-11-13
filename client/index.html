@@ -5,4 +5,10 @@
     console.log(data);
     socket.emit('my other event', { my: 'data' });
   });
+  socket.on('connect_error', function(error){
+    console.log(error);
+  });
+  socket.on('error', function(error){
+    console.log(error);
+  });
 </script>
