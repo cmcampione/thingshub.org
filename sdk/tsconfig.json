@@ -1,12 +1,21 @@
 {
     "compilerOptions": {
         "outDir": "./dist",
+
+        "sourceMap": true,
         
         "declaration": true,
-        "declarationDir": ".",
+        "declarationDir": "./dist",
 
         "module": "system",
         "target": "es2017",
-        "sourceMap": true
-    }
+
+        "preserveConstEnums": true
+    },
+    "include": [
+        "./src/**/*"
+    ],
+    "exclude": [
+      "node_modules"
+    ]
 }
