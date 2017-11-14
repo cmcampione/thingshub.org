@@ -1,7 +1,7 @@
 {
-  "name": "thingshub.org",
+  "name": "thingshub.org.server",
   "version": "1.0.0",
-  "description": "Hope",
+  "description": "the bees are laborious",
   "main": "server.js",
   "scripts": {
     "start": "node server/src/server.js",
