@@ -48,6 +48,8 @@ userSchema.methods.comparePassword = function comparePassword(candidatePassword,
 
 const User = mongoose.model("User", userSchema);
 
+exports.find = filter => User.find(filter).exec();
+
 /**
  * Returns a user if it finds one, otherwise returns null if a user is not found.
  * @param   {String}   _id - The unique id of the user to find

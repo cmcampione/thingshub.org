@@ -9,7 +9,7 @@ const usersManager		= require("./bl/usersMngr");
 
 // SignalR, Socket.io, Internal, ...
 class IClientsConnector {
-	// Typically have a list of specific connections
+	api(usersIds, infos) {}
 }
 
 // Socket.io support
@@ -62,21 +62,32 @@ class ClientsConnectorSocketIO extends IClientsConnector {
 					break;
 				}
 			});
-			
-			socket.emit("news", { hello: "world" });
-			socket.on("my other event", function (data) {
-				console.log(data);
-			});
+
+		});
+	}
+	api(usersIds, info) {
+		let self = this;
+		usersIds.forEach(userId => {
+			let connection = self.connections.get(userId);
+			if (!connection)
+				return;
+			let socket = connection[1];
+			socket.emit("api", info);
 		});
 	}
 }
 
-class clientsConnectorsManager {
+class ClientsConnectorsManager {
 	static initialize(server) {
-		clientsConnectorsManager.ClientsConnectors = []; // List of ClientsConnectors
+		ClientsConnectorsManager.ClientsConnectors = []; // List of ClientsConnectors
 
-		clientsConnectorsManager.ClientsConnectors.push(new ClientsConnectorSocketIO(server));
+		ClientsConnectorsManager.ClientsConnectors.push(new ClientsConnectorSocketIO(server));
+	}
+	static api(usersIds, info) {
+		ClientsConnectorsManager.ClientsConnectors.forEach(element => {
+			element.api(usersIds, info);
+		});
 	}
 }
 
-module.exports = clientsConnectorsManager;
+module.exports = ClientsConnectorsManager;
