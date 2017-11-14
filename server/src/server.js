@@ -160,12 +160,12 @@ class ClientsConnectorSocketIO extends IClientsConnector {
 				return next(new utils.ErrorCustom(httpStatus.UNAUTHORIZED, httpStatus.getStatusText(httpStatus.UNAUTHORIZED), 12));
 
 			let userId = user._id.toString();
-			let userConnections = self.connections.get(userId);
-			if (!userConnections) {
+			let userSockets = self.connections.get(userId);
+			if (!userSockets) {
 				self.connections.set(userId, new Array());
-				userConnections = self.connections.get(userId);
+				userSockets = self.connections.get(userId);
 			}
-			userConnections.push(socket);
+			userSockets.push(socket);
 
 			return next();
 		});
@@ -173,10 +173,21 @@ class ClientsConnectorSocketIO extends IClientsConnector {
 		this.io.on("connection", function (socket) {
 
 			socket.on("disconnect", (reason) => {
-				self.connections.forEach((userConnections, userId, mapObj) => {
-					
-				});	
-				// ...
+
+				var mapIter = self.connections.entries();
+				for(let connection of mapIter) {
+					let userId 		= connection[0];
+					let userSockets = connection[1];
+					let socketToRemove = userSockets.find(s => { return s.id == socket.id; });
+					if (!socketToRemove) {
+						continue;
+					}
+					let i = userSockets.indexOf(socketToRemove);
+					userSockets.splice(i, 1);
+					if (userSockets.length == 0)
+						self.connections.delete(userId);
+					break;
+				}
 			});
 			
 			socket.emit("news", { hello: "world" });
@@ -187,12 +198,12 @@ class ClientsConnectorSocketIO extends IClientsConnector {
 	}
 }
 
-class ClientsConnectionsManager {
-	static init(server) {
-		ClientsConnectionsManager.ClientsConnectors = []; // List of ClientsConnectors
+class ClientsConnectorsManager {
+	static initialize(server) {
+		ClientsConnectorsManager.ClientsConnectors = []; // List of ClientsConnectors
 
-		ClientsConnectionsManager.ClientsConnectors.push(new ClientsConnectorSocketIO(server));
+		ClientsConnectorsManager.ClientsConnectors.push(new ClientsConnectorSocketIO(server));
 	}
 }
-ClientsConnectionsManager.init(httpsServer);
+ClientsConnectorsManager.initialize(httpsServer);
 
