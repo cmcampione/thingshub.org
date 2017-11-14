@@ -4,6 +4,8 @@ const uuid = require("uuid/v4");
 const mongoose = require("mongoose");
 const userModel = require("../models/User.js");
 
+exports.find = filter => userModel.find(filter);
+
 /**
  * Returns a user if it finds one, otherwise returns null if a user is not found.
  * @param   {String}  id - The unique id of the user to find

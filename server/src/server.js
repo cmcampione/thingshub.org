@@ -77,8 +77,15 @@ app.use(passport.initialize());
 
 // Routers
 
-app.get("/api", function (req, res) {
-	res.status(200).send("the bees are laborious");
+app.get("/api", async function (req, res) {
+	let msg = "the bees are laborious";
+
+	let users = await usersManager.find({});
+	let usersIds = users.map(user => user._id.toString());
+
+	clientsConnectorsManager.api(usersIds, msg);
+
+	res.status(200).send(msg);
 });
 
 const AccountController = require(__dirname + "/controllers/accountController");
