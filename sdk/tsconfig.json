@@ -7,7 +7,7 @@
         "declaration": true,
         "declarationDir": "./dist",
 
-        "module": "system",
+        "module": "amd",
         "target": "es2017",
 
         "preserveConstEnums": true

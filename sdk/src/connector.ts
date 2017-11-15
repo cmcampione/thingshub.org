@@ -11,18 +11,18 @@ export class Connector {
 
     protected connectionStatus : ConnectionStates = ConnectionStates.Disconnected;
     
-    protected authHook : () => void = null;
+    protected authHook: () => void = null;
 
-    protected url : string = "";
+    protected url: string = "";
 
-    protected stateChangedHook        : (newState: ConnectionStates) => void = null;
-    protected subscribeSuccessHook    : () => void = null;
-    protected subscribeFailHook       : () => void = null;
+    protected stateChangedHook: (newState: ConnectionStates) => void = null;
+    protected subscribeFailHook: () => void = null;
 
     protected on_connectionStatusChange(newState : ConnectionStates) {
         if (this.connectionStatus == newState)
             return;
-            
+        
+        this.connectionStatus = newState;
         this.stateChangedHook(newState);
     }
 
@@ -34,12 +34,11 @@ export class Connector {
 
     constructor(url : string,
         authHook : () => void,
-        stateChangedHook : (change: StateChanged) => void, 
-        subscribeSuccessHook : () => void, subscribeFailHook : () => void) {
+        stateChangedHook : (change: ConnectionStates) => void, 
+        subscribeFailHook : () => void) {
 
             this.authHook = authHook;
             this.stateChangedHook = stateChangedHook;
-            this.subscribeSuccessHook = subscribeSuccessHook;
             this.subscribeFailHook = subscribeFailHook;
     }
 }
@@ -49,15 +48,10 @@ export class SocketIOConnector extends Connector
     private socket : SocketIOClient.Socket = null;
     
     constructor(url : string,
-        authHook : () => void,
-        stateChangedHook : (change: StateChanged) => void, 
-        reconnectedHook : () => void,
-        subscribeSuccessHook : () => void, subscribeFailHook : () => void) {
-            super(url,
-                authHook,
-                stateChangedHook, 
-                reconnectedHook,
-                subscribeSuccessHook, subscribeFailHook);
+        authHook : () => void, 
+        stateChangedHook : (change: ConnectionStates) => void, 
+        subscribeFailHook : () => void) {
+            super(url, authHook, stateChangedHook, subscribeFailHook);
     }
 
     private on_error(error) {
@@ -67,16 +61,17 @@ export class SocketIOConnector extends Connector
         this.subscribeFailHook();
     }
     private on_connect() {
-        this.stateChangedHook(ConnectionStates.Connected);
+        this.on_connectionStatusChange(ConnectionStates.Connected);
     }
 
     private on_disconnect(reason) {
-        this.stateChangedHook(ConnectionStates.Disconnected);
+        this.on_connectionStatusChange(ConnectionStates.Disconnected);
     }
 
     public subscribe() : void {
         if (this.socket)
             return;
+
         let fullUrl = this.url + "?" + this.authHook();
         this.socket = socketIo(this.url);
 
@@ -85,12 +80,11 @@ export class SocketIOConnector extends Connector
         this.socket.on("connect_error", error => this.on_connect_error(error));
         this.socket.on("connect", () => this.on_connect());
         this.socket.on("disconnect", reason => this.on_disconnect(reason));
-
-        
     }
     public unsubscribe() : void {
         if (!this.socket)
             return;
+
         this.socket.disconnect();
     }
 }

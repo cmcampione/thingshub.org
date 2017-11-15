@@ -1,21 +1,9 @@
-System.register(["./connector"], function (exports_1, context_1) {
+define(["require", "exports", "./connector"], function (require, exports, connector_1) {
     "use strict";
-    var __moduleName = context_1 && context_1.id;
-    function exportStar_1(m) {
-        var exports = {};
-        for (var n in m) {
-            if (n !== "default") exports[n] = m[n];
-        }
-        exports_1(exports);
+    function __export(m) {
+        for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
     }
-    return {
-        setters: [
-            function (connector_1_1) {
-                exportStar_1(connector_1_1);
-            }
-        ],
-        execute: function () {
-        }
-    };
+    Object.defineProperty(exports, "__esModule", { value: true });
+    __export(connector_1);
 });
 //# sourceMappingURL=index.js.map
