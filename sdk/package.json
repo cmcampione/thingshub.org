@@ -13,6 +13,10 @@
     "url": "https://github.com/cmcampione/thingshub.org.git"
   },
   "dependencies": {
-    "axios": "^0.17.1"
+    "axios": "^0.17.1",
+    "socket.io-client": "~2.0.4"
+  },
+  "devDependencies": {
+    "@types/socket.io-client": "^1.4.32"
   }
 }

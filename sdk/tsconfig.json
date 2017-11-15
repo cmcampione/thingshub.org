@@ -11,6 +11,7 @@
         "target": "es2017",
 
         "preserveConstEnums": true
+
     },
     "include": [
         "./src/**/*"
