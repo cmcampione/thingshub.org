@@ -1,88 +1,4 @@
-var ThingsHubClient =
-/******/ (function(modules) { // webpackBootstrap
-/******/ 	// The module cache
-/******/ 	var installedModules = {};
-/******/
-/******/ 	// The require function
-/******/ 	function __webpack_require__(moduleId) {
-/******/
-/******/ 		// Check if module is in cache
-/******/ 		if(installedModules[moduleId]) {
-/******/ 			return installedModules[moduleId].exports;
-/******/ 		}
-/******/ 		// Create a new module (and put it into the cache)
-/******/ 		var module = installedModules[moduleId] = {
-/******/ 			i: moduleId,
-/******/ 			l: false,
-/******/ 			exports: {}
-/******/ 		};
-/******/
-/******/ 		// Execute the module function
-/******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
-/******/
-/******/ 		// Flag the module as loaded
-/******/ 		module.l = true;
-/******/
-/******/ 		// Return the exports of the module
-/******/ 		return module.exports;
-/******/ 	}
-/******/
-/******/
-/******/ 	// expose the modules object (__webpack_modules__)
-/******/ 	__webpack_require__.m = modules;
-/******/
-/******/ 	// expose the module cache
-/******/ 	__webpack_require__.c = installedModules;
-/******/
-/******/ 	// define getter function for harmony exports
-/******/ 	__webpack_require__.d = function(exports, name, getter) {
-/******/ 		if(!__webpack_require__.o(exports, name)) {
-/******/ 			Object.defineProperty(exports, name, {
-/******/ 				configurable: false,
-/******/ 				enumerable: true,
-/******/ 				get: getter
-/******/ 			});
-/******/ 		}
-/******/ 	};
-/******/
-/******/ 	// getDefaultExport function for compatibility with non-harmony modules
-/******/ 	__webpack_require__.n = function(module) {
-/******/ 		var getter = module && module.__esModule ?
-/******/ 			function getDefault() { return module['default']; } :
-/******/ 			function getModuleExports() { return module; };
-/******/ 		__webpack_require__.d(getter, 'a', getter);
-/******/ 		return getter;
-/******/ 	};
-/******/
-/******/ 	// Object.prototype.hasOwnProperty.call
-/******/ 	__webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
-/******/
-/******/ 	// __webpack_public_path__
-/******/ 	__webpack_require__.p = "";
-/******/
-/******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 0);
-/******/ })
-/************************************************************************/
-/******/ ([
-/* 0 */
-/***/ (function(module, exports, __webpack_require__) {
-
 "use strict";
-
-function __export(m) {
-    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
-}
-Object.defineProperty(exports, "__esModule", { value: true });
-__export(__webpack_require__(1));
-
-
-/***/ }),
-/* 1 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = Object.setPrototypeOf ||
         ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
@@ -94,7 +10,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var socketIo = __webpack_require__(2);
+var socketIo = require("socket.io-client");
 var ConnectionStates;
 (function (ConnectionStates) {
     ConnectionStates[ConnectionStates["Connecting"] = 0] = "Connecting";
@@ -109,7 +25,6 @@ var Connector = /** @class */ (function () {
         this.url = "";
         this.stateChangedHook = null;
         this.subscribeFailHook = null;
-        this.url = url;
         this.authHook = authHook;
         this.stateChangedHook = stateChangedHook;
         this.subscribeFailHook = subscribeFailHook;
@@ -135,7 +50,6 @@ var SocketIOConnector = /** @class */ (function (_super) {
         return _this;
     }
     SocketIOConnector.prototype.on_error = function (error) {
-        console.log(error);
     };
     SocketIOConnector.prototype.on_connect_error = function (error) {
         if (this.subscribeFailHook)
@@ -154,7 +68,7 @@ var SocketIOConnector = /** @class */ (function (_super) {
         if (this.socket)
             return;
         var fullUrl = this.url + "?" + this.authHook();
-        this.socket = socketIo(fullUrl);
+        this.socket = socketIo(this.url);
         this.socket.on("error", function (error) { return _this.on_error(error); });
         this.socket.on("connect_error", function (error) { return _this.on_connect_error(error); });
         this.socket.on("connect", function () { return _this.on_connect(); });
@@ -168,14 +82,4 @@ var SocketIOConnector = /** @class */ (function (_super) {
     return SocketIOConnector;
 }(Connector));
 exports.SocketIOConnector = SocketIOConnector;
-
-
-/***/ }),
-/* 2 */
-/***/ (function(module, exports) {
-
-module.exports = io;
-
-/***/ })
-/******/ ]);
-//# sourceMappingURL=thingshub-client-js.js.map
+//# sourceMappingURL=connector.js.map
