@@ -1,5 +1,5 @@
 {
-  "name": "thingshub.org.server",
+  "name": "thingshub.server",
   "version": "1.0.0",
   "description": "the bees are laborious",
   "main": "server.js",
