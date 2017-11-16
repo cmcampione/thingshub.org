@@ -16,7 +16,7 @@
       function authHook() {
         return "token=5e4ff11c-5391-465b-a9c4-9803e0b78799";
       }
-      
+
       function onStateChangedHook(change) {
         console.log(change);
       }
@@ -27,9 +27,6 @@
 
       var socket = new ThingsHubClient.SocketIOConnector("https://localhost:3000", authHook, onStateChangedHook, onSubscribeFailHook);
       socket.subscribe();
-      socket.on('api', function (data) {
-        console.log(data);
-      });
     </script>
 
 
