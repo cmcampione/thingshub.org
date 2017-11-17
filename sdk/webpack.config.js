@@ -9,7 +9,8 @@ module.exports = {
 		library: "ThingsHubClient"
 	},
 	externals:{
-		"socket.io-client":"io"
+		"socket.io-client": "io",
+		"axios" : "axios"
 	},
 	resolve: {
 		// Add `.ts` and `.tsx` as a resolvable extension.
