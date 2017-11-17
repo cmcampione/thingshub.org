@@ -104,18 +104,18 @@ var ConnectionStates;
     ConnectionStates[ConnectionStates["Disconnected"] = 4] = "Disconnected";
 })(ConnectionStates = exports.ConnectionStates || (exports.ConnectionStates = {}));
 var Connector = /** @class */ (function () {
-    function Connector(url, authHook, errorHook, stateChangedHook, subscribeFailHook) {
+    function Connector(url, authHook, errorHook, connectErrorHook, stateChangedHook) {
         this.connectionStatus = 4 /* Disconnected */;
         this.url = "";
         this.authHook = null;
         this.errorHook = null;
         this.stateChangedHook = null;
-        this.subscribeFailHook = null;
+        this.connectErrorHook = null;
         this.url = url;
         this.authHook = authHook;
         this.errorHook = errorHook;
+        this.connectErrorHook = connectErrorHook;
         this.stateChangedHook = stateChangedHook;
-        this.subscribeFailHook = subscribeFailHook;
     }
     Connector.prototype.on_connectionStatusChange = function (newState) {
         if (this.connectionStatus == newState)
@@ -136,8 +136,8 @@ var Connector = /** @class */ (function () {
 exports.Connector = Connector;
 var SocketIOConnector = /** @class */ (function (_super) {
     __extends(SocketIOConnector, _super);
-    function SocketIOConnector(url, authHook, errorHook, stateChangedHook, subscribeFailHook) {
-        var _this = _super.call(this, url, authHook, errorHook, stateChangedHook, subscribeFailHook) || this;
+    function SocketIOConnector(url, authHook, errorHook, connectErrorHook, stateChangedHook) {
+        var _this = _super.call(this, url, authHook, errorHook, connectErrorHook, stateChangedHook) || this;
         _this.socket = null;
         return _this;
     }
@@ -146,8 +146,8 @@ var SocketIOConnector = /** @class */ (function (_super) {
             this.errorHook(error);
     };
     SocketIOConnector.prototype.on_connect_error = function (error) {
-        if (this.subscribeFailHook)
-            this.subscribeFailHook();
+        if (this.connectErrorHook)
+            this.connectErrorHook(error);
     };
     SocketIOConnector.prototype.on_connect = function () {
         if (this.on_connectionStatusChange)

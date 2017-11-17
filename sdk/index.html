@@ -21,20 +21,19 @@
       function onError(error) {
         console.log(error);
       }
-
-      function onStateChangedHook(change) {
-        console.log(change);
+      function onConnectError(error) {
+        console.log(error);
       }
 
-      function onSubscribeFailHook() {
-        console.log("Subscribe failed");
+      function onStateChanged(change) {
+        console.log(change);
       }
 
       function onAPI(data) {
         console.log(data);
       }
 
-      var socket = new ThingsHubClient.SocketIOConnector("https://localhost:3000", authHook, onError, onStateChangedHook, onSubscribeFailHook);
+      var socket = new ThingsHubClient.SocketIOConnector("https://localhost:3000", authHook, onError, onConnectError, onStateChanged);
       socket.subscribe();
       socket.setHook("api", onAPI);
       
