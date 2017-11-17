@@ -7,6 +7,7 @@ const passport 			= require("passport");
 const utils 			= require("../utils.js");
 const usersMngr 		= require("../bl/usersMngr.js");
 const dtos 				= require("../dtos");
+const ClientsConnectorsManager = require("../clientsConnectorsManager");
 
 const router = express.Router();
 
@@ -19,7 +20,12 @@ router.get("/things", function(req, res, next) {
 			if (!user) { 
 				return next(new utils.ErrorCustom(httpStatus.UNAUTHORIZED, httpStatus.getStatusText(httpStatus.UNAUTHORIZED), 10));
 			}
+
 			res.json("first thing");
+
+			let usersIds = [];
+			usersIds.push(user._id);
+			ClientsConnectorsManager.api(usersIds, "first thing");
 		}  catch (e)  {
 			if (e instanceof utils.ErrorCustom) {
 				next(e);
