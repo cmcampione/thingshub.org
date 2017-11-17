@@ -71,8 +71,9 @@ class ClientsConnectorSocketIO extends IClientsConnector {
 			let connection = self.connections.get(userId);
 			if (!connection)
 				return;
-			let socket = connection[1];
-			socket.emit("api", info);
+			connection.forEach(socket => {
+				socket.emit("api", info);
+			});
 		});
 	}
 }

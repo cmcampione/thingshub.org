@@ -11,6 +11,7 @@ const bodyParser 		= require("body-parser");
 const passport 			= require("passport");
 const LocalApiStrategy 	= require("passport-localapikey-update").Strategy;
 const mongoose  		= require("mongoose");
+const cors 				= require("cors");
 
 const utils				= require("./utils");
 const usersManager		= require("./bl/usersMngr");
@@ -39,6 +40,9 @@ mongoose.connect(process.env.MONGODB_URI,
 // HTTP server configuration
 
 const app = express();
+
+// Enable cors for all route
+app.use(cors());
 
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: false }));
