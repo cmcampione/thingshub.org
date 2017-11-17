@@ -18,7 +18,7 @@ export class Connector {
 
     protected errorHook: (error: any) => void = null;
     protected stateChangedHook: (newState: ConnectionStates) => void = null;
-    protected subscribeFailHook: () => void = null;
+    protected connectErrorHook: (error: any) => void = null;
 
     protected on_connectionStatusChange(newState : ConnectionStates) {
         if (this.connectionStatus == newState)
@@ -37,15 +37,15 @@ export class Connector {
     constructor(url : string,
         authHook : () => void,
         errorHook : (error) => void,
-        stateChangedHook : (change: ConnectionStates) => void, 
-        subscribeFailHook : () => void) {
+        connectErrorHook : (error) => void,
+        stateChangedHook : (change: ConnectionStates) => void) {
 
             this.url = url;
 
             this.authHook = authHook;
             this.errorHook = errorHook;
+            this.connectErrorHook = connectErrorHook;
             this.stateChangedHook = stateChangedHook;
-            this.subscribeFailHook = subscribeFailHook;
     }
 
     public api() : Promise<any | any> {
@@ -61,25 +61,24 @@ export class SocketIOConnector extends Connector
     constructor(url : string,
         authHook : () => void,
         errorHook : (error) => void,
-        stateChangedHook : (change: ConnectionStates) => void, 
-        subscribeFailHook : () => void) {
-            super(url, authHook, errorHook, stateChangedHook, subscribeFailHook);
+        connectErrorHook : (error) => void,
+        stateChangedHook : (change: ConnectionStates) => void) {
+            super(url, authHook, errorHook, connectErrorHook, stateChangedHook);
     }
 
     private on_error(error) {
         if (this.errorHook)
             this.errorHook(error);
     }
-
     private on_connect_error(error) {
-        if (this.subscribeFailHook)
-            this.subscribeFailHook();
+        if (this.connectErrorHook)
+            this.connectErrorHook(error);
     }
+
     private on_connect() {
         if (this.on_connectionStatusChange)
             this.on_connectionStatusChange(ConnectionStates.Connected);
     }
-
     private on_disconnect(reason) {
         if (this.on_connectionStatusChange)
             this.on_connectionStatusChange(ConnectionStates.Disconnected);
