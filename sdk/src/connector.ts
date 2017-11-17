@@ -1,3 +1,4 @@
+import axios, { AxiosRequestConfig, AxiosPromise } from "axios";
 import * as socketIo from "socket.io-client";
 
 export const enum ConnectionStates {
@@ -10,11 +11,12 @@ export const enum ConnectionStates {
 export class Connector {
 
     protected connectionStatus : ConnectionStates = ConnectionStates.Disconnected;
+
+    protected url: string = "";
     
     protected authHook: () => void = null;
 
-    protected url: string = "";
-
+    protected errorHook: (error: any) => void = null;
     protected stateChangedHook: (newState: ConnectionStates) => void = null;
     protected subscribeFailHook: () => void = null;
 
@@ -34,13 +36,21 @@ export class Connector {
 
     constructor(url : string,
         authHook : () => void,
+        errorHook : (error) => void,
         stateChangedHook : (change: ConnectionStates) => void, 
         subscribeFailHook : () => void) {
 
             this.url = url;
+
             this.authHook = authHook;
+            this.errorHook = errorHook;
             this.stateChangedHook = stateChangedHook;
             this.subscribeFailHook = subscribeFailHook;
+    }
+
+    public api() : Promise<any | any> {
+        return axios.get(this.url + "/api")
+        .then((response : any) => {return response; });
     }
 }
 
@@ -49,14 +59,16 @@ export class SocketIOConnector extends Connector
     private socket : SocketIOClient.Socket = null;
     
     constructor(url : string,
-        authHook : () => void, 
+        authHook : () => void,
+        errorHook : (error) => void,
         stateChangedHook : (change: ConnectionStates) => void, 
         subscribeFailHook : () => void) {
-            super(url, authHook, stateChangedHook, subscribeFailHook);
+            super(url, authHook, errorHook, stateChangedHook, subscribeFailHook);
     }
 
     private on_error(error) {
-        console.log(error);
+        if (this.errorHook)
+            this.errorHook(error);
     }
 
     private on_connect_error(error) {
@@ -91,5 +103,12 @@ export class SocketIOConnector extends Connector
             return;
 
         this.socket.disconnect();
+    }
+
+    public setHook(eventName : string, hook : (...msg: any[]) => void) : void {
+        this.socket.on(eventName, hook);
+    }
+    public remHook(eventName : any, hook : (...msg: any[]) => void) : void {
+        this.socket.off(eventName, hook);
     }
 }
