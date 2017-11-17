@@ -68,10 +68,10 @@ class ClientsConnectorSocketIO extends IClientsConnector {
 	api(usersIds, info) {
 		let self = this;
 		usersIds.forEach(userId => {
-			let connection = self.connections.get(userId);
-			if (!connection)
+			let connections = self.connections.get(userId);
+			if (!connections)
 				return;
-			connection.forEach(socket => {
+			connections.forEach(socket => {
 				socket.emit("api", info);
 			});
 		});
