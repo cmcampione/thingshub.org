@@ -5,10 +5,95 @@ const uuidv4 = require("uuid/v4");
 
 const utils = require("../utils");
 const constants = require("../sharedConst");
+const usersManager = require("../bl/usersMngr");
 const thingModel = require("../models/Thing");
 
 function findThingById(id) { return thingModel.findThingById(id);}
-exports.findThingById = findThingById;
+
+function createThingPosition(user, parentThing, childThing, pos){
+	if (!user)
+		throw new utils.ErrorCustom(httpStatusCodes.INTERNAL_SERVER_ERROR, "User can't be null", 24);
+
+	if (!childThing)
+		throw new utils.ErrorCustom(httpStatusCodes.INTERNAL_SERVER_ERROR, "Child Thing can't be null", 25);
+	
+	childThing.positions.push({
+		userId: user._id,
+		parentThingId: parentThing ? parentThing._id : null,
+		pos
+	});
+}
+
+// Lo User potrebbe essere null perchè è anonimo o è un SuperAdministrator che non ha alcuna relazione con la Thing
+async function createThingDTOAsync(user, parentThings, thing, isSuperAdministrator)
+{
+	var loggedInThingUserClaims = GetThingUserClaimsOpt(user, thing, isSuperAdministrator);
+
+	ThingUserRights loggedInThingUserRights = new ThingUserRights()
+	{
+		AppUser = null, //In questo contesto non viene utilizzata
+		AppUserId = null, //In questo contesto non viene utilizzata
+		Thing = null, //In questo contesto non viene utilizzata
+		ThingId = null, //In questo contesto non viene utilizzata
+
+		UserRole = (isSuperAdministrator == true) ? ThingUserRole.Administrator : ThingUserRole.User,
+		UserStatus = ThingUserStatus.Ok,
+		ThingVisibility = ThingUserVisibility.Visible,
+		UserReadClaims = loggedInThingUserClaims.Read,
+		UserChangeClaims = loggedInThingUserClaims.Change,
+		ShortPin = 0
+	};
+
+	if (user != null)
+	{
+		var loggedInThingUserRights1 = GetThingUserRights(user.Id, user.UserName, thing);
+		if (loggedInThingUserRights1 != null)
+		{
+			loggedInThingUserRights.UserRole = loggedInThingUserRights1.UserRole;
+			loggedInThingUserRights.UserStatus = loggedInThingUserRights1.UserStatus;
+			loggedInThingUserRights.ThingVisibility = loggedInThingUserRights1.ThingVisibility;
+			loggedInThingUserRights.ShortPin = loggedInThingUserRights1.ShortPin;
+			loggedInThingUserRights.UserReadClaims = loggedInThingUserRights1.UserReadClaims;
+			loggedInThingUserRights.UserChangeClaims = loggedInThingUserRights1.UserChangeClaims;
+		}
+	}
+
+	var thingPosition = GetThingPosition(user, parentThings, thing);
+	int thingPos = thingPosition != null ? thingPosition.Position : int.MaxValue;
+
+	var thingDTO = MappingHelper.ToThingDTO(loggedInThingUserClaims, thing, loggedInThingUserRights, thingPos, commonTable);
+
+	//TODO: Spostare in MappingHelper.ToThingDTO
+	thingDTO.UsersInfos = (loggedInThingUserClaims.Read & ThingUserReadClaims.CanReadThingUserRights) == 0 ? null : await GetUsersInfosAsync(thing);
+
+	return thingDTO;
+}
+
+// Prepara le notifiche per gli User che hanno una relazione con la Thing che comunque siano nello stato Ok o WaitForAuth e che siano realmente registrati (Non utenti "free". I Notificator non potrebbero notificare)
+async function createGenericBLResult(thing)
+{
+	if (thing == null)
+		throw new utils.ErrorCustom(httpStatusCodes.INTERNAL_SERVER_ERROR, "Thing can't be null", 26);
+
+	let UsersIdsToNotify = new Set();
+
+	for(let r of thing.usersRights) {
+		if (r.userId && ((r.userStatus & (constants.ThingUserStatus.Ok | constants.ThingUserStatus.WaitForAuth)) != 0))
+		{
+			UsersIdsToNotify.add(r.userId);
+			continue;
+		}
+		if (!r.username)
+			throw new utils.ErrorCustom(httpStatusCodes.INTERNAL_SERVER_ERROR, "ThingUserRights without userId and username can't exist", 27);
+	
+		let user = usersManager.findUserByUsername(r.username)
+		if (!user)
+			continue;
+		
+		UsersIdsToNotify.add(user._id);
+	}
+
+}
 
 exports.createThing = async (user, thingDTO) => {
 	// Validate DTO
@@ -50,8 +135,8 @@ exports.createThing = async (user, thingDTO) => {
 	thing.everyoneReadClaims = thingDTO.everyoneReadClaims;
 	thing.everyoneChangeClaims = thingDTO.everyoneChangeClaims;
     
-	thing.userRights = [];
-	thing.userRights.push({
+	thing.usersRights = [];
+	thing.usersRights.push({
 		userId : user.id,
 		username: user.username,
 		userRole: thingDTO.userRole,
@@ -62,5 +147,14 @@ exports.createThing = async (user, thingDTO) => {
 		shortPin: thingDTO.shortPin
 	});
 
-	return await thing.save(thing);
+	let defaultThingPos = Number.MAX_SAFE_INTEGER;
+
+	createThingPosition(user, null, thing, defaultThingPos);
+
+	createGenericBLResult
+
+	return {
+		pos: defaultThingPos, 
+		thing
+	};
 };
