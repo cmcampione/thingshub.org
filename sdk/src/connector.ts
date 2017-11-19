@@ -12,7 +12,7 @@ export class Connector {
 
     protected connectionStatus : ConnectionStates = ConnectionStates.Disconnected;
 
-    protected url: string = "";
+    protected url: string = "";//   https://servername:port/route
     
     protected authHook: () => void = null;
 
