@@ -1,6 +1,21 @@
 "use strict";
 
+const sharedConst = require("../sharedConst");
 const User = require("../models/User");
+
+exports.RegisterByOnlyEmailStatus = {
+	UserAlreadyRegistered : 1,
+	ConfirmPendingEmailSent : 2,
+};
+
+class RegisterByOnlyEmailDTO {
+	constructor(email, confirmationToken, status) {
+		this.email = email;
+		this.confirmationToken = confirmationToken;
+		this.status = status;
+	}
+}
+exports.RegisterByOnlyEmailDTO = RegisterByOnlyEmailDTO;
 
 class EmailDTO {
 	constructor(email) {
@@ -27,20 +42,30 @@ class UserDTO {
 		this.masterApiKey = user.masterApiKey;
 	}
 }
-
 exports.UserDTO = UserDTO;
 
-exports.RegisterByOnlyEmailStatus = {
-	UserAlreadyRegistered : 1,
-	ConfirmPendingEmailSent : 2,
-};
-
-class RegisterByOnlyEmailDTO {
-	constructor(email, confirmationToken, status) {
-		this.email = email;
-		this.confirmationToken = confirmationToken;
-		this.status = status;
+class ThingDTO {
+	constructor() {
+		this.id = "";
+		this.creationDateTime = null;
+		this.name = "";
+		this.kind = sharedConst.ThingKind.generic;
+		this.kindTxt = sharedConst.ThingKind.genericTxt;
+		this.pos = 0;
+		this.deletedStatus = sharedConst.ThingDeletedStates.Ok;
+		this.publicReadClaims = sharedConst.ThingUserReadClaims.NoClaim;
+		this.publicChangeClaims = sharedConst.ThingUserChangeClaims.NoClaim;
+		this.everyoneReadClaims = sharedConst.ThingUserReadClaims.NoClaim;
+		this.everyoneChangeClaims = sharedConst.ThingUserChangeClaims.NoClaim;
+		this.value = {};
+		this.userStatus = sharedConst.ThingUserStates.Ok;
+		this.UserRole = sharedConst.ThingUserRole.User;
+		this.UserReadClaims = sharedConst.ThingUserReadClaims.NoClaim;
+		this.UserChangeClaims = sharedConst.ThingUserChangeClaims.NoClaim;
+		this.usersInfo = [];
 	}
 }
-exports.RegisterByOnlyEmailDTO = RegisterByOnlyEmailDTO;
+exports.ThingDTO = ThingDTO;
+
+
 

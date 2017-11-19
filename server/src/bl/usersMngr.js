@@ -2,7 +2,7 @@
 
 const uuid = require("uuid/v4");
 const mongoose = require("mongoose");
-const userModel = require("../models/User.js");
+const userModel = require("../models/User");
 
 exports.find = filter => userModel.find(filter);
 
