@@ -5,12 +5,12 @@ const mongoose = require("mongoose");
 const sharedConst = require("../sharedConst");
 
 const thingSchema = mongoose.Schema({
-	_id                   : mongoose.Schema.Types.ObjectId,
+	_id                   : String,
 	creationDate          : Date,
 	name                  : String,
 	kind                  : String,
 	description           : String,
-	value                 : String,
+	value                 : {},
 
 	deletedStatus         : { type: Number, default : sharedConst.ThingDeletedStates.Ok },
 	deletedDate       	  : Date,
