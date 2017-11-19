@@ -70,8 +70,7 @@ async function createThingDTOAsync(user, parentThings, thing, isSuperAdministrat
 }
 
 // Prepara le notifiche per gli User che hanno una relazione con la Thing che comunque siano nello stato Ok o WaitForAuth e che siano realmente registrati (Non utenti "free". I Notificator non potrebbero notificare)
-async function createGenericBLResult(thing)
-{
+async function createGenericBLResult(thing) {
 	if (thing == null)
 		throw new utils.ErrorCustom(httpStatusCodes.INTERNAL_SERVER_ERROR, "Thing can't be null", 26);
 
@@ -115,6 +114,7 @@ exports.createThing = async (user, thingDTO) => {
         
 	// Generate Thing's Id if not in input
 	let thingId = !thingDTO.Id ? uuidv4() : thingDTO.Id;
+	
 	let letterNumber = /^[0-9a-zA-Z-]+$/;  
 	if (!thingId.match(letterNumber))
 		throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Thing's Id is invalid", 20);
