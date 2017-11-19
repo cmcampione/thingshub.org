@@ -20,7 +20,7 @@ const thingSchema = mongoose.Schema({
 	everyoneReadClaims    : { type: Number, default : sharedConst.ThingUserReadClaims.NoClaim },
 	everyoneChangeClaims  : { type: Number, default : sharedConst.ThingUserChangeClaims.NoClaim },
 
-	userRights : [{
+	usersRights : [{
 		userId            : mongoose.Schema.Types.ObjectId,
 		username          : String,
 
@@ -33,16 +33,21 @@ const thingSchema = mongoose.Schema({
 
 		shortPin          : Number
 	}],
+
+	positions: [{
+		userId : mongoose.Schema.Types.ObjectId,
+		parentThingId : String,
+		pos  : Number
+	}],
   
 	parentsThingsIds : [{
 		userId : mongoose.Schema.Types.ObjectId,
-		parentThingId : Number
+		parentThingId : String
 	}],
   
 	childrenThings: [{
 		userId : mongoose.Schema.Types.ObjectId,
-		childThingId : mongoose.Schema.Types.ObjectId,
-		pos : Number
+		childThingId : String
 	}]
 });
 
