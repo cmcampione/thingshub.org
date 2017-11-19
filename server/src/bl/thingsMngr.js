@@ -1,7 +1,7 @@
 "use strict";
 
 const httpStatusCodes = require("http-status-codes");
-const mongoose = require("mongoose");
+const uuidv4 = require("uuid/v4");
 
 const utils = require("../utils");
 const constants = require("../sharedConst");
@@ -29,7 +29,7 @@ exports.createThing = async (user, thingDTO) => {
 		throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Thing UserRole is incorrect", 19);
         
 	// Generate Thing's Id if not in input
-	let thingId = !thingDTO.Id ? mongoose.Types.ObjectId() : thingDTO.Id;
+	let thingId = !thingDTO.Id ? uuidv4() : thingDTO.Id;
 	let letterNumber = /^[0-9a-zA-Z-]+$/;  
 	if (!thingId.match(letterNumber))
 		throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Thing's Id is invalid", 20);
@@ -38,13 +38,13 @@ exports.createThing = async (user, thingDTO) => {
 		throw new utils.ErrorCustom(httpStatusCodes.SEE_OTHER, "Thing's Id already exist", 21);
 
 	let thing = new thingModel.Thing();
-	thing._Id = thingId;
+	thing._id = thingId;
 	thing.creationDate = thingDTO.creationDateTime ? thingDTO.creationDate : Date.now();
 	thing.name = thingDTO.name;
 	thing.kind = thingDTO.kind;
 	thing.value = thingDTO.value;
 	thing.deletedStatus = thingDTO.deletedStatus;
-	thing.deletedDate = thingDTO.deletedStatus == constants.ThingDeletedStatus.deleted ? Date.now : null;
+	thing.deletedDate = thingDTO.deletedStatus == constants.ThingDeletedStates.Deleted ? Date.now : null;
 	thing.publicReadClaims = thingDTO.publicReadClaims;
 	thing.publicChangeClaims = thingDTO.publicChangeClaims;
 	thing.everyoneReadClaims = thingDTO.everyoneReadClaims;
