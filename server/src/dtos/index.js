@@ -1,7 +1,6 @@
 "use strict";
 
 const sharedConst = require("../sharedConst");
-const User = require("../models/User");
 
 exports.RegisterByOnlyEmailStatus = {
 	UserAlreadyRegistered : 1,
@@ -44,15 +43,26 @@ class UserDTO {
 }
 exports.UserDTO = UserDTO;
 
+class UserInfoDTO {
+	constructor() {
+	
+		this.id = "";
+		this.name = "the bees are laborious";
+		this.surname = "";
+	}
+}
+exports.UserInfoDTO = UserInfoDTO;
+
 class ThingDTO {
 	constructor() {
 		this.id = "";
-		this.creationDateTime = null;
+		this.creationDate = null;
 		this.name = "";
 		this.kind = sharedConst.ThingKind.generic;
 		this.kindTxt = sharedConst.ThingKind.genericTxt;
 		this.pos = 0;
 		this.deletedStatus = sharedConst.ThingDeletedStates.Ok;
+		this.deletedDate = null;
 		this.publicReadClaims = sharedConst.ThingUserReadClaims.NoClaim;
 		this.publicChangeClaims = sharedConst.ThingUserChangeClaims.NoClaim;
 		this.everyoneReadClaims = sharedConst.ThingUserReadClaims.NoClaim;
