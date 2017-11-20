@@ -5,66 +5,196 @@ const uuidv4 = require("uuid/v4");
 
 const utils = require("../utils");
 const constants = require("../sharedConst");
+const UserInfoDTO = require("../dtos").UserInfoDTO;
+const ThingDTO = require("../dtos").ThingDTO;
 const usersManager = require("../bl/usersMngr");
 const thingModel = require("../models/Thing");
 
 function findThingById(id) { return thingModel.findThingById(id);}
 
- // First search for userId if it does not find it by username
- function getThingUserRights(userId, username, thing)
- {
+async function getUsersInfosAsync(thing) {
+
+	if (!thing)
+		throw new utils.ErrorCustom(httpStatusCodes.INTERNAL_SERVER_ERROR, "Thing can't be null", 32);
+
+	let usersInfosDTOs = [];
+
+	for(let r of thing.usersRights)
+	{
+		let userId = r.userId;
+		let username = r.username;
+
+		if (!userId && !username)
+			throw new utils.ErrorCustom(httpStatusCodes.INTERNAL_SERVER_ERROR, "userId or username must be not empty", 33);
+
+		let userInfoDTO = new UserInfoDTO();
+		
+		userInfoDTO.id = userId;
+		userInfoDTO.name = "the bees are laborious";
+		userInfoDTO.surname = "";
+		
+		let user = userId ? await usersManager.findUserById(userId) : await	usersManager.findUserByUsername(username);
+		if (user) {
+			userInfoDTO.id = user.Id;
+			userInfoDTO.name = user.name;
+			userInfoDTO.surname = user.surname;
+		}
+
+		usersInfosDTOs.Add(userInfoDTO);
+	}
+
+	return usersInfosDTOs;
+}
+
+async function thingToThingDTO(accessThingUserClaims, thing, thingUserRights, pos) {
+
+	if (!accessThingUserClaims)
+		throw new utils.ErrorCustom(httpStatusCodes.INTERNAL_SERVER_ERROR, "No Correct User's Thing Claims ", 31);
+
+	let thingDTO = new ThingDTO();
+
+	thingDTO.id = thing._id;
+	thingDTO.creationDate = null;
+	thingDTO.kind = constants.ThingKind.NoMatter;
+	thingDTO.kindTxt = "";
+	thingDTO.name = "";
+	thingDTO.pos = pos;
+	thingDTO.deletedStatus = constants.ThingDeletedStatus.NoMatter;
+	thingDTO.deletedDate = null;
+	thingDTO.publicReadClaims = constants.ThingUserReadClaims.NoClaim;
+	thingDTO.publicChangeClaims = constants.ThingUserChangeClaims.NoClaim;
+	thingDTO.everyoneReadClaims = constants.ThingUserReadClaims.NoClaim;
+	thingDTO.everyoneChangeClaims = constants.ThingUserChangeClaims.NoClaim;
+	thingDTO.value = "";
+	thingDTO.userChangeClaims = constants.ThingUserChangeClaims.NoClaim;
+	thingDTO.userReadClaims = constants.ThingUserReadClaims.NoClaim;
+	thingDTO.userRole = constants.ThingUserRole.NoMatter;
+	thingDTO.userStatus = constants.ThingUserStatus.NoMatter;
+
+	if ((accessThingUserClaims.read & constants.ThingUserReadClaims.CanReadCreationDate) != 0)
+		thingDTO.creationDate = thing.creationDate;
+
+	if ((accessThingUserClaims.read & constants.ThingUserReadClaims.CanReadName) != 0)
+		thingDTO.name = thing.name;
+
+	if ((accessThingUserClaims.read & constants.ThingUserReadClaims.CanReadDeletedStatus) != 0)
+	{
+		thingDTO.deletedStatus = thing.deletedStatus;
+		thingDTO.deletedDate = thing.deletedDate;
+	}
+
+	if ((accessThingUserClaims.read & constants.ThingUserReadClaims.CanReadPublicReadClaims) != 0)
+		thingDTO.publicReadClaims = thing.publicReadClaims;
+
+	if ((accessThingUserClaims.read & constants.ThingUserReadClaims.CanReadPublicChangeClaims) != 0)
+		thingDTO.publicChangeClaims = thing.publicChangeClaims;
+
+	if ((accessThingUserClaims.read & constants.ThingUserReadClaims.CanReadEveryoneReadClaims) != 0)
+		thingDTO.everyoneReadClaims = thing.everyoneReadClaims;
+
+	if ((accessThingUserClaims.read & constants.ThingUserReadClaims.CanReadEveryoneChangeClaims) != 0)
+		thingDTO.everyoneChangeClaims = thing.everyoneChangeClaims;
+
+	if ((accessThingUserClaims.read & constants.ThingUserReadClaims.CanReadKind) != 0)
+	{
+		thingDTO.kind = thing.kind;
+		thingDTO.kindTxt = "";
+	}
+
+	if ((accessThingUserClaims.read & constants.ThingUserReadClaims.CanReadValue) != 0)
+		thingDTO.value = thing.value;
+
+	if (thingUserRights && (accessThingUserClaims.read & constants.ThingUserReadClaims.CanReadThingUserRights) != 0)
+	{
+		if ((accessThingUserClaims.read & constants.ThingUserReadClaims.CanReadThingUserRole) != 0)
+			thingDTO.userRole = thingUserRights.userRole;
+
+		if ((accessThingUserClaims.read & constants.ThingUserReadClaims.CanReadThingUserStatus) != 0)
+			thingDTO.userStatus = thingUserRights.userStatus;
+
+		if ((accessThingUserClaims.read & constants.ThingUserReadClaims.CanReadThingUserReadClaims) != 0)
+			thingDTO.userReadClaims = thingUserRights.userReadClaims;
+
+		if ((accessThingUserClaims.read & constants.ThingUserReadClaims.CanReadThingUserChangeClaims) != 0)
+			thingDTO.userChangeClaims = thingUserRights.userChangeClaims;
+	}
+
+	thingDTO.usersInfos = (accessThingUserClaims.read & constants.ThingUserReadClaims.CanReadThingUserRights) == 0 ? [] : await getUsersInfosAsync(thing);
+
+	return thingDTO;
+}
+
+// First search is for userId after it searchs by username
+// Can return null
+function getThingUserRights(userId, username, thing) {
+
 	if (!userId && !username)
 		throw new utils.ErrorCustom(httpStatusCodes.INTERNAL_SERVER_ERROR, "userId or usernane must be not empty", 28);
-
 	if (!thing)
 		throw new utils.ErrorCustom(httpStatusCodes.INTERNAL_SERVER_ERROR, "Thing can't be null", 27);
 
-	 let thingUserRights = null;            
-
-	 if (userId)
-		 thingUserRights = thing.usersRights.FirstOrDefault(u => u.AppUserId == userId);
-	 if (thingUserRights == null && username)
-		 thingUserRights = thing.usersRights.FirstOrDefault(u => u.Username == username);
-
-	 return thingUserRights;
- }
+	let thingUserRights = null;
+	if (userId)
+		thingUserRights = thing.usersRights.find(u => u.userId == userId);
+	if (!thingUserRights && username)
+		thingUserRights = thing.usersRights.find(u => u.username == username);
+	
+	return thingUserRights;
+}
 
 // All paths return to something. It never returns null except for exceptions
 // The User may be null as anonymous. If User is anonymous returns Thing's PublicClaims
-function getThingUserClaims(user, thing, isSuperAdministrator)
-{
+function getThingUserClaims(user, thing, isSuperAdministrator) {
+
 	if (!thing)
 		throw new utils.ErrorCustom(httpStatusCodes.INTERNAL_SERVER_ERROR, "Thing can't be null", 26);
 
-	thingUserClaimsAndRights = 
+	let thingUserClaimsAndRights = 
 	{
 		read    : thing.publicReadClaims,
 		change  : thing.publicChangeClaims
-	}
+	};
 
-	if (user != null)
+	if (user)
 	{
 		thingUserClaimsAndRights.read   = thingUserClaimsAndRights.read   | thing.everyoneReadClaims;
 		thingUserClaimsAndRights.change = thingUserClaimsAndRights.change | thing.everyoneChangeClaims;
 
 		var thingUserRights = getThingUserRights(user.id, user.userName, thing);
-		if (thingUserRights != null)
+		if (thingUserRights)
 		{
 			thingUserClaimsAndRights.read   = thingUserClaimsAndRights.read   | thingUserRights.userReadClaims;
 			thingUserClaimsAndRights.change = thingUserClaimsAndRights.change | thingUserRights.userChangeClaims;
 		}
 
-		if (isSuperAdministrator == true)
+		if (isSuperAdministrator)
 		{
-			thingUserClaimsAndRights.read   = ThingUserReadClaims.AllClaims;
-			thingUserClaimsAndRights.change = ThingUserChangeClaims.AllClaims;
+			thingUserClaimsAndRights.read   = constants.ThingUserReadClaims.AllClaims;
+			thingUserClaimsAndRights.change = constants.ThingUserChangeClaims.AllClaims;
 		}
 	}
 
 	return thingUserClaimsAndRights;
 }
 
-function createThingPosition(user, parentThing, childThing, pos){
+// User may be null as it may be anonymous or is a SuperAdministrator who has no relationship with Thing
+// It may return null for old Thing created before Position Management
+function getThingPosition(user, parentThing, childThing) {
+
+	if (!childThing)
+		throw new utils.ErrorCustom(httpStatusCodes.INTERNAL_SERVER_ERROR, "Child Thing can't be null", 29);
+
+	// If User is equal to null as it may be anonymous or is a SuperAdministrator who has no relationship with Thing
+	if (!user)
+		return null;
+
+	let userId = user._id;
+	let parentThingId = parentThing ? parentThing._id : null;
+
+	return childThing.positions.find(p => p.userId == userId && p.parentThingId == parentThingId);
+}
+
+function createThingPosition(user, parentThing, childThing, pos) {
 	if (!user)
 		throw new utils.ErrorCustom(httpStatusCodes.INTERNAL_SERVER_ERROR, "User can't be null", 24);
 
@@ -78,54 +208,43 @@ function createThingPosition(user, parentThing, childThing, pos){
 	});
 }
 
-// Lo User potrebbe essere null perchè è anonimo o è un SuperAdministrator che non ha alcuna relazione con la Thing
-async function createThingDTOAsync(user, parentThings, thing, isSuperAdministrator)
-{
-	var loggedInThingUserClaims = GetThingUserClaimsOpt(user, thing, isSuperAdministrator);
+// User may be null because it is anonymous or is a SuperAdministrator who has no relationship with Thing
+async function createThingDTOAsync(user, parentThing, thing, isSuperAdministrator) {
 
-	ThingUserRights loggedInThingUserRights = new ThingUserRights()
-	{
-		AppUser = null, //In questo contesto non viene utilizzata
-		AppUserId = null, //In questo contesto non viene utilizzata
-		Thing = null, //In questo contesto non viene utilizzata
-		ThingId = null, //In questo contesto non viene utilizzata
+	let loggedInThingUserClaims = getThingUserClaims(user, thing, isSuperAdministrator);
 
-		UserRole = (isSuperAdministrator == true) ? ThingUserRole.Administrator : ThingUserRole.User,
-		UserStatus = ThingUserStatus.Ok,
-		ThingVisibility = ThingUserVisibility.Visible,
-		UserReadClaims = loggedInThingUserClaims.Read,
-		UserChangeClaims = loggedInThingUserClaims.Change,
-		ShortPin = 0
+	let loggedInThingUserRights = {
+		userRole : (isSuperAdministrator == true) ? constants.ThingUserRole.Administrator : constants.ThingUserRole.User,
+		userStatus : constants.ThingUserStatus.Ok,
+		thingVisibility : constants.ThingUserVisibility.Visible,
+		userReadClaims : loggedInThingUserClaims.read,
+		userChangeClaims : loggedInThingUserClaims.change,
+		shortPin : 0
 	};
 
-	if (user != null)
-	{
-		var loggedInThingUserRights1 = GetThingUserRights(user.Id, user.UserName, thing);
-		if (loggedInThingUserRights1 != null)
+	if (user) {
+		let loggedInThingUserRights1 = getThingUserRights(user._id, user.username, thing);
+		if (loggedInThingUserRights1)
 		{
-			loggedInThingUserRights.UserRole = loggedInThingUserRights1.UserRole;
-			loggedInThingUserRights.UserStatus = loggedInThingUserRights1.UserStatus;
-			loggedInThingUserRights.ThingVisibility = loggedInThingUserRights1.ThingVisibility;
-			loggedInThingUserRights.ShortPin = loggedInThingUserRights1.ShortPin;
-			loggedInThingUserRights.UserReadClaims = loggedInThingUserRights1.UserReadClaims;
-			loggedInThingUserRights.UserChangeClaims = loggedInThingUserRights1.UserChangeClaims;
+			loggedInThingUserRights.userRole = loggedInThingUserRights1.userRole;
+			loggedInThingUserRights.userStatus = loggedInThingUserRights1.userStatus;
+			loggedInThingUserRights.thingVisibility = loggedInThingUserRights1.thingVisibility;
+			loggedInThingUserRights.shortPin = loggedInThingUserRights1.shortPin;
+			loggedInThingUserRights.userReadClaims = loggedInThingUserRights1.userReadClaims;
+			loggedInThingUserRights.userChangeClaims = loggedInThingUserRights1.userChangeClaims;
 		}
 	}
 
-	var thingPosition = GetThingPosition(user, parentThings, thing);
-	int thingPos = thingPosition != null ? thingPosition.Position : int.MaxValue;
+	let thingPosition = getThingPosition(user, parentThing, thing);
+	let thingPos = thingPosition ? thingPosition.Position : Number.MAX_SAFE_INTEGER;
 
-	var thingDTO = MappingHelper.ToThingDTO(loggedInThingUserClaims, thing, loggedInThingUserRights, thingPos, commonTable);
-
-	//TODO: Spostare in MappingHelper.ToThingDTO
-	thingDTO.UsersInfos = (loggedInThingUserClaims.Read & ThingUserReadClaims.CanReadThingUserRights) == 0 ? null : await GetUsersInfosAsync(thing);
-
-	return thingDTO;
+	return await thingToThingDTO(loggedInThingUserClaims, thing, loggedInThingUserRights, thingPos);
 }
 
-// Prepara le notifiche per gli User che hanno una relazione con la Thing che comunque siano nello stato Ok o WaitForAuth e che siano realmente registrati (Non utenti "free". I Notificator non potrebbero notificare)
+// Prepare notifications for Users who have a relationship with Thing anyway in Ok or WaitForAuth status and that they are actually registered (Non-users "free" Notifications can not be notified)
 async function createGenericBLResult(thing) {
-	if (thing == null)
+
+	if (!thing)
 		throw new utils.ErrorCustom(httpStatusCodes.INTERNAL_SERVER_ERROR, "Thing can't be null", 26);
 
 	let UsersIdsToNotify = new Set();
@@ -139,16 +258,20 @@ async function createGenericBLResult(thing) {
 		if (!r.username)
 			throw new utils.ErrorCustom(httpStatusCodes.INTERNAL_SERVER_ERROR, "ThingUserRights without userId and username can't exist", 27);
 	
-		let user = usersManager.findUserByUsername(r.username)
+		let user = await usersManager.findUserByUsername(r.username);
 		if (!user)
 			continue;
 		
 		UsersIdsToNotify.add(user._id);
 	}
-
+	return {
+		UsersIdsToNotify: UsersIdsToNotify,
+		DTO: null
+	};
 }
 
 exports.createThing = async (user, thingDTO) => {
+
 	// Validate DTO
 	if (!user)
 		throw new utils.ErrorCustom(httpStatusCodes.UNAUTHORIZED,
@@ -167,7 +290,7 @@ exports.createThing = async (user, thingDTO) => {
 		throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Thing UserRole is incorrect", 19);
         
 	// Generate Thing's Id if not in input
-	let thingId = !thingDTO.Id ? uuidv4() : thingDTO.Id;
+	let thingId = !thingDTO.id ? uuidv4() : thingDTO.id;
 	
 	let letterNumber = /^[0-9a-zA-Z-]+$/;  
 	if (!thingId.match(letterNumber))
@@ -177,6 +300,7 @@ exports.createThing = async (user, thingDTO) => {
 		throw new utils.ErrorCustom(httpStatusCodes.SEE_OTHER, "Thing's Id already exist", 21);
 
 	let thing = new thingModel.Thing();
+
 	thing._id = thingId;
 	thing.creationDate = thingDTO.creationDateTime ? thingDTO.creationDate : Date.now();
 	thing.name = thingDTO.name;
@@ -202,13 +326,10 @@ exports.createThing = async (user, thingDTO) => {
 	});
 
 	let defaultThingPos = Number.MAX_SAFE_INTEGER;
-
 	createThingPosition(user, null, thing, defaultThingPos);
 
-	createGenericBLResult
+	let blResult = await createGenericBLResult(thing);
+	blResult.DTO = await createThingDTOAsync(user, null, thing, false);
 
-	return {
-		pos: defaultThingPos, 
-		thing
-	};
+	return blResult;
 };
