@@ -58,15 +58,15 @@ exports.validateThingUserStatus = function validateThingUserStatus(userStatus) {
 };
 
 const ThingUserVisibility = {
-	NoVisibility  : 0,  // Internal state. Do not use for external use like filter
+	NoMatter  : 0,  // Internal state. Do not use for external use like filter
 	Visible       : 1,
 	Hidden        : 2,
 };
 exports.ThingUserVisibility = ThingUserVisibility;
 
-exports.validateThingUserStatus = function validateThingUserStatus(visibility) {
+exports.validateThingUserVisibility = function validateThingUserVisibility(visibility) {
 	switch(visibility) {
-	case ThingUserVisibility.NoVisibility:
+	case ThingUserVisibility.NoMatter:
 	case ThingUserVisibility.Visible:
 	case ThingUserVisibility.Hidden:
 		return true;

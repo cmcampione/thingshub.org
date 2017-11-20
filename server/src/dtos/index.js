@@ -48,7 +48,6 @@ class UserInfoDTO {
 	
 		this.id = "";
 		this.name = "the bees are laborious";
-		this.surname = "";
 	}
 }
 exports.UserInfoDTO = UserInfoDTO;
@@ -56,23 +55,36 @@ exports.UserInfoDTO = UserInfoDTO;
 class ThingDTO {
 	constructor() {
 		this.id = "";
+
 		this.creationDate = null;
+		
 		this.name = "";
+		
 		this.kind = sharedConst.ThingKind.generic;
 		this.kindTxt = sharedConst.ThingKind.genericTxt;
+		
 		this.pos = 0;
+		
 		this.deletedStatus = sharedConst.ThingDeletedStates.Ok;
 		this.deletedDate = null;
+		
 		this.publicReadClaims = sharedConst.ThingUserReadClaims.NoClaim;
 		this.publicChangeClaims = sharedConst.ThingUserChangeClaims.NoClaim;
+		
 		this.everyoneReadClaims = sharedConst.ThingUserReadClaims.NoClaim;
 		this.everyoneChangeClaims = sharedConst.ThingUserChangeClaims.NoClaim;
+		
 		this.value = {};
+		
 		this.userStatus = sharedConst.ThingUserStates.Ok;
-		this.UserRole = sharedConst.ThingUserRole.User;
-		this.UserReadClaims = sharedConst.ThingUserReadClaims.NoClaim;
-		this.UserChangeClaims = sharedConst.ThingUserChangeClaims.NoClaim;
-		this.usersInfo = [];
+		this.userRole = sharedConst.ThingUserRole.User;
+		
+		this.userReadClaims = sharedConst.ThingUserReadClaims.NoClaim;
+		this.userChangeClaims = sharedConst.ThingUserChangeClaims.NoClaim;
+		
+		this.userVisibility = sharedConst.ThingUserVisibility.Ok;
+		
+		this.usersInfos = [];
 	}
 }
 exports.ThingDTO = ThingDTO;

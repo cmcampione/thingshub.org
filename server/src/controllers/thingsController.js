@@ -49,7 +49,9 @@ router.post("/", async function (req, res, next){
 
 			let thingDTO = req.body;
 
-			await thingsMngr.createThing(user,thingDTO);
+			let blResult = await thingsMngr.createThing(user,thingDTO);
+
+			res.json(blResult.DTO);
 
 			next();
 		}  catch (e)  {
