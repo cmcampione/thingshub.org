@@ -5,6 +5,7 @@ const mongoose = require("mongoose");
 const sharedConst = require("../sharedConst");
 
 const thingSchema = mongoose.Schema({
+	
 	_id                   : String,
 	creationDate          : Date,
 	name                  : String,
@@ -12,11 +13,12 @@ const thingSchema = mongoose.Schema({
 	description           : String,
 	value                 : {},
 
-	deletedStatus         : { type: Number, default : sharedConst.ThingDeletedStates.Ok },
+	deletedStatus         : { type: Number, default : sharedConst.ThingDeletedStates.NoMatter },
 	deletedDate       	  : Date,
 
 	publicReadClaims      : { type: Number, default : sharedConst.ThingUserReadClaims.NoClaim },
 	publicChangeClaims    : { type: Number, default : sharedConst.ThingUserChangeClaims.NoClaim },
+
 	everyoneReadClaims    : { type: Number, default : sharedConst.ThingUserReadClaims.NoClaim },
 	everyoneChangeClaims  : { type: Number, default : sharedConst.ThingUserChangeClaims.NoClaim },
 
@@ -26,7 +28,7 @@ const thingSchema = mongoose.Schema({
 
 		userRole          : { type: Number, default : sharedConst.ThingUserRole.NoMatter },
 		userStatus        : { type: Number, default : sharedConst.ThingUserStates.NoMatter },
-		thingVisibility   : { type: Number, default : sharedConst.ThingUserVisibility.Visible },
+		thingVisibility   : { type: Number, default : sharedConst.ThingUserVisibility.NoMatter },
 
 		userReadClaims    : { type: Number, default : sharedConst.ThingUserReadClaims.NoClaim },
 		userChangeClaims  : { type: Number, default : sharedConst.ThingUserChangeClaims.NoClaim },

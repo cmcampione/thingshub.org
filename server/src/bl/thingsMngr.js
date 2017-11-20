@@ -10,8 +10,6 @@ const ThingDTO = require("../dtos").ThingDTO;
 const usersManager = require("../bl/usersMngr");
 const thingModel = require("../models/Thing");
 
-function findThingById(id) { return thingModel.findThingById(id);}
-
 async function getUsersInfosAsync(thing) {
 
 	if (!thing)
@@ -43,6 +41,8 @@ async function getUsersInfosAsync(thing) {
 
 	return usersInfosDTOs;
 }
+
+function findThingById(id) { return thingModel.findThingById(id);}
 
 async function thingToThingDTO(accessThingUserClaims, thing, thingUserRights, pos) {
 
