@@ -65,7 +65,7 @@ class ThingDTO {
 		
 		this.pos = 0;
 		
-		this.deletedStatus = sharedConst.ThingDeletedStates.Ok;
+		this.deletedStatus = sharedConst.ThingDeletedStates.NoMatter;
 		this.deletedDate = null;
 		
 		this.publicReadClaims = sharedConst.ThingUserReadClaims.NoClaim;
@@ -76,13 +76,13 @@ class ThingDTO {
 		
 		this.value = {};
 		
-		this.userStatus = sharedConst.ThingUserStates.Ok;
-		this.userRole = sharedConst.ThingUserRole.User;
+		this.userStatus = sharedConst.ThingUserStates.NoMatter;
+		this.userRole = sharedConst.ThingUserRole.NoMatter;
 		
 		this.userReadClaims = sharedConst.ThingUserReadClaims.NoClaim;
 		this.userChangeClaims = sharedConst.ThingUserChangeClaims.NoClaim;
 		
-		this.userVisibility = sharedConst.ThingUserVisibility.Ok;
+		this.userVisibility = sharedConst.ThingUserVisibility.NoMatter;
 		
 		this.usersInfos = [];
 	}
