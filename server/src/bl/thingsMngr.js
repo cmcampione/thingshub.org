@@ -10,6 +10,60 @@ const thingModel = require("../models/Thing");
 
 function findThingById(id) { return thingModel.findThingById(id);}
 
+ // First search for userId if it does not find it by username
+ function getThingUserRights(userId, username, thing)
+ {
+	if (!userId && !username)
+		throw new utils.ErrorCustom(httpStatusCodes.INTERNAL_SERVER_ERROR, "userId or usernane must be not empty", 28);
+
+	if (!thing)
+		throw new utils.ErrorCustom(httpStatusCodes.INTERNAL_SERVER_ERROR, "Thing can't be null", 27);
+
+	 let thingUserRights = null;            
+
+	 if (userId)
+		 thingUserRights = thing.usersRights.FirstOrDefault(u => u.AppUserId == userId);
+	 if (thingUserRights == null && username)
+		 thingUserRights = thing.usersRights.FirstOrDefault(u => u.Username == username);
+
+	 return thingUserRights;
+ }
+
+// All paths return to something. It never returns null except for exceptions
+// The User may be null as anonymous. If User is anonymous returns Thing's PublicClaims
+function getThingUserClaims(user, thing, isSuperAdministrator)
+{
+	if (!thing)
+		throw new utils.ErrorCustom(httpStatusCodes.INTERNAL_SERVER_ERROR, "Thing can't be null", 26);
+
+	thingUserClaimsAndRights = 
+	{
+		read    : thing.publicReadClaims,
+		change  : thing.publicChangeClaims
+	}
+
+	if (user != null)
+	{
+		thingUserClaimsAndRights.read   = thingUserClaimsAndRights.read   | thing.everyoneReadClaims;
+		thingUserClaimsAndRights.change = thingUserClaimsAndRights.change | thing.everyoneChangeClaims;
+
+		var thingUserRights = getThingUserRights(user.id, user.userName, thing);
+		if (thingUserRights != null)
+		{
+			thingUserClaimsAndRights.read   = thingUserClaimsAndRights.read   | thingUserRights.userReadClaims;
+			thingUserClaimsAndRights.change = thingUserClaimsAndRights.change | thingUserRights.userChangeClaims;
+		}
+
+		if (isSuperAdministrator == true)
+		{
+			thingUserClaimsAndRights.read   = ThingUserReadClaims.AllClaims;
+			thingUserClaimsAndRights.change = ThingUserChangeClaims.AllClaims;
+		}
+	}
+
+	return thingUserClaimsAndRights;
+}
+
 function createThingPosition(user, parentThing, childThing, pos){
 	if (!user)
 		throw new utils.ErrorCustom(httpStatusCodes.INTERNAL_SERVER_ERROR, "User can't be null", 24);
