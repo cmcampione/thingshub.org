@@ -31,16 +31,14 @@ async function getUsersInfosAsync(thing) {
 		
 		userInfoDTO.id = userId;
 		userInfoDTO.name = "the bees are laborious";
-		userInfoDTO.surname = "";
 		
 		let user = userId ? await usersManager.findUserById(userId) : await	usersManager.findUserByUsername(username);
 		if (user) {
 			userInfoDTO.id = user.Id;
 			userInfoDTO.name = user.name;
-			userInfoDTO.surname = user.surname;
 		}
 
-		usersInfosDTOs.Add(userInfoDTO);
+		usersInfosDTOs.push(userInfoDTO);
 	}
 
 	return usersInfosDTOs;
@@ -59,7 +57,7 @@ async function thingToThingDTO(accessThingUserClaims, thing, thingUserRights, po
 	thingDTO.kindTxt = "";
 	thingDTO.name = "";
 	thingDTO.pos = pos;
-	thingDTO.deletedStatus = constants.ThingDeletedStatus.NoMatter;
+	thingDTO.deletedStatus = constants.ThingDeletedStates.NoMatter;
 	thingDTO.deletedDate = null;
 	thingDTO.publicReadClaims = constants.ThingUserReadClaims.NoClaim;
 	thingDTO.publicChangeClaims = constants.ThingUserChangeClaims.NoClaim;
@@ -69,7 +67,8 @@ async function thingToThingDTO(accessThingUserClaims, thing, thingUserRights, po
 	thingDTO.userChangeClaims = constants.ThingUserChangeClaims.NoClaim;
 	thingDTO.userReadClaims = constants.ThingUserReadClaims.NoClaim;
 	thingDTO.userRole = constants.ThingUserRole.NoMatter;
-	thingDTO.userStatus = constants.ThingUserStatus.NoMatter;
+	thingDTO.userStatus = constants.ThingUserStates.NoMatter;
+	thingDTO.userVisibility = constants.ThingUserVisibility.NoMatter;
 
 	if ((accessThingUserClaims.read & constants.ThingUserReadClaims.CanReadCreationDate) != 0)
 		thingDTO.creationDate = thing.creationDate;
@@ -109,7 +108,7 @@ async function thingToThingDTO(accessThingUserClaims, thing, thingUserRights, po
 		if ((accessThingUserClaims.read & constants.ThingUserReadClaims.CanReadThingUserRole) != 0)
 			thingDTO.userRole = thingUserRights.userRole;
 
-		if ((accessThingUserClaims.read & constants.ThingUserReadClaims.CanReadThingUserStatus) != 0)
+		if ((accessThingUserClaims.read & constants.ThingUserReadClaims.CanReadThingUserStates) != 0)
 			thingDTO.userStatus = thingUserRights.userStatus;
 
 		if ((accessThingUserClaims.read & constants.ThingUserReadClaims.CanReadThingUserReadClaims) != 0)
@@ -215,8 +214,8 @@ async function createThingDTOAsync(user, parentThing, thing, isSuperAdministrato
 
 	let loggedInThingUserRights = {
 		userRole : (isSuperAdministrator == true) ? constants.ThingUserRole.Administrator : constants.ThingUserRole.User,
-		userStatus : constants.ThingUserStatus.Ok,
-		thingVisibility : constants.ThingUserVisibility.Visible,
+		userStatus : constants.ThingUserStates.Ok,
+		userVisibility : constants.ThingUserVisibility.Visible,
 		userReadClaims : loggedInThingUserClaims.read,
 		userChangeClaims : loggedInThingUserClaims.change,
 		shortPin : 0
@@ -228,7 +227,7 @@ async function createThingDTOAsync(user, parentThing, thing, isSuperAdministrato
 		{
 			loggedInThingUserRights.userRole = loggedInThingUserRights1.userRole;
 			loggedInThingUserRights.userStatus = loggedInThingUserRights1.userStatus;
-			loggedInThingUserRights.thingVisibility = loggedInThingUserRights1.thingVisibility;
+			loggedInThingUserRights.userVisibility = loggedInThingUserRights1.userVisibility;
 			loggedInThingUserRights.shortPin = loggedInThingUserRights1.shortPin;
 			loggedInThingUserRights.userReadClaims = loggedInThingUserRights1.userReadClaims;
 			loggedInThingUserRights.userChangeClaims = loggedInThingUserRights1.userChangeClaims;
@@ -236,7 +235,7 @@ async function createThingDTOAsync(user, parentThing, thing, isSuperAdministrato
 	}
 
 	let thingPosition = getThingPosition(user, parentThing, thing);
-	let thingPos = thingPosition ? thingPosition.Position : Number.MAX_SAFE_INTEGER;
+	let thingPos = thingPosition ? thingPosition.pos : Number.MAX_SAFE_INTEGER;
 
 	return await thingToThingDTO(loggedInThingUserClaims, thing, loggedInThingUserRights, thingPos);
 }
@@ -250,7 +249,7 @@ async function createGenericBLResult(thing) {
 	let UsersIdsToNotify = new Set();
 
 	for(let r of thing.usersRights) {
-		if (r.userId && ((r.userStatus & (constants.ThingUserStatus.Ok | constants.ThingUserStatus.WaitForAuth)) != 0))
+		if (r.userId && ((r.userStatus & (constants.ThingUserStates.Ok | constants.ThingUserStates.WaitForAuth)) != 0))
 		{
 			UsersIdsToNotify.add(r.userId);
 			continue;
@@ -276,6 +275,7 @@ exports.createThing = async (user, thingDTO) => {
 	if (!user)
 		throw new utils.ErrorCustom(httpStatusCodes.UNAUTHORIZED,
 			httpStatusCodes.getStatusText(httpStatusCodes.UNAUTHORIZED), 13);
+
 	if (thingDTO == null)
 		throw new utils.ErrorCustom(httpStatusCodes.BAD_GATEWAY, "The body message is empty", 14);
 	if (thingDTO.kind == null)
@@ -288,6 +288,8 @@ exports.createThing = async (user, thingDTO) => {
 		throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Thing UserStatus is incorrect", 18);
 	if (constants.validateThingUserRole(thingDTO.userRole) == false)
 		throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Thing UserRole is incorrect", 19);
+	if (constants.validateThingUserVisibility(thingDTO.userVisibility) == false)
+		throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Thing UserVisibility is incorrect", 35);
         
 	// Generate Thing's Id if not in input
 	let thingId = !thingDTO.id ? uuidv4() : thingDTO.id;
@@ -319,7 +321,7 @@ exports.createThing = async (user, thingDTO) => {
 		username: user.username,
 		userRole: thingDTO.userRole,
 		userStatus: thingDTO.userStatus,
-		thingVisibility: thingDTO.thingVisibility,
+		userVisibility: thingDTO.userVisibility,
 		userReadClaims: thingDTO.userReadClaims,
 		userChangeClaims: thingDTO.userChangeClaims,
 		shortPin: thingDTO.shortPin
