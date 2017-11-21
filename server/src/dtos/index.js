@@ -1,6 +1,6 @@
 "use strict";
 
-const sharedConst = require("../sharedConst");
+const constants = require("../constants");
 
 exports.RegisterByOnlyEmailStatus = {
 	UserAlreadyRegistered : 1,
@@ -24,8 +24,7 @@ class EmailDTO {
 }
 exports.EmailDTO = EmailDTO;
 
-class UserDTO {
-  
+class UserDTO { 
 	constructor(user, fullInfos) {
 		this.id = user._id;
 		this.name = user.name;
@@ -60,29 +59,27 @@ class ThingDTO {
 		
 		this.name = "";
 		
-		this.kind = sharedConst.ThingKind.generic;
-		this.kindTxt = sharedConst.ThingKind.genericTxt;
+		this.kind = constants.ThingKind.generic;
 		
 		this.pos = 0;
 		
-		this.deletedStatus = sharedConst.ThingDeletedStates.NoMatter;
+		this.deletedStatus = constants.ThingDeletedStates.NoMatter;
 		this.deletedDate = null;
 		
-		this.publicReadClaims = sharedConst.ThingUserReadClaims.NoClaim;
-		this.publicChangeClaims = sharedConst.ThingUserChangeClaims.NoClaim;
+		this.publicReadClaims = constants.ThingUserReadClaims.NoClaim;
+		this.publicChangeClaims = constants.ThingUserChangeClaims.NoClaim;
 		
-		this.everyoneReadClaims = sharedConst.ThingUserReadClaims.NoClaim;
-		this.everyoneChangeClaims = sharedConst.ThingUserChangeClaims.NoClaim;
+		this.everyoneReadClaims = constants.ThingUserReadClaims.NoClaim;
+		this.everyoneChangeClaims = constants.ThingUserChangeClaims.NoClaim;
 		
 		this.value = {};
 		
-		this.userStatus = sharedConst.ThingUserStates.NoMatter;
-		this.userRole = sharedConst.ThingUserRole.NoMatter;
+		this.userStatus = constants.ThingUserStates.NoMatter;
+		this.userRole = constants.ThingUserRole.NoMatter;
+		this.userVisibility = constants.ThingUserVisibility.NoMatter;
 		
-		this.userReadClaims = sharedConst.ThingUserReadClaims.NoClaim;
-		this.userChangeClaims = sharedConst.ThingUserChangeClaims.NoClaim;
-		
-		this.userVisibility = sharedConst.ThingUserVisibility.NoMatter;
+		this.userReadClaims = constants.ThingUserReadClaims.NoClaim;
+		this.userChangeClaims = constants.ThingUserChangeClaims.NoClaim;
 		
 		this.usersInfos = [];
 	}

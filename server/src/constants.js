@@ -4,7 +4,7 @@ const ThingDeletedStates =
 {
 	NoMatter  : 0,  // Interna state. Do not useful for external usage
 	Ok        : 1,
-	Deleted   : 2,	
+	Deleted   : 2
 };
 exports.ThingDeletedStates = ThingDeletedStates;
 
@@ -60,7 +60,7 @@ exports.validateThingUserStatus = function validateThingUserStatus(userStatus) {
 const ThingUserVisibility = {
 	NoMatter  : 0,  // Internal state. Do not use for external use like filter
 	Visible       : 1,
-	Hidden        : 2,
+	Hidden        : 2
 };
 exports.ThingUserVisibility = ThingUserVisibility;
 
@@ -79,33 +79,35 @@ exports.ThingUserReadClaims =
 {
 	NoClaim: 0,
 
-	CanReadThingUserChangeClaims: 1,
-
 	CanReadCreationDate: 2,
 	CanReadName: 4,
 	CanReadDescription: 8,
 	CanReadKind: 16,
 	CanReadValue: 32,
 	CanReadDeletedStatus: 64,
-	CanReadThingUserRights: 128,
-	CanReadThingUserRole: 256,
-	CanReadThingUserStatus: 512,
-	CanReadThingUserReadClaims: 1024,
-	// CanReadThingUserChangeClaims : 1,
+
 	CanReadPublicReadClaims: 2048,
 	CanReadPublicChangeClaims: 4096,
 	CanReadEveryoneReadClaims: 8192,
 	CanReadEveryoneChangeClaims: 16384,
 
+	CanReadThingUserRights: 128,
+	CanReadThingUserRole: 256,
+	CanReadThingUserStatus: 512,
+	CanReadThingUserVisibility: 32768,
+
+	CanReadThingUserReadClaims: 1024,
+	CanReadThingUserChangeClaims : 1,
+	
 	// ShortCut
 
 	// INFO: Max int value 0x7FFFFFFF;//2147483647 - 32 bit with sign. Javascript bit manipulation limit
 	AllClaims: this.CanReadThingUserChangeClaims |
-  this.CanReadCreationDate | this.CanReadName | this.CanReadDescription |
-  this.CanReadKind | this.CanReadValue | this.CanReadDeletedStatus |
-  this.CanReadThingUserRights | this.CanReadThingUserRole |
-  this.CanReadThingUserStatus | this.CanReadThingUserReadClaims | this.CanReadPublicReadClaims |
-  this.CanReadPublicChangeClaims | this.CanReadEveryoneReadClaims | this.CanReadEveryoneChangeClaims,
+		this.CanReadCreationDate | this.CanReadName | this.CanReadDescription |
+		this.CanReadKind | this.CanReadValue | this.CanReadDeletedStatus |
+		this.CanReadThingUserRights | this.CanReadThingUserRole | | this.CanReadThingUserVisibility |
+		this.CanReadThingUserStatus | this.CanReadThingUserReadClaims | this.CanReadPublicReadClaims |
+		this.CanReadPublicChangeClaims | this.CanReadEveryoneReadClaims | this.CanReadEveryoneChangeClaims,
 };
 
 // Do not have validation function since are bitwise values
@@ -120,19 +122,20 @@ exports.ThingUserChangeClaims =
 	CanChangeValue: 16,
 	CanChangeDeletedStatus: 32,
 
+	CanChangePublicReadClaims: 4096,
+	CanChangePublicChangeClaims: 8192,
+	CanChangeEveryoneReadClaims: 16384,
+	CanChangeEveryoneChangeClaims: 32768,
+
 	CanAddThingUserRights: 64,
 	CanDeleteThingUserRights: 128,
 
 	CanChangeThingUserRole: 256,
 	CanChangeThingUserStatus: 512,
+	CanChangeThingUserVisibility: 524288,
 
 	CanChangeThingUserReadClaims: 1024,
 	CanChangeThingUserChangeClaims: 2048,
-
-	CanChangePublicReadClaims: 4096,
-	CanChangePublicChangeClaims: 8192,
-	CanChangeEveryoneReadClaims: 16384,
-	CanChangeEveryoneChangeClaims: 32768,
 
 	CanAddChildrenThing: 65536,
 	CanRemoveChildrenThing: 131072,
@@ -144,16 +147,19 @@ exports.ThingUserChangeClaims =
 
 	// INFO: Max int value 0x7FFFFFFF;//2147483647 - 32 bit with sign. Javascript bit manipulation limit
 	AllClaims: this.CanDeleteThing | this.CanChangeName | this.CanChangeDescription |
-  this.CanChangeKind | this.CanChangeValue | this.CanChangeDeletedStatus |
-  this.CanAddThingUserRights | this.CanDeleteThingUserRights | this.CanChangeThingUserRole |
-  this.CanChangeThingUserStatus | this.CanChangeThingUserReadClaims | this.CanChangeThingUserChangeClaims |
-  this.CanChangePublicReadClaims | this.CanChangePublicChangeClaims | this.CanChangeEveryoneReadClaims | this.CanChangeEveryoneChangeClaims |
-  this.CanAddChildrenThing | this.CanRemoveChildrenThing,
+		this.CanChangeKind | this.CanChangeValue | this.CanChangeDeletedStatus |
+		this.CanAddThingUserRights | this.CanDeleteThingUserRights | this.CanChangeThingUserRole | this.CanChangeThingUserVisibility |
+		this.CanChangeThingUserStatus | this.CanChangeThingUserReadClaims | this.CanChangeThingUserChangeClaims |
+		this.CanChangePublicReadClaims | this.CanChangePublicChangeClaims | this.CanChangeEveryoneReadClaims | this.CanChangeEveryoneChangeClaims |
+		this.CanAddChildrenThing | this.CanRemoveChildrenThing,
 };
 
 exports.ThingKind = {
 	genericId : "1",
 	genericTxt : "the bees are laborious"
 };
+
+const DefaultThingPos = Number.MAX_SAFE_INTEGER;
+exports.DefaultThingPos = DefaultThingPos;
 
 
