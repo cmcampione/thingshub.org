@@ -16,6 +16,7 @@ const userSchema = mongoose.Schema({
 		isConfirmed : { type: Boolean, default: false },
 	}],
 	masterApiKey : String,
+	isSuperAdministrator : { type: Boolean, default: false }
 });
 
 userSchema.pre("save", function save(next) {
