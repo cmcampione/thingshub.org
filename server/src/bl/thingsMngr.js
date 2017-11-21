@@ -4,124 +4,13 @@ const httpStatusCodes = require("http-status-codes");
 const uuidv4 = require("uuid/v4");
 
 const utils = require("../utils");
-const constants = require("../sharedConst");
+const constants = require("../constants");
 const UserInfoDTO = require("../dtos").UserInfoDTO;
 const ThingDTO = require("../dtos").ThingDTO;
 const usersManager = require("../bl/usersMngr");
 const thingModel = require("../models/Thing");
 
-async function getUsersInfosAsync(thing) {
-
-	if (!thing)
-		throw new utils.ErrorCustom(httpStatusCodes.INTERNAL_SERVER_ERROR, "Thing can't be null", 32);
-
-	let usersInfosDTOs = [];
-
-	for(let r of thing.usersRights)
-	{
-		let userId = r.userId;
-		let username = r.username;
-
-		if (!userId && !username)
-			throw new utils.ErrorCustom(httpStatusCodes.INTERNAL_SERVER_ERROR, "userId or username must be not empty", 33);
-
-		let userInfoDTO = new UserInfoDTO();
-		
-		userInfoDTO.id = userId;
-		userInfoDTO.name = "the bees are laborious";
-		
-		let user = userId ? await usersManager.findUserById(userId) : await	usersManager.findUserByUsername(username);
-		if (user) {
-			userInfoDTO.id = user.Id;
-			userInfoDTO.name = user.name;
-		}
-
-		usersInfosDTOs.push(userInfoDTO);
-	}
-
-	return usersInfosDTOs;
-}
-
 function findThingById(id) { return thingModel.findThingById(id);}
-
-async function thingToThingDTO(accessThingUserClaims, thing, thingUserRights, pos) {
-
-	if (!accessThingUserClaims)
-		throw new utils.ErrorCustom(httpStatusCodes.INTERNAL_SERVER_ERROR, "No Correct User's Thing Claims ", 31);
-
-	let thingDTO = new ThingDTO();
-
-	thingDTO.id = thing._id;
-	thingDTO.creationDate = null;
-	thingDTO.kind = constants.ThingKind.NoMatter;
-	thingDTO.kindTxt = "";
-	thingDTO.name = "";
-	thingDTO.pos = pos;
-	thingDTO.deletedStatus = constants.ThingDeletedStates.NoMatter;
-	thingDTO.deletedDate = null;
-	thingDTO.publicReadClaims = constants.ThingUserReadClaims.NoClaim;
-	thingDTO.publicChangeClaims = constants.ThingUserChangeClaims.NoClaim;
-	thingDTO.everyoneReadClaims = constants.ThingUserReadClaims.NoClaim;
-	thingDTO.everyoneChangeClaims = constants.ThingUserChangeClaims.NoClaim;
-	thingDTO.value = "";
-	thingDTO.userChangeClaims = constants.ThingUserChangeClaims.NoClaim;
-	thingDTO.userReadClaims = constants.ThingUserReadClaims.NoClaim;
-	thingDTO.userRole = constants.ThingUserRole.NoMatter;
-	thingDTO.userStatus = constants.ThingUserStates.NoMatter;
-	thingDTO.userVisibility = constants.ThingUserVisibility.NoMatter;
-
-	if ((accessThingUserClaims.read & constants.ThingUserReadClaims.CanReadCreationDate) != 0)
-		thingDTO.creationDate = thing.creationDate;
-
-	if ((accessThingUserClaims.read & constants.ThingUserReadClaims.CanReadName) != 0)
-		thingDTO.name = thing.name;
-
-	if ((accessThingUserClaims.read & constants.ThingUserReadClaims.CanReadDeletedStatus) != 0)
-	{
-		thingDTO.deletedStatus = thing.deletedStatus;
-		thingDTO.deletedDate = thing.deletedDate;
-	}
-
-	if ((accessThingUserClaims.read & constants.ThingUserReadClaims.CanReadPublicReadClaims) != 0)
-		thingDTO.publicReadClaims = thing.publicReadClaims;
-
-	if ((accessThingUserClaims.read & constants.ThingUserReadClaims.CanReadPublicChangeClaims) != 0)
-		thingDTO.publicChangeClaims = thing.publicChangeClaims;
-
-	if ((accessThingUserClaims.read & constants.ThingUserReadClaims.CanReadEveryoneReadClaims) != 0)
-		thingDTO.everyoneReadClaims = thing.everyoneReadClaims;
-
-	if ((accessThingUserClaims.read & constants.ThingUserReadClaims.CanReadEveryoneChangeClaims) != 0)
-		thingDTO.everyoneChangeClaims = thing.everyoneChangeClaims;
-
-	if ((accessThingUserClaims.read & constants.ThingUserReadClaims.CanReadKind) != 0)
-	{
-		thingDTO.kind = thing.kind;
-		thingDTO.kindTxt = "";
-	}
-
-	if ((accessThingUserClaims.read & constants.ThingUserReadClaims.CanReadValue) != 0)
-		thingDTO.value = thing.value;
-
-	if (thingUserRights && (accessThingUserClaims.read & constants.ThingUserReadClaims.CanReadThingUserRights) != 0)
-	{
-		if ((accessThingUserClaims.read & constants.ThingUserReadClaims.CanReadThingUserRole) != 0)
-			thingDTO.userRole = thingUserRights.userRole;
-
-		if ((accessThingUserClaims.read & constants.ThingUserReadClaims.CanReadThingUserStates) != 0)
-			thingDTO.userStatus = thingUserRights.userStatus;
-
-		if ((accessThingUserClaims.read & constants.ThingUserReadClaims.CanReadThingUserReadClaims) != 0)
-			thingDTO.userReadClaims = thingUserRights.userReadClaims;
-
-		if ((accessThingUserClaims.read & constants.ThingUserReadClaims.CanReadThingUserChangeClaims) != 0)
-			thingDTO.userChangeClaims = thingUserRights.userChangeClaims;
-	}
-
-	thingDTO.usersInfos = (accessThingUserClaims.read & constants.ThingUserReadClaims.CanReadThingUserRights) == 0 ? [] : await getUsersInfosAsync(thing);
-
-	return thingDTO;
-}
 
 // First search is for userId after it searchs by username
 // Can return null
@@ -133,6 +22,7 @@ function getThingUserRights(userId, username, thing) {
 		throw new utils.ErrorCustom(httpStatusCodes.INTERNAL_SERVER_ERROR, "Thing can't be null", 27);
 
 	let thingUserRights = null;
+
 	if (userId)
 		thingUserRights = thing.usersRights.find(u => u.userId == userId);
 	if (!thingUserRights && username)
@@ -194,6 +84,7 @@ function getThingPosition(user, parentThing, childThing) {
 }
 
 function createThingPosition(user, parentThing, childThing, pos) {
+
 	if (!user)
 		throw new utils.ErrorCustom(httpStatusCodes.INTERNAL_SERVER_ERROR, "User can't be null", 24);
 
@@ -208,7 +99,98 @@ function createThingPosition(user, parentThing, childThing, pos) {
 }
 
 // User may be null because it is anonymous or is a SuperAdministrator who has no relationship with Thing
-async function createThingDTOAsync(user, parentThing, thing, isSuperAdministrator) {
+async function createThingDTO(user, parentThing, thing, isSuperAdministrator) {
+
+	async function getUsersInfosAsync(thing) {
+		
+		if (!thing)
+			throw new utils.ErrorCustom(httpStatusCodes.INTERNAL_SERVER_ERROR, "Thing can't be null", 32);
+		
+		let usersInfosDTOs = [];
+		
+		for(let r of thing.usersRights)
+		{
+			let userId = r.userId;
+			let username = r.username;
+		
+			if (!userId && !username)
+				throw new utils.ErrorCustom(httpStatusCodes.INTERNAL_SERVER_ERROR, "userId or username must be not empty", 33);
+		
+			let userInfoDTO = new UserInfoDTO();
+				
+			userInfoDTO.id = userId;
+			userInfoDTO.name = username;
+				
+			let user = userId ? await usersManager.findUserById(userId) : await	usersManager.findUserByUsername(username);
+			if (user) {
+				userInfoDTO.id = user.Id;
+				userInfoDTO.name = user.name;
+			}
+		
+			usersInfosDTOs.push(userInfoDTO);
+		}
+		
+		return usersInfosDTOs;
+	}
+	async function thingToThingDTO(accessThingUserClaims, thing, thingUserRights, pos) {
+		
+		if (!accessThingUserClaims)
+			throw new utils.ErrorCustom(httpStatusCodes.INTERNAL_SERVER_ERROR, "No Correct User's Thing Claims ", 31);
+		
+		let thingDTO = new ThingDTO();
+		
+		thingDTO.id = thing._id;
+		thingDTO.pos = pos;
+		
+		if ((accessThingUserClaims.read & constants.ThingUserReadClaims.CanReadCreationDate) != 0)
+			thingDTO.creationDate = thing.creationDate;
+		
+		if ((accessThingUserClaims.read & constants.ThingUserReadClaims.CanReadName) != 0)
+			thingDTO.name = thing.name;
+		
+		if ((accessThingUserClaims.read & constants.ThingUserReadClaims.CanReadKind) != 0)
+			thingDTO.kind = thing.kind;
+		
+		if ((accessThingUserClaims.read & constants.ThingUserReadClaims.CanReadDeletedStatus) != 0)
+		{
+			thingDTO.deletedStatus = thing.deletedStatus;
+			thingDTO.deletedDate = thing.deletedDate;
+		}
+		
+		if ((accessThingUserClaims.read & constants.ThingUserReadClaims.CanReadPublicReadClaims) != 0)
+			thingDTO.publicReadClaims = thing.publicReadClaims;
+		if ((accessThingUserClaims.read & constants.ThingUserReadClaims.CanReadPublicChangeClaims) != 0)
+			thingDTO.publicChangeClaims = thing.publicChangeClaims;
+		
+		if ((accessThingUserClaims.read & constants.ThingUserReadClaims.CanReadEveryoneReadClaims) != 0)
+			thingDTO.everyoneReadClaims = thing.everyoneReadClaims;
+		if ((accessThingUserClaims.read & constants.ThingUserReadClaims.CanReadEveryoneChangeClaims) != 0)
+			thingDTO.everyoneChangeClaims = thing.everyoneChangeClaims;
+		
+		if ((accessThingUserClaims.read & constants.ThingUserReadClaims.CanReadValue) != 0)
+			thingDTO.value = thing.value;
+		
+		if (thingUserRights && (accessThingUserClaims.read & constants.ThingUserReadClaims.CanReadThingUserRights) != 0)
+		{
+			if ((accessThingUserClaims.read & constants.ThingUserReadClaims.CanReadThingUserStates) != 0)
+				thingDTO.userStatus = thingUserRights.userStatus;
+			
+			if ((accessThingUserClaims.read & constants.ThingUserReadClaims.CanReadThingUserRole) != 0)
+				thingDTO.userRole = thingUserRights.userRole;
+		
+			if ((accessThingUserClaims.read & constants.ThingUserVisibility.CanReadThingUserVisibility) != 0)
+				thingDTO.userVisibility = thingUserRights.userVisibility;
+		
+			if ((accessThingUserClaims.read & constants.ThingUserReadClaims.CanReadThingUserReadClaims) != 0)
+				thingDTO.userReadClaims = thingUserRights.userReadClaims;
+			if ((accessThingUserClaims.read & constants.ThingUserReadClaims.CanReadThingUserChangeClaims) != 0)
+				thingDTO.userChangeClaims = thingUserRights.userChangeClaims;
+		}
+		
+		thingDTO.usersInfos = (accessThingUserClaims.read & constants.ThingUserReadClaims.CanReadThingUserRights) == 0 ? [] : await getUsersInfosAsync(thing);
+		
+		return thingDTO;
+	}
 
 	let loggedInThingUserClaims = getThingUserClaims(user, thing, isSuperAdministrator);
 
@@ -241,7 +223,7 @@ async function createThingDTOAsync(user, parentThing, thing, isSuperAdministrato
 }
 
 // Prepare notifications for Users who have a relationship with Thing anyway in Ok or WaitForAuth status and that they are actually registered (Non-users "free" Notifications can not be notified)
-async function createGenericBLResult(thing) {
+async function getUsersIdsToNotify(thing) {
 
 	if (!thing)
 		throw new utils.ErrorCustom(httpStatusCodes.INTERNAL_SERVER_ERROR, "Thing can't be null", 26);
@@ -263,10 +245,8 @@ async function createGenericBLResult(thing) {
 		
 		UsersIdsToNotify.add(user._id);
 	}
-	return {
-		UsersIdsToNotify: UsersIdsToNotify,
-		DTO: null
-	};
+
+	return UsersIdsToNotify;
 }
 
 exports.createThing = async (user, thingDTO) => {
@@ -327,11 +307,10 @@ exports.createThing = async (user, thingDTO) => {
 		shortPin: thingDTO.shortPin
 	});
 
-	let defaultThingPos = Number.MAX_SAFE_INTEGER;
-	createThingPosition(user, null, thing, defaultThingPos);
+	createThingPosition(user, null, thing, constants.DefaultThingPos);
 
-	let blResult = await createGenericBLResult(thing);
-	blResult.DTO = await createThingDTOAsync(user, null, thing, false);
-
-	return blResult;
+	return {
+		usersIdsToNotify : await getUsersIdsToNotify(thing),
+		thingDTO : await createThingDTO(user, null, thing, false)
+	};
 };
