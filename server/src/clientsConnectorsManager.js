@@ -10,6 +10,8 @@ const usersManager		= require("./bl/usersMngr");
 // SignalR, Socket.io, Internal, ...
 class IClientsConnector {
 	api(usersIds, infos) {}
+
+	onCreateThing(usersIds, thingDTO) {}
 }
 
 // Socket.io support
@@ -76,6 +78,17 @@ class ClientsConnectorSocketIO extends IClientsConnector {
 			});
 		});
 	}
+	
+	onCreateThing(usersIds, thingDTO) {
+		for(let userId of usersIds) {
+			let connections = this.connections.get(userId);
+			if (!connections)
+				return;
+			for(let socket in connections) {
+				socket.emit("api", thingDTO);
+			}
+		}
+	}
 }
 
 class ClientsConnectorsManager {
@@ -87,6 +100,11 @@ class ClientsConnectorsManager {
 	static api(usersIds, info) {
 		ClientsConnectorsManager.ClientsConnectors.forEach(element => {
 			element.api(usersIds, info);
+		});
+	}
+	static onCreateThing(usersIds, thingDTO) {
+		ClientsConnectorsManager.ClientsConnectors.forEach(element => {
+			element.api(usersIds, thingDTO);
 		});
 	}
 }

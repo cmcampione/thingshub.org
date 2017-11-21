@@ -43,5 +43,6 @@ exports.createUser = (email, name, password, registrationDate, isConfirmed,
 		}],
 		masterApiKey: uuid(),
 	});
+	// TODO: Test with userModel.save(user);
 	return user.save(user);
 };

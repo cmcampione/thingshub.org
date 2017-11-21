@@ -321,6 +321,8 @@ exports.createThing = async (user, thingDTO) => {
 
 	createThingPosition(user, null, thing, constants.DefaultThingPos);
 
+	thingModel.save(thing);
+
 	return {
 		usersIdsToNotify : await getUsersIdsToNotify(thing),
 		thingDTO : await createThingDTO(user, null, thing, false)
