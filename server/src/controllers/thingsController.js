@@ -51,9 +51,8 @@ router.post("/", async function (req, res, next){
 
 			let blResult = await thingsMngr.createThing(user,thingDTO);
 
-			res.json(blResult.DTO);
+			res.json(blResult.thingDTO);
 
-			next();
 		}  catch (e)  {
 			if (e instanceof utils.ErrorCustom) {
 				next(e);

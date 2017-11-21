@@ -49,7 +49,7 @@ function getThingUserClaims(user, thing, isSuperAdministrator) {
 		thingUserClaimsAndRights.read   = thingUserClaimsAndRights.read   | thing.everyoneReadClaims;
 		thingUserClaimsAndRights.change = thingUserClaimsAndRights.change | thing.everyoneChangeClaims;
 
-		var thingUserRights = getThingUserRights(user.id, user.userName, thing);
+		var thingUserRights = getThingUserRights(user._id, user.username, thing);
 		if (thingUserRights)
 		{
 			thingUserClaimsAndRights.read   = thingUserClaimsAndRights.read   | thingUserRights.userReadClaims;
@@ -204,7 +204,7 @@ async function createThingDTO(user, parentThing, thing, isSuperAdministrator) {
 		userVisibility : constants.ThingUserVisibility.Visible,
 		userReadClaims : loggedInThingUserClaims.read,
 		userChangeClaims : loggedInThingUserClaims.change,
-		// TODO: Is useful? Test during shortPin implementation
+		// TODO: Is it useful? Test during shortPin implementation
 		shortPin : 0
 	};
 
@@ -268,11 +268,11 @@ exports.createThing = async (user, thingDTO) => {
 			httpStatusCodes.getStatusText(httpStatusCodes.UNAUTHORIZED), 13);
 	
 	// Validate DTO
-	if (thingDTO == null)
+	if (!thingDTO)
 		throw new utils.ErrorCustom(httpStatusCodes.BAD_GATEWAY, "The body message is empty", 14);
-	if (thingDTO.kind == null)
+	if (!thingDTO.kind)
 		throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Kind can't be empty", 15);
-	if (thingDTO.name == null)
+	if (!thingDTO.name)
 		throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Name can't be empty", 16);
 	if (constants.validateThingDeletedStatus(thingDTO.deletedStatus) == false)
 		throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Thing DeletedStatus is incorrect", 17);
@@ -309,7 +309,7 @@ exports.createThing = async (user, thingDTO) => {
     
 	thing.usersRights = [];
 	thing.usersRights.push({
-		userId : user.id,
+		userId : user._id,
 		username: user.username,
 		userRole: thingDTO.userRole,
 		userStatus: thingDTO.userStatus,
