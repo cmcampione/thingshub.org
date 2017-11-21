@@ -98,22 +98,21 @@ const ThingUserReadClaims =
 	CanReadThingUserVisibility: 32768,
 
 	CanReadThingUserReadClaims: 1024,
-	CanReadThingUserChangeClaims : 1,
-	
-	// ShortCut
-
-	// INFO: Max int value 0x7FFFFFFF;//2147483647 - 32 bit with sign. Javascript bit manipulation limit
-	AllClaims: this.CanReadThingUserChangeClaims |
-		this.CanReadCreationDate | this.CanReadName | this.CanReadDescription |
-		this.CanReadKind | this.CanReadValue | this.CanReadDeletedStatus |
-		this.CanReadThingUserRights | this.CanReadThingUserRole | this.CanReadThingUserVisibility |
-		this.CanReadThingUserStatus | this.CanReadThingUserReadClaims | this.CanReadPublicReadClaims |
-		this.CanReadPublicChangeClaims | this.CanReadEveryoneReadClaims | this.CanReadEveryoneChangeClaims,
+	CanReadThingUserChangeClaims : 1
 };
+// ShortCut
+// INFO: Max int value 0x7FFFFFFF;//2147483647 - 32 bit with sign. Javascript bit manipulation limit
+ThingUserReadClaims.AllClaims = ThingUserReadClaims.CanReadThingUserChangeClaims |
+ThingUserReadClaims.CanReadCreationDate | ThingUserReadClaims.CanReadName | ThingUserReadClaims.CanReadDescription |
+ThingUserReadClaims.CanReadKind | ThingUserReadClaims.CanReadValue | ThingUserReadClaims.CanReadDeletedStatus |
+ThingUserReadClaims.CanReadThingUserRights | ThingUserReadClaims.CanReadThingUserRole | ThingUserReadClaims.CanReadThingUserVisibility |
+ThingUserReadClaims.CanReadThingUserStatus | ThingUserReadClaims.CanReadThingUserReadClaims | ThingUserReadClaims.CanReadPublicReadClaims |
+ThingUserReadClaims.CanReadPublicChangeClaims | ThingUserReadClaims.CanReadEveryoneReadClaims | ThingUserReadClaims.CanReadEveryoneChangeClaims;
+
 exports.ThingUserReadClaims = ThingUserReadClaims;
 
 // Do not have validation function since are bitwise values
-exports.ThingUserChangeClaims =
+const ThingUserChangeClaims =
 {
 	NoClaim: 0,
 
@@ -143,18 +142,18 @@ exports.ThingUserChangeClaims =
 	CanRemoveChildrenThing: 131072,
 
 	// In beta test
-	CanOtherUsersChangeMyThingPos: 262144,
-
-	// ShortCut
-
-	// INFO: Max int value 0x7FFFFFFF;//2147483647 - 32 bit with sign. Javascript bit manipulation limit
-	AllClaims: this.CanDeleteThing | this.CanChangeName | this.CanChangeDescription |
-		this.CanChangeKind | this.CanChangeValue | this.CanChangeDeletedStatus |
-		this.CanAddThingUserRights | this.CanDeleteThingUserRights | this.CanChangeThingUserRole | this.CanChangeThingUserVisibility |
-		this.CanChangeThingUserStatus | this.CanChangeThingUserReadClaims | this.CanChangeThingUserChangeClaims |
-		this.CanChangePublicReadClaims | this.CanChangePublicChangeClaims | this.CanChangeEveryoneReadClaims | this.CanChangeEveryoneChangeClaims |
-		this.CanAddChildrenThing | this.CanRemoveChildrenThing,
+	CanOtherUsersChangeMyThingPos: 262144
 };
+// ShortCut
+// INFO: Max int value 0x7FFFFFFF;//2147483647 - 32 bit with sign. Javascript bit manipulation limit
+ThingUserChangeClaims.AllClaims = ThingUserChangeClaims.CanDeleteThing | ThingUserChangeClaims.CanChangeName | ThingUserChangeClaims.CanChangeDescription |
+ThingUserChangeClaims.CanChangeKind | ThingUserChangeClaims.CanChangeValue | ThingUserChangeClaims.CanChangeDeletedStatus |
+ThingUserChangeClaims.CanAddThingUserRights | ThingUserChangeClaims.CanDeleteThingUserRights | ThingUserChangeClaims.CanChangeThingUserRole | ThingUserChangeClaims.CanChangeThingUserVisibility |
+ThingUserChangeClaims.CanChangeThingUserStatus | ThingUserChangeClaims.CanChangeThingUserReadClaims | ThingUserChangeClaims.CanChangeThingUserChangeClaims |
+ThingUserChangeClaims.CanChangePublicReadClaims | ThingUserChangeClaims.CanChangePublicChangeClaims | ThingUserChangeClaims.CanChangeEveryoneReadClaims | ThingUserChangeClaims.CanChangeEveryoneChangeClaims |
+ThingUserChangeClaims.CanAddChildrenThing | ThingUserChangeClaims.CanRemoveChildrenThing;
+
+exports.ThingUserChangeClaims = ThingUserChangeClaims;
 
 exports.ThingKind = {
 	genericId : "1",
