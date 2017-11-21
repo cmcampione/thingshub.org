@@ -75,7 +75,8 @@ exports.validateThingUserVisibility = function validateThingUserVisibility(visib
 };
 
 // Do not have validation function since are bitwise values
-exports.ThingUserReadClaims =
+
+const ThingUserReadClaims =
 {
 	NoClaim: 0,
 
@@ -105,10 +106,11 @@ exports.ThingUserReadClaims =
 	AllClaims: this.CanReadThingUserChangeClaims |
 		this.CanReadCreationDate | this.CanReadName | this.CanReadDescription |
 		this.CanReadKind | this.CanReadValue | this.CanReadDeletedStatus |
-		this.CanReadThingUserRights | this.CanReadThingUserRole | | this.CanReadThingUserVisibility |
+		this.CanReadThingUserRights | this.CanReadThingUserRole | this.CanReadThingUserVisibility |
 		this.CanReadThingUserStatus | this.CanReadThingUserReadClaims | this.CanReadPublicReadClaims |
 		this.CanReadPublicChangeClaims | this.CanReadEveryoneReadClaims | this.CanReadEveryoneChangeClaims,
 };
+exports.ThingUserReadClaims = ThingUserReadClaims;
 
 // Do not have validation function since are bitwise values
 exports.ThingUserChangeClaims =
