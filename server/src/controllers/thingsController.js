@@ -49,7 +49,9 @@ router.post("/", async function (req, res, next){
 
 			let thingDTO = req.body;
 
-			let blResult = await thingsMngr.createThing(user,thingDTO);
+			let blResult = await thingsMngr.createThing(user, thingDTO);
+
+			ClientsConnectorsManager.api(blResult.usersIdsToNotify, blResult.thingDTO);
 
 			res.json(blResult.thingDTO);
 
