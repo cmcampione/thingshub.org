@@ -172,13 +172,13 @@ async function createThingDTO(user, parentThing, thing, isSuperAdministrator) {
 		
 		if (thingUserRights && (accessThingUserClaims.read & constants.ThingUserReadClaims.CanReadThingUserRights) != 0)
 		{
-			if ((accessThingUserClaims.read & constants.ThingUserReadClaims.CanReadThingUserStates) != 0)
+			if ((accessThingUserClaims.read & constants.ThingUserReadClaims.CanReadThingUserStatus) != 0)
 				thingDTO.userStatus = thingUserRights.userStatus;
 			
 			if ((accessThingUserClaims.read & constants.ThingUserReadClaims.CanReadThingUserRole) != 0)
 				thingDTO.userRole = thingUserRights.userRole;
 		
-			if ((accessThingUserClaims.read & constants.ThingUserVisibility.CanReadThingUserVisibility) != 0)
+			if ((accessThingUserClaims.read & constants.ThingUserReadClaims.CanReadThingUserVisibility) != 0)
 				thingDTO.userVisibility = thingUserRights.userVisibility;
 		
 			if ((accessThingUserClaims.read & constants.ThingUserReadClaims.CanReadThingUserReadClaims) != 0)
