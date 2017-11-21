@@ -185,6 +185,10 @@ async function createThingDTO(user, parentThing, thing, isSuperAdministrator) {
 				thingDTO.userReadClaims = thingUserRights.userReadClaims;
 			if ((accessThingUserClaims.read & constants.ThingUserReadClaims.CanReadThingUserChangeClaims) != 0)
 				thingDTO.userChangeClaims = thingUserRights.userChangeClaims;
+
+			// TODO: Insert Claims control?
+			// TODO: Is useful? Test during shortPin implementation
+			thingDTO.shortPin = thingUserRights.shortPin;
 		}
 		
 		thingDTO.usersInfos = (accessThingUserClaims.read & constants.ThingUserReadClaims.CanReadThingUserRights) == 0 ? [] : await getUsersInfosAsync(thing);
@@ -200,6 +204,7 @@ async function createThingDTO(user, parentThing, thing, isSuperAdministrator) {
 		userVisibility : constants.ThingUserVisibility.Visible,
 		userReadClaims : loggedInThingUserClaims.read,
 		userChangeClaims : loggedInThingUserClaims.change,
+		// TODO: Is useful? Test during shortPin implementation
 		shortPin : 0
 	};
 
@@ -213,11 +218,13 @@ async function createThingDTO(user, parentThing, thing, isSuperAdministrator) {
 			loggedInThingUserRights.shortPin = loggedInThingUserRights1.shortPin;
 			loggedInThingUserRights.userReadClaims = loggedInThingUserRights1.userReadClaims;
 			loggedInThingUserRights.userChangeClaims = loggedInThingUserRights1.userChangeClaims;
+			// TODO: Is useful? Test during shortPin implementation
+			loggedInThingUserRights.shortPin = loggedInThingUserRights1.shortPin;
 		}
 	}
 
 	let thingPosition = getThingPosition(user, parentThing, thing);
-	let thingPos = thingPosition ? thingPosition.pos : Number.MAX_SAFE_INTEGER;
+	let thingPos = thingPosition ? thingPosition.pos : constants.DefaultThingPos;
 
 	return await thingToThingDTO(loggedInThingUserClaims, thing, loggedInThingUserRights, thingPos);
 }
@@ -231,19 +238,24 @@ async function getUsersIdsToNotify(thing) {
 	let UsersIdsToNotify = new Set();
 
 	for(let r of thing.usersRights) {
-		if (r.userId && ((r.userStatus & (constants.ThingUserStates.Ok | constants.ThingUserStates.WaitForAuth)) != 0))
-		{
-			UsersIdsToNotify.add(r.userId);
+
+		if (!(
+			((r.userStatus & (constants.ThingUserStates.Ok | constants.ThingUserStates.WaitForAuth)) != 0) &&
+			((r.userVisibility & constants.ThingUserVisibility.Visible) != 0))
+		)
 			continue;
-		}
-		if (!r.username)
-			throw new utils.ErrorCustom(httpStatusCodes.INTERNAL_SERVER_ERROR, "ThingUserRights without userId and username can't exist", 27);
+
+		let userId = r.userId;
+		let username = r.username;
+
+		if (!userId && !username)
+			throw new utils.ErrorCustom(httpStatusCodes.INTERNAL_SERVER_ERROR, "both userId and username can't be empty", 27);
 	
-		let user = await usersManager.findUserByUsername(r.username);
+		let user = userId ? await usersManager.findUserById(userId) : await	usersManager.findUserByUsername(username);
 		if (!user)
 			continue;
 		
-		UsersIdsToNotify.add(user._id);
+		UsersIdsToNotify.add(userId);
 	}
 
 	return UsersIdsToNotify;
@@ -251,11 +263,11 @@ async function getUsersIdsToNotify(thing) {
 
 exports.createThing = async (user, thingDTO) => {
 
-	// Validate DTO
 	if (!user)
 		throw new utils.ErrorCustom(httpStatusCodes.UNAUTHORIZED,
 			httpStatusCodes.getStatusText(httpStatusCodes.UNAUTHORIZED), 13);
-
+	
+	// Validate DTO
 	if (thingDTO == null)
 		throw new utils.ErrorCustom(httpStatusCodes.BAD_GATEWAY, "The body message is empty", 14);
 	if (thingDTO.kind == null)
@@ -271,7 +283,7 @@ exports.createThing = async (user, thingDTO) => {
 	if (constants.validateThingUserVisibility(thingDTO.userVisibility) == false)
 		throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Thing UserVisibility is incorrect", 35);
         
-	// Generate Thing's Id if not in input
+	// Generate Thing's Id if not provided
 	let thingId = !thingDTO.id ? uuidv4() : thingDTO.id;
 	
 	let letterNumber = /^[0-9a-zA-Z-]+$/;  
