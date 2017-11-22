@@ -188,6 +188,99 @@ async function getThing(user, thingId, deletedStatus, userRole, userStatus, user
 	return thing;          
 }
 
+async function getThings(user, parentThingId, kind, deletedStatus, valueFilter)
+{
+	let mainThingsQuery = {};
+	mainThingsQuery["$and"]=[];
+  
+	if (!user.isSuperAdministrator)
+	{
+		// Solo le Things public
+		let publicThingsQuery = {};
+
+		publicThingsQuery["$or"] = [];
+		publicThingsQuery["$or"].push({"publicReadClaims": { $bitsAnySet: constants.ThingUserReadClaims.AllClaims }});
+		publicThingsQuery["$or"].push({"publicChangeClaims": { $bitsAnySet: constants.ThingUserChangeClaims.AllClaims }});
+		
+		if (user)
+		{
+			publicThingsQuery["$or"] = [];
+			publicThingsQuery["$or"].push({"everyoneReadClaims": { $bitsAnySet: constants.ThingUserReadClaims.AllClaims }});
+			publicThingsQuery["$or"].push({"everyoneChangeClaims": { $bitsAnySet: constants.ThingUserChangeClaims.AllClaims }});
+
+			let userQuery1 = {};
+			userQuery["$or"] = [];
+			userQuery["$or"].push({"usersRights.userId": { $eq: user._id}});
+			userQuery["$or"].push({"usersRights.UserName": { $eq: user._username}});
+
+			userQuery["$and"] = [];
+
+
+			// Le Things public, everyone e dello User
+			things = from t in thingsRep.AsQueryable() where 
+					 (t.PublicReadClaims & ThingUserReadClaims.AllClaims) != 0 || 
+					 (t.PublicChangeClaims & ThingUserChangeClaims.AllClaims) != 0 ||
+					 (t.EveryoneReadClaims & ThingUserReadClaims.AllClaims) != 0 ||
+					 (t.EveryoneChangeClaims & ThingUserChangeClaims.AllClaims) != 0 || 
+					 t.UsersRights.Count(r => (r.AppUserId == user.Id || r.Username == user.UserName) && ((r.UserStatus & (ThingUserStatus.Ok | ThingUserStatus.WaitForAuth)) != 0)) != 0 select t;
+		}
+
+		mainThingsQuery["$and"].push(publicThingsQuery);
+	}
+
+	if (kind != ThingKind.NoMatter)
+		things = from t in things where t.Kind == kind select t;
+
+	if (deletedStatus != ThingDeletedStatus.NoMatter)
+		things = from t in things where t.DeletedStatus == deletedStatus select t;
+
+	Thing parentThing = null;
+	if (string.IsNullOrWhiteSpace(parentThingId) == false)
+	{
+		parentThingId = parentThingId.ToLower();
+		// La Thing parent deve essere solo nello Status Ok a meno che non si è SuperAdministrators (Viene controllato da GetThingAsync(...)). By design
+		parentThing = await GetThingAsync(user, objectContext, parentThingId, ThingKind.NoMatter, deletedStatus, ThingUserRole.NoMatter, ThingUserStatus.Ok);
+
+		// TODO: Controllare con il Profile di SQL Server le prestazioni di tutte queste prove
+
+		// Da buone prestazioni
+		// Non ho riscontrato grandi cambiamenti di prestazioni tra Any e Count
+		things = from t in things where t.Parents.Count(p => p.Id == parentThingId) != 0 select t;
+		//things = from t in things where t.Parents.Any(p => p.Id == parentThingId) select t;
+
+		//IEnumerable<string> childrenIds = GetChildrenThingsIds(parentThing, kind, deletedStatus);
+		//things = from t in things.AsQueryable() join x in childrenIds on t.Id equals x select t;
+		// Funziona ma è lenta
+		//things = from t in things where childrenIds.Contains(t.Id) select t;
+
+		// Non funziona
+		//things = from t in things join c in parentThing.Children on t.Id equals c.Id select t;
+
+		// Non funziona
+		//things = parentThing.Children.AsQueryable();
+	}
+
+	if (mongoDBContext != null && mongoDBContext.IsFake == false)
+	{
+		//Ottengo tutti gli id che soddisfano i filtri del value e che l'id sia tra quelli già filtrati prima
+		var thingIds = from t in things.AsQueryable() select t.Id;
+
+		string joined = string.Join(",", thingIds);
+		joined = "'" + joined.Replace(",", "','") + "'";
+		valueFilter += "{thingId:{$in:[" + joined + "]}},";
+
+		List<BsonDocument> documents;
+		BsonDocument filter = MongoDB.Bson.Serialization.BsonSerializer.Deserialize<BsonDocument>(valueFilter);
+
+		var mongoCollection = mongoDBContext.MongoDB.GetCollection<BsonDocument>("ThingValue");
+		documents = await mongoCollection.Find(filter).ToListAsync(); //   FirstOrDefaultAsync();
+
+		//TODO: Limitare le things in funzione di solo quelle ritornale su documents
+	}
+
+	return new Tuple<Thing, IQueryable<Thing>>(parentThing, things);
+}
+
 // User may be null as it may be anonymous or is a SuperAdministrator who has no relationship with Thing
 // It may return null for old Thing created before Position Management
 function getThingPosition(user, parentThing, childThing) {
