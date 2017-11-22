@@ -12,7 +12,7 @@ const thingModel = require("../models/Thing");
 
 function findThingById(id) { return thingModel.findThingById(id);}
 
-// First search is for userId after it searchs by username
+// First search is by userId after it searchs by username
 // Can return null
 function getThingUserRights(userId, username, thing) {
 
@@ -38,14 +38,12 @@ function getThingUserClaims(user, thing, isSuperAdministrator) {
 	if (!thing)
 		throw new utils.ErrorCustom(httpStatusCodes.INTERNAL_SERVER_ERROR, "Thing can't be null", 26);
 
-	let thingUserClaimsAndRights = 
-	{
+	let thingUserClaimsAndRights = {
 		read    : thing.publicReadClaims,
 		change  : thing.publicChangeClaims
 	};
 
-	if (user)
-	{
+	if (user) {
 		thingUserClaimsAndRights.read   = thingUserClaimsAndRights.read   | thing.everyoneReadClaims;
 		thingUserClaimsAndRights.change = thingUserClaimsAndRights.change | thing.everyoneChangeClaims;
 
@@ -108,8 +106,8 @@ async function createThingDTO(user, parentThing, thing, isSuperAdministrator) {
 		
 		let usersInfosDTOs = [];
 		
-		for(let r of thing.usersRights)
-		{
+		for(let r of thing.usersRights) {
+
 			let userId = r.userId;
 			let username = r.username;
 		
@@ -140,6 +138,7 @@ async function createThingDTO(user, parentThing, thing, isSuperAdministrator) {
 		let thingDTO = new ThingDTO();
 		
 		thingDTO.id = thing._id;
+		// TODO: Insert Claims control?
 		thingDTO.pos = pos;
 		
 		if ((accessThingUserClaims.read & constants.ThingUserReadClaims.CanReadCreationDate) != 0)
@@ -170,8 +169,7 @@ async function createThingDTO(user, parentThing, thing, isSuperAdministrator) {
 		if ((accessThingUserClaims.read & constants.ThingUserReadClaims.CanReadValue) != 0)
 			thingDTO.value = thing.value;
 		
-		if (thingUserRights && (accessThingUserClaims.read & constants.ThingUserReadClaims.CanReadThingUserRights) != 0)
-		{
+		if (thingUserRights && (accessThingUserClaims.read & constants.ThingUserReadClaims.CanReadThingUserRights) != 0) {
 			if ((accessThingUserClaims.read & constants.ThingUserReadClaims.CanReadThingUserStatus) != 0)
 				thingDTO.userStatus = thingUserRights.userStatus;
 			
@@ -186,8 +184,7 @@ async function createThingDTO(user, parentThing, thing, isSuperAdministrator) {
 			if ((accessThingUserClaims.read & constants.ThingUserReadClaims.CanReadThingUserChangeClaims) != 0)
 				thingDTO.userChangeClaims = thingUserRights.userChangeClaims;
 
-			// TODO: Insert Claims control?
-			// TODO: Is useful? Test during shortPin implementation
+			// TODO: Insert Claims control? Is it useful? Test during shortPin implementation
 			thingDTO.shortPin = thingUserRights.shortPin;
 		}
 		
