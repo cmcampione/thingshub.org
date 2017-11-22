@@ -37,6 +37,7 @@ router.get("/", function(req, res, next) {
 	})(req, res, next);
 });
 
+// Create Thing
 router.post("/", async function (req, res, next){
 	passport.authenticate("localapikey", async function(err, user, info) {
 		try {
@@ -51,7 +52,7 @@ router.post("/", async function (req, res, next){
 
 			let blResult = await thingsMngr.createThing(user, thingDTO);
 
-			ClientsConnectorsManager.api(blResult.usersIdsToNotify, blResult.thingDTO);
+			ClientsConnectorsManager.onCreateThing(blResult.usersIdsToNotify, blResult.thingDTO);
 
 			res.json(blResult.thingDTO);
 

@@ -1,7 +1,6 @@
 "use strict";
 
-const ThingDeletedStates =
-{
+const ThingDeletedStates = {
 	NoMatter  : 0,  // Interna state. Do not useful for external usage
 	Ok        : 1,
 	Deleted   : 2
@@ -19,8 +18,7 @@ exports.validateThingDeletedStatus = function validateThingDeletedStatus(deleted
 };
 
 // The User can not have more Roles in the same time
-const ThingUserRole =
-{
+const ThingUserRole = {
 	NoMatter      : 0,  // Internal state. Do not use for external use like filter
 	Administrator : 1,
 	User          : 2
@@ -37,7 +35,7 @@ exports.validateThingUserRole = function validateThingUserRole(userRole) {
 	return false;
 };
 
-// The User can not have more Status in the same time
+// The User can not have more Status at same time
 const ThingUserStates = {
 	NoMatter    : 0,  // Internal state. Do not use for external use like filter
 	Ok          : 1,
@@ -76,8 +74,7 @@ exports.validateThingUserVisibility = function validateThingUserVisibility(visib
 
 // Do not have validation function since are bitwise values
 
-const ThingUserReadClaims =
-{
+const ThingUserReadClaims = {
 	NoClaim: 0,
 
 	CanReadCreationDate: 2,
@@ -112,8 +109,7 @@ ThingUserReadClaims.CanReadPublicChangeClaims | ThingUserReadClaims.CanReadEvery
 exports.ThingUserReadClaims = ThingUserReadClaims;
 
 // Do not have validation function since are bitwise values
-const ThingUserChangeClaims =
-{
+const ThingUserChangeClaims = {
 	NoClaim: 0,
 
 	CanDeleteThing: 1,

@@ -85,7 +85,7 @@ app.get("/api", async function (req, res) {
 	let msg = "the bees are laborious";
 
 	let users = await usersManager.find({});
-	let usersIds = users.map(user => user._id.toString());
+	let usersIds = users.map(user => user._id);
 
 	clientsConnectorsManager.api(usersIds, msg);
 
