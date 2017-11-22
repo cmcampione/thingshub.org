@@ -68,7 +68,7 @@ function checkThingAccess(user, thing, deletedStatus, userRole, userStatus, user
 	if (!thing)
 		throw new utils.ErrorCustom(httpStatusCodes.INTERNAL_SERVER_ERROR, "Thing not valid", 36);
 
-	if (deletedStatus != constants.ThingDeletedStatus.NoMatter && thing.deletedStatus != deletedStatus)
+	if (deletedStatus != constants.ThingDeletedStates.NoMatter && thing.deletedStatus != deletedStatus)
 		return false;
 
 	if ((thing.publicReadClaims & constants.ThingUserReadClaims.AllClaims) != 0 || (thing.publicChangeClaims & constants.ThingUserChangeClaims.AllClaims) != 0)
@@ -88,7 +88,7 @@ function checkThingAccess(user, thing, deletedStatus, userRole, userStatus, user
 
 	// Priority control if the User has a relationship with the Thing
 	var thingUserRights = getThingUserRights(user._id, user.userName, thing);
-	if (thingUserRights != null)
+	if (thingUserRights)
 	{
 		if (userStatus != constants.ThingUserStates.NoMatter && ((thingUserRights.userStatus & userStatus) == 0))
 			return false;
@@ -104,7 +104,7 @@ function checkThingAccess(user, thing, deletedStatus, userRole, userStatus, user
 		return true;
 
 	// If the User has no relationship with Thing does not pass
-	if (thingUserRights == null)
+	if (!thingUserRights)
 		return false;
 
 	if (userStatus != constants.ThingUserStates.NoMatter && ((thingUserRights.userStatus & userStatus) == 0))
@@ -135,7 +135,7 @@ async function getThing(user, thingId, deletedStatus, userRole, userStatus, user
 		throw new utils.ErrorCustom(httpStatusCodes.NOT_FOUND, "Thing not found", 39);
 	}
 
-	if (deletedStatus != constants.ThingDeletedStatus.NoMatter && thing.DeletedStatus != deletedStatus)
+	if (deletedStatus != constants.ThingDeletedStates.NoMatter && thing.DeletedStatus != deletedStatus)
 		throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Thing's Deletedstatus not valid", 40);
 
 	if ((thing.publicReadClaims & constants.ThingUserReadClaims.AllClaims) != 0 
@@ -148,7 +148,7 @@ async function getThing(user, thingId, deletedStatus, userRole, userStatus, user
 		return thing;
 	}
 
-	if (user == null)
+	if (!user)
 		throw new utils.ErrorCustom(httpStatusCodes.UNAUTHORIZED, "Unauthorized user", 41);
 
 	// If User is Super Administrator returns Thing whatever the pass filters (userRole) passed as parameters
@@ -157,7 +157,7 @@ async function getThing(user, thingId, deletedStatus, userRole, userStatus, user
 
 	// Priority control if the User has a relationship with the Thing
 	var thingUserRights = getThingUserRights(user._id, user.username, thing);
-	if (thingUserRights != null)
+	if (thingUserRights)
 	{
 		if (userStatus != constants.ThingUserStates.NoMatter && ((thingUserRights.userStatus & userStatus) == 0))
 			throw new utils.ErrorCustom(httpStatusCodes.FORBIDDEN, "Unauthorized user", 42);
@@ -173,7 +173,7 @@ async function getThing(user, thingId, deletedStatus, userRole, userStatus, user
 		return thing;
 
 	// If the User has no relationship with Thing does not pass
-	if (thingUserRights == null)
+	if (!thingUserRights)
 		throw new utils.ErrorCustom(httpStatusCodes.FORBIDDEN, "Unauthorized user", 44);
 
 	if (userStatus != constants.ThingUserStates.NoMatter && ((thingUserRights.userStatus & userStatus) == 0))
@@ -390,7 +390,7 @@ exports.getThing = async (user, thingId, deletedStatus) => {
 		throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Thing's Id can't be null", 47);
 
 	var thing = await getThing(user, thingId, deletedStatus, constants.ThingUserRole.NoMatter,
-		user != null ? constants.ThingUserStates.Ok | constants.ThingUserStates.WaitForAuth : constants.ThingUserStates.NoMatter,
+		user ? constants.ThingUserStates.Ok | constants.ThingUserStates.WaitForAuth : constants.ThingUserStates.NoMatter,
 		constants.ThingUserVisibility.NoMatter
 	);
 
@@ -410,7 +410,7 @@ exports.createThing = async (user, thingDTO) => {
 		throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Kind can't be empty", 15);
 	if (!thingDTO.name)
 		throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Name can't be empty", 16);
-	if (constants.validateThingDeletedStatus(thingDTO.deletedStatus) == false)
+	if (constants.validateThingDeletedStates(thingDTO.deletedStatus) == false)
 		throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Thing DeletedStatus is incorrect", 17);
 	if (constants.validateThingUserStates(thingDTO.userStatus) == false)
 		throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Thing UserStatus is incorrect", 18);

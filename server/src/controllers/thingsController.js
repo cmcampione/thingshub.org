@@ -50,7 +50,7 @@ router.get("/:id", function(req, res, next) {
 
 			let thingId = req.params.id;
 
-			return await thingsMngr.getThing(user, thingId, constants.ThingDeletedStates.NoMatter);
+			res.json(await thingsMngr.getThing(user, thingId, constants.ThingDeletedStates.NoMatter));
 
 		}  catch (e)  {
 			if (e instanceof utils.ErrorCustom) {
