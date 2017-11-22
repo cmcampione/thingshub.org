@@ -1,3 +1,5 @@
+// import { constants } from "zlib";
+
 "use strict";
 
 const httpStatus 		= require("http-status-codes");
@@ -5,6 +7,7 @@ const express 			= require("express");
 const passport 			= require("passport");
 
 const utils 			= require("../utils.js");
+const constants 		= require("../constants");
 const dtos 				= require("../dtos");
 const usersMngr 		= require("../bl/usersMngr.js");
 const thingsMngr		= require("../bl/thingsMngr");
@@ -27,12 +30,34 @@ router.get("/", function(req, res, next) {
 			let usersIds = [];
 			usersIds.push(user._id);
 			ClientsConnectorsManager.api(usersIds, "first thing");
+
 		}  catch (e)  {
 			if (e instanceof utils.ErrorCustom) {
 				next(e);
 				return;
 			}
 			next(new utils.ErrorCustom(httpStatus.INTERNAL_SERVER_ERROR, e.message, 8));
+		}
+	})(req, res, next);
+});
+
+router.get("/:id", function(req, res, next) {
+	passport.authenticate("localapikey", async function(err, user, info) {
+		try {
+			if (err) { 
+				return next(err); 
+			}
+
+			let thingId = req.params.id;
+
+			return await thingsMngr.getThing(user, thingId, constants.ThingDeletedStates.NoMatter);
+
+		}  catch (e)  {
+			if (e instanceof utils.ErrorCustom) {
+				next(e);
+				return;
+			}
+			next(new utils.ErrorCustom(httpStatus.INTERNAL_SERVER_ERROR, e.message, 50));
 		}
 	})(req, res, next);
 });
