@@ -9,6 +9,7 @@ const usersManager		= require("./bl/usersMngr");
 
 // SignalR, Socket.io, Internal, ...
 class IClientsConnector {
+
 	api(usersIds, infos) {}
 
 	onCreateThing(usersIds, thingDTO) {}
@@ -16,6 +17,7 @@ class IClientsConnector {
 
 // Socket.io support
 class ClientsConnectorSocketIO extends IClientsConnector {
+
 	constructor(server) {
 		super();
 
@@ -26,6 +28,7 @@ class ClientsConnectorSocketIO extends IClientsConnector {
 		this.io = require("socket.io")(server);
 
 		this.io.use(async (socket, next) => {
+			
 			let token = socket.handshake.query.token;
 			if (!token)
 				return next(new utils.ErrorCustom(httpStatus.UNAUTHORIZED, httpStatus.getStatusText(httpStatus.UNAUTHORIZED), 11));
@@ -51,6 +54,7 @@ class ClientsConnectorSocketIO extends IClientsConnector {
 
 				var mapIter = self.connections.entries();
 				for(let connection of mapIter) {
+
 					let userId 		= connection[0];
 					let userSockets = connection[1];
 					let socketToRemove = userSockets.find(s => { return s.id == socket.id; });
@@ -70,7 +74,7 @@ class ClientsConnectorSocketIO extends IClientsConnector {
 	api(usersIds, info) {
 		let self = this;
 		usersIds.forEach(userId => {
-			let connections = self.connections.get(userId);
+			let connections = self.connections.get(userId.toString());
 			if (!connections)
 				return;
 			connections.forEach(socket => {
@@ -80,12 +84,13 @@ class ClientsConnectorSocketIO extends IClientsConnector {
 	}
 	
 	onCreateThing(usersIds, thingDTO) {
+
 		for(let userId of usersIds) {
-			let connections = this.connections.get(userId);
+			let connections = this.connections.get(userId.toString());
 			if (!connections)
 				return;
-			for(let socket in connections) {
-				socket.emit("api", thingDTO);
+			for(let socket of connections) {
+				socket.emit("onCreateThing", thingDTO);
 			}
 		}
 	}
@@ -93,18 +98,20 @@ class ClientsConnectorSocketIO extends IClientsConnector {
 
 class ClientsConnectorsManager {
 	static initialize(server) {
-		ClientsConnectorsManager.ClientsConnectors = []; // List of ClientsConnectors
 
+		ClientsConnectorsManager.ClientsConnectors = []; // List of ClientsConnectors
 		ClientsConnectorsManager.ClientsConnectors.push(new ClientsConnectorSocketIO(server));
 	}
 	static api(usersIds, info) {
+
 		ClientsConnectorsManager.ClientsConnectors.forEach(element => {
 			element.api(usersIds, info);
 		});
 	}
 	static onCreateThing(usersIds, thingDTO) {
+
 		ClientsConnectorsManager.ClientsConnectors.forEach(element => {
-			element.api(usersIds, thingDTO);
+			element.onCreateThing(usersIds, thingDTO);
 		});
 	}
 }

@@ -34,9 +34,14 @@
         console.log(data);
       }
 
+      function onCreateThing(thingDTO) {
+        console.log(thingDTO);
+      }
+
       var socket = new ThingsHubClient.SocketIOConnector("https://localhost:3000", authHook, onError, onConnectError, onStateChanged);
       socket.subscribe();
       socket.setHook("api", onAPI);
+      socket.setHook("onCreateThing", onCreateThing);
       
       socket.api()
       .then(function(res) {
