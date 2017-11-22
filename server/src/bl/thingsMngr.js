@@ -64,6 +64,130 @@ function getThingUserClaims(user, thing, isSuperAdministrator) {
 	return thingUserClaimsAndRights;
 }
 
+function checkThingAccess(user, thing, deletedStatus, userRole, userStatus, userVisibility) {
+	if (!thing)
+		throw new utils.ErrorCustom(httpStatusCodes.INTERNAL_SERVER_ERROR, "Thing not valid", 36);
+
+	if (deletedStatus != constants.ThingDeletedStatus.NoMatter && thing.deletedStatus != deletedStatus)
+		return false;
+
+	if ((thing.publicReadClaims & constants.ThingUserReadClaims.AllClaims) != 0 || (thing.publicChangeClaims & constants.ThingUserChangeClaims.AllClaims) != 0)
+	{
+		if (!user && userRole == constants.ThingUserRole.NoMatter 
+			&& userStatus == constants.ThingUserStates.NoMatter
+			&& userVisibility == constants.ThingUserVisibility.NoMatter)
+			return true;
+	}
+
+	if (!user)
+		return false;
+
+	// If User is Super Administrator returns Thing whatever the pass filters (userRole) passed as parameters
+	if (user.isSuperAdministrator)
+		return true;
+
+	// Priority control if the User has a relationship with the Thing
+	var thingUserRights = getThingUserRights(user._id, user.userName, thing);
+	if (thingUserRights != null)
+	{
+		if (userStatus != constants.ThingUserStates.NoMatter && ((thingUserRights.userStatus & userStatus) == 0))
+			return false;
+
+		if (userRole != constants.ThingUserRole.NoMatter && ((thingUserRights.userRole & userRole) == 0))
+			return false;
+
+		if (userVisibility != constants.ThingUserVisibility.NoMatter && ((thingUserRights.userVisibility & userVisibility) == 0))
+			return false;
+	}
+
+	if ((thing.everyoneReadClaims & constants.ThingUserReadClaims.AllClaims) != 0 || (thing.everyoneChangeClaims & constants.ThingUserChangeClaims.AllClaims) != 0)
+		return true;
+
+	// If the User has no relationship with Thing does not pass
+	if (thingUserRights == null)
+		return false;
+
+	if (userStatus != constants.ThingUserStates.NoMatter && ((thingUserRights.userStatus & userStatus) == 0))
+		return false;
+
+	if (userRole != constants.ThingUserRole.NoMatter && ((thingUserRights.userRole & userRole) == 0))
+		return false;
+
+	if (userVisibility != constants.ThingUserVisibility.NoMatter && ((thingUserRights.userVisibility & userVisibility) == 0))
+		return false;
+
+	return true;
+}
+
+// Not optimized using the CheckThingAccess function.
+// It does not get optimized because staying so you have a capillary control of where it eventually snaps the error
+async function getThing(user, thingId, deletedStatus, userRole, userStatus, userVisibility) {
+
+	if (!thingId)
+		throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Thing's Id not valid", 37);
+
+	let thing = await findThingById(thingId);
+	if (!thing)
+	{
+		// Returns HttpStatusCode.Unauthorized to Reset Some Malicious Logon Access
+		if (!user)
+			throw new utils.ErrorCustom(httpStatusCodes.UNAUTHORIZED, "Unauthorized user", 38);
+		throw new utils.ErrorCustom(httpStatusCodes.NOT_FOUND, "Thing not found", 39);
+	}
+
+	if (deletedStatus != constants.ThingDeletedStatus.NoMatter && thing.DeletedStatus != deletedStatus)
+		throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Thing's Deletedstatus not valid", 40);
+
+	if ((thing.publicReadClaims & constants.ThingUserReadClaims.AllClaims) != 0 
+		|| (thing.publicChangeClaims & constants.ThingUserChangeClaims.AllClaims) != 0)
+	{
+		// This is a condition I do not remember why it was put on. I consider it important.
+		// At this time it is commented why when I try to assign a pos to Thing
+		// for an unnamed user who does not have a relationship with Thing the condition does not let me pass.
+		// if (user == null && userRole == ThingUserRole.NoMatter && userStatus == ThingUserStates.NoMatter && userVisibility == constants.ThingUserVisibility.NoMatter)
+		return thing;
+	}
+
+	if (user == null)
+		throw new utils.ErrorCustom(httpStatusCodes.UNAUTHORIZED, "Unauthorized user", 41);
+
+	// If User is Super Administrator returns Thing whatever the pass filters (userRole) passed as parameters
+	if (user.isSuperAdministrator)
+		return thing;
+
+	// Priority control if the User has a relationship with the Thing
+	var thingUserRights = getThingUserRights(user._id, user.username, thing);
+	if (thingUserRights != null)
+	{
+		if (userStatus != constants.ThingUserStates.NoMatter && ((thingUserRights.userStatus & userStatus) == 0))
+			throw new utils.ErrorCustom(httpStatusCodes.FORBIDDEN, "Unauthorized user", 42);
+
+		if (userRole != constants.ThingUserRole.NoMatter && ((thingUserRights.userRole & userRole) == 0))
+			throw new utils.ErrorCustom(httpStatusCodes.FORBIDDEN, "Unauthorized user", 43);
+
+		if (userVisibility != constants.ThingUserVisibility.NoMatter && ((thingUserRights.userVisibility & userVisibility) == 0))
+			throw new utils.ErrorCustom(httpStatusCodes.FORBIDDEN, "Unauthorized user", 48);
+	}
+
+	if ((thing.everyoneReadClaims & constants.ThingUserReadClaims.AllClaims) != 0 || (thing.everyoneChangeClaims & constants.ThingUserChangeClaims.AllClaims) != 0)
+		return thing;
+
+	// If the User has no relationship with Thing does not pass
+	if (thingUserRights == null)
+		throw new utils.ErrorCustom(httpStatusCodes.FORBIDDEN, "Unauthorized user", 44);
+
+	if (userStatus != constants.ThingUserStates.NoMatter && ((thingUserRights.userStatus & userStatus) == 0))
+		throw new utils.ErrorCustom(httpStatusCodes.FORBIDDEN, "Unauthorized user", 45);
+
+	if (userRole != constants.ThingUserRole.NoMatter && ((thingUserRights.userRole & userRole) == 0))
+		throw new utils.ErrorCustom(httpStatusCodes.FORBIDDEN, "Unauthorized user", 46);
+
+	if (userVisibility != constants.ThingUserVisibility.NoMatter && ((thingUserRights.userVisibility & userVisibility) == 0))
+		throw new utils.ErrorCustom(httpStatusCodes.FORBIDDEN, "Unauthorized user", 49);
+
+	return thing;          
+}
+
 // User may be null as it may be anonymous or is a SuperAdministrator who has no relationship with Thing
 // It may return null for old Thing created before Position Management
 function getThingPosition(user, parentThing, childThing) {
@@ -94,6 +218,39 @@ function createThingPosition(user, parentThing, childThing, pos) {
 		parentThingId: parentThing ? parentThing._id : null,
 		pos
 	});
+}
+
+// Prepare notifications for Users who have a relationship with Thing anyway in Ok or WaitForAuth status 
+// and that they are actually registered (Non-users "free" Notifications can not be notified)
+async function getUsersIdsToNotify(thing) {
+	
+	if (!thing)
+		throw new utils.ErrorCustom(httpStatusCodes.INTERNAL_SERVER_ERROR, "Thing can't be null", 26);
+	
+	let UsersIdsToNotify = new Set();
+	
+	for(let r of thing.usersRights) {
+	
+		if (!(
+			((r.userStatus & (constants.ThingUserStates.Ok | constants.ThingUserStates.WaitForAuth)) != 0) &&
+				((r.userVisibility & constants.ThingUserVisibility.Visible) != 0))
+		)
+			continue;
+	
+		let userId = r.userId;
+		let username = r.username;
+	
+		if (!userId && !username)
+			throw new utils.ErrorCustom(httpStatusCodes.INTERNAL_SERVER_ERROR, "both userId and username can't be empty", 27);
+		
+		let user = userId ? await usersManager.findUserById(userId) : await	usersManager.findUserByUsername(username);
+		if (!user)
+			continue;
+			
+		UsersIdsToNotify.add(userId);
+	}
+	
+	return UsersIdsToNotify;
 }
 
 // User may be null because it is anonymous or is a SuperAdministrator who has no relationship with Thing
@@ -170,7 +327,7 @@ async function createThingDTO(user, parentThing, thing, isSuperAdministrator) {
 			thingDTO.value = thing.value;
 		
 		if (thingUserRights && (accessThingUserClaims.read & constants.ThingUserReadClaims.CanReadThingUserRights) != 0) {
-			if ((accessThingUserClaims.read & constants.ThingUserReadClaims.CanReadThingUserStatus) != 0)
+			if ((accessThingUserClaims.read & constants.ThingUserReadClaims.CanReadThingUserStates) != 0)
 				thingDTO.userStatus = thingUserRights.userStatus;
 			
 			if ((accessThingUserClaims.read & constants.ThingUserReadClaims.CanReadThingUserRole) != 0)
@@ -226,37 +383,19 @@ async function createThingDTO(user, parentThing, thing, isSuperAdministrator) {
 	return await thingToThingDTO(loggedInThingUserClaims, thing, loggedInThingUserRights, thingPos);
 }
 
-// Prepare notifications for Users who have a relationship with Thing anyway in Ok or WaitForAuth status and that they are actually registered (Non-users "free" Notifications can not be notified)
-async function getUsersIdsToNotify(thing) {
+// User may be null because it is anonymous or is a SuperAdministrator who has no relationship with Thing
+exports.getThing = async (user, thingId, deletedStatus) => {
 
-	if (!thing)
-		throw new utils.ErrorCustom(httpStatusCodes.INTERNAL_SERVER_ERROR, "Thing can't be null", 26);
+	if (!thingId)
+		throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Thing's Id can't be null", 47);
 
-	let UsersIdsToNotify = new Set();
+	var thing = await getThing(user, thingId, deletedStatus, constants.ThingUserRole.NoMatter,
+		user != null ? constants.ThingUserStates.Ok | constants.ThingUserStates.WaitForAuth : constants.ThingUserStates.NoMatter,
+		constants.ThingUserVisibility.NoMatter
+	);
 
-	for(let r of thing.usersRights) {
-
-		if (!(
-			((r.userStatus & (constants.ThingUserStates.Ok | constants.ThingUserStates.WaitForAuth)) != 0) &&
-			((r.userVisibility & constants.ThingUserVisibility.Visible) != 0))
-		)
-			continue;
-
-		let userId = r.userId;
-		let username = r.username;
-
-		if (!userId && !username)
-			throw new utils.ErrorCustom(httpStatusCodes.INTERNAL_SERVER_ERROR, "both userId and username can't be empty", 27);
-	
-		let user = userId ? await usersManager.findUserById(userId) : await	usersManager.findUserByUsername(username);
-		if (!user)
-			continue;
-		
-		UsersIdsToNotify.add(userId);
-	}
-
-	return UsersIdsToNotify;
-}
+	return await createThingDTO(user, null, thing, user.isSuperAdministrator);
+};
 
 exports.createThing = async (user, thingDTO) => {
 
@@ -273,7 +412,7 @@ exports.createThing = async (user, thingDTO) => {
 		throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Name can't be empty", 16);
 	if (constants.validateThingDeletedStatus(thingDTO.deletedStatus) == false)
 		throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Thing DeletedStatus is incorrect", 17);
-	if (constants.validateThingUserStatus(thingDTO.userStatus) == false)
+	if (constants.validateThingUserStates(thingDTO.userStatus) == false)
 		throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Thing UserStatus is incorrect", 18);
 	if (constants.validateThingUserRole(thingDTO.userRole) == false)
 		throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Thing UserRole is incorrect", 19);
