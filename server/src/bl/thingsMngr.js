@@ -155,6 +155,10 @@ async function getThing(user, thingId, deletedStatus, userRole, userStatus, user
 	if (user.isSuperAdministrator)
 		return thing;
 
+	if ((thing.everyoneReadClaims & constants.ThingUserReadClaims.AllClaims) != 0 
+		|| (thing.everyoneChangeClaims & constants.ThingUserChangeClaims.AllClaims) != 0)
+		return thing;
+
 	// Priority control if the User has a relationship with the Thing
 	var thingUserRights = getThingUserRights(user._id, user.username, thing);
 	if (thingUserRights)
@@ -167,25 +171,11 @@ async function getThing(user, thingId, deletedStatus, userRole, userStatus, user
 
 		if (userVisibility != constants.ThingUserVisibility.NoMatter && ((thingUserRights.userVisibility & userVisibility) == 0))
 			throw new utils.ErrorCustom(httpStatusCodes.FORBIDDEN, "Unauthorized user", 48);
+
+		return thing;
 	}
 
-	if ((thing.everyoneReadClaims & constants.ThingUserReadClaims.AllClaims) != 0 || (thing.everyoneChangeClaims & constants.ThingUserChangeClaims.AllClaims) != 0)
-		return thing;
-
-	// If the User has no relationship with Thing does not pass
-	if (!thingUserRights)
-		throw new utils.ErrorCustom(httpStatusCodes.FORBIDDEN, "Unauthorized user", 44);
-
-	if (userStatus != constants.ThingUserStates.NoMatter && ((thingUserRights.userStatus & userStatus) == 0))
-		throw new utils.ErrorCustom(httpStatusCodes.FORBIDDEN, "Unauthorized user", 45);
-
-	if (userRole != constants.ThingUserRole.NoMatter && ((thingUserRights.userRole & userRole) == 0))
-		throw new utils.ErrorCustom(httpStatusCodes.FORBIDDEN, "Unauthorized user", 46);
-
-	if (userVisibility != constants.ThingUserVisibility.NoMatter && ((thingUserRights.userVisibility & userVisibility) == 0))
-		throw new utils.ErrorCustom(httpStatusCodes.FORBIDDEN, "Unauthorized user", 49);
-
-	return thing;          
+	throw new utils.ErrorCustom(httpStatusCodes.FORBIDDEN, "Unauthorized user", 44);
 }
 
 async function getThings(user, parentThingId, kind, deletedStatus, valueFilter)
@@ -204,11 +194,10 @@ async function getThings(user, parentThingId, kind, deletedStatus, valueFilter)
 		
 		if (user)
 		{
-			publicThingsQuery["$or"] = [];
 			publicThingsQuery["$or"].push({"everyoneReadClaims": { $bitsAnySet: constants.ThingUserReadClaims.AllClaims }});
 			publicThingsQuery["$or"].push({"everyoneChangeClaims": { $bitsAnySet: constants.ThingUserChangeClaims.AllClaims }});
 
-			let userQuery1 = {};
+			let userQuery = {};
 			userQuery["$or"] = [];
 			userQuery["$or"].push({"usersRights.userId": { $eq: user._id}});
 			userQuery["$or"].push({"usersRights.UserName": { $eq: user._username}});
@@ -228,36 +217,22 @@ async function getThings(user, parentThingId, kind, deletedStatus, valueFilter)
 		mainThingsQuery["$and"].push(publicThingsQuery);
 	}
 
-	if (kind != ThingKind.NoMatter)
-		things = from t in things where t.Kind == kind select t;
+	if (kind != constants.ThingKind.NoMatter)
+		mainThingsQuery["$and"].push({"kind": { $eq: kind }});
 
-	if (deletedStatus != ThingDeletedStatus.NoMatter)
-		things = from t in things where t.DeletedStatus == deletedStatus select t;
+	if (deletedStatus != constants.ThingDeletedStates.NoMatter)
+		mainThingsQuery["$and"].push({"deletedStatus": { $eq: deletedStatus }});
 
-	Thing parentThing = null;
-	if (string.IsNullOrWhiteSpace(parentThingId) == false)
+	let parentThing = null;
+	if (parentThingId)
 	{
-		parentThingId = parentThingId.ToLower();
-		// La Thing parent deve essere solo nello Status Ok a meno che non si è SuperAdministrators (Viene controllato da GetThingAsync(...)). By design
-		parentThing = await GetThingAsync(user, objectContext, parentThingId, ThingKind.NoMatter, deletedStatus, ThingUserRole.NoMatter, ThingUserStatus.Ok);
+		// La Thing parent deve essere solo nello Status Ok a meno che non si è SuperAdministrators (Viene controllato da GetThing(...)). By design
+		parentThing = await getThing(user, parentThingId, deletedStatus, 
+			constants.ThingUserRole.NoMatter, constants.ThingUserStatus.Ok, constants.ThingUserVisibility.Visible);
 
-		// TODO: Controllare con il Profile di SQL Server le prestazioni di tutte queste prove
+		mainThingsQuery["$and"].push({"parentsThingsIds.parentThingId": {$eq: parentThingId}});
 
-		// Da buone prestazioni
-		// Non ho riscontrato grandi cambiamenti di prestazioni tra Any e Count
 		things = from t in things where t.Parents.Count(p => p.Id == parentThingId) != 0 select t;
-		//things = from t in things where t.Parents.Any(p => p.Id == parentThingId) select t;
-
-		//IEnumerable<string> childrenIds = GetChildrenThingsIds(parentThing, kind, deletedStatus);
-		//things = from t in things.AsQueryable() join x in childrenIds on t.Id equals x select t;
-		// Funziona ma è lenta
-		//things = from t in things where childrenIds.Contains(t.Id) select t;
-
-		// Non funziona
-		//things = from t in things join c in parentThing.Children on t.Id equals c.Id select t;
-
-		// Non funziona
-		//things = parentThing.Children.AsQueryable();
 	}
 
 	if (mongoDBContext != null && mongoDBContext.IsFake == false)
@@ -484,8 +459,7 @@ exports.getThing = async (user, thingId, deletedStatus) => {
 
 	var thing = await getThing(user, thingId, deletedStatus, constants.ThingUserRole.NoMatter,
 		user ? constants.ThingUserStates.Ok | constants.ThingUserStates.WaitForAuth : constants.ThingUserStates.NoMatter,
-		constants.ThingUserVisibility.NoMatter
-	);
+		constants.ThingUserVisibility.NoMatter);
 
 	return await createThingDTO(user, null, thing, user.isSuperAdministrator);
 };
