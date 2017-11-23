@@ -152,6 +152,7 @@ ThingUserChangeClaims.CanAddChildrenThing | ThingUserChangeClaims.CanRemoveChild
 exports.ThingUserChangeClaims = ThingUserChangeClaims;
 
 exports.ThingKind = {
+	NoMatter: "0",
 	genericId : "1",
 	genericTxt : "the bees are laborious"
 };
