@@ -8,15 +8,13 @@ const passport 			= require("passport");
 
 const utils 			= require("../utils.js");
 const constants 		= require("../constants");
-const dtos 				= require("../dtos");
-const usersMngr 		= require("../bl/usersMngr.js");
 const thingsMngr		= require("../bl/thingsMngr");
 const ClientsConnectorsManager = require("../clientsConnectorsManager");
 
 const router = express.Router();
 
 router.get("/", function(req, res, next) {
-	passport.authenticate("localapikey", function(err, user, info) {
+	passport.authenticate("localapikey", async function(err, user, info) {
 		try {
 			if (err) { 
 				return next(err); 
@@ -25,12 +23,7 @@ router.get("/", function(req, res, next) {
 				return next(new utils.ErrorCustom(httpStatus.UNAUTHORIZED, httpStatus.getStatusText(httpStatus.UNAUTHORIZED), 10));
 			}
 
-			res.json("first thing");
-
-			let usersIds = [];
-			usersIds.push(user._id);
-			ClientsConnectorsManager.api(usersIds, "first thing");
-
+			res.json(await thingsMngr.getThings(user));
 		}  catch (e)  {
 			if (e instanceof utils.ErrorCustom) {
 				next(e);
