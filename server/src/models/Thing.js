@@ -62,6 +62,8 @@ const Thing = mongoose.model("Thing", thingSchema);
  */
 exports.findThingById = _id => Thing.findById(_id).exec();
 
+exports.findThings = query => Thing.find(query).exec();
+
 exports.save = thing => thing.save(thing);
 
 exports.Thing = Thing;

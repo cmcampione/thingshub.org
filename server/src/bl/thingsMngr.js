@@ -11,6 +11,7 @@ const usersManager = require("../bl/usersMngr");
 const thingModel = require("../models/Thing");
 
 function findThingById(id) { return thingModel.findThingById(id);}
+function findThings(query) { return thingModel.findThings(query);}
 
 // First search is by userId after it searchs by username
 // Can return null
@@ -159,7 +160,6 @@ async function getThing(user, thingId, deletedStatus, userRole, userStatus, user
 		|| (thing.everyoneChangeClaims & constants.ThingUserChangeClaims.AllClaims) != 0)
 		return thing;
 
-	// Priority control if the User has a relationship with the Thing
 	var thingUserRights = getThingUserRights(user._id, user.username, thing);
 	if (thingUserRights)
 	{
@@ -178,43 +178,51 @@ async function getThing(user, thingId, deletedStatus, userRole, userStatus, user
 	throw new utils.ErrorCustom(httpStatusCodes.FORBIDDEN, "Unauthorized user", 44);
 }
 
-async function getThings(user, parentThingId, kind, deletedStatus, valueFilter)
-{
+async function getThings(user, parentThingId, kind, deletedStatus, valueFilter) {
+
 	let mainThingsQuery = {};
-	mainThingsQuery["$and"]=[];
-  
+	mainThingsQuery["$and"] = [];
+
 	if (!user.isSuperAdministrator)
 	{
 		// Solo le Things public
-		let publicThingsQuery = {};
+		let publicQuery = {};
+		publicQuery["$or"] = [];
 
-		publicThingsQuery["$or"] = [];
-		publicThingsQuery["$or"].push({"publicReadClaims": { $bitsAnySet: constants.ThingUserReadClaims.AllClaims }});
-		publicThingsQuery["$or"].push({"publicChangeClaims": { $bitsAnySet: constants.ThingUserChangeClaims.AllClaims }});
+		publicQuery["$or"] = [];
+		publicQuery["$or"].push({publicReadClaims: { $bitsAnySet: constants.ThingUserReadClaims.AllClaims }});
+		publicQuery["$or"].push({publicChangeClaims: { $bitsAnySet: constants.ThingUserChangeClaims.AllClaims }});
+
+		mainThingsQuery["$and"].push(publicQuery);
 		
 		if (user)
 		{
-			publicThingsQuery["$or"].push({"everyoneReadClaims": { $bitsAnySet: constants.ThingUserReadClaims.AllClaims }});
-			publicThingsQuery["$or"].push({"everyoneChangeClaims": { $bitsAnySet: constants.ThingUserChangeClaims.AllClaims }});
+			let everyoneQuery = {};
+			everyoneQuery["$or"] = [];
+			everyoneQuery["$or"].push({everyoneReadClaims: { $bitsAnySet: constants.ThingUserReadClaims.AllClaims }});
+			everyoneQuery["$or"].push({everyoneChangeClaims: { $bitsAnySet: constants.ThingUserChangeClaims.AllClaims }});
 
-			let userQuery = {};
-			userQuery["$or"] = [];
-			userQuery["$or"].push({"usersRights.userId": { $eq: user._id}});
-			userQuery["$or"].push({"usersRights.UserName": { $eq: user._username}});
+			mainThingsQuery["$and"].push(everyoneQuery);
 
-			userQuery["$and"] = [];
+			let userRightsQuery = {};
+			userRightsQuery["$and"] = [];
 
+			let userIdUsernameQuery = {};
+			userIdUsernameQuery["$or"] = [];
+			userIdUsernameQuery["$or"].push({"usersRights.userId": { $eq: user._id}});
+			userIdUsernameQuery["$or"].push({"usersRights.username": { $eq: user.username}});
 
-			// Le Things public, everyone e dello User
-			things = from t in thingsRep.AsQueryable() where 
-					 (t.PublicReadClaims & ThingUserReadClaims.AllClaims) != 0 || 
-					 (t.PublicChangeClaims & ThingUserChangeClaims.AllClaims) != 0 ||
-					 (t.EveryoneReadClaims & ThingUserReadClaims.AllClaims) != 0 ||
-					 (t.EveryoneChangeClaims & ThingUserChangeClaims.AllClaims) != 0 || 
-					 t.UsersRights.Count(r => (r.AppUserId == user.Id || r.Username == user.UserName) && ((r.UserStatus & (ThingUserStatus.Ok | ThingUserStatus.WaitForAuth)) != 0)) != 0 select t;
+			userRightsQuery["$and"].push(userIdUsernameQuery);
+
+			let userStatusVisibilityQuery = {};
+			userStatusVisibilityQuery["$and"] = [];
+			userStatusVisibilityQuery["$and"].push({"usersRights.userStatus": {$bitsAnySet: (constants.ThingUserStates.Ok | constants.ThingUserStates.WaitForAuth) }});
+			userStatusVisibilityQuery["$and"].push({"usersRights.userVisibility": {$bitsAnySet: constants.ThingUserVisibility.Visible }});
+			
+			userRightsQuery["$and"].push(userStatusVisibilityQuery);
+
+			mainThingsQuery["$and"].push(userRightsQuery);	
 		}
-
-		mainThingsQuery["$and"].push(publicThingsQuery);
 	}
 
 	if (kind != constants.ThingKind.NoMatter)
@@ -228,13 +236,12 @@ async function getThings(user, parentThingId, kind, deletedStatus, valueFilter)
 	{
 		// La Thing parent deve essere solo nello Status Ok a meno che non si è SuperAdministrators (Viene controllato da GetThing(...)). By design
 		parentThing = await getThing(user, parentThingId, deletedStatus, 
-			constants.ThingUserRole.NoMatter, constants.ThingUserStatus.Ok, constants.ThingUserVisibility.Visible);
+			constants.ThingUserRole.NoMatter, constants.ThingUserStates.Ok, constants.ThingUserVisibility.Visible);
 
-		mainThingsQuery["$and"].push({"parentsThingsIds.parentThingId": {$eq: parentThingId}});
-
-		things = from t in things where t.Parents.Count(p => p.Id == parentThingId) != 0 select t;
+		mainThingsQuery["$and"].push({"parentsThingsIds.parentThingId": {$in: [parentThingId] }});
 	}
 
+	/* 
 	if (mongoDBContext != null && mongoDBContext.IsFake == false)
 	{
 		//Ottengo tutti gli id che soddisfano i filtri del value e che l'id sia tra quelli già filtrati prima
@@ -251,9 +258,12 @@ async function getThings(user, parentThingId, kind, deletedStatus, valueFilter)
 		documents = await mongoCollection.Find(filter).ToListAsync(); //   FirstOrDefaultAsync();
 
 		//TODO: Limitare le things in funzione di solo quelle ritornale su documents
-	}
+	} */
 
-	return new Tuple<Thing, IQueryable<Thing>>(parentThing, things);
+	return {
+		parentThing, 
+		things: await findThings(mainThingsQuery)
+	};
 }
 
 // User may be null as it may be anonymous or is a SuperAdministrator who has no relationship with Thing
@@ -462,6 +472,11 @@ exports.getThing = async (user, thingId, deletedStatus) => {
 		constants.ThingUserVisibility.NoMatter);
 
 	return await createThingDTO(user, null, thing, user.isSuperAdministrator);
+};
+
+exports.getThings = async (user) => {
+
+	return await getThings(user, null, constants.ThingKind.NoMatter, constants.ThingDeletedStates.NoMatter, null);
 };
 
 exports.createThing = async (user, thingDTO) => {
