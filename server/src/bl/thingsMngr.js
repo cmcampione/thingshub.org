@@ -180,7 +180,7 @@ async function getThing(user, thingId, deletedStatus, userRole, userStatus, user
 	throw new utils.ErrorCustom(httpStatusCodes.FORBIDDEN, "Unauthorized user", 44);
 }
 
-async function getThings(user, parentThingId, kind, deletedStatus, thingFilter, valueFilter, orderBy, skip, pageSize) {
+async function getThings(user, parentThingId, thingFilter, valueFilter, orderBy, skip, pageSize) {
 
 	let mainThingsQuery = {};
 
@@ -211,8 +211,8 @@ async function getThings(user, parentThingId, kind, deletedStatus, thingFilter, 
 
 		let userIdUsernameQuery = {};
 		userIdUsernameQuery["$or"] = [];
-		userIdUsernameQuery["$or"].push({"usersRights.userId": { $eq: user._id}});
-		userIdUsernameQuery["$or"].push({"usersRights.username": { $eq: user.username}});
+		userIdUsernameQuery["$or"].push({"usersRights.userId": user._id });
+		userIdUsernameQuery["$or"].push({"usersRights.username": user.username });
 
 		userRightsQuery["$and"].push(userIdUsernameQuery);
 
@@ -228,19 +228,14 @@ async function getThings(user, parentThingId, kind, deletedStatus, thingFilter, 
 
 	mainThingsQuery["$and"].push(publicEveryoneUserQuery);
 
-	if (kind != constants.ThingKind.NoMatter)
-		mainThingsQuery["$and"].push({kind: { $eq: kind }});
-
-	if (deletedStatus != constants.ThingDeletedStates.NoMatter)
-		mainThingsQuery["$and"].push({deletedStatus: { $eq: deletedStatus }});
-
 	let parentThing = null;
 	if (parentThingId) {
 		// La Thing parent deve essere solo nello Status Ok e Visibile a meno che non si è SuperAdministrators (Viene controllato da GetThing(...)). By design
-		parentThing = await getThing(user, parentThingId, deletedStatus, 
+		parentThing = await getThing(user, parentThingId, constants.ThingDeletedStates.Ok, 
 			constants.ThingUserRole.NoMatter, constants.ThingUserStates.Ok, constants.ThingUserVisibility.Visible);
 
-		mainThingsQuery["$and"].push({"parentsThingsIds.parentThingId": {$in: [parentThingId] }});
+		mainThingsQuery["$and"].push({"parentsThingsIds.userId": user ? user._id : null });
+		mainThingsQuery["$and"].push({"parentsThingsIds.parentThingId": parentThingId });
 	}
 
 	if (thingFilter)
@@ -255,9 +250,16 @@ async function getThings(user, parentThingId, kind, deletedStatus, thingFilter, 
 	else
 		order = { "positions.pos": 1 };
 
+	let things = await findThings(mainThingsQuery, order, skip, pageSize);
+
+	let thingsDTO = [];
+	for(let thing of things) {
+		thingsDTO.push(await createThingDTO(user, parentThing, thing, user ? user.isSuperAdministrator : false));
+	}
+
 	return {
 		totalItem: await countThings(mainThingsQuery),
-		things: await findThings(mainThingsQuery, order, skip, pageSize)
+		thingsDTO
 	};
 }
 
@@ -471,7 +473,7 @@ exports.getThing = async (user, thingId, deletedStatus) => {
 
 exports.getThings = async (user) => {
 
-	return await getThings(user, null, constants.ThingKind.NoMatter, constants.ThingDeletedStates.NoMatter, null, null, null , 0, 3);
+	return await getThings(user, null, {name: "gambero"}, null, {_id: 1} , 0, 3);
 };
 
 exports.createThing = async (user, thingDTO) => {
@@ -487,9 +489,9 @@ exports.createThing = async (user, thingDTO) => {
 		throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Kind can't be empty", 15);
 	if (!thingDTO.name)
 		throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Name can't be empty", 16);
-	if (constants.validateThingDeletedStates(thingDTO.deletedStatus) == false)
+	if (constants.validateThingDeletedStatus(thingDTO.deletedStatus) == false)
 		throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Thing DeletedStatus is incorrect", 17);
-	if (constants.validateThingUserStates(thingDTO.userStatus) == false)
+	if (constants.validateThingUserStatus(thingDTO.userStatus) == false)
 		throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Thing UserStatus is incorrect", 18);
 	if (constants.validateThingUserRole(thingDTO.userRole) == false)
 		throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Thing UserRole is incorrect", 19);
