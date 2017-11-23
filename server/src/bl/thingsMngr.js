@@ -256,7 +256,6 @@ async function getThings(user, parentThingId, kind, deletedStatus, thingFilter, 
 		order = { "positions.pos": 1 };
 
 	return {
-		parentThing, 
 		totalItem: await countThings(mainThingsQuery),
 		things: await findThings(mainThingsQuery, order, skip, pageSize)
 	};
