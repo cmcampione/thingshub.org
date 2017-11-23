@@ -11,7 +11,8 @@ const usersManager = require("../bl/usersMngr");
 const thingModel = require("../models/Thing");
 
 function findThingById(id) { return thingModel.findThingById(id);}
-function findThings(query) { return thingModel.findThings(query);}
+function countThings(query) { return thingModel.countThings(query);}
+function findThings(query, orderBy, skip, pageSize) { return thingModel.findThings(query, orderBy, skip, pageSize);}
 
 // First search is by userId after it searchs by username
 // Can return null
@@ -66,6 +67,7 @@ function getThingUserClaims(user, thing, isSuperAdministrator) {
 }
 
 function checkThingAccess(user, thing, deletedStatus, userRole, userStatus, userVisibility) {
+
 	if (!thing)
 		throw new utils.ErrorCustom(httpStatusCodes.INTERNAL_SERVER_ERROR, "Thing not valid", 36);
 
@@ -178,7 +180,7 @@ async function getThing(user, thingId, deletedStatus, userRole, userStatus, user
 	throw new utils.ErrorCustom(httpStatusCodes.FORBIDDEN, "Unauthorized user", 44);
 }
 
-async function getThings(user, parentThingId, kind, deletedStatus, valueFilter) {
+async function getThings(user, parentThingId, kind, deletedStatus, thingFilter, valueFilter, orderBy, skip, pageSize) {
 
 	let mainThingsQuery = {};
 
@@ -194,8 +196,8 @@ async function getThings(user, parentThingId, kind, deletedStatus, valueFilter) 
 		publicEveryoneUserQuery["$or"].push({publicChangeClaims: { $bitsAnySet: constants.ThingUserChangeClaims.AllClaims }});
 	}
 
-	if (user && !user.isSuperAdministrator)
-	{
+	if (user && !user.isSuperAdministrator)	{
+
 		publicEveryoneUserQuery["$or"] = [];
 
 		publicEveryoneUserQuery["$or"].push({publicReadClaims: { $bitsAnySet: constants.ThingUserReadClaims.AllClaims }});
@@ -227,14 +229,13 @@ async function getThings(user, parentThingId, kind, deletedStatus, valueFilter) 
 	mainThingsQuery["$and"].push(publicEveryoneUserQuery);
 
 	if (kind != constants.ThingKind.NoMatter)
-		mainThingsQuery["$and"].push({"kind": { $eq: kind }});
+		mainThingsQuery["$and"].push({kind: { $eq: kind }});
 
 	if (deletedStatus != constants.ThingDeletedStates.NoMatter)
-		mainThingsQuery["$and"].push({"deletedStatus": { $eq: deletedStatus }});
+		mainThingsQuery["$and"].push({deletedStatus: { $eq: deletedStatus }});
 
 	let parentThing = null;
-	if (parentThingId)
-	{
+	if (parentThingId) {
 		// La Thing parent deve essere solo nello Status Ok e Visibile a meno che non si è SuperAdministrators (Viene controllato da GetThing(...)). By design
 		parentThing = await getThing(user, parentThingId, deletedStatus, 
 			constants.ThingUserRole.NoMatter, constants.ThingUserStates.Ok, constants.ThingUserVisibility.Visible);
@@ -242,28 +243,22 @@ async function getThings(user, parentThingId, kind, deletedStatus, valueFilter) 
 		mainThingsQuery["$and"].push({"parentsThingsIds.parentThingId": {$in: [parentThingId] }});
 	}
 
-	/* 
-	if (mongoDBContext != null && mongoDBContext.IsFake == false)
-	{
-		//Ottengo tutti gli id che soddisfano i filtri del value e che l'id sia tra quelli già filtrati prima
-		var thingIds = from t in things.AsQueryable() select t.Id;
+	if (thingFilter)
+		mainThingsQuery["$and"].push(thingFilter);	
 
-		string joined = string.Join(",", thingIds);
-		joined = "'" + joined.Replace(",", "','") + "'";
-		valueFilter += "{thingId:{$in:[" + joined + "]}},";
+	if (valueFilter)
+		mainThingsQuery["$and"].push(valueFilter);
 
-		List<BsonDocument> documents;
-		BsonDocument filter = MongoDB.Bson.Serialization.BsonSerializer.Deserialize<BsonDocument>(valueFilter);
-
-		var mongoCollection = mongoDBContext.MongoDB.GetCollection<BsonDocument>("ThingValue");
-		documents = await mongoCollection.Find(filter).ToListAsync(); //   FirstOrDefaultAsync();
-
-		//TODO: Limitare le things in funzione di solo quelle ritornale su documents
-	} */
+	let order = null;
+	if (orderBy)
+		order = orderBy;
+	else
+		order = { "positions.pos": 1 };
 
 	return {
 		parentThing, 
-		things: await findThings(mainThingsQuery)
+		totalItem: await countThings(mainThingsQuery),
+		things: await findThings(mainThingsQuery, order, skip, pageSize)
 	};
 }
 
@@ -477,7 +472,7 @@ exports.getThing = async (user, thingId, deletedStatus) => {
 
 exports.getThings = async (user) => {
 
-	return await getThings(user, null, constants.ThingKind.NoMatter, constants.ThingDeletedStates.NoMatter, null);
+	return await getThings(user, null, constants.ThingKind.NoMatter, constants.ThingDeletedStates.NoMatter, null, null, null , 0, 3);
 };
 
 exports.createThing = async (user, thingDTO) => {
