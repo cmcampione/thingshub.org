@@ -181,49 +181,50 @@ async function getThing(user, thingId, deletedStatus, userRole, userStatus, user
 async function getThings(user, parentThingId, kind, deletedStatus, valueFilter) {
 
 	let mainThingsQuery = {};
+
 	mainThingsQuery["$and"] = [];
 
-	if (!user.isSuperAdministrator)
-	{
-		// Solo le Things public
-		let publicQuery = {};
-		publicQuery["$or"] = [];
+	let publicEveryoneUserQuery = {};
 
-		publicQuery["$or"] = [];
-		publicQuery["$or"].push({publicReadClaims: { $bitsAnySet: constants.ThingUserReadClaims.AllClaims }});
-		publicQuery["$or"].push({publicChangeClaims: { $bitsAnySet: constants.ThingUserChangeClaims.AllClaims }});
+	if (!user) {
 
-		mainThingsQuery["$and"].push(publicQuery);
+		publicEveryoneUserQuery["$or"] = [];
 		
-		if (user)
-		{
-			let everyoneQuery = {};
-			everyoneQuery["$or"] = [];
-			everyoneQuery["$or"].push({everyoneReadClaims: { $bitsAnySet: constants.ThingUserReadClaims.AllClaims }});
-			everyoneQuery["$or"].push({everyoneChangeClaims: { $bitsAnySet: constants.ThingUserChangeClaims.AllClaims }});
-
-			mainThingsQuery["$and"].push(everyoneQuery);
-
-			let userRightsQuery = {};
-			userRightsQuery["$and"] = [];
-
-			let userIdUsernameQuery = {};
-			userIdUsernameQuery["$or"] = [];
-			userIdUsernameQuery["$or"].push({"usersRights.userId": { $eq: user._id}});
-			userIdUsernameQuery["$or"].push({"usersRights.username": { $eq: user.username}});
-
-			userRightsQuery["$and"].push(userIdUsernameQuery);
-
-			let userStatusVisibilityQuery = {};
-			userStatusVisibilityQuery["$and"] = [];
-			userStatusVisibilityQuery["$and"].push({"usersRights.userStatus": {$bitsAnySet: (constants.ThingUserStates.Ok | constants.ThingUserStates.WaitForAuth) }});
-			userStatusVisibilityQuery["$and"].push({"usersRights.userVisibility": {$bitsAnySet: constants.ThingUserVisibility.Visible }});
-			
-			userRightsQuery["$and"].push(userStatusVisibilityQuery);
-
-			mainThingsQuery["$and"].push(userRightsQuery);	
-		}
+		publicEveryoneUserQuery["$or"].push({publicReadClaims: { $bitsAnySet: constants.ThingUserReadClaims.AllClaims }});
+		publicEveryoneUserQuery["$or"].push({publicChangeClaims: { $bitsAnySet: constants.ThingUserChangeClaims.AllClaims }});
 	}
+
+	if (user && !user.isSuperAdministrator)
+	{
+		publicEveryoneUserQuery["$or"] = [];
+
+		publicEveryoneUserQuery["$or"].push({publicReadClaims: { $bitsAnySet: constants.ThingUserReadClaims.AllClaims }});
+		publicEveryoneUserQuery["$or"].push({publicChangeClaims: { $bitsAnySet: constants.ThingUserChangeClaims.AllClaims }});
+
+		publicEveryoneUserQuery["$or"].push({everyoneReadClaims: { $bitsAnySet: constants.ThingUserReadClaims.AllClaims }});
+		publicEveryoneUserQuery["$or"].push({everyoneChangeClaims: { $bitsAnySet: constants.ThingUserChangeClaims.AllClaims }});
+
+		let userRightsQuery = {};
+		userRightsQuery["$and"] = [];
+
+		let userIdUsernameQuery = {};
+		userIdUsernameQuery["$or"] = [];
+		userIdUsernameQuery["$or"].push({"usersRights.userId": { $eq: user._id}});
+		userIdUsernameQuery["$or"].push({"usersRights.username": { $eq: user.username}});
+
+		userRightsQuery["$and"].push(userIdUsernameQuery);
+
+		let userStatusVisibilityQuery = {};
+		userStatusVisibilityQuery["$and"] = [];
+		userStatusVisibilityQuery["$and"].push({"usersRights.userStatus": {$bitsAnySet: (constants.ThingUserStates.Ok | constants.ThingUserStates.WaitForAuth) }});
+		userStatusVisibilityQuery["$and"].push({"usersRights.userVisibility": {$bitsAnySet: constants.ThingUserVisibility.Visible }});
+		
+		userRightsQuery["$and"].push(userStatusVisibilityQuery);
+
+		publicEveryoneUserQuery["$or"].push(userRightsQuery);
+	}
+
+	mainThingsQuery["$and"].push(publicEveryoneUserQuery);
 
 	if (kind != constants.ThingKind.NoMatter)
 		mainThingsQuery["$and"].push({"kind": { $eq: kind }});
@@ -234,7 +235,7 @@ async function getThings(user, parentThingId, kind, deletedStatus, valueFilter) 
 	let parentThing = null;
 	if (parentThingId)
 	{
-		// La Thing parent deve essere solo nello Status Ok a meno che non si è SuperAdministrators (Viene controllato da GetThing(...)). By design
+		// La Thing parent deve essere solo nello Status Ok e Visibile a meno che non si è SuperAdministrators (Viene controllato da GetThing(...)). By design
 		parentThing = await getThing(user, parentThingId, deletedStatus, 
 			constants.ThingUserRole.NoMatter, constants.ThingUserStates.Ok, constants.ThingUserVisibility.Visible);
 
