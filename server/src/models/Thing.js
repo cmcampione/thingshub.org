@@ -36,20 +36,10 @@ const thingSchema = mongoose.Schema({
 		shortPin          : Number
 	}],
 
-	positions: [{
+	parentsThingsIds : [{
 		userId : mongoose.Schema.Types.ObjectId,
 		parentThingId : String,
 		pos  : Number
-	}],
-  
-	parentsThingsIds : [{
-		userId : mongoose.Schema.Types.ObjectId,
-		parentThingId : String
-	}],
-  
-	childrenThings: [{
-		userId : mongoose.Schema.Types.ObjectId,
-		childThingId : String
 	}]
 });
 

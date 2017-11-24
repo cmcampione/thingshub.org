@@ -53,6 +53,7 @@ exports.UserInfoDTO = UserInfoDTO;
 
 class ThingDTO {
 	constructor() {
+		
 		this.id = "";
 
 		this.creationDate = null;
@@ -61,7 +62,7 @@ class ThingDTO {
 		
 		this.kind = constants.ThingKind.generic;
 		
-		this.pos = 0;
+		this.pos = 0;// Not used during creation or updating of thing
 		
 		this.deletedStatus = constants.ThingDeletedStates.NoMatter;
 		this.deletedDate = null;
@@ -81,7 +82,7 @@ class ThingDTO {
 		this.userReadClaims = constants.ThingUserReadClaims.NoClaim;
 		this.userChangeClaims = constants.ThingUserChangeClaims.NoClaim;
 		
-		this.usersInfos = [];
+		this.usersInfos = []; // Not used during creation or updating of thing
 	}
 }
 exports.ThingDTO = ThingDTO;
