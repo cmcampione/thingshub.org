@@ -138,7 +138,7 @@ async function getThing(user, thingId, deletedStatus, userRole, userStatus, user
 		throw new utils.ErrorCustom(httpStatusCodes.NOT_FOUND, "Thing not found", 39);
 	}
 
-	if (deletedStatus != constants.ThingDeletedStates.NoMatter && thing.DeletedStatus != deletedStatus)
+	if (deletedStatus != constants.ThingDeletedStates.NoMatter && thing.deletedStatus != deletedStatus)
 		throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Thing's Deletedstatus not valid", 40);
 
 	if ((thing.publicReadClaims & constants.ThingUserReadClaims.AllClaims) != 0 
@@ -154,7 +154,7 @@ async function getThing(user, thingId, deletedStatus, userRole, userStatus, user
 	if (!user)
 		throw new utils.ErrorCustom(httpStatusCodes.UNAUTHORIZED, "Unauthorized user", 41);
 
-	// If User is Super Administrator returns Thing whatever the pass filters (userRole) passed as parameters
+	// If User is Super Administrator returns Thing whatever filters(userRole) are passed as parameters
 	if (user.isSuperAdministrator)
 		return thing;
 
@@ -230,12 +230,10 @@ async function getThings(user, parentThingId, thingFilter, valueFilter, orderBy,
 
 	let parentThing = null;
 	if (parentThingId) {
-		// La Thing parent deve essere solo nello Status Ok e Visibile a meno che non si è SuperAdministrators (Viene controllato da GetThing(...)). By design
 		parentThing = await getThing(user, parentThingId, constants.ThingDeletedStates.Ok, 
 			constants.ThingUserRole.NoMatter, constants.ThingUserStates.Ok, constants.ThingUserVisibility.Visible);
 
-		mainThingsQuery["$and"].push({"parentsThingsIds.userId": user ? user._id : null });
-		mainThingsQuery["$and"].push({"parentsThingsIds.parentThingId": parentThingId });
+		mainThingsQuery["$and"].push({parentsThingsIds: { $elemMatch: {userId: user ? user._id : null, parentThingId: parentThingId }}} );
 	}
 
 	if (thingFilter)
@@ -244,11 +242,7 @@ async function getThings(user, parentThingId, thingFilter, valueFilter, orderBy,
 	if (valueFilter)
 		mainThingsQuery["$and"].push(valueFilter);
 
-	let order = null;
-	if (orderBy)
-		order = orderBy;
-	else
-		order = { "positions.pos": 1 };
+	let order = orderBy ? orderBy : { "parentsThingsIds.pos": 1 };
 
 	let things = await findThings(mainThingsQuery, order, skip, pageSize);
 
@@ -277,7 +271,7 @@ function getThingPosition(user, parentThing, childThing) {
 	let userId = user._id;
 	let parentThingId = parentThing ? parentThing._id : null;
 
-	return childThing.positions.find(p => p.userId == userId && p.parentThingId == parentThingId);
+	return childThing.parentsThingsIds.find(p => p.userId == userId && p.parentThingId == parentThingId);
 }
 
 function createThingPosition(user, parentThing, childThing, pos) {
@@ -288,7 +282,7 @@ function createThingPosition(user, parentThing, childThing, pos) {
 	if (!childThing)
 		throw new utils.ErrorCustom(httpStatusCodes.INTERNAL_SERVER_ERROR, "Child Thing can't be null", 25);
 	
-	childThing.positions.push({
+	childThing.parentsThingsIds.push({
 		userId: user._id,
 		parentThingId: parentThing ? parentThing._id : null,
 		pos
@@ -473,7 +467,7 @@ exports.getThing = async (user, thingId, deletedStatus) => {
 
 exports.getThings = async (user) => {
 
-	return await getThings(user, null, {name: "gambero"}, null, {_id: 1} , 0, 3);
+	return await getThings(user, null, null, null, null , 0, 3);
 };
 
 exports.createThing = async (user, thingDTO) => {
