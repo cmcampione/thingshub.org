@@ -2,7 +2,7 @@
 
 const mongoose = require("mongoose");
 
-const constants = require("../constants");
+const constants = require("../../../common/src/constants");
 
 const thingSchema = mongoose.Schema({
 	

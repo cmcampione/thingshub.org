@@ -1,0 +1,30 @@
+import { UserInfo } from "./userInfo";
+import * as thingConstants from "../../common/src/constants";
+import { ThingDTO } from "../../common/src/dtos";
+export declare class Thing {
+    childrenSkip: number;
+    childrenTotalItems: number;
+    children: Thing[];
+    id: string;
+    creationDateTime: Date;
+    name: string;
+    kind: string;
+    pos: number;
+    deletedStatus: thingConstants.ThingDeletedStatus;
+    deletedDateTime: Date;
+    publicReadClaims: thingConstants.ThingUserReadClaims;
+    publicChangeClaims: thingConstants.ThingUserChangeClaims;
+    everyoneReadClaims: thingConstants.ThingUserReadClaims;
+    everyoneChangeClaims: thingConstants.ThingUserChangeClaims;
+    userStatus: thingConstants.ThingUserStatus;
+    userRole: thingConstants.ThingUserRoles;
+    userVisibility: thingConstants.ThingUserVisibility;
+    userReadClaims: thingConstants.ThingUserReadClaims;
+    userChangeClaims: thingConstants.ThingUserChangeClaims;
+    usersInfos: UserInfo[];
+    value: any;
+    constructor(thingDTO?: ThingDTO);
+    addThingChild(thingChildDTO: ThingDTO): void;
+    collapse(): void;
+    shallowCopy(): Thing;
+}
