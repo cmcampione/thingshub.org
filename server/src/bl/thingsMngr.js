@@ -12,7 +12,7 @@ const thingModel = require("../models/Thing");
 
 function findThingById(id) { return thingModel.findThingById(id);}
 function countThings(query) { return thingModel.countThings(query);}
-function findThings(query, orderBy, skip, pageSize) { return thingModel.findThings(query, orderBy, skip, pageSize);}
+function findThings(query, orderBy, skip, top) { return thingModel.findThings(query, orderBy, skip, top);}
 
 // First search is by userId after it searchs by username
 // Can return null
@@ -180,7 +180,12 @@ async function getThing(user, thingId, deletedStatus, userRole, userStatus, user
 	throw new utils.ErrorCustom(httpStatusCodes.FORBIDDEN, "Unauthorized user", 44);
 }
 
-async function getThings(user, parentThingId, thingFilter, valueFilter, orderBy, skip, pageSize) {
+async function getThings(user, parentThingId, thingFilter, valueFilter, orderBy, skip, top) {
+
+	let paging = utils.validateAndFixInputPaging(skip, top);
+
+	skip = paging.skip;
+	top = paging.top;
 
 	let mainThingsQuery = {};
 
@@ -230,10 +235,11 @@ async function getThings(user, parentThingId, thingFilter, valueFilter, orderBy,
 
 	let parentThing = null;
 	if (parentThingId) {
+		
 		parentThing = await getThing(user, parentThingId, constants.ThingDeletedStates.Ok, 
 			constants.ThingUserRole.NoMatter, constants.ThingUserStates.Ok, constants.ThingUserVisibility.Visible);
 
-		mainThingsQuery["$and"].push({parentsThingsIds: { $elemMatch: {userId: user ? user._id : null, parentThingId: parentThingId }}} );
+		mainThingsQuery["$and"].push({parentsThingsIds: { $elemMatch: {userId: user ? user._id : null, parentThingId }}} );
 	}
 
 	if (thingFilter)
@@ -242,17 +248,26 @@ async function getThings(user, parentThingId, thingFilter, valueFilter, orderBy,
 	if (valueFilter)
 		mainThingsQuery["$and"].push(valueFilter);
 
+	let totalItems =  await countThings(mainThingsQuery);
+
+	if (skip >= totalItems)
+		throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Skip param is not valid",53);
+
+	if (skip + top > totalItems)
+		top = totalItems - skip;
+
 	let order = orderBy ? orderBy : { "parentsThingsIds.pos": 1 };
 
-	let things = await findThings(mainThingsQuery, order, skip, pageSize);
+	let things = await findThings(mainThingsQuery, order, skip, top);
 
 	let thingsDTO = [];
-	for(let thing of things) {
+	for(let thing of things)
 		thingsDTO.push(await createThingDTO(user, parentThing, thing, user ? user.isSuperAdministrator : false));
-	}
 
 	return {
-		totalItem: await countThings(mainThingsQuery),
+		totalItems,
+		skip,
+		top,
 		thingsDTO
 	};
 }
@@ -465,9 +480,11 @@ exports.getThing = async (user, thingId, deletedStatus) => {
 	return await createThingDTO(user, null, thing, user.isSuperAdministrator);
 };
 
-exports.getThings = async (user) => {
+exports.getThings = async (user, parentThingId, thingFilter, valueFilter, orderBy, skip, top) => {
 
-	return await getThings(user, null, null, null, null , 0, 3);
+	let paging = utils.validateAndFixInputPaging(skip, top);
+
+	return await getThings(user, parentThingId, thingFilter, valueFilter, orderBy, paging.skip, paging.top);
 };
 
 exports.createThing = async (user, thingDTO) => {
@@ -537,3 +554,4 @@ exports.createThing = async (user, thingDTO) => {
 		thingDTO : await createThingDTO(user, null, thing, false)
 	};
 };
+
