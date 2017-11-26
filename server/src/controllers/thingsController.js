@@ -23,7 +23,21 @@ router.get("/", function(req, res, next) {
 				return next(new utils.ErrorCustom(httpStatus.UNAUTHORIZED, httpStatus.getStatusText(httpStatus.UNAUTHORIZED), 10));
 			}
 
-			res.json(await thingsMngr.getThings(user));
+			let parentThingId = req.query.parentThingId;
+			let thingFilter = req.query.thingFilter ? JSON.parse(req.query.thingFilter) : null;
+			let valueFilter = req.query.valueFilter ? JSON.parse(req.query.valueFilter) : null;
+			let orderBy = req.query.orderBy;
+			let skip = req.query.skip ? parseInt(req.query.skip) : 0;
+			let top = req.query.top ? parseInt(req.query.top) : parseInt(process.env.GET_THINGS_MAX_PAGESIZE);
+
+			let paging = utils.validateAndFixInputPaging(skip, top);
+
+			let things = await thingsMngr.getThings(user, parentThingId, thingFilter, valueFilter, orderBy, paging.skip, paging.top);
+
+			res.setHeader("Content-Range", "Items " + things.top + "-" + skip + "/" + things.totalItems);
+
+			res.json(things.thingsDTO);
+			
 		}  catch (e)  {
 			if (e instanceof utils.ErrorCustom) {
 				next(e);

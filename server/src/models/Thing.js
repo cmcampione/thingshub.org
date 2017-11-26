@@ -53,7 +53,7 @@ const Thing = mongoose.model("Thing", thingSchema);
 exports.findThingById = _id => Thing.findById(_id).exec();
 
 exports.countThings = (query) => Thing.find(query).count().exec();
-exports.findThings = (query, orderBy, skip, pageSize) => Thing.find(query).sort(orderBy).skip(skip).limit(pageSize).exec();
+exports.findThings = (query, orderBy, skip, top) => Thing.find(query).sort(orderBy).skip(skip).limit(top).exec();
 
 exports.save = thing => thing.save(thing);
 
