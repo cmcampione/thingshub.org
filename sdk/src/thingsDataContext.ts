@@ -14,53 +14,55 @@ export interface ThingsGetParams {
     top : number;
 }
 
-export interface ThingsRawDataSet {
+export interface ThingsDTOsDataSet {
     things:  ThingDTO[];
     itemsRange: ItemsRange
 }
 
 export class ThingsDataContext {
 
-    private static apiEndPointAddress: string = "";
+    private apiEndPointAddress: string = "";
+    private securityHeaderHook: () => object = null;
     
-    private static thingsUrl(thingId?: string) : string { 
-        return ThingsDataContext.apiEndPointAddress + "/things/" + (thingId || ""); 
+    private thingsUrl(thingId?: string) : string { 
+        return this.apiEndPointAddress + "/things/" + (thingId || ""); 
     }
-    private static thingsValueUrl(thingId: string) : string { 
-        return ThingsDataContext.apiEndPointAddress + "/things/" + thingId + "/value" 
+    private thingsValueUrl(thingId: string) : string { 
+        return this.apiEndPointAddress + "/things/" + thingId + "/value" 
     }
-    private static thingsPositionsUrl() : string {
-        return ThingsDataContext.apiEndPointAddress + "/things/positions" 
+    private thingsPositionsUrl() : string {
+        return this.apiEndPointAddress + "/things/positions" 
     }
-    private static thingChildrenUrl(parentThingId: string, childrenId?: string) {
-        return ThingsDataContext.apiEndPointAddress + "/things/" + (parentThingId) + "/childrenIds/" + (childrenId || "");
+    private thingChildrenUrl(parentThingId: string, childrenId?: string) {
+        return this.apiEndPointAddress + "/things/" + (parentThingId) + "/childrenIds/" + (childrenId || "");
     }
-    private static thingDeleteChildUrl(parentThingId: string, childThingId: string) {
-        return ThingsDataContext.apiEndPointAddress + "/things/" + parentThingId + "/childrenIds/" + childThingId 
-    }
-
-    // INFO: Is mandatory call "init"" before the use of this class
-    public static init(endPointAddress: EndPointAddress) {
-
-        ThingsDataContext.apiEndPointAddress = endPointAddress.api;
+    private thingDeleteChildUrl(parentThingId: string, childThingId: string) {
+        return this.apiEndPointAddress + "/things/" + parentThingId + "/childrenIds/" + childThingId 
     }
 
-    public static getThing(thingId: string) : Promise<ThingDTO | HttpFailResult> {
-        return axios.get(ThingsDataContext.thingsUrl(thingId), {
-            headers: Helpers.securityHeaders
+    public  constructor(endPointAddress: EndPointAddress,
+        securityHeaderHook: () => object) {
+
+        this.apiEndPointAddress = endPointAddress.api;
+        this.securityHeaderHook = securityHeaderHook;
+    }
+
+    public  getThing(thingId: string) : Promise<ThingDTO | HttpFailResult> {
+        return axios.get(this.thingsUrl(thingId), {
+            headers: this.securityHeaderHook()
         })
         .then(function(response: any) : ThingDTO {
             return response.data;
         })
     }
     // INFO: To abort call "canceler.cancel()"
-    public static getThings(parameter: ThingsGetParams, canceler?: HttpRequestCanceler) : Promise<ThingsRawDataSet | HttpFailResult> {
+    public  getThings(parameter: ThingsGetParams, canceler?: HttpRequestCanceler) : Promise<ThingsDTOsDataSet | HttpFailResult> {
         
-        var urlRaw = ThingsDataContext.thingsUrl() + "?" +
-                (!!parameter.parentThingId ? ("&$parentId=" + parameter.parentThingId) : "") +
+        var urlRaw = this.thingsUrl() + "?" +
+                (!!parameter.parentThingId ? ("&$parentThingId=" + parameter.parentThingId) : "") +
                 (!!parameter.thingFilter ? ("&$thingFilter=" + parameter.thingFilter) : "") +
                 (!!parameter.valueFilter ? ("&$valueFilter=" + parameter.valueFilter) : "") +                
-                (!!parameter.orderBy ? ("&$orderby=" + parameter.orderBy) : "") +
+                (!!parameter.orderBy ? ("&$orderBy=" + parameter.orderBy) : "") +
                 (!!parameter.skip ? ("&$skip=" + parameter.skip) : "") +
                 (!!parameter.top ? ("&$top=" + parameter.top) : "");
 
@@ -68,10 +70,10 @@ export class ThingsDataContext {
             canceler.setup();
 
         return axios.get(urlRaw, {
-                headers: Helpers.securityHeaders,
+                headers: this.securityHeaderHook(),
                 cancelToken: (canceler) ? canceler.cancelerToken : null
             })
-        .then(function(response: any) : ThingsRawDataSet {
+        .then(function(response: any) : ThingsDTOsDataSet {
             return {
                 things: response.data,
                 itemsRange: Helpers.getRangeItemsFromResponse(response)
@@ -86,27 +88,27 @@ export class ThingsDataContext {
     }
     
     // TOCHECK: Check Returned data
-    public static createThing(ThingDTO: ThingDTO) : Promise<ThingDTO | HttpFailResult> {
-        return axios.post(ThingsDataContext.thingsUrl(), ThingDTO, {
-            headers: Helpers.securityHeaders
+    public  createThing(ThingDTO: ThingDTO) : Promise<ThingDTO | HttpFailResult> {
+        return axios.post(this.thingsUrl(), ThingDTO, {
+            headers: this.securityHeaderHook()
         })
         .then(function(response: any) : ThingDTO {            
             return response.data;
         })
     }
     // TOCHECK: Check Returned data
-    public static updateThing(thingId: string, ThingDTO: ThingDTO) : Promise<ThingDTO | HttpFailResult> {
-        return axios.put(ThingsDataContext.thingsUrl(thingId), ThingDTO, {
-            headers: Helpers.securityHeaders
+    public  updateThing(thingId: string, ThingDTO: ThingDTO) : Promise<ThingDTO | HttpFailResult> {
+        return axios.put(this.thingsUrl(thingId), ThingDTO, {
+            headers: this.securityHeaderHook()
         })
         .then(function(response: any) : ThingDTO {            
             return response.data;
         });
     }
     // TOCHECK: Check Returned data
-    public static deleteThing(thingId: string) : Promise<any | HttpFailResult> {
-        return axios.delete(ThingsDataContext.thingsUrl(thingId), {
-            headers: Helpers.securityHeaders
+    public  deleteThing(thingId: string) : Promise<any | HttpFailResult> {
+        return axios.delete(this.thingsUrl(thingId), {
+            headers: this.securityHeaderHook()
         })
         .then(function(response: any) : any {            
             return response.data;
@@ -114,9 +116,9 @@ export class ThingsDataContext {
     }
 
     // TOCHECK: Check Returned data
-    public static getThingChildrenIds(parentThingId : string) : Promise<string[] | HttpFailResult> {
-        return axios.get(ThingsDataContext.thingChildrenUrl(parentThingId), {
-            headers: Helpers.securityHeaders
+    public  getThingChildrenIds(parentThingId : string) : Promise<string[] | HttpFailResult> {
+        return axios.get(this.thingChildrenUrl(parentThingId), {
+            headers: this.securityHeaderHook()
         })
         .then(function(response: any) : string[] {
             return response.data;
@@ -124,35 +126,35 @@ export class ThingsDataContext {
     }
 
     // TOCHECK: Check Returned data
-    public static addChildToParent(parentThingId : string, childThingId : string) : Promise<any | HttpFailResult> {
-        return axios.post(ThingsDataContext.thingChildrenUrl(parentThingId), JSON.stringify(childThingId), {
-            headers: Helpers.securityHeaders
+    public  addChildToParent(parentThingId : string, childThingId : string) : Promise<any | HttpFailResult> {
+        return axios.post(this.thingChildrenUrl(parentThingId), JSON.stringify(childThingId), {
+            headers: this.securityHeaderHook()
         })
         .then(function(response: any) : any {
             return response.data;
         })
     }
     // TOCHECK: Check Returned data
-    public static deleteThingChild(parentThingId : string, childThingId : string) : Promise<any | HttpFailResult> {
-        return axios.delete(ThingsDataContext.thingDeleteChildUrl(parentThingId, childThingId), {
-            headers: Helpers.securityHeaders
+    public  deleteThingChild(parentThingId : string, childThingId : string) : Promise<any | HttpFailResult> {
+        return axios.delete(this.thingDeleteChildUrl(parentThingId, childThingId), {
+            headers: this.securityHeaderHook()
         })
         .then(function(response: any) : any {
             return response.data;
         })
     }
 
-    public static getThingValue(thingId : string, value: any) : Promise<any | HttpFailResult> {
-        return axios.get(ThingsDataContext.thingsValueUrl(thingId), {
-            headers: Helpers.securityHeaders
+    public  getThingValue(thingId : string, value: any) : Promise<any | HttpFailResult> {
+        return axios.get(this.thingsValueUrl(thingId), {
+            headers: this.securityHeaderHook()
         })
         .then(function(response: any) : any {
             return response.data;
         })
     }
-    public static putThingValue(thingId : string, value : any): Promise<any | HttpFailResult> {
-        return axios.put(ThingsDataContext.thingsValueUrl(thingId), value, {
-            headers: Helpers.securityHeaders
+    public  putThingValue(thingId : string, value : any): Promise<any | HttpFailResult> {
+        return axios.put(this.thingsValueUrl(thingId), value, {
+            headers: this.securityHeaderHook()
         })
         .then(function(response: any) : any {            
             return response.data;
@@ -160,11 +162,11 @@ export class ThingsDataContext {
     }
 
     // TOCHECK: Check Returned data
-    public static putThingsPositions(positions: ThingPositionRaw[]) : Promise<any | HttpFailResult> {
-        return axios.put(ThingsDataContext.thingsPositionsUrl(), 
+    public  putThingsPositions(positions: ThingPositionRaw[]) : Promise<any | HttpFailResult> {
+        return axios.put(this.thingsPositionsUrl(), 
             positions, 
             {
-                headers: Helpers.securityHeaders
+                headers: this.securityHeaderHook()
             })
         .then(function(response: any) : any {            
             return response.data;
