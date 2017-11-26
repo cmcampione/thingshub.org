@@ -1,5 +1,6 @@
 "use strict";
 
+const httpStatusCodes = require("http-status-codes");
 const UserDTO = require("./dtos").UserDTO;
 
 // Errors support
@@ -31,3 +32,14 @@ exports.MappingModelAndDTO = class MappingModelAndDTO {
 	}
 };
 
+function validateAndFixInputPaging(skip, top) {
+	if (!skip)
+		skip = 0;
+	let maxPagSize = parseInt(process.env.GET_THINGS_MAX_PAGESIZE);
+	if (!top || top > maxPagSize)
+		top = maxPagSize;
+	if (skip < 0 || top < 0)
+		throw new ErrorCustom(httpStatusCodes.BAD_REQUEST, "Bad Paging range", 51);
+	return { skip, top };
+}
+exports.validateAndFixInputPaging = validateAndFixInputPaging;
