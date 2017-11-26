@@ -1,21 +1,21 @@
 import axios, { AxiosRequestConfig, AxiosPromise, CancelToken } from "axios";
 import {HttpRequestCanceler, HttpFailResult, ItemsRange, Helpers} from "./helpers";
 import {EndPointAddress} from "./endPointAddress";
-import {ThingRaw} from "./thing";
+import {ThingDTO} from "../../common/src/dtos";
 import {ThingPositionRaw} from "./thingPosition";
-import * as thingConstants from "./thingConstants";
+import * as thingConstants from "../../common/src/constants";
 
 export interface ThingsGetParams {
     parentThingId : string;
-    thingsFilter : string;
+    thingFilter : string;
     valueFilter : string;
     orderBy : string;
     skip : number;
-    pageSize : number;
+    top : number;
 }
 
 export interface ThingsRawDataSet {
-    things:  ThingRaw[];
+    things:  ThingDTO[];
     itemsRange: ItemsRange
 }
 
@@ -45,11 +45,11 @@ export class ThingsDataContext {
         ThingsDataContext.apiEndPointAddress = endPointAddress.api;
     }
 
-    public static getThing(thingId: string) : Promise<ThingRaw | HttpFailResult> {
+    public static getThing(thingId: string) : Promise<ThingDTO | HttpFailResult> {
         return axios.get(ThingsDataContext.thingsUrl(thingId), {
             headers: Helpers.securityHeaders
         })
-        .then(function(response: any) : ThingRaw {
+        .then(function(response: any) : ThingDTO {
             return response.data;
         })
     }
@@ -58,12 +58,11 @@ export class ThingsDataContext {
         
         var urlRaw = ThingsDataContext.thingsUrl() + "?" +
                 (!!parameter.parentThingId ? ("&$parentId=" + parameter.parentThingId) : "") +
-                (!!parameter.filter ? ("&$filter=" + parameter.filter) : "") +
-                (!!parameter.top ? ("&$top=" + parameter.top) : "") +
-                (!!parameter.skip ? ("&$skip=" + parameter.skip) : "") +
-                (parameter.deleteStatus == null || parameter.deleteStatus == undefined ? "" : "&$deletedStatus=" + parameter.deleteStatus) +
+                (!!parameter.thingFilter ? ("&$thingFilter=" + parameter.thingFilter) : "") +
+                (!!parameter.valueFilter ? ("&$valueFilter=" + parameter.valueFilter) : "") +                
                 (!!parameter.orderBy ? ("&$orderby=" + parameter.orderBy) : "") +
-                (!!parameter.valueFilter ? ("&$valueFilter=" + parameter.valueFilter) : "");
+                (!!parameter.skip ? ("&$skip=" + parameter.skip) : "") +
+                (!!parameter.top ? ("&$top=" + parameter.top) : "");
 
         if (canceler)
             canceler.setup();
@@ -87,20 +86,20 @@ export class ThingsDataContext {
     }
     
     // TOCHECK: Check Returned data
-    public static createThing(thingRaw: ThingRaw) : Promise<ThingRaw | HttpFailResult> {
-        return axios.post(ThingsDataContext.thingsUrl(), thingRaw, {
+    public static createThing(ThingDTO: ThingDTO) : Promise<ThingDTO | HttpFailResult> {
+        return axios.post(ThingsDataContext.thingsUrl(), ThingDTO, {
             headers: Helpers.securityHeaders
         })
-        .then(function(response: any) : ThingRaw {            
+        .then(function(response: any) : ThingDTO {            
             return response.data;
         })
     }
     // TOCHECK: Check Returned data
-    public static updateThing(thingId: string, thingRaw: ThingRaw) : Promise<ThingRaw | HttpFailResult> {
-        return axios.put(ThingsDataContext.thingsUrl(thingId), thingRaw, {
+    public static updateThing(thingId: string, ThingDTO: ThingDTO) : Promise<ThingDTO | HttpFailResult> {
+        return axios.put(ThingsDataContext.thingsUrl(thingId), ThingDTO, {
             headers: Helpers.securityHeaders
         })
-        .then(function(response: any) : ThingRaw {            
+        .then(function(response: any) : ThingDTO {            
             return response.data;
         });
     }

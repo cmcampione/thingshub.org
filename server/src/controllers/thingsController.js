@@ -7,7 +7,7 @@ const express 			= require("express");
 const passport 			= require("passport");
 
 const utils 			= require("../utils.js");
-const constants 		= require("../constants");
+const constants 		= require("../../../common/src/constants");
 const thingsMngr		= require("../bl/thingsMngr");
 const ClientsConnectorsManager = require("../clientsConnectorsManager");
 
