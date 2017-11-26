@@ -1,7 +1,7 @@
 "use strict";
 
 const httpStatusCodes = require("http-status-codes");
-const UserDTO = require("./dtos").UserDTO;
+const UserDTO = require("../../common/src/dtos").UserDTO;
 
 // Errors support
 

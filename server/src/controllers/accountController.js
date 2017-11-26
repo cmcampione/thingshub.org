@@ -9,7 +9,7 @@ const ejs 				= require("ejs");
 const utils 			= require("../utils.js");
 const usersMngr 		= require("../bl/usersMngr.js");
 const usersPendingMngr 	= require("../bl/usersPendingMngr.js");
-const dtos 				= require("../dtos");
+const dtos 				= require("../../../common/src/dtos");
 
 const router = express.Router();
 

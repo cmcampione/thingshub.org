@@ -4,9 +4,9 @@ const httpStatusCodes = require("http-status-codes");
 const uuidv4 = require("uuid/v4");
 
 const utils = require("../utils");
-const constants = require("../constants");
-const UserInfoDTO = require("../dtos").UserInfoDTO;
-const ThingDTO = require("../dtos").ThingDTO;
+const constants = require("../../../common/src/constants");
+const UserInfoDTO = require("../../../common/src/dtos").UserInfoDTO;
+const ThingDTO = require("../../../common/src/dtos").ThingDTO;
 const usersManager = require("../bl/usersMngr");
 const thingModel = require("../models/Thing");
 
@@ -467,7 +467,7 @@ async function createThingDTO(user, parentThing, thing, isSuperAdministrator) {
 	return await thingToThingDTO(loggedInThingUserClaims, thing, loggedInThingUserRights, thingPos);
 }
 
-// User may be null because it is anonymous or is a SuperAdministrator who has no relationship with Thing
+// User may be null because it is anonymous or it is a SuperAdministrator who has no relationship with Thing
 exports.getThing = async (user, thingId, deletedStatus) => {
 
 	if (!thingId)
