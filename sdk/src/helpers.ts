@@ -1,8 +1,8 @@
 import axios, { AxiosRequestConfig, AxiosPromise, CancelToken } from "axios";
 
 export interface ItemsRange {
-    top: number;
     skip:number;
+    top: number;
     totalItems: number
 }
 

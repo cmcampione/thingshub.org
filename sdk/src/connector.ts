@@ -55,6 +55,7 @@ export class Connector {
 }
 
 export class SocketIOConnector extends Connector {
+    
     private socket : SocketIOClient.Socket = null;
     
     constructor(url : string,
