@@ -611,48 +611,48 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var axios_1 = __webpack_require__(1);
 var helpers_1 = __webpack_require__(2);
 var ThingsDataContext = /** @class */ (function () {
-    function ThingsDataContext() {
+    function ThingsDataContext(endPointAddress, securityHeaderHook) {
+        this.apiEndPointAddress = "";
+        this.securityHeaderHook = null;
+        this.apiEndPointAddress = endPointAddress.api;
+        this.securityHeaderHook = securityHeaderHook;
     }
-    ThingsDataContext.thingsUrl = function (thingId) {
-        return ThingsDataContext.apiEndPointAddress + "/things/" + (thingId || "");
+    ThingsDataContext.prototype.thingsUrl = function (thingId) {
+        return this.apiEndPointAddress + "/things/" + (thingId || "");
     };
-    ThingsDataContext.thingsValueUrl = function (thingId) {
-        return ThingsDataContext.apiEndPointAddress + "/things/" + thingId + "/value";
+    ThingsDataContext.prototype.thingsValueUrl = function (thingId) {
+        return this.apiEndPointAddress + "/things/" + thingId + "/value";
     };
-    ThingsDataContext.thingsPositionsUrl = function () {
-        return ThingsDataContext.apiEndPointAddress + "/things/positions";
+    ThingsDataContext.prototype.thingsPositionsUrl = function () {
+        return this.apiEndPointAddress + "/things/positions";
     };
-    ThingsDataContext.thingChildrenUrl = function (parentThingId, childrenId) {
-        return ThingsDataContext.apiEndPointAddress + "/things/" + (parentThingId) + "/childrenIds/" + (childrenId || "");
+    ThingsDataContext.prototype.thingChildrenUrl = function (parentThingId, childrenId) {
+        return this.apiEndPointAddress + "/things/" + (parentThingId) + "/childrenIds/" + (childrenId || "");
     };
-    ThingsDataContext.thingDeleteChildUrl = function (parentThingId, childThingId) {
-        return ThingsDataContext.apiEndPointAddress + "/things/" + parentThingId + "/childrenIds/" + childThingId;
+    ThingsDataContext.prototype.thingDeleteChildUrl = function (parentThingId, childThingId) {
+        return this.apiEndPointAddress + "/things/" + parentThingId + "/childrenIds/" + childThingId;
     };
-    // INFO: Is mandatory call "init"" before the use of this class
-    ThingsDataContext.init = function (endPointAddress) {
-        ThingsDataContext.apiEndPointAddress = endPointAddress.api;
-    };
-    ThingsDataContext.getThing = function (thingId) {
-        return axios_1.default.get(ThingsDataContext.thingsUrl(thingId), {
-            headers: helpers_1.Helpers.securityHeaders
+    ThingsDataContext.prototype.getThing = function (thingId) {
+        return axios_1.default.get(this.thingsUrl(thingId), {
+            headers: this.securityHeaderHook()
         })
             .then(function (response) {
             return response.data;
         });
     };
     // INFO: To abort call "canceler.cancel()"
-    ThingsDataContext.getThings = function (parameter, canceler) {
-        var urlRaw = ThingsDataContext.thingsUrl() + "?" +
-            (!!parameter.parentThingId ? ("&$parentId=" + parameter.parentThingId) : "") +
+    ThingsDataContext.prototype.getThings = function (parameter, canceler) {
+        var urlRaw = this.thingsUrl() + "?" +
+            (!!parameter.parentThingId ? ("&$parentThingId=" + parameter.parentThingId) : "") +
             (!!parameter.thingFilter ? ("&$thingFilter=" + parameter.thingFilter) : "") +
             (!!parameter.valueFilter ? ("&$valueFilter=" + parameter.valueFilter) : "") +
-            (!!parameter.orderBy ? ("&$orderby=" + parameter.orderBy) : "") +
+            (!!parameter.orderBy ? ("&$orderBy=" + parameter.orderBy) : "") +
             (!!parameter.skip ? ("&$skip=" + parameter.skip) : "") +
             (!!parameter.top ? ("&$top=" + parameter.top) : "");
         if (canceler)
             canceler.setup();
         return axios_1.default.get(urlRaw, {
-            headers: helpers_1.Helpers.securityHeaders,
+            headers: this.securityHeaderHook(),
             cancelToken: (canceler) ? canceler.cancelerToken : null
         })
             .then(function (response) {
@@ -669,85 +669,84 @@ var ThingsDataContext = /** @class */ (function () {
         });
     };
     // TOCHECK: Check Returned data
-    ThingsDataContext.createThing = function (ThingDTO) {
-        return axios_1.default.post(ThingsDataContext.thingsUrl(), ThingDTO, {
-            headers: helpers_1.Helpers.securityHeaders
+    ThingsDataContext.prototype.createThing = function (ThingDTO) {
+        return axios_1.default.post(this.thingsUrl(), ThingDTO, {
+            headers: this.securityHeaderHook()
         })
             .then(function (response) {
             return response.data;
         });
     };
     // TOCHECK: Check Returned data
-    ThingsDataContext.updateThing = function (thingId, ThingDTO) {
-        return axios_1.default.put(ThingsDataContext.thingsUrl(thingId), ThingDTO, {
-            headers: helpers_1.Helpers.securityHeaders
+    ThingsDataContext.prototype.updateThing = function (thingId, ThingDTO) {
+        return axios_1.default.put(this.thingsUrl(thingId), ThingDTO, {
+            headers: this.securityHeaderHook()
         })
             .then(function (response) {
             return response.data;
         });
     };
     // TOCHECK: Check Returned data
-    ThingsDataContext.deleteThing = function (thingId) {
-        return axios_1.default.delete(ThingsDataContext.thingsUrl(thingId), {
-            headers: helpers_1.Helpers.securityHeaders
+    ThingsDataContext.prototype.deleteThing = function (thingId) {
+        return axios_1.default.delete(this.thingsUrl(thingId), {
+            headers: this.securityHeaderHook()
         })
             .then(function (response) {
             return response.data;
         });
     };
     // TOCHECK: Check Returned data
-    ThingsDataContext.getThingChildrenIds = function (parentThingId) {
-        return axios_1.default.get(ThingsDataContext.thingChildrenUrl(parentThingId), {
-            headers: helpers_1.Helpers.securityHeaders
+    ThingsDataContext.prototype.getThingChildrenIds = function (parentThingId) {
+        return axios_1.default.get(this.thingChildrenUrl(parentThingId), {
+            headers: this.securityHeaderHook()
         })
             .then(function (response) {
             return response.data;
         });
     };
     // TOCHECK: Check Returned data
-    ThingsDataContext.addChildToParent = function (parentThingId, childThingId) {
-        return axios_1.default.post(ThingsDataContext.thingChildrenUrl(parentThingId), JSON.stringify(childThingId), {
-            headers: helpers_1.Helpers.securityHeaders
+    ThingsDataContext.prototype.addChildToParent = function (parentThingId, childThingId) {
+        return axios_1.default.post(this.thingChildrenUrl(parentThingId), JSON.stringify(childThingId), {
+            headers: this.securityHeaderHook()
         })
             .then(function (response) {
             return response.data;
         });
     };
     // TOCHECK: Check Returned data
-    ThingsDataContext.deleteThingChild = function (parentThingId, childThingId) {
-        return axios_1.default.delete(ThingsDataContext.thingDeleteChildUrl(parentThingId, childThingId), {
-            headers: helpers_1.Helpers.securityHeaders
+    ThingsDataContext.prototype.deleteThingChild = function (parentThingId, childThingId) {
+        return axios_1.default.delete(this.thingDeleteChildUrl(parentThingId, childThingId), {
+            headers: this.securityHeaderHook()
         })
             .then(function (response) {
             return response.data;
         });
     };
-    ThingsDataContext.getThingValue = function (thingId, value) {
-        return axios_1.default.get(ThingsDataContext.thingsValueUrl(thingId), {
-            headers: helpers_1.Helpers.securityHeaders
+    ThingsDataContext.prototype.getThingValue = function (thingId, value) {
+        return axios_1.default.get(this.thingsValueUrl(thingId), {
+            headers: this.securityHeaderHook()
         })
             .then(function (response) {
             return response.data;
         });
     };
-    ThingsDataContext.putThingValue = function (thingId, value) {
-        return axios_1.default.put(ThingsDataContext.thingsValueUrl(thingId), value, {
-            headers: helpers_1.Helpers.securityHeaders
+    ThingsDataContext.prototype.putThingValue = function (thingId, value) {
+        return axios_1.default.put(this.thingsValueUrl(thingId), value, {
+            headers: this.securityHeaderHook()
         })
             .then(function (response) {
             return response.data;
         });
     };
     // TOCHECK: Check Returned data
-    ThingsDataContext.putThingsPositions = function (positions) {
-        return axios_1.default.put(ThingsDataContext.thingsPositionsUrl(), positions, {
-            headers: helpers_1.Helpers.securityHeaders
+    ThingsDataContext.prototype.putThingsPositions = function (positions) {
+        return axios_1.default.put(this.thingsPositionsUrl(), positions, {
+            headers: this.securityHeaderHook()
         })
             .then(function (response) {
             return response.data;
         });
     };
-    ThingsDataContext.apiEndPointAddress = "";
     return ThingsDataContext;
 }());
 exports.ThingsDataContext = ThingsDataContext;
