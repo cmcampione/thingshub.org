@@ -1,6 +1,6 @@
 export interface ItemsRange {
-    top: number;
     skip: number;
+    top: number;
     totalItems: number;
 }
 export declare class HttpRequestCanceler {
