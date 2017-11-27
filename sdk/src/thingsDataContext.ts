@@ -40,8 +40,7 @@ export class ThingsDataContext {
         return this.apiEndPointAddress + "/things/" + parentThingId + "/childrenIds/" + childThingId 
     }
 
-    public  constructor(endPointAddress: EndPointAddress,
-        securityHeaderHook: () => object) {
+    public  constructor(endPointAddress: EndPointAddress, securityHeaderHook: () => object) {
 
         this.apiEndPointAddress = endPointAddress.api;
         this.securityHeaderHook = securityHeaderHook;
@@ -59,12 +58,12 @@ export class ThingsDataContext {
     public  getThings(parameter: ThingsGetParams, canceler?: HttpRequestCanceler) : Promise<ThingsDTOsDataSet | HttpFailResult> {
         
         var urlRaw = this.thingsUrl() + "?" +
-                (!!parameter.parentThingId ? ("&$parentThingId=" + parameter.parentThingId) : "") +
-                (!!parameter.thingFilter ? ("&$thingFilter=" + parameter.thingFilter) : "") +
-                (!!parameter.valueFilter ? ("&$valueFilter=" + parameter.valueFilter) : "") +                
-                (!!parameter.orderBy ? ("&$orderBy=" + parameter.orderBy) : "") +
-                (!!parameter.skip ? ("&$skip=" + parameter.skip) : "") +
-                (!!parameter.top ? ("&$top=" + parameter.top) : "");
+                (!!parameter.parentThingId ? ("&parentThingId=" + parameter.parentThingId) : "") +
+                (!!parameter.thingFilter ? ("&thingFilter=" + parameter.thingFilter) : "") +
+                (!!parameter.valueFilter ? ("&valueFilter=" + parameter.valueFilter) : "") +                
+                (!!parameter.orderBy ? ("&orderBy=" + parameter.orderBy) : "") +
+                (!!parameter.skip ? ("&skip=" + parameter.skip) : "") +
+                (!!parameter.top ? ("&top=" + parameter.top) : "");
 
         if (canceler)
             canceler.setup();

@@ -1,3 +1,6 @@
+import { shim } from "promise.prototype.finally";
+shim(); //https://stackoverflow.com/questions/35876549/typescript-type-definition-for-promise-prototype-finally
+
 export * from "../../common/src/dtos";
 export * from "../../common/src/constants";
 
