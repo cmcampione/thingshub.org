@@ -10,27 +10,28 @@ export interface ThingsGetParams {
     skip: number;
     top: number;
 }
-export interface ThingsRawDataSet {
+export interface ThingsDTOsDataSet {
     things: ThingDTO[];
     itemsRange: ItemsRange;
 }
 export declare class ThingsDataContext {
-    private static apiEndPointAddress;
-    private static thingsUrl(thingId?);
-    private static thingsValueUrl(thingId);
-    private static thingsPositionsUrl();
-    private static thingChildrenUrl(parentThingId, childrenId?);
-    private static thingDeleteChildUrl(parentThingId, childThingId);
-    static init(endPointAddress: EndPointAddress): void;
-    static getThing(thingId: string): Promise<ThingDTO | HttpFailResult>;
-    static getThings(parameter: ThingsGetParams, canceler?: HttpRequestCanceler): Promise<ThingsRawDataSet | HttpFailResult>;
-    static createThing(ThingDTO: ThingDTO): Promise<ThingDTO | HttpFailResult>;
-    static updateThing(thingId: string, ThingDTO: ThingDTO): Promise<ThingDTO | HttpFailResult>;
-    static deleteThing(thingId: string): Promise<any | HttpFailResult>;
-    static getThingChildrenIds(parentThingId: string): Promise<string[] | HttpFailResult>;
-    static addChildToParent(parentThingId: string, childThingId: string): Promise<any | HttpFailResult>;
-    static deleteThingChild(parentThingId: string, childThingId: string): Promise<any | HttpFailResult>;
-    static getThingValue(thingId: string, value: any): Promise<any | HttpFailResult>;
-    static putThingValue(thingId: string, value: any): Promise<any | HttpFailResult>;
-    static putThingsPositions(positions: ThingPositionRaw[]): Promise<any | HttpFailResult>;
+    private apiEndPointAddress;
+    private securityHeaderHook;
+    private thingsUrl(thingId?);
+    private thingsValueUrl(thingId);
+    private thingsPositionsUrl();
+    private thingChildrenUrl(parentThingId, childrenId?);
+    private thingDeleteChildUrl(parentThingId, childThingId);
+    constructor(endPointAddress: EndPointAddress, securityHeaderHook: () => object);
+    getThing(thingId: string): Promise<ThingDTO | HttpFailResult>;
+    getThings(parameter: ThingsGetParams, canceler?: HttpRequestCanceler): Promise<ThingsDTOsDataSet | HttpFailResult>;
+    createThing(ThingDTO: ThingDTO): Promise<ThingDTO | HttpFailResult>;
+    updateThing(thingId: string, ThingDTO: ThingDTO): Promise<ThingDTO | HttpFailResult>;
+    deleteThing(thingId: string): Promise<any | HttpFailResult>;
+    getThingChildrenIds(parentThingId: string): Promise<string[] | HttpFailResult>;
+    addChildToParent(parentThingId: string, childThingId: string): Promise<any | HttpFailResult>;
+    deleteThingChild(parentThingId: string, childThingId: string): Promise<any | HttpFailResult>;
+    getThingValue(thingId: string, value: any): Promise<any | HttpFailResult>;
+    putThingValue(thingId: string, value: any): Promise<any | HttpFailResult>;
+    putThingsPositions(positions: ThingPositionRaw[]): Promise<any | HttpFailResult>;
 }
