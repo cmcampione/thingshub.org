@@ -42,7 +42,10 @@ mongoose.connect(process.env.MONGODB_URI,
 const app = express();
 
 // Enable cors for all route
-app.use(cors());
+var corsOptions = {
+	exposedHeaders :"Content-Range"
+};
+app.use(cors(corsOptions));
 
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: false }));
