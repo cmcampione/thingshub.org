@@ -38,6 +38,32 @@
         console.log(thingDTO);
       }
 
+      var endPointAddress = {
+          server: "https://localhost:3000",
+          api: "https://localhost:3000/api"    
+      }
+
+      function securityHeaderHook() {
+        return { thapikey: "5e4ff11c-5391-465b-a9c4-9803e0b78799" };
+      }
+
+      var thingsDatacontext = new ThingsHubClient.ThingsDataContext(endPointAddress, securityHeaderHook);
+
+      var thingsGetParams =  {
+        parentThingId : null,
+        thingFilter : "",
+        valueFilter : "",
+        orderBy : "",
+        skip : 0,
+        top : 100
+      }
+
+      thingsDatacontext.getThings(thingsGetParams)
+      .then(function(res) {
+        console.log(res);
+      });
+
+
       var socket = new ThingsHubClient.SocketIOConnector("https://localhost:3000", authHook, onError, onConnectError, onStateChanged);
       socket.subscribe();
       socket.setHook("api", onAPI);
