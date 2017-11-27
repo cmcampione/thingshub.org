@@ -107,6 +107,9 @@ ThingUserReadClaims.CanReadThingUserStatus | ThingUserReadClaims.CanReadThingUse
 ThingUserReadClaims.CanReadPublicChangeClaims | ThingUserReadClaims.CanReadEveryoneReadClaims | ThingUserReadClaims.CanReadEveryoneChangeClaims;
 
 exports.ThingUserReadClaims = ThingUserReadClaims;
+exports.validateThingUserReadClaims = (userReadClaims) => {
+	return userReadClaims <= ThingUserReadClaims.AllClaims && userReadClaims >= ThingUserReadClaims.NoClaim;
+};
 
 // Do not have validation function since are bitwise values
 const ThingUserChangeClaims = {
@@ -150,6 +153,9 @@ ThingUserChangeClaims.CanChangePublicReadClaims | ThingUserChangeClaims.CanChang
 ThingUserChangeClaims.CanAddChildrenThing | ThingUserChangeClaims.CanRemoveChildrenThing;
 
 exports.ThingUserChangeClaims = ThingUserChangeClaims;
+exports.validateThingUserChangeClaims = (userChangeClaims) => {
+	return userChangeClaims <= ThingUserChangeClaims.AllClaims && userChangeClaims >= ThingUserChangeClaims.NoClaim;
+};
 
 exports.ThingKind = {
 	NoMatter: "0",

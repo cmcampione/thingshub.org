@@ -132,7 +132,7 @@ async function getThing(user, thingId, deletedStatus, userRole, userStatus, user
 	let thing = await findThingById(thingId);
 	if (!thing)
 	{
-		// Returns HttpStatusCode.Unauthorized to Reset Some Malicious Logon Access
+		// Returns httpStatusCodes.Unauthorized to Reset Some Malicious Logon Access
 		if (!user)
 			throw new utils.ErrorCustom(httpStatusCodes.UNAUTHORIZED, "Unauthorized user", 38);
 		throw new utils.ErrorCustom(httpStatusCodes.NOT_FOUND, "Thing not found", 39);
@@ -450,12 +450,12 @@ async function createThingDTO(user, parentThing, thing, isSuperAdministrator) {
 		let loggedInThingUserRights1 = getThingUserRights(user._id, user.username, thing);
 		if (loggedInThingUserRights1)
 		{
-			loggedInThingUserRights.userRole = loggedInThingUserRights1.userRole;
-			loggedInThingUserRights.userStatus = loggedInThingUserRights1.userStatus;
+			loggedInthingUserRights.userRole = loggedInThingUserRights1.userRole;
+			loggedInthingUserRights.userStatus = loggedInThingUserRights1.userStatus;
 			loggedInThingUserRights.userVisibility = loggedInThingUserRights1.userVisibility;
 			loggedInThingUserRights.shortPin = loggedInThingUserRights1.shortPin;
-			loggedInThingUserRights.userReadClaims = loggedInThingUserRights1.userReadClaims;
-			loggedInThingUserRights.userChangeClaims = loggedInThingUserRights1.userChangeClaims;
+			loggedInthingUserRights.userReadClaims = loggedInThingUserRights1.userReadClaims;
+			loggedInthingUserRights.userChangeClaims = loggedInThingUserRights1.userChangeClaims;
 			// TODO: Is useful? Test during shortPin implementation
 			loggedInThingUserRights.shortPin = loggedInThingUserRights1.shortPin;
 		}
@@ -493,14 +493,14 @@ exports.createThing = async (user, thingDTO) => {
 		throw new utils.ErrorCustom(httpStatusCodes.UNAUTHORIZED,
 			httpStatusCodes.getStatusText(httpStatusCodes.UNAUTHORIZED), 13);
 	
-	// Validate DTO
+	// validate DTO
 	if (!thingDTO)
 		throw new utils.ErrorCustom(httpStatusCodes.BAD_GATEWAY, "The body message is empty", 14);
 	if (!thingDTO.kind)
 		throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Kind can't be empty", 15);
 	if (!thingDTO.name)
 		throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Name can't be empty", 16);
-	if (constants.validateThingDeletedStatus(thingDTO.deletedStatus) == false)
+	if (constants.validateThingDeletedStates(thingDTO.deletedStatus) == false)
 		throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Thing DeletedStatus is incorrect", 17);
 	if (constants.validateThingUserStatus(thingDTO.userStatus) == false)
 		throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Thing UserStatus is incorrect", 18);
@@ -554,4 +554,175 @@ exports.createThing = async (user, thingDTO) => {
 		thingDTO : await createThingDTO(user, null, thing, false)
 	};
 };
+
+exports.updateThingAsync= async (user, thingId, thingDTO) => {
+	//TODO: Potrebbe essere bello provare a cancellare le due linee sottostanti e abilitare la funzione che gli User anonimo possano cambiare la Thing ovviamente rispettando Claims e Roles
+	if (!user)
+		throw new utils.ErrorCustom(httpStatusCodes.UNAUTHORIZED, httpStatusCodes.getStatusText(httpStatusCodes.UNAUTHORIZED), 54);
+
+	if (!thingId)
+		throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Thing's Id can't be null", 55);
+
+	var thing = await getThing(user, thingId, constants.ThingDeletedStates.Ok, 
+		constants.ThingUserRole.Administrator, constants.ThingUserStates.Ok, constants.ThingUserVisibility.Visible);
+
+	// Non viene utilizzata la validazione in quanto si ha bisogno di controllare l'accesso alle varie proprietà della Thing
+	//validateThingDTO(constants, thingDTO);
+
+	if (!thingDTO)
+		throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "The body message is empty", 56);
+
+	let loggedInThingUserClaims = getThingUserClaims(user, thing, user.isSuperAdministrator);
+
+	//Aggiorniamo la Thing
+
+	let isChanged = false;
+
+	if (thing.name == thingDTO.name) {
+		if ((loggedInThingUserClaims.change & constants.ThingUserChangeClaims.CanChangeName) == 0)
+			throw new utils.ErrorCustom(httpStatusCodes.FORBIDDEN, "Unauthorized user", 57);
+
+		if (thingDTO.name == null)
+			throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Name can't be empty", 58);
+
+		thing.name = thingDTO.name;
+		isChanged = true;
+	}
+	if (thing.kind == thingDTO.kind) {
+		if ((loggedInThingUserClaims.change & constants.ThingUserChangeClaims.CanChangeKind) == 0)
+			throw new utils.ErrorCustom(httpStatusCodes.FORBIDDEN, "Unauthorized user", 59);
+
+		if (!thingDTO.kind)
+			throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Kind can't be empty", 60);
+
+		thing.kind = thingDTO.kind;
+		isChanged = true;
+	}
+	if (thing.value != thingDTO.value) {
+		if ((loggedInThingUserClaims.change & constants.ThingUserChangeClaims.CanChangeValue) == 0)
+			throw new utils.ErrorCustom(httpStatusCodes.FORBIDDEN, "User can not changes Thing's properties", 61);
+
+		thing.value = thingDTO.value;
+		isChanged = true;
+	}
+	if (thing.publicReadClaims != thingDTO.publicReadClaims) {
+		if ((loggedInThingUserClaims.change & constants.ThingUserChangeClaims.CanChangePublicReadClaims) == 0)
+			throw new utils.ErrorCustom(httpStatusCodes.FORBIDDEN, "User can not changes Thing's properties", 62);
+
+		if (constants.validateThingUserReadClaims(thingDTO.publicReadClaims) == false)
+			throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Thing PublicReadClaims is incorrect", 63);
+
+		thing.publicReadClaims = thingDTO.publicReadClaims;
+		isChanged = true;
+	}
+	if (thing.publicChangeClaims != thingDTO.publicChangeClaims) {
+		if ((loggedInThingUserClaims.change & constants.ThingUserChangeClaims.CanChangePublicChangeClaims) == 0)
+			throw new utils.ErrorCustom(httpStatusCodes.FORBIDDEN, "User can not changes Thing's properties", 64);
+
+		if (constants.validateThingUserChangeClaims(thingDTO.publicChangeClaims) == false)
+			throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Thing PublicChangeClaims is incorrect", 65);
+
+		thing.publicChangeClaims = thingDTO.publicChangeClaims;
+		isChanged = true;
+	}
+	if (thing.everyoneReadClaims != thingDTO.everyoneReadClaims) {
+		if ((loggedInThingUserClaims.change & constants.ThingUserChangeClaims.CanChangeEveryoneReadClaims) == 0)
+			throw new utils.ErrorCustom(httpStatusCodes.FORBIDDEN, "User can not changes Thing's properties", 66);
+
+		if (constants.validateThingUserReadClaims(thingDTO.everyoneReadClaims) == false)
+			throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Thing EveryoneReadClaims is incorrect", 67);
+
+		thing.everyoneReadClaims = thingDTO.everyoneReadClaims;
+		isChanged = true;
+	}
+	if (thing.everyoneChangeClaims != thingDTO.everyoneChangeClaims) {
+		if ((loggedInThingUserClaims.change & constants.ThingUserChangeClaims.CanChangeEveryoneChangeClaims) == 0)
+			throw new utils.ErrorCustom(httpStatusCodes.FORBIDDEN, "User can not changes Thing's properties", 68);
+
+		if (constants.validateThingUserChangeClaims(thingDTO.everyoneChangeClaims) == false)
+			throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Thing EveryoneChangeClaims is incorrect", 69);
+
+		thing.everyoneChangeClaims = thingDTO.everyoneChangeClaims;
+		isChanged = true;
+	}
+	if (thing.deletedStatus != thingDTO.deletedStatus) {
+		if ((loggedInThingUserClaims.change & constants.ThingUserChangeClaims.CanChangeDeletedStatus) == 0)
+			throw new utils.ErrorCustom(httpStatusCodes.FORBIDDEN, "User can not changes Thing's properties", 70);
+
+		if (constants.validateThingDeletedStatus(thingDTO.deletedStatus) == false)
+			throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Thing EveryoneChangeClaims is incorrect", 81);
+
+		thing.deletedStatus = thingDTO.deletedStatus;
+		thing.deletedDate = Date.now();
+		isChanged = true;
+	}
+
+	//Sono sicuro che lo status dello User è OK in quanto durante il controllo dell'accesso alla Thing ho imposto che lo User doveva essere in status OK
+	var thingUserRights = getThingUserRights(user._id, user.userName, thing);
+	// Se lo user loggato non ha una relazione significa che è un SuperAdministrator
+	if (thingUserRights != null) {
+		if (thingUserRights.userReadClaims != thingDTO.userReadClaims) {
+			if ((loggedInThingUserClaims.change & constants.ThingUserChangeClaims.CanChangeThingUserReadClaims) == 0)
+				throw new utils.ErrorCustom(httpStatusCodes.FORBIDDEN, "User can not changes Thing's properties", 78);
+
+			if (constants.validateThingUserReadClaims(thingDTO.userReadClaims) == false)
+				throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Thing UserReadClaims is incorrect", 71);
+
+			thingUserRights.userReadClaims = thingDTO.userReadClaims;
+			isChanged = true;
+		}
+		if (thingUserRights.userRole != thingDTO.userRole) {
+			if ((loggedInThingUserClaims.change & constants.ThingUserChangeClaims.CanChangeThingUserRole) == 0)
+				throw new utils.ErrorCustom(httpStatusCodes.FORBIDDEN, "User can not changes Thing's properties", 72);
+
+			if (constants.validateThingUserRole(thingDTO.userRole) == false)
+				throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Thing UserRole is incorrect", 73);
+
+			thingUserRights.userRole = thingDTO.userRole;
+			isChanged = true;
+		}
+		if (thingUserRights.userStatus != thingDTO.userStatus) {
+			if ((loggedInThingUserClaims.change & constants.ThingUserChangeClaims.CanChangeThingUserStatus) == 0)
+				throw new utils.ErrorCustom(httpStatusCodes.FORBIDDEN, "User can not changes Thing's properties", 74);
+
+			if (constants.validateThingUserStatus(thingDTO.userStatus) == false)
+				throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Thing UserStatus is incorrect", 75);
+
+			thingUserRights.userStatus = thingDTO.userStatus;
+			isChanged = true;
+		}
+		if (thingUserRights.userVisibility != thingDTO.userVisibility) {
+			if ((loggedInThingUserClaims.change & constants.ThingUserChangeClaims.CanChangeThingUserVisibility) == 0)
+				throw new utils.ErrorCustom(httpStatusCodes.FORBIDDEN, "User can not changes Thing's properties", 79);
+
+			if (constants.validateThingUserVisibility(thingDTO.userVisibility) == false)
+				throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Thing UserStatus is incorrect", 80);
+
+			thingUserRights.userVisibility = thingDTO.userVisibility;
+			isChanged = true;
+		}
+
+		// Must be last
+		if (thingUserRights.userChangeClaims != thingDTO.userChangeClaims) {
+			if ((loggedInThingUserClaims.change & constants.ThingUserChangeClaims.CanChangeThingUserChangeClaims) == 0)
+				throw new utils.ErrorCustom(httpStatusCodes.FORBIDDEN, "User can not changes Thing's properties", 76);
+
+			if (constants.validateThingUserChangeClaims(thingDTO.userChangeClaims) == false)
+				throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Thing UserChangeClaims is incorrect", 77);
+
+			thingUserRights.userChangeClaims = thingDTO.userChangeClaims;
+			isChanged = true;
+		}
+	}
+
+	if (isChanged == false)
+		return null;
+
+	let blResult = await CreateGenericBLResult(thing);
+
+	//TODO: Fare in modo di inviare le notifiche agli User con i rispettivi ThingDTO riempiti secondo i relativi Claims
+	blResult.DTO = await CreateThingDTOAsync(user, objectContext, constants, null, thing, false);
+
+	return blResult;
+}
 
