@@ -33,7 +33,7 @@ router.get("/", function(req, res, next) {
 			let paging = utils.validateAndFixInputPaging(skip, top);
 
 			let blResult = await thingsMngr.getThings(user, parentThingId, thingFilter, valueFilter, orderBy, paging.skip, paging.top);
-			if (!blResult || !blResult.top || !blResult.skip || !blResult.totalItems)
+			if (!blResult || !blResult.top == null || !blResult.skip == null || !blResult.totalItems == null)
 				throw new utils.ErrorCustom(httpStatusCodes.INTERNAL_SERVER_ERROR, "Result not valid", 98);
 
 			res.setHeader("Content-Range", "Items " + blResult.top + "-" + skip + "/" + blResult.totalItems);
