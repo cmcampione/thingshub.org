@@ -33,6 +33,8 @@ router.get("/", function(req, res, next) {
 			let paging = utils.validateAndFixInputPaging(skip, top);
 
 			let blResult = await thingsMngr.getThings(user, parentThingId, thingFilter, valueFilter, orderBy, paging.skip, paging.top);
+			if (!blResult || !blResult.top || !blResult.skip || !blResult.totalItems)
+				throw new utils.ErrorCustom(httpStatusCodes.INTERNAL_SERVER_ERROR, "Result not valid", 98);
 
 			res.setHeader("Content-Range", "Items " + blResult.top + "-" + skip + "/" + blResult.totalItems);
 
@@ -60,6 +62,8 @@ router.get("/:id", function(req, res, next) {
 				throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Thing's Id can't be null", 93);
 
 			let blResult = await thingsMngr.getThing(user, thingId, constants.ThingDeletedStates.NoMatter);
+			if (!blResult)
+				throw new utils.ErrorCustom(httpStatusCodes.INTERNAL_SERVER_ERROR, "Result not valid", 99);
 
 			res.json(blResult);
 
@@ -89,6 +93,8 @@ router.post("/", async function (req, res, next){
 				throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "The body message is empty", 92);
 
 			let blResult = await thingsMngr.createThing(user, thingDTO);
+			if (!blResult || !blResult.usersIdsToNotify || !blResult.thingDTO)
+				throw new utils.ErrorCustom(httpStatusCodes.INTERNAL_SERVER_ERROR, "Result not valid", 100);
 
 			ClientsConnectorsManager.onCreateThing(blResult.usersIdsToNotify, blResult.thingDTO);
 
