@@ -32,11 +32,11 @@ router.get("/", function(req, res, next) {
 
 			let paging = utils.validateAndFixInputPaging(skip, top);
 
-			let things = await thingsMngr.getThings(user, parentThingId, thingFilter, valueFilter, orderBy, paging.skip, paging.top);
+			let blResult = await thingsMngr.getThings(user, parentThingId, thingFilter, valueFilter, orderBy, paging.skip, paging.top);
 
-			res.setHeader("Content-Range", "Items " + things.top + "-" + skip + "/" + things.totalItems);
+			res.setHeader("Content-Range", "Items " + blResult.top + "-" + skip + "/" + blResult.totalItems);
 
-			res.json(things.thingsDTO);
+			res.json(blResult.thingsDTO);
 			
 		}  catch (e)  {
 			if (e instanceof utils.ErrorCustom) {
@@ -59,7 +59,9 @@ router.get("/:id", function(req, res, next) {
 			if (!thingId)
 				throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Thing's Id can't be null", 93);
 
-			res.json(await thingsMngr.getThing(user, thingId, constants.ThingDeletedStates.NoMatter));
+			let blResult = await thingsMngr.getThing(user, thingId, constants.ThingDeletedStates.NoMatter);
+
+			res.json(blResult);
 
 		}  catch (e)  {
 			if (e instanceof utils.ErrorCustom) {
@@ -106,12 +108,11 @@ router.post("/", async function (req, res, next){
 router.put("/:id", async function (req, res, next){
 	passport.authenticate("localapikey", async function(err, user, info) {
 		try {
-			if (err) { 
+			if (err)
 				return next(err); 
-			}
-			if (!user) { 
+
+			if (!user)
 				return next(new utils.ErrorCustom(httpStatusCodes.UNAUTHORIZED, httpStatusCodes.getStatusText(httpStatusCodes.UNAUTHORIZED), 88));
-			}
 
 			let thingId = req.params.id;
 			if (!thingId)
@@ -122,11 +123,21 @@ router.put("/:id", async function (req, res, next){
 				throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "The body message is empty", 91);
 
 			let blResult = await thingsMngr.updateThing(user, thingId, thingDTO);
-			if (!blResult) {
+			if (!blResult)
+				throw new utils.ErrorCustom(httpStatusCodes.INTERNAL_SERVER_ERROR, "Result not valid", 95);
+
+			if (blResult.usersIdsToNotify) {
+
+				if (!blResult.thingDTOs)
+					throw new utils.ErrorCustom(httpStatusCodes.INTERNAL_SERVER_ERROR, "Result not valid", 96);
+				
 				ClientsConnectorsManager.onUpdateThing(blResult.usersIdsToNotify, blResult.thingDTOs);
 			}
 
 			// TODO: According to the restful paradigm what should the PUT return?
+			if (!blResult.thingDTO)
+				throw new utils.ErrorCustom(httpStatusCodes.INTERNAL_SERVER_ERROR, "Result not valid", 97);
+
 			res.json(blResult.thingDTO);
 
 		}  catch (e)  {
