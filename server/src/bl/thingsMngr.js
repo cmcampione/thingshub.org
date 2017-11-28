@@ -731,15 +731,14 @@ exports.updateThing = async (user, thingId, thingDTO) => {
 		}
 	}
 
+	let thingDTONew = await createThingDTO(user, null, thing, user.isSuperAdministrator);
+
 	if (isChanged == false)
 		return {
-			thingDTO : await createThingDTO(user, null, thing, user.isSuperAdministrator),
+			thingDTO : thingDTONew,
 			usersIdsToNotify : null,
 			thingDTOs : null
 		};
-
-	thing.set(thingDTO);
-	thingModel.save(thing);
 
 	let usersIdsToNotify = await getUsersIdsToNotify(thing);
 	let thingDTOs = new Map();
@@ -750,8 +749,11 @@ exports.updateThing = async (user, thingId, thingDTO) => {
 		thingDTOs[user._id] = await createThingDTO(user, null, thing, user.isSuperAdministrator);
 	}
 
+	thing.set(thingDTO);
+	thingModel.save(thing);
+
 	return {
-		thingDTO : await createThingDTO(user, null, thing, user.isSuperAdministrator),
+		thingDTO : thingDTONew,
 		usersIdsToNotify,
 		thingDTOs
 	};
