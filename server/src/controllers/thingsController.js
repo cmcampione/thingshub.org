@@ -2,7 +2,7 @@
 
 "use strict";
 
-const httpStatus 		= require("http-status-codes");
+const httpStatusCodes 		= require("http-status-codes");
 const express 			= require("express");
 const passport 			= require("passport");
 
@@ -20,13 +20,13 @@ router.get("/", function(req, res, next) {
 				return next(err); 
 			}
 			if (!user) { 
-				return next(new utils.ErrorCustom(httpStatus.UNAUTHORIZED, httpStatus.getStatusText(httpStatus.UNAUTHORIZED), 10));
+				return next(new utils.ErrorCustom(httpStatusCodes.UNAUTHORIZED, httpStatusCodes.getStatusText(httpStatusCodes.UNAUTHORIZED), 10));
 			}
 
 			let parentThingId = req.query.parentThingId;
 			let thingFilter = req.query.thingFilter ? JSON.parse(req.query.thingFilter) : null;
 			let valueFilter = req.query.valueFilter ? JSON.parse(req.query.valueFilter) : null;
-			let orderBy = req.query.orderBy;
+			let orderBy = req.query.orderBy ? JSON.parse(req.query.orderBy) : null;
 			let skip = req.query.skip ? parseInt(req.query.skip) : 0;
 			let top = req.query.top ? parseInt(req.query.top) : parseInt(process.env.GET_THINGS_MAX_PAGESIZE);
 
@@ -43,7 +43,7 @@ router.get("/", function(req, res, next) {
 				next(e);
 				return;
 			}
-			next(new utils.ErrorCustom(httpStatus.INTERNAL_SERVER_ERROR, e.message, 8));
+			next(new utils.ErrorCustom(httpStatusCodes.INTERNAL_SERVER_ERROR, e.message, 8));
 		}
 	})(req, res, next);
 });
@@ -56,6 +56,8 @@ router.get("/:id", function(req, res, next) {
 			}
 
 			let thingId = req.params.id;
+			if (!thingId)
+				throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Thing's Id can't be null", 93);
 
 			res.json(await thingsMngr.getThing(user, thingId, constants.ThingDeletedStates.NoMatter));
 
@@ -64,7 +66,7 @@ router.get("/:id", function(req, res, next) {
 				next(e);
 				return;
 			}
-			next(new utils.ErrorCustom(httpStatus.INTERNAL_SERVER_ERROR, e.message, 50));
+			next(new utils.ErrorCustom(httpStatusCodes.INTERNAL_SERVER_ERROR, e.message, 50));
 		}
 	})(req, res, next);
 });
@@ -77,10 +79,12 @@ router.post("/", async function (req, res, next){
 				return next(err); 
 			}
 			if (!user) { 
-				return next(new utils.ErrorCustom(httpStatus.UNAUTHORIZED, httpStatus.getStatusText(httpStatus.UNAUTHORIZED), 22));
+				return next(new utils.ErrorCustom(httpStatusCodes.UNAUTHORIZED, httpStatusCodes.getStatusText(httpStatusCodes.UNAUTHORIZED), 22));
 			}
 
 			let thingDTO = req.body;
+			if (!thingDTO)
+				throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "The body message is empty", 92);
 
 			let blResult = await thingsMngr.createThing(user, thingDTO);
 
@@ -93,7 +97,44 @@ router.post("/", async function (req, res, next){
 				next(e);
 				return;
 			}
-			next(new utils.ErrorCustom(httpStatus.INTERNAL_SERVER_ERROR, e.message, 23));
+			next(new utils.ErrorCustom(httpStatusCodes.INTERNAL_SERVER_ERROR, e.message, 23));
+		}
+	})(req, res, next);
+});
+
+// Update Thing
+router.pust("/:id", async function (req, res, next){
+	passport.authenticate("localapikey", async function(err, user, info) {
+		try {
+			if (err) { 
+				return next(err); 
+			}
+			if (!user) { 
+				return next(new utils.ErrorCustom(httpStatusCodes.UNAUTHORIZED, httpStatusCodes.getStatusText(httpStatusCodes.UNAUTHORIZED), 88));
+			}
+
+			let thingId = req.params.id;
+			if (!thingId)
+				throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Thing's Id can't be null", 90);
+
+			let thingDTO = req.body;
+			if (!thingDTO)
+				throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "The body message is empty", 91);
+
+			let blResult = await thingsMngr.updateThing(user, thingId, thingDTO);
+			if (!blResult) {
+				ClientsConnectorsManager.onUpdateThing(blResult.usersIdsToNotify, blResult.thingDTOs);
+			}
+
+			// TODO: According to the restful paradigm what should the PUT return?
+			res.json(blResult.thingDTO);
+
+		}  catch (e)  {
+			if (e instanceof utils.ErrorCustom) {
+				next(e);
+				return;
+			}
+			next(new utils.ErrorCustom(httpStatusCodes.INTERNAL_SERVER_ERROR, e.message, 89));
 		}
 	})(req, res, next);
 });
