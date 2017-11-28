@@ -1,1 +1,0 @@
-exports.usersMngr = require("./usersMngr");
