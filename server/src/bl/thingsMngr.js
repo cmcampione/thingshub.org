@@ -579,9 +579,6 @@ exports.updateThing = async (user, thingId, thingDTO) => {
 	var thing = await getThing(user, thingId, constants.ThingDeletedStates.Ok, 
 		constants.ThingUserRole.Administrator, constants.ThingUserStates.Ok, constants.ThingUserVisibility.Visible);
 
-	// Validation is not used because you need to control access to the various Thing properties
-	//validateThingDTO(constants, thingDTO);
-
 	if (!thingDTO)
 		throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "The body message is empty", 56);
 
