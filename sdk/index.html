@@ -38,6 +38,10 @@
         console.log(thingDTO);
       }
 
+      function onUpdateThing(thingDTO) {
+        console.log(thingDTO);
+      }
+
       var endPointAddress = {
           server: "https://localhost:3000",
           api: "https://localhost:3000/api"    
@@ -68,6 +72,7 @@
       socket.subscribe();
       socket.setHook("api", onAPI);
       socket.setHook("onCreateThing", onCreateThing);
+      socket.setHook("onUpdateThing", onUpdateThing);
       
       socket.api()
       .then(function(res) {
