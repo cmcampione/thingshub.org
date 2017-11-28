@@ -508,6 +508,19 @@ exports.createThing = async (user, thingDTO) => {
 		throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Thing UserRole is incorrect", 19);
 	if (constants.validateThingUserVisibility(thingDTO.userVisibility) == false)
 		throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Thing UserVisibility is incorrect", 35);
+
+	if (constants.validateThingUserReadClaims(thingDTO.publicReadClaims) == false)
+		throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Thing PublicReadClaims is incorrect", 82);
+	if (constants.validateThingUserReadClaims(thingDTO.everyoneReadClaims) == false)
+		throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Thing EveryoneReadClaims is incorrect", 83);
+	if (constants.validateThingUserChangeClaims(thingDTO.publicChangeClaims) == false)
+		throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Thing PublicChangeClaims is incorrect", 84);
+	if (constants.validateThingUserChangeClaims(thingDTO.everyoneChangeClaims) == false)
+		throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Thing EveryoneChangeClaimss is incorrect", 85);
+	if (constants.validateThingUserReadClaims(thingDTO.userReadClaims) == false)
+		throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Thing UserReadClaims is incorrect", 86);
+	if (constants.validateThingUserChangeClaims(thingDTO.userChangeClaims) == false)
+		throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Thing UserChangeClaims is incorrect", 87);
         
 	// Generate Thing's Id if not provided
 	let thingId = !thingDTO.id ? uuidv4() : thingDTO.id;
@@ -555,8 +568,8 @@ exports.createThing = async (user, thingDTO) => {
 	};
 };
 
-exports.updateThingAsync= async (user, thingId, thingDTO) => {
-	//TODO: Potrebbe essere bello provare a cancellare le due linee sottostanti e abilitare la funzione che gli User anonimo possano cambiare la Thing ovviamente rispettando Claims e Roles
+exports.updateThing = async (user, thingId, thingDTO) => {
+	// TODO: It might be nice try clearing the two lines below and enable the function that anonymous users can change the Thing obviously by respecting Claims and Roles
 	if (!user)
 		throw new utils.ErrorCustom(httpStatusCodes.UNAUTHORIZED, httpStatusCodes.getStatusText(httpStatusCodes.UNAUTHORIZED), 54);
 
@@ -566,7 +579,7 @@ exports.updateThingAsync= async (user, thingId, thingDTO) => {
 	var thing = await getThing(user, thingId, constants.ThingDeletedStates.Ok, 
 		constants.ThingUserRole.Administrator, constants.ThingUserStates.Ok, constants.ThingUserVisibility.Visible);
 
-	// Non viene utilizzata la validazione in quanto si ha bisogno di controllare l'accesso alle varie proprietà della Thing
+	// Validation is not used because you need to control access to the various Thing properties
 	//validateThingDTO(constants, thingDTO);
 
 	if (!thingDTO)
@@ -574,7 +587,7 @@ exports.updateThingAsync= async (user, thingId, thingDTO) => {
 
 	let loggedInThingUserClaims = getThingUserClaims(user, thing, user.isSuperAdministrator);
 
-	//Aggiorniamo la Thing
+	// We update the Thing
 
 	let isChanged = false;
 
@@ -657,9 +670,9 @@ exports.updateThingAsync= async (user, thingId, thingDTO) => {
 		isChanged = true;
 	}
 
-	//Sono sicuro che lo status dello User è OK in quanto durante il controllo dell'accesso alla Thing ho imposto che lo User doveva essere in status OK
+	// I'm sure the User's status is OK because during Thing's access control I imposed that the User should be in OK status
 	var thingUserRights = getThingUserRights(user._id, user.userName, thing);
-	// Se lo user loggato non ha una relazione significa che è un SuperAdministrator
+	// If user logged in does not have a relationship it means it is a SuperAdministrator
 	if (thingUserRights != null) {
 		if (thingUserRights.userReadClaims != thingDTO.userReadClaims) {
 			if ((loggedInThingUserClaims.change & constants.ThingUserChangeClaims.CanChangeThingUserReadClaims) == 0)
@@ -718,11 +731,17 @@ exports.updateThingAsync= async (user, thingId, thingDTO) => {
 	if (isChanged == false)
 		return null;
 
-	let blResult = await CreateGenericBLResult(thing);
+	let usersIdsToNotify = await getUsersIdsToNotify(thing);
+	let thingDTOs = new Map();
+	for (let userId of usersIdsToNotify) {
+		let user = await usersManager.findUserById(userId);
+		thingDTOs[user._id] = await createThingDTO(user, null, thing, user.isSuperAdministrator);
+	}
 
-	//TODO: Fare in modo di inviare le notifiche agli User con i rispettivi ThingDTO riempiti secondo i relativi Claims
-	blResult.DTO = await CreateThingDTOAsync(user, objectContext, constants, null, thing, false);
-
-	return blResult;
-}
+	return {
+		thingDTO : await createThingDTO(user, null, thing, user.isSuperAdministrator),
+		usersIdsToNotify,
+		thingDTOs
+	};
+};
 
