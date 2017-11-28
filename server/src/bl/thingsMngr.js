@@ -450,12 +450,12 @@ async function createThingDTO(user, parentThing, thing, isSuperAdministrator) {
 		let loggedInThingUserRights1 = getThingUserRights(user._id, user.username, thing);
 		if (loggedInThingUserRights1)
 		{
-			loggedInthingUserRights.userRole = loggedInThingUserRights1.userRole;
-			loggedInthingUserRights.userStatus = loggedInThingUserRights1.userStatus;
+			loggedInThingUserRights.userRole = loggedInThingUserRights1.userRole;
+			loggedInThingUserRights.userStatus = loggedInThingUserRights1.userStatus;
 			loggedInThingUserRights.userVisibility = loggedInThingUserRights1.userVisibility;
 			loggedInThingUserRights.shortPin = loggedInThingUserRights1.shortPin;
-			loggedInthingUserRights.userReadClaims = loggedInThingUserRights1.userReadClaims;
-			loggedInthingUserRights.userChangeClaims = loggedInThingUserRights1.userChangeClaims;
+			loggedInThingUserRights.userReadClaims = loggedInThingUserRights1.userReadClaims;
+			loggedInThingUserRights.userChangeClaims = loggedInThingUserRights1.userChangeClaims;
 			// TODO: Is useful? Test during shortPin implementation
 			loggedInThingUserRights.shortPin = loggedInThingUserRights1.shortPin;
 		}
@@ -591,34 +591,37 @@ exports.updateThing = async (user, thingId, thingDTO) => {
 
 	let isChanged = false;
 
-	if (thingDTO.name && thing.name != thingDTO.name) {
+	if (thingDTO.name != undefined && thing.name != thingDTO.name) {
+
 		if ((loggedInThingUserClaims.change & constants.ThingUserChangeClaims.CanChangeName) == 0)
 			throw new utils.ErrorCustom(httpStatusCodes.FORBIDDEN, "Unauthorized user", 57);
-		/*
-		if (thingDTO.name == null)
+
+		if (!thingDTO.name)
 			throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Name can't be empty", 58);
-		*/
+
 		thing.name = thingDTO.name;
 		isChanged = true;
 	}
-	if (thingDTO.kind && thing.kind != thingDTO.kind) {
+	if (thingDTO.kind != undefined && thing.kind != thingDTO.kind) {
+
 		if ((loggedInThingUserClaims.change & constants.ThingUserChangeClaims.CanChangeKind) == 0)
 			throw new utils.ErrorCustom(httpStatusCodes.FORBIDDEN, "Unauthorized user", 59);
-		/*
+		
 		if (!thingDTO.kind)
 			throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Kind can't be empty", 60);
-		*/
+		
 		thing.kind = thingDTO.kind;
 		isChanged = true;
 	}
-	if (thing.value != thingDTO.value) {
+	if (thingDTO.value != undefined && thing.value != thingDTO.value) {
+
 		if ((loggedInThingUserClaims.change & constants.ThingUserChangeClaims.CanChangeValue) == 0)
 			throw new utils.ErrorCustom(httpStatusCodes.FORBIDDEN, "User can not changes Thing's properties", 61);
 
 		thing.value = thingDTO.value;
 		isChanged = true;
 	}
-	if (thing.publicReadClaims != thingDTO.publicReadClaims) {
+	if (thingDTO.publicReadClaims != undefined && thing.publicReadClaims != thingDTO.publicReadClaims) {
 		if ((loggedInThingUserClaims.change & constants.ThingUserChangeClaims.CanChangePublicReadClaims) == 0)
 			throw new utils.ErrorCustom(httpStatusCodes.FORBIDDEN, "User can not changes Thing's properties", 62);
 
@@ -628,7 +631,7 @@ exports.updateThing = async (user, thingId, thingDTO) => {
 		thing.publicReadClaims = thingDTO.publicReadClaims;
 		isChanged = true;
 	}
-	if (thing.publicChangeClaims != thingDTO.publicChangeClaims) {
+	if (thingDTO.publicChangeClaims != undefined && thing.publicChangeClaims != thingDTO.publicChangeClaims) {
 		if ((loggedInThingUserClaims.change & constants.ThingUserChangeClaims.CanChangePublicChangeClaims) == 0)
 			throw new utils.ErrorCustom(httpStatusCodes.FORBIDDEN, "User can not changes Thing's properties", 64);
 
@@ -638,7 +641,7 @@ exports.updateThing = async (user, thingId, thingDTO) => {
 		thing.publicChangeClaims = thingDTO.publicChangeClaims;
 		isChanged = true;
 	}
-	if (thing.everyoneReadClaims != thingDTO.everyoneReadClaims) {
+	if (thingDTO.everyoneReadClaims != undefined && thing.everyoneReadClaims != thingDTO.everyoneReadClaims) {
 		if ((loggedInThingUserClaims.change & constants.ThingUserChangeClaims.CanChangeEveryoneReadClaims) == 0)
 			throw new utils.ErrorCustom(httpStatusCodes.FORBIDDEN, "User can not changes Thing's properties", 66);
 
@@ -648,7 +651,7 @@ exports.updateThing = async (user, thingId, thingDTO) => {
 		thing.everyoneReadClaims = thingDTO.everyoneReadClaims;
 		isChanged = true;
 	}
-	if (thing.everyoneChangeClaims != thingDTO.everyoneChangeClaims) {
+	if (thingDTO.everyoneChangeClaims != undefined && thing.everyoneChangeClaims != thingDTO.everyoneChangeClaims) {
 		if ((loggedInThingUserClaims.change & constants.ThingUserChangeClaims.CanChangeEveryoneChangeClaims) == 0)
 			throw new utils.ErrorCustom(httpStatusCodes.FORBIDDEN, "User can not changes Thing's properties", 68);
 
@@ -658,7 +661,7 @@ exports.updateThing = async (user, thingId, thingDTO) => {
 		thing.everyoneChangeClaims = thingDTO.everyoneChangeClaims;
 		isChanged = true;
 	}
-	if (thing.deletedStatus != thingDTO.deletedStatus) {
+	if (thingDTO.deletedStatus != undefined && thing.deletedStatus != thingDTO.deletedStatus) {
 		if ((loggedInThingUserClaims.change & constants.ThingUserChangeClaims.CanChangeDeletedStatus) == 0)
 			throw new utils.ErrorCustom(httpStatusCodes.FORBIDDEN, "User can not changes Thing's properties", 70);
 
@@ -674,7 +677,7 @@ exports.updateThing = async (user, thingId, thingDTO) => {
 	var thingUserRights = getThingUserRights(user._id, user.username, thing);
 	// If user logged in does not have a relationship it means it is a SuperAdministrator
 	if (thingUserRights) {
-		if (thingUserRights.userReadClaims != thingDTO.userReadClaims) {
+		if (thingDTO.userReadClaims != undefined && thingUserRights.userReadClaims != thingDTO.userReadClaims) {
 			if ((loggedInThingUserClaims.change & constants.ThingUserChangeClaims.CanChangeThingUserReadClaims) == 0)
 				throw new utils.ErrorCustom(httpStatusCodes.FORBIDDEN, "User can not changes Thing's properties", 78);
 
@@ -684,7 +687,7 @@ exports.updateThing = async (user, thingId, thingDTO) => {
 			thingUserRights.userReadClaims = thingDTO.userReadClaims;
 			isChanged = true;
 		}
-		if (thingUserRights.userRole != thingDTO.userRole) {
+		if (thingDTO.userRole != undefined && thingUserRights.userRole != thingDTO.userRole) {
 			if ((loggedInThingUserClaims.change & constants.ThingUserChangeClaims.CanChangeThingUserRole) == 0)
 				throw new utils.ErrorCustom(httpStatusCodes.FORBIDDEN, "User can not changes Thing's properties", 72);
 
@@ -694,7 +697,7 @@ exports.updateThing = async (user, thingId, thingDTO) => {
 			thingUserRights.userRole = thingDTO.userRole;
 			isChanged = true;
 		}
-		if (thingUserRights.userStatus != thingDTO.userStatus) {
+		if (thingDTO.userStatus != undefined && thingUserRights.userStatus != thingDTO.userStatus) {
 			if ((loggedInThingUserClaims.change & constants.ThingUserChangeClaims.CanChangeThingUserStatus) == 0)
 				throw new utils.ErrorCustom(httpStatusCodes.FORBIDDEN, "User can not changes Thing's properties", 74);
 
@@ -704,7 +707,7 @@ exports.updateThing = async (user, thingId, thingDTO) => {
 			thingUserRights.userStatus = thingDTO.userStatus;
 			isChanged = true;
 		}
-		if (thingUserRights.userVisibility != thingDTO.userVisibility) {
+		if (thingDTO.userVisibility != undefined && thingUserRights.userVisibility != thingDTO.userVisibility) {
 			if ((loggedInThingUserClaims.change & constants.ThingUserChangeClaims.CanChangeThingUserVisibility) == 0)
 				throw new utils.ErrorCustom(httpStatusCodes.FORBIDDEN, "User can not changes Thing's properties", 79);
 
@@ -716,7 +719,7 @@ exports.updateThing = async (user, thingId, thingDTO) => {
 		}
 
 		// Must be last
-		if (thingUserRights.userChangeClaims != thingDTO.userChangeClaims) {
+		if (thingDTO.userChangeClaims != undefined && thingUserRights.userChangeClaims != thingDTO.userChangeClaims) {
 			if ((loggedInThingUserClaims.change & constants.ThingUserChangeClaims.CanChangeThingUserChangeClaims) == 0)
 				throw new utils.ErrorCustom(httpStatusCodes.FORBIDDEN, "User can not changes Thing's properties", 76);
 
@@ -729,12 +732,21 @@ exports.updateThing = async (user, thingId, thingDTO) => {
 	}
 
 	if (isChanged == false)
-		return null;
+		return {
+			thingDTO : await createThingDTO(user, null, thing, user.isSuperAdministrator),
+			usersIdsToNotify : null,
+			thingDTOs : null
+		};
+
+	thing.set(thingDTO);
+	thingModel.save(thing);
 
 	let usersIdsToNotify = await getUsersIdsToNotify(thing);
 	let thingDTOs = new Map();
 	for (let userId of usersIdsToNotify) {
 		let user = await usersManager.findUserById(userId);
+		if (!user)
+			throw new utils.ErrorCustom(httpStatusCodes.INTERNAL_SERVER_ERROR, "User not found", 94);
 		thingDTOs[user._id] = await createThingDTO(user, null, thing, user.isSuperAdministrator);
 	}
 
