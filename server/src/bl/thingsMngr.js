@@ -591,23 +591,23 @@ exports.updateThing = async (user, thingId, thingDTO) => {
 
 	let isChanged = false;
 
-	if (thing.name == thingDTO.name) {
+	if (thingDTO.name && thing.name != thingDTO.name) {
 		if ((loggedInThingUserClaims.change & constants.ThingUserChangeClaims.CanChangeName) == 0)
 			throw new utils.ErrorCustom(httpStatusCodes.FORBIDDEN, "Unauthorized user", 57);
-
+		/*
 		if (thingDTO.name == null)
 			throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Name can't be empty", 58);
-
+		*/
 		thing.name = thingDTO.name;
 		isChanged = true;
 	}
-	if (thing.kind == thingDTO.kind) {
+	if (thingDTO.kind && thing.kind != thingDTO.kind) {
 		if ((loggedInThingUserClaims.change & constants.ThingUserChangeClaims.CanChangeKind) == 0)
 			throw new utils.ErrorCustom(httpStatusCodes.FORBIDDEN, "Unauthorized user", 59);
-
+		/*
 		if (!thingDTO.kind)
 			throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Kind can't be empty", 60);
-
+		*/
 		thing.kind = thingDTO.kind;
 		isChanged = true;
 	}
@@ -671,9 +671,9 @@ exports.updateThing = async (user, thingId, thingDTO) => {
 	}
 
 	// I'm sure the User's status is OK because during Thing's access control I imposed that the User should be in OK status
-	var thingUserRights = getThingUserRights(user._id, user.userName, thing);
+	var thingUserRights = getThingUserRights(user._id, user.username, thing);
 	// If user logged in does not have a relationship it means it is a SuperAdministrator
-	if (thingUserRights != null) {
+	if (thingUserRights) {
 		if (thingUserRights.userReadClaims != thingDTO.userReadClaims) {
 			if ((loggedInThingUserClaims.change & constants.ThingUserChangeClaims.CanChangeThingUserReadClaims) == 0)
 				throw new utils.ErrorCustom(httpStatusCodes.FORBIDDEN, "User can not changes Thing's properties", 78);

@@ -103,7 +103,7 @@ router.post("/", async function (req, res, next){
 });
 
 // Update Thing
-router.pust("/:id", async function (req, res, next){
+router.put("/:id", async function (req, res, next){
 	passport.authenticate("localapikey", async function(err, user, info) {
 		try {
 			if (err) { 
