@@ -156,4 +156,40 @@ router.put("/:id", async function (req, res, next){
 	})(req, res, next);
 });
 
+router.put("/:id/value", async function (req, res, next){
+	passport.authenticate("localapikey", async function(err, user, info) {
+		try {
+			if (err)
+				return next(err); 
+
+			if (!user)
+				return next(new utils.ErrorCustom(httpStatusCodes.UNAUTHORIZED, httpStatusCodes.getStatusText(httpStatusCodes.UNAUTHORIZED), 104));
+
+			let thingId = req.params.id;
+			if (!thingId)
+				throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Thing's Id can't be null", 105);
+
+			let value = req.body;
+			if (!value)
+				throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "The body message is empty", 106);
+
+			let blResult = await thingsMngr.updateThingValue(user, thingId, value);
+			if (!blResult)
+				return; // TODO: According to the restful paradigm what should the PUT return?
+
+			ClientsConnectorsManager.onUpdateThingValue(blResult, value);
+
+			// TODO: According to the restful paradigm what should the PUT return?
+			res.json(value);
+
+		}  catch (e)  {
+			if (e instanceof utils.ErrorCustom) {
+				next(e);
+				return;
+			}
+			next(new utils.ErrorCustom(httpStatusCodes.INTERNAL_SERVER_ERROR, e.message, 89));
+		}
+	})(req, res, next);
+});
+
 module.exports = router;

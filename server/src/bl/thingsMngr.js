@@ -625,7 +625,8 @@ exports.updateThing = async (user, thingId, thingDTO) => {
 		thing.description = thingDTO.description;
 		isChanged = true;
 	}
-	if (thingDTO.value != null && thing.value != thingDTO.value) {
+	// Do not campare value value :-) because is an object
+	if (thingDTO.value != null) {
 
 		if ((loggedInThingUserClaims.change & constants.ThingUserChangeClaims.CanChangeValue) == 0)
 			throw new utils.ErrorCustom(httpStatusCodes.FORBIDDEN, "User can not changes Thing's properties", 61);
@@ -784,35 +785,25 @@ exports.updateThingValue = async (user, thingId, value) => {
 	if (!user)
 		throw new utils.ErrorCustom(httpStatusCodes.UNAUTHORIZED, "Unauthorized user", 105);
 
-	var thing = await getThing(user, thingId, constants.ThingDeletedStates.Ok, constants.ThingUserRole.NoMatter, constants.ThingUserStatus.Ok, constants.ThingUserVisibility.Visible);
+	var thing = await getThing(user, thingId, constants.ThingDeletedStates.Ok, constants.ThingUserRole.NoMatter, constants.ThingUserStates.Ok, constants.ThingUserVisibility.Visible);
 
 	var loggedInThingUserClaims = getThingUserClaims(user, thing);
 
-	if ((loggedInThingUserClaims.Change & constants.ThingUserChangeClaims.CanChangeValue) == 0)
+	if ((loggedInThingUserClaims.change & constants.ThingUserChangeClaims.CanChangeValue) == 0)
 		throw new utils.ErrorCustom(httpStatusCodes.FORBIDDEN, "Unauthorized user", 106);
 
-	let needNotification = false;
-	if (value != null && thing.value != value) {
+	// Do not campare value value :-) because is an object
+	if (value != null) {
 		
 		if ((loggedInThingUserClaims.change & constants.ThingUserChangeClaims.CanChangeValue) == 0)
 			throw new utils.ErrorCustom(httpStatusCodes.FORBIDDEN, "User can not changes Thing's value", 107);
 
-		thing.value = value;
-		needNotification = true;
-	}
-
-	if (needNotification == true)
-	{			
 		let usersIdsToNotify = await getUsersIdsToNotify(thing, true);
 
-		thing.set({"value" : value});
+		thing.set({value});
 		thingModel.save(thing);
 
-		return {
-			usersIdsToNotify,
-			// TODO: Send the notification only to anyone who can read the Thing Value
-			value
-		};
+		return usersIdsToNotify;
 	}
 
 	return null;
