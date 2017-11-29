@@ -132,7 +132,7 @@ async function getThing(user, thingId, deletedStatus, userRole, userStatus, user
 	let thing = await findThingById(thingId);
 	if (!thing)
 	{
-		// Returns httpStatusCodes.Unauthorized to Reset Some Malicious Logon Access
+		// Returns httpStatusCodes.UNAUTHORIZED to Reset Some Malicious Logon Access
 		if (!user)
 			throw new utils.ErrorCustom(httpStatusCodes.UNAUTHORIZED, "Unauthorized user", 38);
 		throw new utils.ErrorCustom(httpStatusCodes.NOT_FOUND, "Thing not found", 39);
@@ -306,7 +306,7 @@ function createThingPosition(user, parentThing, childThing, pos) {
 
 // Prepare notifications for Users who have a relationship with Thing anyway in Ok or WaitForAuth status 
 // and that they are actually registered (Non-users "free" Notifications can not be notified)
-async function getUsersIdsToNotify(thing) {
+async function getUsersIdsToNotify(thing, checkValueAccess) {
 	
 	if (!thing)
 		throw new utils.ErrorCustom(httpStatusCodes.INTERNAL_SERVER_ERROR, "Thing can't be null", 26);
@@ -320,16 +320,22 @@ async function getUsersIdsToNotify(thing) {
 				((r.userVisibility & constants.ThingUserVisibility.Visible) != 0))
 		)
 			continue;
-	
+
 		let userId = r.userId;
 		let username = r.username;
 	
 		if (!userId && !username)
-			throw new utils.ErrorCustom(httpStatusCodes.INTERNAL_SERVER_ERROR, "both userId and username can't be empty", 27);
+			throw new utils.ErrorCustom(httpStatusCodes.INTERNAL_SERVER_ERROR, "Both userId and username can't be empty", 27);
 		
 		let user = userId ? await usersManager.findUserById(userId) : await	usersManager.findUserByUsername(username);
 		if (!user)
 			continue;
+
+		if (checkValueAccess) {
+			let thingUserClaims = getThingUserClaims(user, thing, user.isSuperAdministrator);
+			if ((thingUserClaims.change & constants.ThingUserChangeClaims.CanChangeValue) == 0)
+				continue;
+		}
 			
 		UsersIdsToNotify.add(userId);
 	}
@@ -738,6 +744,8 @@ exports.updateThing = async (user, thingId, thingDTO) => {
 	}
 
 	let thingDTONew = await createThingDTO(user, null, thing, user.isSuperAdministrator);
+	if (!thingDTONew)
+		throw new utils.ErrorCustom(httpStatusCodes.INTERNAL_SERVER_ERROR, "ThingDTO not created", 102);
 
 	if (isChanged == false)
 		return {
@@ -753,6 +761,8 @@ exports.updateThing = async (user, thingId, thingDTO) => {
 		if (!user)
 			throw new utils.ErrorCustom(httpStatusCodes.INTERNAL_SERVER_ERROR, "User not found", 94);
 		thingDTOs[user._id] = await createThingDTO(user, null, thing, user.isSuperAdministrator);
+		if (!thingDTOs[user._id])
+			throw new utils.ErrorCustom(httpStatusCodes.INTERNAL_SERVER_ERROR, "ThingDTO not created", 103);
 	}
 
 	thing.set(thingDTO);
@@ -763,5 +773,49 @@ exports.updateThing = async (user, thingId, thingDTO) => {
 		usersIdsToNotify,
 		thingDTOs
 	};
+};
+
+exports.updateThingValue = async (user, thingId, value) => {
+
+	if (!thingId)
+		throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Thing's Id can't be null", 104);
+
+	// TODO: It might be nice try clearing the two lines below and enable the function that anonymous users can change the Thing obviously by respecting Claims and Roles
+	if (!user)
+		throw new utils.ErrorCustom(httpStatusCodes.UNAUTHORIZED, "Unauthorized user", 105);
+
+	var thing = await getThing(user, thingId, constants.ThingDeletedStates.Ok, constants.ThingUserRole.NoMatter, constants.ThingUserStatus.Ok, constants.ThingUserVisibility.Visible);
+
+	var loggedInThingUserClaims = getThingUserClaims(user, thing);
+
+	if ((loggedInThingUserClaims.Change & constants.ThingUserChangeClaims.CanChangeValue) == 0)
+		throw new utils.ErrorCustom(httpStatusCodes.FORBIDDEN, "Unauthorized user", 106);
+
+	let needNotification = false;
+	if (value != null && thing.value != value) {
+		
+		if ((loggedInThingUserClaims.change & constants.ThingUserChangeClaims.CanChangeValue) == 0)
+			throw new utils.ErrorCustom(httpStatusCodes.FORBIDDEN, "User can not changes Thing's value", 107);
+
+		thing.value = value;
+		needNotification = true;
+	}
+
+	if (needNotification == true)
+	{			
+		let usersIdsToNotify = await getUsersIdsToNotify(thing, true);
+
+		thing.set({"value" : value});
+		thingModel.save(thing);
+
+		return {
+			usersIdsToNotify,
+			// TODO: Send the notification only to anyone who can read the Thing Value
+			value
+		};
+	}
+
+	return null;
+
 };
 
