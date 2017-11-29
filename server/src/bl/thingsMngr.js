@@ -538,6 +538,7 @@ exports.createThing = async (user, thingDTO) => {
 	thing.creationDate = thingDTO.creationDateTime ? thingDTO.creationDate : Date.now();
 	thing.name = thingDTO.name;
 	thing.kind = thingDTO.kind;
+	thing.description = thingDTO.description;
 	thing.value = thingDTO.value;
 	thing.deletedStatus = thingDTO.deletedStatus;
 	thing.deletedDate = thingDTO.deletedStatus == constants.ThingDeletedStates.Deleted ? Date.now : null;
@@ -608,6 +609,14 @@ exports.updateThing = async (user, thingId, thingDTO) => {
 			throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Kind can't be empty", 60);
 		
 		thing.kind = thingDTO.kind;
+		isChanged = true;
+	}
+	if (thingDTO.description != null && thing.description != thingDTO.description) {
+		
+		if ((loggedInThingUserClaims.change & constants.ThingUserChangeClaims.CanChangeDescription) == 0)
+			throw new utils.ErrorCustom(httpStatusCodes.FORBIDDEN, "Unauthorized user", 101);
+				
+		thing.description = thingDTO.description;
 		isChanged = true;
 	}
 	if (thingDTO.value != null && thing.value != thingDTO.value) {
