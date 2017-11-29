@@ -13,6 +13,33 @@ const ClientsConnectorsManager = require("../clientsConnectorsManager");
 
 const router = express.Router();
 
+router.get("/:id", function(req, res, next) {
+	passport.authenticate("localapikey", async function(err, user, info) {
+		try {
+			if (err) { 
+				return next(err); 
+			}
+
+			let thingId = req.params.id;
+			if (!thingId)
+				throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Thing's Id can't be null", 93);
+
+			let blResult = await thingsMngr.getThing(user, thingId, constants.ThingDeletedStates.NoMatter);
+			if (!blResult)
+				throw new utils.ErrorCustom(httpStatusCodes.INTERNAL_SERVER_ERROR, "Result not valid", 99);
+
+			res.json(blResult);
+
+		}  catch (e)  {
+			if (e instanceof utils.ErrorCustom) {
+				next(e);
+				return;
+			}
+			next(new utils.ErrorCustom(httpStatusCodes.INTERNAL_SERVER_ERROR, e.message, 50));
+		}
+	})(req, res, next);
+});
+
 router.get("/", function(req, res, next) {
 	passport.authenticate("localapikey", async function(err, user, info) {
 		try {
@@ -46,33 +73,6 @@ router.get("/", function(req, res, next) {
 				return;
 			}
 			next(new utils.ErrorCustom(httpStatusCodes.INTERNAL_SERVER_ERROR, e.message, 8));
-		}
-	})(req, res, next);
-});
-
-router.get("/:id", function(req, res, next) {
-	passport.authenticate("localapikey", async function(err, user, info) {
-		try {
-			if (err) { 
-				return next(err); 
-			}
-
-			let thingId = req.params.id;
-			if (!thingId)
-				throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Thing's Id can't be null", 93);
-
-			let blResult = await thingsMngr.getThing(user, thingId, constants.ThingDeletedStates.NoMatter);
-			if (!blResult)
-				throw new utils.ErrorCustom(httpStatusCodes.INTERNAL_SERVER_ERROR, "Result not valid", 99);
-
-			res.json(blResult);
-
-		}  catch (e)  {
-			if (e instanceof utils.ErrorCustom) {
-				next(e);
-				return;
-			}
-			next(new utils.ErrorCustom(httpStatusCodes.INTERNAL_SERVER_ERROR, e.message, 50));
 		}
 	})(req, res, next);
 });
