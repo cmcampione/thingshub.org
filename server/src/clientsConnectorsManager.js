@@ -14,6 +14,7 @@ class IClientsConnector {
 
 	onCreateThing(usersIds, thingDTO) {}
 	onUpdateThing(usersIds, thingDTOs) {}
+	onUpdateThingValue(usersIds, value) {}
 }
 
 // Socket.io support
@@ -112,6 +113,19 @@ class ClientsConnectorSocketIO extends IClientsConnector {
 			}
 		}
 	}
+	onUpdateThingValue(usersIds, value) {
+		
+		for(let userId of usersIds) {
+
+			let connections = this.connections.get(userId.toString());
+			if (!connections)
+				continue;
+
+			for(let socket of connections) {
+				socket.emit("onUpdateThingValue", value);
+			}
+		}
+	}
 }
 
 class ClientsConnectorsManager {
@@ -135,6 +149,11 @@ class ClientsConnectorsManager {
 	static onUpdateThing(usersIds, thingDTOs) {
 		ClientsConnectorsManager.ClientsConnectors.forEach(element => {
 			element.onUpdateThing(usersIds, thingDTOs);
+		});
+	}
+	static onUpdateThingValue(usersIds, value) {
+		ClientsConnectorsManager.ClientsConnectors.forEach(element => {
+			element.onUpdateThingValue(usersIds, value);
 		});
 	}
 }
