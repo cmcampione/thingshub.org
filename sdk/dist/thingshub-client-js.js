@@ -259,6 +259,9 @@ ThingUserReadClaims.CanReadThingUserStatus | ThingUserReadClaims.CanReadThingUse
 ThingUserReadClaims.CanReadPublicChangeClaims | ThingUserReadClaims.CanReadEveryoneReadClaims | ThingUserReadClaims.CanReadEveryoneChangeClaims;
 
 exports.ThingUserReadClaims = ThingUserReadClaims;
+exports.validateThingUserReadClaims = (userReadClaims) => {
+	return userReadClaims <= ThingUserReadClaims.AllClaims && userReadClaims >= ThingUserReadClaims.NoClaim;
+};
 
 // Do not have validation function since are bitwise values
 const ThingUserChangeClaims = {
@@ -302,6 +305,9 @@ ThingUserChangeClaims.CanChangePublicReadClaims | ThingUserChangeClaims.CanChang
 ThingUserChangeClaims.CanAddChildrenThing | ThingUserChangeClaims.CanRemoveChildrenThing;
 
 exports.ThingUserChangeClaims = ThingUserChangeClaims;
+exports.validateThingUserChangeClaims = (userChangeClaims) => {
+	return userChangeClaims <= ThingUserChangeClaims.AllClaims && userChangeClaims >= ThingUserChangeClaims.NoClaim;
+};
 
 exports.ThingKind = {
 	NoMatter: "0",
@@ -2342,12 +2348,12 @@ var ThingsDataContext = /** @class */ (function () {
     // INFO: To abort call "canceler.cancel()"
     ThingsDataContext.prototype.getThings = function (parameter, canceler) {
         var urlRaw = this.thingsUrl() + "?" +
-            (!!parameter.parentThingId ? ("&$parentThingId=" + parameter.parentThingId) : "") +
-            (!!parameter.thingFilter ? ("&$thingFilter=" + parameter.thingFilter) : "") +
-            (!!parameter.valueFilter ? ("&$valueFilter=" + parameter.valueFilter) : "") +
-            (!!parameter.orderBy ? ("&$orderBy=" + parameter.orderBy) : "") +
-            (!!parameter.skip ? ("&$skip=" + parameter.skip) : "") +
-            (!!parameter.top ? ("&$top=" + parameter.top) : "");
+            (!!parameter.parentThingId ? ("&parentThingId=" + parameter.parentThingId) : "") +
+            (!!parameter.thingFilter ? ("&thingFilter=" + parameter.thingFilter) : "") +
+            (!!parameter.valueFilter ? ("&valueFilter=" + parameter.valueFilter) : "") +
+            (!!parameter.orderBy ? ("&orderBy=" + parameter.orderBy) : "") +
+            (!!parameter.skip ? ("&skip=" + parameter.skip) : "") +
+            (!!parameter.top ? ("&top=" + parameter.top) : "");
         if (canceler)
             canceler.setup();
         return axios_1.default.get(urlRaw, {
