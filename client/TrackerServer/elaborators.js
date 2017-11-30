@@ -27,7 +27,8 @@ module.exports.ElaboratorFreeAnts = function() {
 
 	//INFO: La X iniziale è per evitare la conversione implicita di javascript in int
 	let gpsId = "X" + process.env.MAIN_GPS;
-	var GPSs = {gpsId : process.env.FREEANTS_THING};
+	var GPSs = [];
+	GPSs[gpsId] = process.env.FREEANTS_THING;
 
 	var serverAddress = process.env.FREEANTS_SERVERNAME;
 	var apiAddress = process.env.FREEANTS_API_URL;
@@ -78,7 +79,8 @@ module.exports.ElaboratorThingsHub = function() {
 	
 	//INFO: La X iniziale è per evitare la conversione implicita di javascript in int
 	let gpsId = "X" + process.env.MAIN_GPS;
-	var GPSs = {gpsId : process.env.THINGSHUB_THING};
+	var GPSs = [];
+	GPSs[gpsId] = process.env.THINGSHUB_THING;
 
 	var serverAddress = process.env.THINGSHUB_SERVERNAME;
 	var apiAddress = process.env.THINGSHUB_API_URL;
