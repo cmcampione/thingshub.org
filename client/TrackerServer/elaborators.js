@@ -101,12 +101,12 @@ module.exports.ElaboratorThingsHub = function() {
 			headers : {
 				"Content-Type"   : "application/json",
 				"Content-Length" : Buffer.byteLength(jsonObject, "utf8"),
-				"DWApiKey"       : thApiKey 
+				"thapikey"       : thApiKey 
 			}
 		};
 	
-		var responseData = "";
-		var reqPut = https.request(optionsPutThingValue, function(res) {
+		let responseData = "";
+		let reqPut = https.request(optionsPutThingValue, function(res) {
 			res.on("data", function(d) {
 				responseData += d;
 			});
