@@ -8,7 +8,7 @@
             "type": "node",
             "request": "launch",
             "name": "Launch Tracker Server ",
-            "program": "${workspaceFolder}\\client\\Trackerserver\\app.js"
+            "program": "${workspaceFolder}\\client\\TrackerServer\\app.js"
         },
         {
             "type": "node",
