@@ -7,7 +7,13 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "Launch Server",
+            "name": "Launch Tracker Server ",
+            "program": "${workspaceFolder}\\client\\Trackerserver\\app.js"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Launch ThingsHub Server",
             "program": "${workspaceFolder}\\server\\src\\server.js"
         }
     ]
