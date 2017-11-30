@@ -2,26 +2,33 @@
 
 console.log("-----------------------------------------------------------");
 
-var net         = require("net");
+const net         	= require("net");
+const path    			= require("path");
+const dotenv  		= require("dotenv");
+const gpsDataMod     = require("./gpsData.js");
+const parser        = require("./parsers.js");
+const elaboratorsMod = require("./elaborators.js");
 
-var gpsDataMod     = require("./gpsData.js");
-var parser         = require("./parsers.js");
-var elaboratorsMod = require("./elaborators.js");
+// Env configuration
+
+const configPath = path.join(__dirname, "./", "trackerServer.env");
+dotenv.config({ path: configPath });
 
 var GPSs = [];
 
-//INFO: La X iniziale è per evitare la conversione implicita di javascript in int
-GPSs["X087073117560"] = new gpsDataMod.Data();
+// INFO: The initial X is to avoid implicit Javascript conversion in int
+GPSs["X" + process.env.MAIN_GPS] = new gpsDataMod.Data();
 
 var elaborators = [];
 
 elaborators.push(new elaboratorsMod.ElaboratorUIGPSData());
 elaborators.push(new elaboratorsMod.ElaboratorFreeAnts());
+elaborators.push(new elaboratorsMod.ElaboratorThingsHub());
 
 var server = net.createServer();  
 server.on("connection", handleConnection);
 
-server.listen(5014, function() {  
+server.listen(process.env.TRACKER_SERVER_PORT, function() {  
 	console.log("server listening to %j", server.address());
 	console.log("-----------------------------------------------------------");
 });
