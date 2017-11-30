@@ -149,7 +149,7 @@ module.exports = {
 			case GT02AProtocolState.WaitAngle:
 				gpsData.angle = parseFloat(field.substring(0, 6));
 
-				state = GT02AProtocolState.WaitFinished;//TODO: I dati sono per ora sufficienti, ma bisognerebbe continuare con il resto del parsing
+				state = GT02AProtocolState.WaitFinished;// TODO: Data is for now sufficient, but we should continue with the rest of the parsing
 				break;
 			case GT02AProtocolState.WaitStop:
 				if (field != ")") {
