@@ -1,6 +1,7 @@
 "use strict";
 
 var http = require("http");
+var https = require("https");
 var gpsDataMod = require("./gpsData.js");
 
 module.exports.ElaboratorUIGPSData = function() {
@@ -25,11 +26,12 @@ module.exports.ElaboratorUIGPSData = function() {
 module.exports.ElaboratorFreeAnts = function() {
 
 	//INFO: La X iniziale è per evitare la conversione implicita di javascript in int
-	var GPSs = {"X087073117560" : "5e8f5ed0-a15b-45e6-af59-a6ced478e202"};
+	let gpsId = "X" + process.env.MAIN_GPS;
+	var GPSs = {gpsId : process.env.FREEANTS_THING};
 
-	var serverAddress = "titaggocoreportal.azurewebsites.net";
-	var apiAddress = "/api";
-	var dwApiKey = "";
+	var serverAddress = process.env.FREEANTS_SERVERNAME;
+	var apiAddress = process.env.FREEANTS_API_URL;
+	var dwApiKey = process.env.FREEANTS_DWAPIKEY;
 
 	this.elaborate = function elaborate(gpsData) {
 
@@ -42,7 +44,7 @@ module.exports.ElaboratorFreeAnts = function() {
 
 		var optionsPutThingValue = {
 			host : serverAddress, 
-			port : 80,
+			port : process.env.FREEANTS_PORT,
 			path : apiAddress + "/things/" + thingId + "/value", // the rest of the url with parameters if needed
 			method : "PUT", 
 			headers : {
@@ -66,6 +68,57 @@ module.exports.ElaboratorFreeAnts = function() {
 			console.log("-----------------------------------------------------------");
 		});
 
+		// write the json data
+		reqPut.write(jsonObject);
+		reqPut.end();
+	};
+};
+
+module.exports.ElaboratorThingsHub = function() {
+	
+	//INFO: La X iniziale è per evitare la conversione implicita di javascript in int
+	let gpsId = "X" + process.env.MAIN_GPS;
+	var GPSs = {gpsId : process.env.THINGSHUB_THING};
+
+	var serverAddress = process.env.THINGSHUB_SERVERNAME;
+	var apiAddress = process.env.THINGSHUB_API_URL;
+	var thApiKey = process.env.THINGSHUB_THAPIKEY;
+	
+	this.elaborate = function elaborate(gpsData) {
+	
+		var thingId = GPSs["X" + gpsData.deviceId];
+		if (!thingId)
+			//TODO: Segnalare qualcosa
+			return;
+	
+		var jsonObject = JSON.stringify(gpsData);
+	
+		var optionsPutThingValue = {
+			host : serverAddress, 
+			port : process.env.THINGSHUB_PORT,
+			path : apiAddress + "/things/" + thingId + "/value", // the rest of the url with parameters if needed
+			method : "PUT", 
+			headers : {
+				"Content-Type"   : "application/json",
+				"Content-Length" : Buffer.byteLength(jsonObject, "utf8"),
+				"DWApiKey"       : thApiKey 
+			}
+		};
+	
+		var responseData = "";
+		var reqPut = https.request(optionsPutThingValue, function(res) {
+			res.on("data", function(d) {
+				responseData += d;
+			});
+			res.on("end", function() {
+			});
+		});
+	
+		reqPut.on("error", function(e) {
+			console.error(e);
+			console.log("-----------------------------------------------------------");
+		});
+	
 		// write the json data
 		reqPut.write(jsonObject);
 		reqPut.end();
