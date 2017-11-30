@@ -27,7 +27,7 @@ module.exports = {
 		var state = GT02AProtocolState.WaitStart;
 
 		while(state != GT02AProtocolState.WaitFinished) {
-			if (currentFieldPos + currentFieldLenght > content.Length) {
+			if (currentFieldPos + currentFieldLenght > content.length) {
 				gpsData.lastStatus = new gpsDataMod.ResultStatusData(gpsDataMod.ResultStatus.IncompleteLine, new Date().toUTCString() + " - Incomplete line" + " - Content: " + content ); 
 				return gpsData;
 			}
