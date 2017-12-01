@@ -52,10 +52,9 @@ function handleConnection(conn) {
 
 		var currentGPSData = parser.parse(d);
 
-		if (GPSs["X" + currentGPSData.deviceId] == undefined)
-			GPSs["X" + currentGPSData.deviceId] = new gpsDataMod.Data();
-
 		var lastGPSData = GPSs["X" + currentGPSData.deviceId];
+		if (!lastGPSData)
+			lastGPSData = new gpsDataMod.Data();
 
 		lastGPSData.deviceId = currentGPSData.deviceId;
 		lastGPSData.lastEventDateTime = new Date();
