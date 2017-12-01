@@ -11,6 +11,8 @@ const elaboratorsMod = require("./elaborators.js");
 
 // Env configuration
 
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+
 const configPath = path.join(__dirname, "./", "trackerServer.env");
 dotenv.config({ path: configPath });
 
