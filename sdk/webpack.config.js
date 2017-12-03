@@ -5,8 +5,8 @@ module.exports = {
 	entry: "./src/index.ts",
 	output: {
 		path: path.resolve(__dirname, "dist"),  
-		filename: "thingshub-client-js.js",
-		library: "ThingsHubClient"
+		filename: "thingshub.js",
+		library: "ThingsHub"
 	},
 	externals:{
 		"socket.io-client": "io",
