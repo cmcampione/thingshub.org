@@ -5,7 +5,7 @@
         "sourceMap": true,
         
         "declaration": true,
-        "declarationDir": ".",
+        "declarationDir": "./declarations",
 
         "jsx": "react",
         "module": "commonjs",
