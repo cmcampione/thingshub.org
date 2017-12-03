@@ -12,7 +12,7 @@
     <script src="node_modules/axios/dist/axios.min.js"></script>
     <script src="node_modules/socket.io-client/dist/socket.io.slim.js"></script>
     
-    <script src="dist/thingshub-client-js.js"></script>
+    <script src="dist/thingshub.js"></script>
 
     <script>
       function authHook() {
@@ -47,15 +47,15 @@
       }
 
       var endPointAddress = {
-          server: "https://localhost:3000",
-          api: "https://localhost:3000/api"    
+          server: "https://server1.carmelocampione.it:3000",
+          api: "https://server1.carmelocampione.it:3000/api"    
       }
 
       function securityHeaderHook() {
         return { thapikey: "5e4ff11c-5391-465b-a9c4-9803e0b78799" };
       }
 
-      var thingsDatacontext = new ThingsHubClient.ThingsDataContext(endPointAddress, securityHeaderHook);
+      var thingsDatacontext = new ThingsHub.ThingsDataContext(endPointAddress, securityHeaderHook);
 
       var thingsGetParams =  {
         parentThingId : null,
@@ -72,7 +72,7 @@
       });
 
 
-      var socket = new ThingsHubClient.SocketIOConnector("https://localhost:3000", authHook, onError, onConnectError, onStateChanged);
+      var socket = new ThingsHub.SocketIOConnector("https://server1.carmelocampione.it:3000", authHook, onError, onConnectError, onStateChanged);
       socket.subscribe();
       socket.setHook("api", onAPI);
       socket.setHook("onCreateThing", onCreateThing);

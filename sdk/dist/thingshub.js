@@ -1,4 +1,4 @@
-var ThingsHubClient =
+var ThingsHub =
 /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -2459,4 +2459,4 @@ exports.ThingsDataContext = ThingsDataContext;
 
 /***/ })
 /******/ ]);
-//# sourceMappingURL=thingshub-client-js.js.map
+//# sourceMappingURL=thingshub.js.map
