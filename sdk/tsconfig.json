@@ -17,7 +17,9 @@
             "es6"
         ],
 
-        "preserveConstEnums": true
+        "preserveConstEnums": true,
+
+        "allowJs" : true
 
     },
     "include": [
