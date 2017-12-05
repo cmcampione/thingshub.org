@@ -25,6 +25,7 @@
     "ngx-onsenui": "^4.1.0",
     "onsenui": "^2.8.2",
     "rxjs": "^5.5.2",
+    "thingshub-js-sdk": "^1.0.1",
     "zone.js": "^0.8.14"
   },
   "devDependencies": {
