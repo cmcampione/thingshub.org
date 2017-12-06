@@ -76,7 +76,7 @@ class ThingDTO {
 		this.value = {};
 		
 		this.userStatus = constants.ThingUserStates.NoMatter;
-		this.userRole = constants.ThingUserRole.NoMatter;
+		this.userRole = constants.ThingUserRoles.NoMatter;
 		this.userVisibility = constants.ThingUserVisibility.NoMatter;
 		
 		this.userReadClaims = constants.ThingUserReadClaims.NoClaim;
