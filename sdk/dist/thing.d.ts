@@ -10,13 +10,13 @@ export declare class Thing {
     name: string;
     kind: string;
     pos: number;
-    deletedStatus: thingConstants.ThingDeletedStatus;
+    deletedStatus: thingConstants.ThingDeletedStates;
     deletedDateTime: Date;
     publicReadClaims: thingConstants.ThingUserReadClaims;
     publicChangeClaims: thingConstants.ThingUserChangeClaims;
     everyoneReadClaims: thingConstants.ThingUserReadClaims;
     everyoneChangeClaims: thingConstants.ThingUserChangeClaims;
-    userStatus: thingConstants.ThingUserStatus;
+    userStatus: thingConstants.ThingUserStates;
     userRole: thingConstants.ThingUserRoles;
     userVisibility: thingConstants.ThingUserVisibility;
     userReadClaims: thingConstants.ThingUserReadClaims;
