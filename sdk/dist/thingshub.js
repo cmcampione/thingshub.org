@@ -170,18 +170,18 @@ exports.validateThingDeletedStatus = function validateThingDeletedStatus(deleted
 };
 
 // The User can not have more Roles in the same time
-const ThingUserRole = {
+const ThingUserRoles = {
 	NoMatter      : 0,  // Internal state. Do not use for external use like filter
 	Administrator : 1,
 	User          : 2
 };
-exports.ThingUserRole = ThingUserRole;
+exports.ThingUserRoles = ThingUserRoles;
 
-exports.validateThingUserRole = function validateThingUserRole(userRole) {
+exports.validateThingUserRoles = function validateThingUserRoles(userRole) {
 	switch(userRole) {
-	case ThingUserRole.NoMatter:
-	case ThingUserRole.Administrator:
-	case ThingUserRole.User:
+	case ThingUserRoles.NoMatter:
+	case ThingUserRoles.Administrator:
+	case ThingUserRoles.User:
 		return true;
 	}
 	return false;
@@ -2123,7 +2123,7 @@ class ThingDTO {
 		this.value = {};
 		
 		this.userStatus = constants.ThingUserStates.NoMatter;
-		this.userRole = constants.ThingUserRole.NoMatter;
+		this.userRole = constants.ThingUserRoles.NoMatter;
 		this.userVisibility = constants.ThingUserVisibility.NoMatter;
 		
 		this.userReadClaims = constants.ThingUserReadClaims.NoClaim;
@@ -2268,12 +2268,12 @@ var Thing = /** @class */ (function () {
         this.name = "";
         this.kind = "";
         this.pos = 0;
-        this.deletedStatus = thingConstants.ThingDeletedStatus.NoMatter;
+        this.deletedStatus = thingConstants.ThingDeletedStates.NoMatter;
         this.publicReadClaims = thingConstants.ThingUserReadClaims.NoClaims;
         this.publicChangeClaims = thingConstants.ThingUserChangeClaims.NoClaims;
         this.everyoneReadClaims = thingConstants.ThingUserReadClaims.NoClaims;
         this.everyoneChangeClaims = thingConstants.ThingUserChangeClaims.NoClaims;
-        this.userStatus = thingConstants.ThingUserStatus.NoMatter;
+        this.userStatus = thingConstants.ThingUserStates.NoMatter;
         this.userRole = thingConstants.ThingUserRoles.NoMatter;
         this.userVisibility = thingConstants.ThingUserVisibility.NoMatter;
         this.userReadClaims = thingConstants.ThingUserReadClaims.NoClaims;

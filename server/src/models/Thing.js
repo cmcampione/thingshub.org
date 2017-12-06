@@ -26,7 +26,7 @@ const thingSchema = mongoose.Schema({
 		userId            : mongoose.Schema.Types.ObjectId,
 		username          : String,
 
-		userRole          : { type: Number, default : constants.ThingUserRole.NoMatter },
+		userRole          : { type: Number, default : constants.ThingUserRoles.NoMatter },
 		userStatus        : { type: Number, default : constants.ThingUserStates.NoMatter },
 		userVisibility    : { type: Number, default : constants.ThingUserVisibility.NoMatter },
 

@@ -18,18 +18,18 @@ exports.validateThingDeletedStatus = function validateThingDeletedStatus(deleted
 };
 
 // The User can not have more Roles in the same time
-const ThingUserRole = {
+const ThingUserRoles = {
 	NoMatter      : 0,  // Internal state. Do not use for external use like filter
 	Administrator : 1,
 	User          : 2
 };
-exports.ThingUserRole = ThingUserRole;
+exports.ThingUserRoles = ThingUserRoles;
 
-exports.validateThingUserRole = function validateThingUserRole(userRole) {
+exports.validateThingUserRoles = function validateThingUserRoles(userRole) {
 	switch(userRole) {
-	case ThingUserRole.NoMatter:
-	case ThingUserRole.Administrator:
-	case ThingUserRole.User:
+	case ThingUserRoles.NoMatter:
+	case ThingUserRoles.Administrator:
+	case ThingUserRoles.User:
 		return true;
 	}
 	return false;
