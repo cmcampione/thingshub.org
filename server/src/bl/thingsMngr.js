@@ -76,7 +76,7 @@ function checkThingAccess(user, thing, deletedStatus, userRole, userStatus, user
 
 	if ((thing.publicReadClaims & constants.ThingUserReadClaims.AllClaims) != 0 || (thing.publicChangeClaims & constants.ThingUserChangeClaims.AllClaims) != 0)
 	{
-		if (!user && userRole == constants.ThingUserRole.NoMatter 
+		if (!user && userRole == constants.ThingUserRoles.NoMatter 
 			&& userStatus == constants.ThingUserStates.NoMatter
 			&& userVisibility == constants.ThingUserVisibility.NoMatter)
 			return true;
@@ -96,7 +96,7 @@ function checkThingAccess(user, thing, deletedStatus, userRole, userStatus, user
 		if (userStatus != constants.ThingUserStates.NoMatter && ((thingUserRights.userStatus & userStatus) == 0))
 			return false;
 
-		if (userRole != constants.ThingUserRole.NoMatter && ((thingUserRights.userRole & userRole) == 0))
+		if (userRole != constants.ThingUserRoles.NoMatter && ((thingUserRights.userRole & userRole) == 0))
 			return false;
 
 		if (userVisibility != constants.ThingUserVisibility.NoMatter && ((thingUserRights.userVisibility & userVisibility) == 0))
@@ -113,7 +113,7 @@ function checkThingAccess(user, thing, deletedStatus, userRole, userStatus, user
 	if (userStatus != constants.ThingUserStates.NoMatter && ((thingUserRights.userStatus & userStatus) == 0))
 		return false;
 
-	if (userRole != constants.ThingUserRole.NoMatter && ((thingUserRights.userRole & userRole) == 0))
+	if (userRole != constants.ThingUserRoles.NoMatter && ((thingUserRights.userRole & userRole) == 0))
 		return false;
 
 	if (userVisibility != constants.ThingUserVisibility.NoMatter && ((thingUserRights.userVisibility & userVisibility) == 0))
@@ -147,7 +147,7 @@ async function getThing(user, thingId, deletedStatus, userRole, userStatus, user
 		// This is a condition I do not remember why it was put on. I consider it important.
 		// At this time it is commented why when I try to assign a pos to Thing
 		// for an unnamed user who does not have a relationship with Thing the condition does not let me pass.
-		// if (user == null && userRole == ThingUserRole.NoMatter && userStatus == ThingUserStates.NoMatter && userVisibility == constants.ThingUserVisibility.NoMatter)
+		// if (user == null && userRole == ThingUserRoles.NoMatter && userStatus == ThingUserStates.NoMatter && userVisibility == constants.ThingUserVisibility.NoMatter)
 		return thing;
 	}
 
@@ -168,7 +168,7 @@ async function getThing(user, thingId, deletedStatus, userRole, userStatus, user
 		if (userStatus != constants.ThingUserStates.NoMatter && ((thingUserRights.userStatus & userStatus) == 0))
 			throw new utils.ErrorCustom(httpStatusCodes.FORBIDDEN, "Unauthorized user", 42);
 
-		if (userRole != constants.ThingUserRole.NoMatter && ((thingUserRights.userRole & userRole) == 0))
+		if (userRole != constants.ThingUserRoles.NoMatter && ((thingUserRights.userRole & userRole) == 0))
 			throw new utils.ErrorCustom(httpStatusCodes.FORBIDDEN, "Unauthorized user", 43);
 
 		if (userVisibility != constants.ThingUserVisibility.NoMatter && ((thingUserRights.userVisibility & userVisibility) == 0))
@@ -237,7 +237,7 @@ async function getThings(user, parentThingId, thingFilter, valueFilter, orderBy,
 	if (parentThingId) {
 		
 		parentThing = await getThing(user, parentThingId, constants.ThingDeletedStates.Ok, 
-			constants.ThingUserRole.NoMatter, constants.ThingUserStates.Ok, constants.ThingUserVisibility.Visible);
+			constants.ThingUserRoles.NoMatter, constants.ThingUserStates.Ok, constants.ThingUserVisibility.Visible);
 
 		mainThingsQuery["$and"].push({parentsThingsIds: { $elemMatch: {userId: user ? user._id : null, parentThingId }}} );
 	}
@@ -443,7 +443,7 @@ async function createThingDTO(user, parentThing, thing, isSuperAdministrator) {
 	let loggedInThingUserClaims = getThingUserClaims(user, thing, isSuperAdministrator);
 
 	let loggedInThingUserRights = {
-		userRole : (isSuperAdministrator == true) ? constants.ThingUserRole.Administrator : constants.ThingUserRole.User,
+		userRole : (isSuperAdministrator == true) ? constants.ThingUserRoles.Administrator : constants.ThingUserRoles.User,
 		userStatus : constants.ThingUserStates.Ok,
 		userVisibility : constants.ThingUserVisibility.Visible,
 		userReadClaims : loggedInThingUserClaims.read,
@@ -479,7 +479,7 @@ exports.getThing = async (user, thingId, deletedStatus) => {
 	if (!thingId)
 		throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Thing's Id can't be null", 47);
 
-	var thing = await getThing(user, thingId, deletedStatus, constants.ThingUserRole.NoMatter,
+	var thing = await getThing(user, thingId, deletedStatus, constants.ThingUserRoles.NoMatter,
 		user ? constants.ThingUserStates.Ok | constants.ThingUserStates.WaitForAuth : constants.ThingUserStates.NoMatter,
 		constants.ThingUserVisibility.NoMatter);
 
@@ -510,7 +510,7 @@ exports.createThing = async (user, thingDTO) => {
 		throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Thing DeletedStatus is incorrect", 17);
 	if (constants.validateThingUserStatus(thingDTO.userStatus) == false)
 		throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Thing UserStatus is incorrect", 18);
-	if (constants.validateThingUserRole(thingDTO.userRole) == false)
+	if (constants.validateThingUserRoles(thingDTO.userRole) == false)
 		throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Thing UserRole is incorrect", 19);
 	if (constants.validateThingUserVisibility(thingDTO.userVisibility) == false)
 		throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Thing UserVisibility is incorrect", 35);
@@ -584,7 +584,7 @@ exports.updateThing = async (user, thingId, thingDTO) => {
 		throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Thing's Id can't be null", 55);
 
 	var thing = await getThing(user, thingId, constants.ThingDeletedStates.Ok, 
-		constants.ThingUserRole.Administrator, constants.ThingUserStates.Ok, constants.ThingUserVisibility.Visible);
+		constants.ThingUserRoles.Administrator, constants.ThingUserStates.Ok, constants.ThingUserVisibility.Visible);
 
 	if (!thingDTO)
 		throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "The body message is empty", 56);
@@ -704,7 +704,7 @@ exports.updateThing = async (user, thingId, thingDTO) => {
 			if ((loggedInThingUserClaims.change & constants.ThingUserChangeClaims.CanChangeThingUserRole) == 0)
 				throw new utils.ErrorCustom(httpStatusCodes.FORBIDDEN, "User can not changes Thing's properties", 72);
 
-			if (constants.validateThingUserRole(thingDTO.userRole) == false)
+			if (constants.validateThingUserRoles(thingDTO.userRole) == false)
 				throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Thing UserRole is incorrect", 73);
 
 			thingUserRights.userRole = thingDTO.userRole;
@@ -785,7 +785,7 @@ exports.updateThingValue = async (user, thingId, value) => {
 	if (!user)
 		throw new utils.ErrorCustom(httpStatusCodes.UNAUTHORIZED, "Unauthorized user", 105);
 
-	var thing = await getThing(user, thingId, constants.ThingDeletedStates.Ok, constants.ThingUserRole.NoMatter, constants.ThingUserStates.Ok, constants.ThingUserVisibility.Visible);
+	var thing = await getThing(user, thingId, constants.ThingDeletedStates.Ok, constants.ThingUserRoles.NoMatter, constants.ThingUserStates.Ok, constants.ThingUserVisibility.Visible);
 
 	var loggedInThingUserClaims = getThingUserClaims(user, thing);
 

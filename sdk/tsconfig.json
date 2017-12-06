@@ -1,11 +1,10 @@
 {
     "compilerOptions": {
-        "outDir": "./dist",
+        "outDir": "./",
 
         "sourceMap": true,
         
         "declaration": true,
-        "declarationDir": "./declarations",
 
         "jsx": "react",
         "module": "commonjs",
@@ -17,10 +16,7 @@
             "es6"
         ],
 
-        "preserveConstEnums": true,
-
-        "allowJs" : true
-
+        "preserveConstEnums": true
     },
     "include": [
         "../common/src/**/*",

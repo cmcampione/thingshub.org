@@ -19,7 +19,7 @@ export class Thing {
 
     public pos: number = 0
 
-    public deletedStatus : thingConstants.ThingDeletedStatus = thingConstants.ThingDeletedStatus.NoMatter
+    public deletedStatus : thingConstants.ThingDeletedStatus = thingConstants.ThingDeletedStates.NoMatter
     public deletedDateTime : Date
 
     public publicReadClaims : thingConstants.ThingUserReadClaims = thingConstants.ThingUserReadClaims.NoClaims
@@ -28,7 +28,7 @@ export class Thing {
     public everyoneReadClaims : thingConstants.ThingUserReadClaims = thingConstants.ThingUserReadClaims.NoClaims
     public everyoneChangeClaims : thingConstants.ThingUserChangeClaims = thingConstants.ThingUserChangeClaims.NoClaims
 
-    public userStatus : thingConstants.ThingUserStatus = thingConstants.ThingUserStatus.NoMatter
+    public userStatus : thingConstants.ThingUserStatus = thingConstants.ThingUserStates.NoMatter
     public userRole : thingConstants.ThingUserRoles = thingConstants.ThingUserRoles.NoMatter
     public userVisibility: thingConstants.ThingUserVisibility = thingConstants.ThingUserVisibility.NoMatter
 
