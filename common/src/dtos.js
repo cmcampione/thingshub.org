@@ -60,18 +60,18 @@ class ThingDTO {
 		
 		this.name = "";
 		
-		this.kind = constants.ThingKind.generic;
+		this.kind = constants.ThingKind.genericId;
 		
 		this.pos = 0;// Not used during creation or updating of thing
 		
 		this.deletedStatus = constants.ThingDeletedStates.NoMatter;
 		this.deletedDate = null;
 		
-		this.publicReadClaims = constants.ThingUserReadClaims.NoClaim;
-		this.publicChangeClaims = constants.ThingUserChangeClaims.NoClaim;
+		this.publicReadClaims = constants.ThingUserReadClaims.NoClaims;
+		this.publicChangeClaims = constants.ThingUserChangeClaims.NoClaims;
 		
-		this.everyoneReadClaims = constants.ThingUserReadClaims.NoClaim;
-		this.everyoneChangeClaims = constants.ThingUserChangeClaims.NoClaim;
+		this.everyoneReadClaims = constants.ThingUserReadClaims.NoClaims;
+		this.everyoneChangeClaims = constants.ThingUserChangeClaims.NoClaims;
 		
 		this.value = {};
 		
@@ -79,8 +79,8 @@ class ThingDTO {
 		this.userRole = constants.ThingUserRoles.NoMatter;
 		this.userVisibility = constants.ThingUserVisibility.NoMatter;
 		
-		this.userReadClaims = constants.ThingUserReadClaims.NoClaim;
-		this.userChangeClaims = constants.ThingUserChangeClaims.NoClaim;
+		this.userReadClaims = constants.ThingUserReadClaims.NoClaims;
+		this.userChangeClaims = constants.ThingUserChangeClaims.NoClaims;
 		
 		this.usersInfos = []; // Not used during creation or updating of thing
 	}
