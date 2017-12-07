@@ -79,7 +79,7 @@ export class ThingDTO {
 	public everyoneReadClaims = constants.ThingUserReadClaims.NoClaims;
 	public everyoneChangeClaims = constants.ThingUserChangeClaims.NoClaims;
 	
-	public value = {};
+	public value : any = {};
 	
 	public userStatus = constants.ThingUserStates.NoMatter;
 	public userRole = constants.ThingUserRoles.NoMatter;
