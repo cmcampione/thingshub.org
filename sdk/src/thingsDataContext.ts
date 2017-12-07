@@ -3,7 +3,6 @@ import {HttpRequestCanceler, HttpFailResult, ItemsRange, Helpers} from "./helper
 import {EndPointAddress} from "./endPointAddress";
 import {ThingDTO} from "../../common/src/dtos";
 import {ThingPositionRaw} from "./thingPosition";
-import * as thingConstants from "../../common/src/constants";
 
 export interface ThingsGetParams {
     parentThingId : string;
