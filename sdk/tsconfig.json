@@ -1,16 +1,18 @@
 {
     "compilerOptions": {
         "outDir": "./dist",
+
         "declarationDir": "./",
+
+        //"outFile": "./thingshub.d.ts",
 
         "sourceMap": true,
         
         "declaration": true,
 
-        "jsx": "react",
         "module": "commonjs",
 
-        "target": "es5",
+        "target": "es6",
 
         "lib": [
             "dom",
@@ -24,6 +26,7 @@
         "./src/**/*"
     ],
     "exclude": [
-      "node_modules"
+      "node_modules",
+      "dist"
     ]
 }
