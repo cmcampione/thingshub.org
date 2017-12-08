@@ -15,14 +15,15 @@
   },
   "dependencies": {
     "axios": "^0.17.1",
-    "socket.io-client": "~2.0.4",
     "promise.prototype.finally": "~3.1.0",
-    "qs": "^6.5.1"
+    "qs": "^6.5.1",
+    "socket.io-client": "~2.0.4"
   },
   "devDependencies": {
+    "@types/promise.prototype.finally": "~2.0.2",
     "@types/socket.io-client": "^1.4.32",
+    "dts-bundle": "^0.7.3",
     "ts-loader": "^3.1.1",
-    "webpack": "^3.8.1",
-    "@types/promise.prototype.finally": "~2.0.2"
+    "webpack": "^3.8.1"
   }
 }

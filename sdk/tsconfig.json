@@ -2,13 +2,12 @@
     "compilerOptions": {
         "outDir": "./dist",
 
+        "declaration": true,
         "declarationDir": "./",
 
         //"outFile": "./thingshub.d.ts",
 
         "sourceMap": true,
-        
-        "declaration": true,
 
         "module": "commonjs",
 
