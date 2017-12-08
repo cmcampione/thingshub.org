@@ -16,11 +16,11 @@ const thingSchema = mongoose.Schema({
 	deletedStatus         : { type: Number, default : constants.ThingDeletedStates.NoMatter },
 	deletedDate       	  : Date,
 
-	publicReadClaims      : { type: Number, default : constants.ThingUserReadClaims.NoClaim },
-	publicChangeClaims    : { type: Number, default : constants.ThingUserChangeClaims.NoClaim },
+	publicReadClaims      : { type: Number, default : constants.ThingUserReadClaims.NoClaimss },
+	publicChangeClaims    : { type: Number, default : constants.ThingUserChangeClaims.NoClaims },
 
-	everyoneReadClaims    : { type: Number, default : constants.ThingUserReadClaims.NoClaim },
-	everyoneChangeClaims  : { type: Number, default : constants.ThingUserChangeClaims.NoClaim },
+	everyoneReadClaims    : { type: Number, default : constants.ThingUserReadClaims.NoClaims },
+	everyoneChangeClaims  : { type: Number, default : constants.ThingUserChangeClaims.NoClaims },
 
 	usersRights : [{
 		userId            : mongoose.Schema.Types.ObjectId,
@@ -30,8 +30,8 @@ const thingSchema = mongoose.Schema({
 		userStatus        : { type: Number, default : constants.ThingUserStates.NoMatter },
 		userVisibility    : { type: Number, default : constants.ThingUserVisibility.NoMatter },
 
-		userReadClaims    : { type: Number, default : constants.ThingUserReadClaims.NoClaim },
-		userChangeClaims  : { type: Number, default : constants.ThingUserChangeClaims.NoClaim },
+		userReadClaims    : { type: Number, default : constants.ThingUserReadClaims.NoClaims },
+		userChangeClaims  : { type: Number, default : constants.ThingUserChangeClaims.NoClaims },
 
 		shortPin          : Number
 	}],
