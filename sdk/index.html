@@ -55,7 +55,7 @@
         return { thapikey: "5e4ff11c-5391-465b-a9c4-9803e0b78799" };
       }
 
-      var thingsDatacontext = new ThingsHub.ThingsDataContext(endPointAddress, securityHeaderHook);
+      var thingsDatacontext = new thingshub.ThingsDataContext(endPointAddress, securityHeaderHook);
 
       var thingsGetParams =  {
         parentThingId : null,
@@ -72,7 +72,7 @@
       });
 
 
-      var socket = new ThingsHub.SocketIOConnector("https://server1.carmelocampione.it:3000", authHook, onError, onConnectError, onStateChanged);
+      var socket = new thingshub.SocketIOConnector("https://server1.carmelocampione.it:3000", authHook, onError, onConnectError, onStateChanged);
       socket.subscribe();
       socket.setHook("api", onAPI);
       socket.setHook("onCreateThing", onCreateThing);
