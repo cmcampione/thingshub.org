@@ -1,4 +1,4 @@
-// import { constants } from "zlib";
+// import { thConstants } from "zlib";
 
 "use strict";
 
@@ -7,7 +7,7 @@ const express 			= require("express");
 const passport 			= require("passport");
 
 const utils 			= require("../utils.js");
-const constants 		= require("../../../common/src/constants");
+const thConstants 		= require("../../../common/src/thConstants");
 const thingsMngr		= require("../bl/thingsMngr");
 const ClientsConnectorsManager = require("../clientsConnectorsManager");
 
@@ -24,7 +24,7 @@ router.get("/:id", function(req, res, next) {
 			if (!thingId)
 				throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Thing's Id can't be null", 93);
 
-			let blResult = await thingsMngr.getThing(user, thingId, constants.ThingDeletedStates.NoMatter);
+			let blResult = await thingsMngr.getThing(user, thingId, thConstants.ThingDeletedStates.NoMatter);
 			if (!blResult)
 				throw new utils.ErrorCustom(httpStatusCodes.INTERNAL_SERVER_ERROR, "Result not valid", 99);
 

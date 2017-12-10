@@ -4,7 +4,7 @@ const httpStatusCodes = require("http-status-codes");
 const uuidv4 = require("uuid/v4");
 
 const utils = require("../utils");
-const constants = require("../../../common/src/constants");
+const thConstants = require("../../../common/src/thConstants");
 const UserInfoDTO = require("../../../common/src/dtos").UserInfoDTO;
 const ThingDTO = require("../../../common/src/dtos").ThingDTO;
 const usersManager = require("../bl/usersMngr");
@@ -58,8 +58,8 @@ function getThingUserClaims(user, thing, isSuperAdministrator) {
 
 		if (isSuperAdministrator)
 		{
-			thingUserClaimsAndRights.read   = constants.ThingUserReadClaims.AllClaims;
-			thingUserClaimsAndRights.change = constants.ThingUserChangeClaims.AllClaims;
+			thingUserClaimsAndRights.read   = thConstants.ThingUserReadClaims.AllClaims;
+			thingUserClaimsAndRights.change = thConstants.ThingUserChangeClaims.AllClaims;
 		}
 	}
 
@@ -71,14 +71,14 @@ function checkThingAccess(user, thing, deletedStatus, userRole, userStatus, user
 	if (!thing)
 		throw new utils.ErrorCustom(httpStatusCodes.INTERNAL_SERVER_ERROR, "Thing not valid", 36);
 
-	if (deletedStatus != constants.ThingDeletedStates.NoMatter && thing.deletedStatus != deletedStatus)
+	if (deletedStatus != thConstants.ThingDeletedStates.NoMatter && thing.deletedStatus != deletedStatus)
 		return false;
 
-	if ((thing.publicReadClaims & constants.ThingUserReadClaims.AllClaims) != 0 || (thing.publicChangeClaims & constants.ThingUserChangeClaims.AllClaims) != 0)
+	if ((thing.publicReadClaims & thConstants.ThingUserReadClaims.AllClaims) != 0 || (thing.publicChangeClaims & thConstants.ThingUserChangeClaims.AllClaims) != 0)
 	{
-		if (!user && userRole == constants.ThingUserRoles.NoMatter 
-			&& userStatus == constants.ThingUserStates.NoMatter
-			&& userVisibility == constants.ThingUserVisibility.NoMatter)
+		if (!user && userRole == thConstants.ThingUserRoles.NoMatter 
+			&& userStatus == thConstants.ThingUserStates.NoMatter
+			&& userVisibility == thConstants.ThingUserVisibility.NoMatter)
 			return true;
 	}
 
@@ -93,30 +93,30 @@ function checkThingAccess(user, thing, deletedStatus, userRole, userStatus, user
 	var thingUserRights = getThingUserRights(user._id, user.userName, thing);
 	if (thingUserRights)
 	{
-		if (userStatus != constants.ThingUserStates.NoMatter && ((thingUserRights.userStatus & userStatus) == 0))
+		if (userStatus != thConstants.ThingUserStates.NoMatter && ((thingUserRights.userStatus & userStatus) == 0))
 			return false;
 
-		if (userRole != constants.ThingUserRoles.NoMatter && ((thingUserRights.userRole & userRole) == 0))
+		if (userRole != thConstants.ThingUserRoles.NoMatter && ((thingUserRights.userRole & userRole) == 0))
 			return false;
 
-		if (userVisibility != constants.ThingUserVisibility.NoMatter && ((thingUserRights.userVisibility & userVisibility) == 0))
+		if (userVisibility != thConstants.ThingUserVisibility.NoMatter && ((thingUserRights.userVisibility & userVisibility) == 0))
 			return false;
 	}
 
-	if ((thing.everyoneReadClaims & constants.ThingUserReadClaims.AllClaims) != 0 || (thing.everyoneChangeClaims & constants.ThingUserChangeClaims.AllClaims) != 0)
+	if ((thing.everyoneReadClaims & thConstants.ThingUserReadClaims.AllClaims) != 0 || (thing.everyoneChangeClaims & thConstants.ThingUserChangeClaims.AllClaims) != 0)
 		return true;
 
 	// If the User has no relationship with Thing does not pass
 	if (!thingUserRights)
 		return false;
 
-	if (userStatus != constants.ThingUserStates.NoMatter && ((thingUserRights.userStatus & userStatus) == 0))
+	if (userStatus != thConstants.ThingUserStates.NoMatter && ((thingUserRights.userStatus & userStatus) == 0))
 		return false;
 
-	if (userRole != constants.ThingUserRoles.NoMatter && ((thingUserRights.userRole & userRole) == 0))
+	if (userRole != thConstants.ThingUserRoles.NoMatter && ((thingUserRights.userRole & userRole) == 0))
 		return false;
 
-	if (userVisibility != constants.ThingUserVisibility.NoMatter && ((thingUserRights.userVisibility & userVisibility) == 0))
+	if (userVisibility != thConstants.ThingUserVisibility.NoMatter && ((thingUserRights.userVisibility & userVisibility) == 0))
 		return false;
 
 	return true;
@@ -138,16 +138,16 @@ async function getThing(user, thingId, deletedStatus, userRole, userStatus, user
 		throw new utils.ErrorCustom(httpStatusCodes.NOT_FOUND, "Thing not found", 39);
 	}
 
-	if (deletedStatus != constants.ThingDeletedStates.NoMatter && thing.deletedStatus != deletedStatus)
+	if (deletedStatus != thConstants.ThingDeletedStates.NoMatter && thing.deletedStatus != deletedStatus)
 		throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Thing's Deletedstatus not valid", 40);
 
-	if ((thing.publicReadClaims & constants.ThingUserReadClaims.AllClaims) != 0 
-		|| (thing.publicChangeClaims & constants.ThingUserChangeClaims.AllClaims) != 0)
+	if ((thing.publicReadClaims & thConstants.ThingUserReadClaims.AllClaims) != 0 
+		|| (thing.publicChangeClaims & thConstants.ThingUserChangeClaims.AllClaims) != 0)
 	{
 		// This is a condition I do not remember why it was put on. I consider it important.
 		// At this time it is commented why when I try to assign a pos to Thing
 		// for an unnamed user who does not have a relationship with Thing the condition does not let me pass.
-		// if (user == null && userRole == ThingUserRoles.NoMatter && userStatus == ThingUserStates.NoMatter && userVisibility == constants.ThingUserVisibility.NoMatter)
+		// if (user == null && userRole == ThingUserRoles.NoMatter && userStatus == ThingUserStates.NoMatter && userVisibility == thConstants.ThingUserVisibility.NoMatter)
 		return thing;
 	}
 
@@ -158,20 +158,20 @@ async function getThing(user, thingId, deletedStatus, userRole, userStatus, user
 	if (user.isSuperAdministrator)
 		return thing;
 
-	if ((thing.everyoneReadClaims & constants.ThingUserReadClaims.AllClaims) != 0 
-		|| (thing.everyoneChangeClaims & constants.ThingUserChangeClaims.AllClaims) != 0)
+	if ((thing.everyoneReadClaims & thConstants.ThingUserReadClaims.AllClaims) != 0 
+		|| (thing.everyoneChangeClaims & thConstants.ThingUserChangeClaims.AllClaims) != 0)
 		return thing;
 
 	var thingUserRights = getThingUserRights(user._id, user.username, thing);
 	if (thingUserRights)
 	{
-		if (userStatus != constants.ThingUserStates.NoMatter && ((thingUserRights.userStatus & userStatus) == 0))
+		if (userStatus != thConstants.ThingUserStates.NoMatter && ((thingUserRights.userStatus & userStatus) == 0))
 			throw new utils.ErrorCustom(httpStatusCodes.FORBIDDEN, "Unauthorized user", 42);
 
-		if (userRole != constants.ThingUserRoles.NoMatter && ((thingUserRights.userRole & userRole) == 0))
+		if (userRole != thConstants.ThingUserRoles.NoMatter && ((thingUserRights.userRole & userRole) == 0))
 			throw new utils.ErrorCustom(httpStatusCodes.FORBIDDEN, "Unauthorized user", 43);
 
-		if (userVisibility != constants.ThingUserVisibility.NoMatter && ((thingUserRights.userVisibility & userVisibility) == 0))
+		if (userVisibility != thConstants.ThingUserVisibility.NoMatter && ((thingUserRights.userVisibility & userVisibility) == 0))
 			throw new utils.ErrorCustom(httpStatusCodes.FORBIDDEN, "Unauthorized user", 48);
 
 		return thing;
@@ -197,19 +197,19 @@ async function getThings(user, parentThingId, thingFilter, valueFilter, orderBy,
 
 		publicEveryoneUserQuery["$or"] = [];
 		
-		publicEveryoneUserQuery["$or"].push({publicReadClaims: { $bitsAnySet: constants.ThingUserReadClaims.AllClaims }});
-		publicEveryoneUserQuery["$or"].push({publicChangeClaims: { $bitsAnySet: constants.ThingUserChangeClaims.AllClaims }});
+		publicEveryoneUserQuery["$or"].push({publicReadClaims: { $bitsAnySet: thConstants.ThingUserReadClaims.AllClaims }});
+		publicEveryoneUserQuery["$or"].push({publicChangeClaims: { $bitsAnySet: thConstants.ThingUserChangeClaims.AllClaims }});
 	}
 
 	if (user && !user.isSuperAdministrator)	{
 
 		publicEveryoneUserQuery["$or"] = [];
 
-		publicEveryoneUserQuery["$or"].push({publicReadClaims: { $bitsAnySet: constants.ThingUserReadClaims.AllClaims }});
-		publicEveryoneUserQuery["$or"].push({publicChangeClaims: { $bitsAnySet: constants.ThingUserChangeClaims.AllClaims }});
+		publicEveryoneUserQuery["$or"].push({publicReadClaims: { $bitsAnySet: thConstants.ThingUserReadClaims.AllClaims }});
+		publicEveryoneUserQuery["$or"].push({publicChangeClaims: { $bitsAnySet: thConstants.ThingUserChangeClaims.AllClaims }});
 
-		publicEveryoneUserQuery["$or"].push({everyoneReadClaims: { $bitsAnySet: constants.ThingUserReadClaims.AllClaims }});
-		publicEveryoneUserQuery["$or"].push({everyoneChangeClaims: { $bitsAnySet: constants.ThingUserChangeClaims.AllClaims }});
+		publicEveryoneUserQuery["$or"].push({everyoneReadClaims: { $bitsAnySet: thConstants.ThingUserReadClaims.AllClaims }});
+		publicEveryoneUserQuery["$or"].push({everyoneChangeClaims: { $bitsAnySet: thConstants.ThingUserChangeClaims.AllClaims }});
 
 		let userRightsQuery = {};
 		userRightsQuery["$and"] = [];
@@ -223,8 +223,8 @@ async function getThings(user, parentThingId, thingFilter, valueFilter, orderBy,
 
 		let userStatusVisibilityQuery = {};
 		userStatusVisibilityQuery["$and"] = [];
-		userStatusVisibilityQuery["$and"].push({"usersRights.userStatus": {$bitsAnySet: (constants.ThingUserStates.Ok | constants.ThingUserStates.WaitForAuth) }});
-		userStatusVisibilityQuery["$and"].push({"usersRights.userVisibility": {$bitsAnySet: constants.ThingUserVisibility.Visible }});
+		userStatusVisibilityQuery["$and"].push({"usersRights.userStatus": {$bitsAnySet: (thConstants.ThingUserStates.Ok | thConstants.ThingUserStates.WaitForAuth) }});
+		userStatusVisibilityQuery["$and"].push({"usersRights.userVisibility": {$bitsAnySet: thConstants.ThingUserVisibility.Visible }});
 		
 		userRightsQuery["$and"].push(userStatusVisibilityQuery);
 
@@ -236,8 +236,8 @@ async function getThings(user, parentThingId, thingFilter, valueFilter, orderBy,
 	let parentThing = null;
 	if (parentThingId) {
 		
-		parentThing = await getThing(user, parentThingId, constants.ThingDeletedStates.Ok, 
-			constants.ThingUserRoles.NoMatter, constants.ThingUserStates.Ok, constants.ThingUserVisibility.Visible);
+		parentThing = await getThing(user, parentThingId, thConstants.ThingDeletedStates.Ok, 
+			thConstants.ThingUserRoles.NoMatter, thConstants.ThingUserStates.Ok, thConstants.ThingUserVisibility.Visible);
 
 		mainThingsQuery["$and"].push({parentsThingsIds: { $elemMatch: {userId: user ? user._id : null, parentThingId }}} );
 	}
@@ -316,8 +316,8 @@ async function getUsersIdsToNotify(thing, checkValueAccess) {
 	for(let r of thing.usersRights) {
 	
 		if (!(
-			((r.userStatus & (constants.ThingUserStates.Ok | constants.ThingUserStates.WaitForAuth)) != 0) &&
-				((r.userVisibility & constants.ThingUserVisibility.Visible) != 0))
+			((r.userStatus & (thConstants.ThingUserStates.Ok | thConstants.ThingUserStates.WaitForAuth)) != 0) &&
+				((r.userVisibility & thConstants.ThingUserVisibility.Visible) != 0))
 		)
 			continue;
 
@@ -333,7 +333,7 @@ async function getUsersIdsToNotify(thing, checkValueAccess) {
 
 		if (checkValueAccess) {
 			let thingUserClaims = getThingUserClaims(user, thing, user.isSuperAdministrator);
-			if ((thingUserClaims.change & constants.ThingUserChangeClaims.CanChangeValue) == 0)
+			if ((thingUserClaims.change & thConstants.ThingUserChangeClaims.CanChangeValue) == 0)
 				continue;
 		}
 			
@@ -388,54 +388,54 @@ async function createThingDTO(user, parentThing, thing, isSuperAdministrator) {
 		// TODO: Insert Claims control?
 		thingDTO.pos = pos;
 		
-		if ((accessThingUserClaims.read & constants.ThingUserReadClaims.CanReadCreationDate) != 0)
+		if ((accessThingUserClaims.read & thConstants.ThingUserReadClaims.CanReadCreationDate) != 0)
 			thingDTO.creationDate = thing.creationDate;
 		
-		if ((accessThingUserClaims.read & constants.ThingUserReadClaims.CanReadName) != 0)
+		if ((accessThingUserClaims.read & thConstants.ThingUserReadClaims.CanReadName) != 0)
 			thingDTO.name = thing.name;
 		
-		if ((accessThingUserClaims.read & constants.ThingUserReadClaims.CanReadKind) != 0)
+		if ((accessThingUserClaims.read & thConstants.ThingUserReadClaims.CanReadKind) != 0)
 			thingDTO.kind = thing.kind;
 		
-		if ((accessThingUserClaims.read & constants.ThingUserReadClaims.CanReadDeletedStatus) != 0)
+		if ((accessThingUserClaims.read & thConstants.ThingUserReadClaims.CanReadDeletedStatus) != 0)
 		{
 			thingDTO.deletedStatus = thing.deletedStatus;
 			thingDTO.deletedDate = thing.deletedDate;
 		}
 		
-		if ((accessThingUserClaims.read & constants.ThingUserReadClaims.CanReadPublicReadClaims) != 0)
+		if ((accessThingUserClaims.read & thConstants.ThingUserReadClaims.CanReadPublicReadClaims) != 0)
 			thingDTO.publicReadClaims = thing.publicReadClaims;
-		if ((accessThingUserClaims.read & constants.ThingUserReadClaims.CanReadPublicChangeClaims) != 0)
+		if ((accessThingUserClaims.read & thConstants.ThingUserReadClaims.CanReadPublicChangeClaims) != 0)
 			thingDTO.publicChangeClaims = thing.publicChangeClaims;
 		
-		if ((accessThingUserClaims.read & constants.ThingUserReadClaims.CanReadEveryoneReadClaims) != 0)
+		if ((accessThingUserClaims.read & thConstants.ThingUserReadClaims.CanReadEveryoneReadClaims) != 0)
 			thingDTO.everyoneReadClaims = thing.everyoneReadClaims;
-		if ((accessThingUserClaims.read & constants.ThingUserReadClaims.CanReadEveryoneChangeClaims) != 0)
+		if ((accessThingUserClaims.read & thConstants.ThingUserReadClaims.CanReadEveryoneChangeClaims) != 0)
 			thingDTO.everyoneChangeClaims = thing.everyoneChangeClaims;
 		
-		if ((accessThingUserClaims.read & constants.ThingUserReadClaims.CanReadValue) != 0)
+		if ((accessThingUserClaims.read & thConstants.ThingUserReadClaims.CanReadValue) != 0)
 			thingDTO.value = thing.value;
 		
-		if (thingUserRights && (accessThingUserClaims.read & constants.ThingUserReadClaims.CanReadThingUserRights) != 0) {
-			if ((accessThingUserClaims.read & constants.ThingUserReadClaims.CanReadThingUserStates) != 0)
+		if (thingUserRights && (accessThingUserClaims.read & thConstants.ThingUserReadClaims.CanReadThingUserRights) != 0) {
+			if ((accessThingUserClaims.read & thConstants.ThingUserReadClaims.CanReadThingUserStates) != 0)
 				thingDTO.userStatus = thingUserRights.userStatus;
 			
-			if ((accessThingUserClaims.read & constants.ThingUserReadClaims.CanReadThingUserRole) != 0)
+			if ((accessThingUserClaims.read & thConstants.ThingUserReadClaims.CanReadThingUserRole) != 0)
 				thingDTO.userRole = thingUserRights.userRole;
 		
-			if ((accessThingUserClaims.read & constants.ThingUserReadClaims.CanReadThingUserVisibility) != 0)
+			if ((accessThingUserClaims.read & thConstants.ThingUserReadClaims.CanReadThingUserVisibility) != 0)
 				thingDTO.userVisibility = thingUserRights.userVisibility;
 		
-			if ((accessThingUserClaims.read & constants.ThingUserReadClaims.CanReadThingUserReadClaims) != 0)
+			if ((accessThingUserClaims.read & thConstants.ThingUserReadClaims.CanReadThingUserReadClaims) != 0)
 				thingDTO.userReadClaims = thingUserRights.userReadClaims;
-			if ((accessThingUserClaims.read & constants.ThingUserReadClaims.CanReadThingUserChangeClaims) != 0)
+			if ((accessThingUserClaims.read & thConstants.ThingUserReadClaims.CanReadThingUserChangeClaims) != 0)
 				thingDTO.userChangeClaims = thingUserRights.userChangeClaims;
 
 			// TODO: Insert Claims control? Is it useful? Test during shortPin implementation
 			thingDTO.shortPin = thingUserRights.shortPin;
 		}
 		
-		thingDTO.usersInfos = (accessThingUserClaims.read & constants.ThingUserReadClaims.CanReadThingUserRights) == 0 ? [] : await getUsersInfosAsync(thing);
+		thingDTO.usersInfos = (accessThingUserClaims.read & thConstants.ThingUserReadClaims.CanReadThingUserRights) == 0 ? [] : await getUsersInfosAsync(thing);
 		
 		return thingDTO;
 	}
@@ -443,9 +443,9 @@ async function createThingDTO(user, parentThing, thing, isSuperAdministrator) {
 	let loggedInThingUserClaims = getThingUserClaims(user, thing, isSuperAdministrator);
 
 	let loggedInThingUserRights = {
-		userRole : (isSuperAdministrator == true) ? constants.ThingUserRoles.Administrator : constants.ThingUserRoles.User,
-		userStatus : constants.ThingUserStates.Ok,
-		userVisibility : constants.ThingUserVisibility.Visible,
+		userRole : (isSuperAdministrator == true) ? thConstants.ThingUserRoles.Administrator : thConstants.ThingUserRoles.User,
+		userStatus : thConstants.ThingUserStates.Ok,
+		userVisibility : thConstants.ThingUserVisibility.Visible,
 		userReadClaims : loggedInThingUserClaims.read,
 		userChangeClaims : loggedInThingUserClaims.change,
 		// TODO: Is it useful? Test during shortPin implementation
@@ -468,7 +468,7 @@ async function createThingDTO(user, parentThing, thing, isSuperAdministrator) {
 	}
 
 	let thingPosition = getThingPosition(user, parentThing, thing);
-	let thingPos = thingPosition ? thingPosition.pos : constants.DefaultThingPos;
+	let thingPos = thingPosition ? thingPosition.pos : thConstants.DefaultThingPos;
 
 	return await thingToThingDTO(loggedInThingUserClaims, thing, loggedInThingUserRights, thingPos);
 }
@@ -479,9 +479,9 @@ exports.getThing = async (user, thingId, deletedStatus) => {
 	if (!thingId)
 		throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Thing's Id can't be null", 47);
 
-	var thing = await getThing(user, thingId, deletedStatus, constants.ThingUserRoles.NoMatter,
-		user ? constants.ThingUserStates.Ok | constants.ThingUserStates.WaitForAuth : constants.ThingUserStates.NoMatter,
-		constants.ThingUserVisibility.NoMatter);
+	var thing = await getThing(user, thingId, deletedStatus, thConstants.ThingUserRoles.NoMatter,
+		user ? thConstants.ThingUserStates.Ok | thConstants.ThingUserStates.WaitForAuth : thConstants.ThingUserStates.NoMatter,
+		thConstants.ThingUserVisibility.NoMatter);
 
 	return await createThingDTO(user, null, thing, user.isSuperAdministrator);
 };
@@ -506,26 +506,26 @@ exports.createThing = async (user, thingDTO) => {
 		throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Kind can't be empty", 15);
 	if (!thingDTO.name)
 		throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Name can't be empty", 16);
-	if (constants.validateThingDeletedStates(thingDTO.deletedStatus) == false)
+	if (thConstants.validateThingDeletedStates(thingDTO.deletedStatus) == false)
 		throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Thing DeletedStatus is incorrect", 17);
-	if (constants.validateThingUserStatus(thingDTO.userStatus) == false)
+	if (thConstants.validateThingUserStatus(thingDTO.userStatus) == false)
 		throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Thing UserStatus is incorrect", 18);
-	if (constants.validateThingUserRoles(thingDTO.userRole) == false)
+	if (thConstants.validateThingUserRoles(thingDTO.userRole) == false)
 		throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Thing UserRole is incorrect", 19);
-	if (constants.validateThingUserVisibility(thingDTO.userVisibility) == false)
+	if (thConstants.validateThingUserVisibility(thingDTO.userVisibility) == false)
 		throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Thing UserVisibility is incorrect", 35);
 
-	if (constants.validateThingUserReadClaims(thingDTO.publicReadClaims) == false)
+	if (thConstants.validateThingUserReadClaims(thingDTO.publicReadClaims) == false)
 		throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Thing PublicReadClaims is incorrect", 82);
-	if (constants.validateThingUserReadClaims(thingDTO.everyoneReadClaims) == false)
+	if (thConstants.validateThingUserReadClaims(thingDTO.everyoneReadClaims) == false)
 		throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Thing EveryoneReadClaims is incorrect", 83);
-	if (constants.validateThingUserChangeClaims(thingDTO.publicChangeClaims) == false)
+	if (thConstants.validateThingUserChangeClaims(thingDTO.publicChangeClaims) == false)
 		throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Thing PublicChangeClaims is incorrect", 84);
-	if (constants.validateThingUserChangeClaims(thingDTO.everyoneChangeClaims) == false)
+	if (thConstants.validateThingUserChangeClaims(thingDTO.everyoneChangeClaims) == false)
 		throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Thing EveryoneChangeClaimss is incorrect", 85);
-	if (constants.validateThingUserReadClaims(thingDTO.userReadClaims) == false)
+	if (thConstants.validateThingUserReadClaims(thingDTO.userReadClaims) == false)
 		throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Thing UserReadClaims is incorrect", 86);
-	if (constants.validateThingUserChangeClaims(thingDTO.userChangeClaims) == false)
+	if (thConstants.validateThingUserChangeClaims(thingDTO.userChangeClaims) == false)
 		throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Thing UserChangeClaims is incorrect", 87);
         
 	// Generate Thing's Id if not provided
@@ -547,7 +547,7 @@ exports.createThing = async (user, thingDTO) => {
 	thing.description = thingDTO.description;
 	thing.value = thingDTO.value;
 	thing.deletedStatus = thingDTO.deletedStatus;
-	thing.deletedDate = thingDTO.deletedStatus == constants.ThingDeletedStates.Deleted ? Date.now : null;
+	thing.deletedDate = thingDTO.deletedStatus == thConstants.ThingDeletedStates.Deleted ? Date.now : null;
 	thing.publicReadClaims = thingDTO.publicReadClaims;
 	thing.publicChangeClaims = thingDTO.publicChangeClaims;
 	thing.everyoneReadClaims = thingDTO.everyoneReadClaims;
@@ -565,7 +565,7 @@ exports.createThing = async (user, thingDTO) => {
 		shortPin: thingDTO.shortPin
 	});
 
-	createThingPosition(user, null, thing, constants.DefaultThingPos);
+	createThingPosition(user, null, thing, thConstants.DefaultThingPos);
 
 	thingModel.save(thing);
 
@@ -583,8 +583,8 @@ exports.updateThing = async (user, thingId, thingDTO) => {
 	if (!thingId)
 		throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Thing's Id can't be null", 55);
 
-	var thing = await getThing(user, thingId, constants.ThingDeletedStates.Ok, 
-		constants.ThingUserRoles.Administrator, constants.ThingUserStates.Ok, constants.ThingUserVisibility.Visible);
+	var thing = await getThing(user, thingId, thConstants.ThingDeletedStates.Ok, 
+		thConstants.ThingUserRoles.Administrator, thConstants.ThingUserStates.Ok, thConstants.ThingUserVisibility.Visible);
 
 	if (!thingDTO)
 		throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "The body message is empty", 56);
@@ -597,7 +597,7 @@ exports.updateThing = async (user, thingId, thingDTO) => {
 
 	if (thingDTO.name != null && thing.name != thingDTO.name) {
 
-		if ((loggedInThingUserClaims.change & constants.ThingUserChangeClaims.CanChangeName) == 0)
+		if ((loggedInThingUserClaims.change & thConstants.ThingUserChangeClaims.CanChangeName) == 0)
 			throw new utils.ErrorCustom(httpStatusCodes.FORBIDDEN, "Unauthorized user", 57);
 
 		if (!thingDTO.name)
@@ -608,7 +608,7 @@ exports.updateThing = async (user, thingId, thingDTO) => {
 	}
 	if (thingDTO.kind != null && thing.kind != thingDTO.kind) {
 
-		if ((loggedInThingUserClaims.change & constants.ThingUserChangeClaims.CanChangeKind) == 0)
+		if ((loggedInThingUserClaims.change & thConstants.ThingUserChangeClaims.CanChangeKind) == 0)
 			throw new utils.ErrorCustom(httpStatusCodes.FORBIDDEN, "Unauthorized user", 59);
 		
 		if (!thingDTO.kind)
@@ -619,7 +619,7 @@ exports.updateThing = async (user, thingId, thingDTO) => {
 	}
 	if (thingDTO.description != null && thing.description != thingDTO.description) {
 		
-		if ((loggedInThingUserClaims.change & constants.ThingUserChangeClaims.CanChangeDescription) == 0)
+		if ((loggedInThingUserClaims.change & thConstants.ThingUserChangeClaims.CanChangeDescription) == 0)
 			throw new utils.ErrorCustom(httpStatusCodes.FORBIDDEN, "Unauthorized user", 101);
 				
 		thing.description = thingDTO.description;
@@ -628,57 +628,57 @@ exports.updateThing = async (user, thingId, thingDTO) => {
 	// Do not campare value value :-) because is an object
 	if (thingDTO.value != null) {
 
-		if ((loggedInThingUserClaims.change & constants.ThingUserChangeClaims.CanChangeValue) == 0)
+		if ((loggedInThingUserClaims.change & thConstants.ThingUserChangeClaims.CanChangeValue) == 0)
 			throw new utils.ErrorCustom(httpStatusCodes.FORBIDDEN, "User can not changes Thing's properties", 61);
 
 		thing.value = thingDTO.value;
 		isChanged = true;
 	}
 	if (thingDTO.publicReadClaims != null && thing.publicReadClaims != thingDTO.publicReadClaims) {
-		if ((loggedInThingUserClaims.change & constants.ThingUserChangeClaims.CanChangePublicReadClaims) == 0)
+		if ((loggedInThingUserClaims.change & thConstants.ThingUserChangeClaims.CanChangePublicReadClaims) == 0)
 			throw new utils.ErrorCustom(httpStatusCodes.FORBIDDEN, "User can not changes Thing's properties", 62);
 
-		if (constants.validateThingUserReadClaims(thingDTO.publicReadClaims) == false)
+		if (thConstants.validateThingUserReadClaims(thingDTO.publicReadClaims) == false)
 			throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Thing PublicReadClaims is incorrect", 63);
 
 		thing.publicReadClaims = thingDTO.publicReadClaims;
 		isChanged = true;
 	}
 	if (thingDTO.publicChangeClaims != null && thing.publicChangeClaims != thingDTO.publicChangeClaims) {
-		if ((loggedInThingUserClaims.change & constants.ThingUserChangeClaims.CanChangePublicChangeClaims) == 0)
+		if ((loggedInThingUserClaims.change & thConstants.ThingUserChangeClaims.CanChangePublicChangeClaims) == 0)
 			throw new utils.ErrorCustom(httpStatusCodes.FORBIDDEN, "User can not changes Thing's properties", 64);
 
-		if (constants.validateThingUserChangeClaims(thingDTO.publicChangeClaims) == false)
+		if (thConstants.validateThingUserChangeClaims(thingDTO.publicChangeClaims) == false)
 			throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Thing PublicChangeClaims is incorrect", 65);
 
 		thing.publicChangeClaims = thingDTO.publicChangeClaims;
 		isChanged = true;
 	}
 	if (thingDTO.everyoneReadClaims != null && thing.everyoneReadClaims != thingDTO.everyoneReadClaims) {
-		if ((loggedInThingUserClaims.change & constants.ThingUserChangeClaims.CanChangeEveryoneReadClaims) == 0)
+		if ((loggedInThingUserClaims.change & thConstants.ThingUserChangeClaims.CanChangeEveryoneReadClaims) == 0)
 			throw new utils.ErrorCustom(httpStatusCodes.FORBIDDEN, "User can not changes Thing's properties", 66);
 
-		if (constants.validateThingUserReadClaims(thingDTO.everyoneReadClaims) == false)
+		if (thConstants.validateThingUserReadClaims(thingDTO.everyoneReadClaims) == false)
 			throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Thing EveryoneReadClaims is incorrect", 67);
 
 		thing.everyoneReadClaims = thingDTO.everyoneReadClaims;
 		isChanged = true;
 	}
 	if (thingDTO.everyoneChangeClaims != null && thing.everyoneChangeClaims != thingDTO.everyoneChangeClaims) {
-		if ((loggedInThingUserClaims.change & constants.ThingUserChangeClaims.CanChangeEveryoneChangeClaims) == 0)
+		if ((loggedInThingUserClaims.change & thConstants.ThingUserChangeClaims.CanChangeEveryoneChangeClaims) == 0)
 			throw new utils.ErrorCustom(httpStatusCodes.FORBIDDEN, "User can not changes Thing's properties", 68);
 
-		if (constants.validateThingUserChangeClaims(thingDTO.everyoneChangeClaims) == false)
+		if (thConstants.validateThingUserChangeClaims(thingDTO.everyoneChangeClaims) == false)
 			throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Thing EveryoneChangeClaims is incorrect", 69);
 
 		thing.everyoneChangeClaims = thingDTO.everyoneChangeClaims;
 		isChanged = true;
 	}
 	if (thingDTO.deletedStatus != null && thing.deletedStatus != thingDTO.deletedStatus) {
-		if ((loggedInThingUserClaims.change & constants.ThingUserChangeClaims.CanChangeDeletedStatus) == 0)
+		if ((loggedInThingUserClaims.change & thConstants.ThingUserChangeClaims.CanChangeDeletedStatus) == 0)
 			throw new utils.ErrorCustom(httpStatusCodes.FORBIDDEN, "User can not changes Thing's properties", 70);
 
-		if (constants.validateThingDeletedStatus(thingDTO.deletedStatus) == false)
+		if (thConstants.validateThingDeletedStatus(thingDTO.deletedStatus) == false)
 			throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Thing EveryoneChangeClaims is incorrect", 81);
 
 		thing.deletedStatus = thingDTO.deletedStatus;
@@ -691,40 +691,40 @@ exports.updateThing = async (user, thingId, thingDTO) => {
 	// If user logged in does not have a relationship it means it is a SuperAdministrator
 	if (thingUserRights) {
 		if (thingDTO.userReadClaims != null && thingUserRights.userReadClaims != thingDTO.userReadClaims) {
-			if ((loggedInThingUserClaims.change & constants.ThingUserChangeClaims.CanChangeThingUserReadClaims) == 0)
+			if ((loggedInThingUserClaims.change & thConstants.ThingUserChangeClaims.CanChangeThingUserReadClaims) == 0)
 				throw new utils.ErrorCustom(httpStatusCodes.FORBIDDEN, "User can not changes Thing's properties", 78);
 
-			if (constants.validateThingUserReadClaims(thingDTO.userReadClaims) == false)
+			if (thConstants.validateThingUserReadClaims(thingDTO.userReadClaims) == false)
 				throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Thing UserReadClaims is incorrect", 71);
 
 			thingUserRights.userReadClaims = thingDTO.userReadClaims;
 			isChanged = true;
 		}
 		if (thingDTO.userRole != null && thingUserRights.userRole != thingDTO.userRole) {
-			if ((loggedInThingUserClaims.change & constants.ThingUserChangeClaims.CanChangeThingUserRole) == 0)
+			if ((loggedInThingUserClaims.change & thConstants.ThingUserChangeClaims.CanChangeThingUserRole) == 0)
 				throw new utils.ErrorCustom(httpStatusCodes.FORBIDDEN, "User can not changes Thing's properties", 72);
 
-			if (constants.validateThingUserRoles(thingDTO.userRole) == false)
+			if (thConstants.validateThingUserRoles(thingDTO.userRole) == false)
 				throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Thing UserRole is incorrect", 73);
 
 			thingUserRights.userRole = thingDTO.userRole;
 			isChanged = true;
 		}
 		if (thingDTO.userStatus != null && thingUserRights.userStatus != thingDTO.userStatus) {
-			if ((loggedInThingUserClaims.change & constants.ThingUserChangeClaims.CanChangeThingUserStatus) == 0)
+			if ((loggedInThingUserClaims.change & thConstants.ThingUserChangeClaims.CanChangeThingUserStatus) == 0)
 				throw new utils.ErrorCustom(httpStatusCodes.FORBIDDEN, "User can not changes Thing's properties", 74);
 
-			if (constants.validateThingUserStatus(thingDTO.userStatus) == false)
+			if (thConstants.validateThingUserStatus(thingDTO.userStatus) == false)
 				throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Thing UserStatus is incorrect", 75);
 
 			thingUserRights.userStatus = thingDTO.userStatus;
 			isChanged = true;
 		}
 		if (thingDTO.userVisibility != null && thingUserRights.userVisibility != thingDTO.userVisibility) {
-			if ((loggedInThingUserClaims.change & constants.ThingUserChangeClaims.CanChangeThingUserVisibility) == 0)
+			if ((loggedInThingUserClaims.change & thConstants.ThingUserChangeClaims.CanChangeThingUserVisibility) == 0)
 				throw new utils.ErrorCustom(httpStatusCodes.FORBIDDEN, "User can not changes Thing's properties", 79);
 
-			if (constants.validateThingUserVisibility(thingDTO.userVisibility) == false)
+			if (thConstants.validateThingUserVisibility(thingDTO.userVisibility) == false)
 				throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Thing UserStatus is incorrect", 80);
 
 			thingUserRights.userVisibility = thingDTO.userVisibility;
@@ -733,10 +733,10 @@ exports.updateThing = async (user, thingId, thingDTO) => {
 
 		// Must be last
 		if (thingDTO.userChangeClaims != null && thingUserRights.userChangeClaims != thingDTO.userChangeClaims) {
-			if ((loggedInThingUserClaims.change & constants.ThingUserChangeClaims.CanChangeThingUserChangeClaims) == 0)
+			if ((loggedInThingUserClaims.change & thConstants.ThingUserChangeClaims.CanChangeThingUserChangeClaims) == 0)
 				throw new utils.ErrorCustom(httpStatusCodes.FORBIDDEN, "User can not changes Thing's properties", 76);
 
-			if (constants.validateThingUserChangeClaims(thingDTO.userChangeClaims) == false)
+			if (thConstants.validateThingUserChangeClaims(thingDTO.userChangeClaims) == false)
 				throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Thing UserChangeClaims is incorrect", 77);
 
 			thingUserRights.userChangeClaims = thingDTO.userChangeClaims;
@@ -785,17 +785,17 @@ exports.updateThingValue = async (user, thingId, value) => {
 	if (!user)
 		throw new utils.ErrorCustom(httpStatusCodes.UNAUTHORIZED, "Unauthorized user", 105);
 
-	var thing = await getThing(user, thingId, constants.ThingDeletedStates.Ok, constants.ThingUserRoles.NoMatter, constants.ThingUserStates.Ok, constants.ThingUserVisibility.Visible);
+	var thing = await getThing(user, thingId, thConstants.ThingDeletedStates.Ok, thConstants.ThingUserRoles.NoMatter, thConstants.ThingUserStates.Ok, thConstants.ThingUserVisibility.Visible);
 
 	var loggedInThingUserClaims = getThingUserClaims(user, thing);
 
-	if ((loggedInThingUserClaims.change & constants.ThingUserChangeClaims.CanChangeValue) == 0)
+	if ((loggedInThingUserClaims.change & thConstants.ThingUserChangeClaims.CanChangeValue) == 0)
 		throw new utils.ErrorCustom(httpStatusCodes.FORBIDDEN, "Unauthorized user", 106);
 
 	// Do not campare value value :-) because is an object
 	if (value != null) {
 		
-		if ((loggedInThingUserClaims.change & constants.ThingUserChangeClaims.CanChangeValue) == 0)
+		if ((loggedInThingUserClaims.change & thConstants.ThingUserChangeClaims.CanChangeValue) == 0)
 			throw new utils.ErrorCustom(httpStatusCodes.FORBIDDEN, "User can not changes Thing's value", 107);
 
 		let usersIdsToNotify = await getUsersIdsToNotify(thing, true);
