@@ -1,5 +1,5 @@
 import {UserInfo} from "./userInfo";
-import * as thingConstants from "../../common/src/constants";
+import * as thConstants from "../../common/src/thConstants";
 import {ThingDTO} from "../../common/src/dtos";
 
 export class Thing {
@@ -19,21 +19,21 @@ export class Thing {
 
     public pos: number = 0
 
-    public deletedStatus : thingConstants.ThingDeletedStates = thingConstants.ThingDeletedStates.NoMatter
+    public deletedStatus : thConstants.ThingDeletedStates = thConstants.ThingDeletedStates.NoMatter
     public deletedDateTime : Date
 
-    public publicReadClaims : thingConstants.ThingUserReadClaims = thingConstants.ThingUserReadClaims.NoClaims
-    public publicChangeClaims : thingConstants.ThingUserChangeClaims = thingConstants.ThingUserChangeClaims.NoClaims
+    public publicReadClaims : thConstants.ThingUserReadClaims = thConstants.ThingUserReadClaims.NoClaims
+    public publicChangeClaims : thConstants.ThingUserChangeClaims = thConstants.ThingUserChangeClaims.NoClaims
 
-    public everyoneReadClaims : thingConstants.ThingUserReadClaims = thingConstants.ThingUserReadClaims.NoClaims
-    public everyoneChangeClaims : thingConstants.ThingUserChangeClaims = thingConstants.ThingUserChangeClaims.NoClaims
+    public everyoneReadClaims : thConstants.ThingUserReadClaims = thConstants.ThingUserReadClaims.NoClaims
+    public everyoneChangeClaims : thConstants.ThingUserChangeClaims = thConstants.ThingUserChangeClaims.NoClaims
 
-    public userStatus : thingConstants.ThingUserStates = thingConstants.ThingUserStates.NoMatter
-    public userRole : thingConstants.ThingUserRoles = thingConstants.ThingUserRoles.NoMatter
-    public userVisibility: thingConstants.ThingUserVisibility = thingConstants.ThingUserVisibility.NoMatter
+    public userStatus : thConstants.ThingUserStates = thConstants.ThingUserStates.NoMatter
+    public userRole : thConstants.ThingUserRoles = thConstants.ThingUserRoles.NoMatter
+    public userVisibility: thConstants.ThingUserVisibility = thConstants.ThingUserVisibility.NoMatter
 
-    public userReadClaims: thingConstants.ThingUserReadClaims = thingConstants.ThingUserReadClaims.NoClaims
-    public userChangeClaims: thingConstants.ThingUserChangeClaims = thingConstants.ThingUserChangeClaims.NoClaims
+    public userReadClaims: thConstants.ThingUserReadClaims = thConstants.ThingUserReadClaims.NoClaims
+    public userChangeClaims: thConstants.ThingUserChangeClaims = thConstants.ThingUserChangeClaims.NoClaims
 
     public usersInfos : UserInfo[] = []
     

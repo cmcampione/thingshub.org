@@ -1,6 +1,6 @@
 "use strict";
 
-const constants = require("./constants");
+const constants = require("./thConstants");
 
 exports.RegisterByOnlyEmailStatus = {
 	UserAlreadyRegistered : 1,

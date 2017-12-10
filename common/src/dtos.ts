@@ -1,4 +1,4 @@
-import * as constants from "./constants"  
+import * as thConstants from "./thConstants"
 
 export const enum RegisterByOnlyEmailStatus {
 	UserAlreadyRegistered = 1,
@@ -66,27 +66,27 @@ export class ThingDTO {
 	
 	public name = "";
 	
-	public kind = constants.ThingKind.genericId;
+	public kind = thConstants.ThingKind.genericId;
 	
 	public pos = 0;// Not used during creation or updating of thing
 	
-	public deletedStatus = constants.ThingDeletedStates.NoMatter;
+	public deletedStatus = thConstants.ThingDeletedStates.NoMatter;
 	public deletedDate = null;
 	
-	public publicReadClaims = constants.ThingUserReadClaims.NoClaims;
-	public publicChangeClaims = constants.ThingUserChangeClaims.NoClaims;
+	public publicReadClaims = thConstants.ThingUserReadClaims.NoClaims;
+	public publicChangeClaims = thConstants.ThingUserChangeClaims.NoClaims;
 	
-	public everyoneReadClaims = constants.ThingUserReadClaims.NoClaims;
-	public everyoneChangeClaims = constants.ThingUserChangeClaims.NoClaims;
+	public everyoneReadClaims = thConstants.ThingUserReadClaims.NoClaims;
+	public everyoneChangeClaims = thConstants.ThingUserChangeClaims.NoClaims;
 	
 	public value : any = {};
 	
-	public userStatus = constants.ThingUserStates.NoMatter;
-	public userRole = constants.ThingUserRoles.NoMatter;
-	public userVisibility = constants.ThingUserVisibility.NoMatter;
+	public userStatus = thConstants.ThingUserStates.NoMatter;
+	public userRole = thConstants.ThingUserRoles.NoMatter;
+	public userVisibility = thConstants.ThingUserVisibility.NoMatter;
 	
-	public userReadClaims = constants.ThingUserReadClaims.NoClaims;
-	public userChangeClaims = constants.ThingUserChangeClaims.NoClaims;
+	public userReadClaims = thConstants.ThingUserReadClaims.NoClaims;
+	public userChangeClaims = thConstants.ThingUserChangeClaims.NoClaims;
 	
 	public usersInfos : UserInfoDTO[] = []; // Not used during creation or updating of thing
 }
