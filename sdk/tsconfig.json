@@ -5,14 +5,14 @@
         
         "outDir": "./dist",
 
-        "declaration": true,
-        "declarationDir": ".",
+        "declaration": false,
+        //"declarationDir": ".",
 
-        //"outFile": "./thingshub.d.ts",
+        //"outFile": "./thingshub.d.ts", // TS6082: Only 'amd' and 'system' modules are supported alongside --outFile.
 
         "sourceMap": true,
 
-        "module": "commonjs",
+        "module": "CommonJS",
 
         "target": "es6",
 
