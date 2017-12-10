@@ -1,9 +1,12 @@
 {
     "compilerOptions": {
+        
+        "baseUrl": ".",
+        
         "outDir": "./dist",
 
         "declaration": true,
-        "declarationDir": "./",
+        "declarationDir": ".",
 
         //"outFile": "./thingshub.d.ts",
 
@@ -19,7 +22,7 @@
         ],
 
         "preserveConstEnums": true
-    },
+    },    
     "include": [
         "../common/src/**/*",
         "./src/**/*"
