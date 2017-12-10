@@ -1,6 +1,6 @@
 "use strict";
 
-const constants = require("./thConstants");
+const thConstants = require("./thConstants");
 
 exports.RegisterByOnlyEmailStatus = {
 	UserAlreadyRegistered : 1,
@@ -60,27 +60,27 @@ class ThingDTO {
 		
 		this.name = "";
 		
-		this.kind = constants.ThingKind.genericId;
+		this.kind = thConstants.ThingKind.genericId;
 		
 		this.pos = 0;// Not used during creation or updating of thing
 		
-		this.deletedStatus = constants.ThingDeletedStates.NoMatter;
+		this.deletedStatus = thConstants.ThingDeletedStates.NoMatter;
 		this.deletedDate = null;
 		
-		this.publicReadClaims = constants.ThingUserReadClaims.NoClaims;
-		this.publicChangeClaims = constants.ThingUserChangeClaims.NoClaims;
+		this.publicReadClaims = thConstants.ThingUserReadClaims.NoClaims;
+		this.publicChangeClaims = thConstants.ThingUserChangeClaims.NoClaims;
 		
-		this.everyoneReadClaims = constants.ThingUserReadClaims.NoClaims;
-		this.everyoneChangeClaims = constants.ThingUserChangeClaims.NoClaims;
+		this.everyoneReadClaims = thConstants.ThingUserReadClaims.NoClaims;
+		this.everyoneChangeClaims = thConstants.ThingUserChangeClaims.NoClaims;
 		
 		this.value = {};
 		
-		this.userStatus = constants.ThingUserStates.NoMatter;
-		this.userRole = constants.ThingUserRoles.NoMatter;
-		this.userVisibility = constants.ThingUserVisibility.NoMatter;
+		this.userStatus = thConstants.ThingUserStates.NoMatter;
+		this.userRole = thConstants.ThingUserRoles.NoMatter;
+		this.userVisibility = thConstants.ThingUserVisibility.NoMatter;
 		
-		this.userReadClaims = constants.ThingUserReadClaims.NoClaims;
-		this.userChangeClaims = constants.ThingUserChangeClaims.NoClaims;
+		this.userReadClaims = thConstants.ThingUserReadClaims.NoClaims;
+		this.userChangeClaims = thConstants.ThingUserChangeClaims.NoClaims;
 		
 		this.usersInfos = []; // Not used during creation or updating of thing
 	}

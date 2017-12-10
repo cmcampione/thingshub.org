@@ -3,15 +3,7 @@ export const enum ThingDeletedStates {
 	Ok        = 1,
 	Deleted   = 2
 }
-export function validateThingDeletedStatus(deletedStatus) : boolean {
-	switch(deletedStatus) {
-	case ThingDeletedStates.NoMatter:
-	case ThingDeletedStates.Ok:
-	case ThingDeletedStates.Deleted:
-		return true;
-	}
-	return false;
-}
+export function validateThingDeletedStatus(deletedStatus) : boolean;
 
 // The User can not have more Roles in the same time
 export const enum ThingUserRoles {
@@ -19,16 +11,7 @@ export const enum ThingUserRoles {
 	Administrator = 1,
 	User          = 2
 }
-export function validateThingUserRoles(userRole) : boolean {
-	switch(userRole) {
-	case ThingUserRoles.NoMatter:
-	case ThingUserRoles.Administrator:
-	case ThingUserRoles.User:
-		return true;
-	}
-	return false;
-}
-
+export function validateThingUserRoles(userRole) : boolean;
 // The User can not have more Status at same time
 export const enum ThingUserStates {
 	NoMatter    = 0,  // Internal state. Do not use for external use like filter
@@ -36,31 +19,14 @@ export const enum ThingUserStates {
 	WaitForAuth = 2,
 	Deleted     = 4
 }
-export function validateThingUserStatus(userStatus) : boolean {
-	switch(userStatus) {
-	case ThingUserStates.NoMatter:
-	case ThingUserStates.Ok:
-	case ThingUserStates.WaitForAuth:
-	case ThingUserStates.Deleted:
-		return true;
-	}
-	return false;
-}
+export function validateThingUserStatus(userStatus) : boolean;
 
 export const enum ThingUserVisibility {
 	NoMatter  = 0,  // Internal state. Do not use for external use like filter
 	Visible       = 1,
 	Hidden        = 2
 }
-export function validateThingUserVisibility(visibility) : boolean {
-	switch(visibility) {
-	case ThingUserVisibility.NoMatter:
-	case ThingUserVisibility.Visible:
-	case ThingUserVisibility.Hidden:
-		return true;
-	}
-	return false;
-}
+export function validateThingUserVisibility(visibility) : boolean;
 
 // Do not have validation function since are bitwise values
 
@@ -99,10 +65,7 @@ ThingUserReadClaims.CanReadThingUserRights | ThingUserReadClaims.CanReadThingUse
 ThingUserReadClaims.CanReadThingUserStatus | ThingUserReadClaims.CanReadThingUserReadClaims | ThingUserReadClaims.CanReadPublicReadClaims |
 ThingUserReadClaims.CanReadPublicChangeClaims | ThingUserReadClaims.CanReadEveryoneReadClaims | ThingUserReadClaims.CanReadEveryoneChangeClaims; */
 
-export function validateThingUserReadClaims(userReadClaims) : boolean {
-	return userReadClaims <= ThingUserReadClaims.AllClaims && userReadClaims >= ThingUserReadClaims.NoClaims;
-}
-
+export function validateThingUserReadClaims(userReadClaims) : boolean;
 // Do not have validation function since are bitwise values
 export const enum ThingUserChangeClaims {
 	NoClaims = 0,
@@ -147,9 +110,7 @@ ThingUserChangeClaims.CanChangePublicReadClaims | ThingUserChangeClaims.CanChang
 ThingUserChangeClaims.CanAddChildrenThing | ThingUserChangeClaims.CanRemoveChildrenThing;
  */
 
-export function validateThingUserChangeClaims(userChangeClaims) {
-	return userChangeClaims <= ThingUserChangeClaims.AllClaims && userChangeClaims >= ThingUserChangeClaims.NoClaims;
-}
+export function validateThingUserChangeClaims(userChangeClaims) : boolean;
 
 export const enum ThingKind {
 	NoMatter= "0",
@@ -157,6 +118,6 @@ export const enum ThingKind {
 	genericTxt = "the bees are laborious"
 }
 
-export const DefaultThingPos : Number = Number.MAX_SAFE_INTEGER;
+export const DefaultThingPos : Number;
 
 
