@@ -2,7 +2,7 @@
 
 const mongoose = require("mongoose");
 
-const constants = require("../../../common/src/constants");
+const thConstants = require("../../../common/src/thConstants");
 
 const thingSchema = mongoose.Schema({
 	
@@ -13,25 +13,25 @@ const thingSchema = mongoose.Schema({
 	description           : String,
 	value                 : {},
 
-	deletedStatus         : { type: Number, default : constants.ThingDeletedStates.NoMatter },
+	deletedStatus         : { type: Number, default : thConstants.ThingDeletedStates.NoMatter },
 	deletedDate       	  : Date,
 
-	publicReadClaims      : { type: Number, default : constants.ThingUserReadClaims.NoClaimss },
-	publicChangeClaims    : { type: Number, default : constants.ThingUserChangeClaims.NoClaims },
+	publicReadClaims      : { type: Number, default : thConstants.ThingUserReadClaims.NoClaimss },
+	publicChangeClaims    : { type: Number, default : thConstants.ThingUserChangeClaims.NoClaims },
 
-	everyoneReadClaims    : { type: Number, default : constants.ThingUserReadClaims.NoClaims },
-	everyoneChangeClaims  : { type: Number, default : constants.ThingUserChangeClaims.NoClaims },
+	everyoneReadClaims    : { type: Number, default : thConstants.ThingUserReadClaims.NoClaims },
+	everyoneChangeClaims  : { type: Number, default : thConstants.ThingUserChangeClaims.NoClaims },
 
 	usersRights : [{
 		userId            : mongoose.Schema.Types.ObjectId,
 		username          : String,
 
-		userRole          : { type: Number, default : constants.ThingUserRoles.NoMatter },
-		userStatus        : { type: Number, default : constants.ThingUserStates.NoMatter },
-		userVisibility    : { type: Number, default : constants.ThingUserVisibility.NoMatter },
+		userRole          : { type: Number, default : thConstants.ThingUserRoles.NoMatter },
+		userStatus        : { type: Number, default : thConstants.ThingUserStates.NoMatter },
+		userVisibility    : { type: Number, default : thConstants.ThingUserVisibility.NoMatter },
 
-		userReadClaims    : { type: Number, default : constants.ThingUserReadClaims.NoClaims },
-		userChangeClaims  : { type: Number, default : constants.ThingUserChangeClaims.NoClaims },
+		userReadClaims    : { type: Number, default : thConstants.ThingUserReadClaims.NoClaims },
+		userChangeClaims  : { type: Number, default : thConstants.ThingUserChangeClaims.NoClaims },
 
 		shortPin          : Number
 	}],
