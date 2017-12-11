@@ -23,21 +23,5 @@ module.exports = {
 			// all files with a `.ts` or `.tsx` extension will be handled by `ts-loader`
 			{ test: /\.tsx?$/, loader: "ts-loader" }
 		]
-	}/* ,
-	plugins: [new DtsBundlePlugin()] */
-};
-
-function DtsBundlePlugin() {}
-DtsBundlePlugin.prototype.apply = function (compiler) {
-	compiler.plugin("done", function(){
-		var dts = require("dts-bundle");
-
-		dts.bundle({
-			name: libraryName,
-			main: "dist/index.d.ts",
-			out: "../dist/index.d.ts",
-			removeSource: true ,
-			outputAsModuleFolder: true // to use npm in-package typings
-		});
-	});
+	}
 };
