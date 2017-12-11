@@ -4,7 +4,7 @@ import {ThingDeletedStates,
 	ThingUserStates, ThingUserRoles,
 	ThingUserVisibility} from "./thConstants"
 
-export const enum RegisterByOnlyEmailStatus {
+export declare const enum RegisterByOnlyEmailStatus {
 	UserAlreadyRegistered = 1,
 	ConfirmPendingEmailSent = 2
 }
