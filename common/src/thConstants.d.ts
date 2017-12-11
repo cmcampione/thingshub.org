@@ -1,4 +1,4 @@
-export const enum ThingDeletedStates {
+export declare const enum ThingDeletedStates {
 	NoMatter  = 0,  // Interna state. Do not useful for external usage
 	Ok        = 1,
 	Deleted   = 2
@@ -6,14 +6,14 @@ export const enum ThingDeletedStates {
 export function validateThingDeletedStatus(deletedStatus) : boolean;
 
 // The User can not have more Roles in the same time
-export const enum ThingUserRoles {
+export declare const enum ThingUserRoles {
 	NoMatter      = 0,  // Internal state. Do not use for external use like filter
 	Administrator = 1,
 	User          = 2
 }
 export function validateThingUserRoles(userRole) : boolean;
 // The User can not have more Status at same time
-export const enum ThingUserStates {
+export declare const enum ThingUserStates {
 	NoMatter    = 0,  // Internal state. Do not use for external use like filter
 	Ok          = 1,
 	WaitForAuth = 2,
@@ -21,16 +21,16 @@ export const enum ThingUserStates {
 }
 export function validateThingUserStatus(userStatus) : boolean;
 
-export const enum ThingUserVisibility {
+export declare const enum ThingUserVisibility {
 	NoMatter  = 0,  // Internal state. Do not use for external use like filter
 	Visible       = 1,
 	Hidden        = 2
 }
-export function validateThingUserVisibility(visibility) : boolean;
+export declare function validateThingUserVisibility(visibility) : boolean;
 
 // Do not have validation function since are bitwise values
 
-export const enum ThingUserReadClaims {
+export declare const enum ThingUserReadClaims {
 
 	NoClaims = 0,
 
@@ -67,7 +67,7 @@ ThingUserReadClaims.CanReadPublicChangeClaims | ThingUserReadClaims.CanReadEvery
 
 export function validateThingUserReadClaims(userReadClaims) : boolean;
 // Do not have validation function since are bitwise values
-export const enum ThingUserChangeClaims {
+export declare const enum ThingUserChangeClaims {
 	NoClaims = 0,
 
 	CanDeleteThing= 1,
@@ -112,12 +112,12 @@ ThingUserChangeClaims.CanAddChildrenThing | ThingUserChangeClaims.CanRemoveChild
 
 export function validateThingUserChangeClaims(userChangeClaims) : boolean;
 
-export const enum ThingKind {
+export declare const enum ThingKind {
 	NoMatter= "0",
 	genericId = "1",
 	genericTxt = "the bees are laborious"
 }
 
-export const DefaultThingPos : Number;
+export declare const DefaultThingPos : Number;
 
 
