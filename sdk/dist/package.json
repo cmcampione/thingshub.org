@@ -1,9 +1,9 @@
 {
   "name": "thingshub-js-sdk",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "",
   "main": "thingshub.js",
-  "types": "index.d.ts",
+  "types": "thingshub.d.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

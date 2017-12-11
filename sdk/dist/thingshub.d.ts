@@ -1,29 +1,29 @@
-export const enum ThingDeletedStates {
+export declare const enum ThingDeletedStates {
 	NoMatter  = 0,  // Interna state. Do not useful for external usage
 	Ok        = 1,
 	Deleted   = 2
 }
 export function validateThingDeletedStatus(deletedStatus) : boolean;
-export const enum ThingUserRoles {
+export declare const enum ThingUserRoles {
 	NoMatter      = 0,  // Internal state. Do not use for external use like filter
 	Administrator = 1,
 	User          = 2
 }
 export function validateThingUserRoles(userRole) : boolean;
-export const enum ThingUserStates {
+export declare const enum ThingUserStates {
 	NoMatter    = 0,  // Internal state. Do not use for external use like filter
 	Ok          = 1,
 	WaitForAuth = 2,
 	Deleted     = 4
 }
 export function validateThingUserStatus(userStatus) : boolean;
-export const enum ThingUserVisibility {
+export declare const enum ThingUserVisibility {
 	NoMatter  = 0,  // Internal state. Do not use for external use like filter
 	Visible       = 1,
 	Hidden        = 2
 }
-export function validateThingUserVisibility(visibility) : boolean;
-export const enum ThingUserReadClaims {
+export declare function validateThingUserVisibility(visibility) : boolean;
+export declare const enum ThingUserReadClaims {
 
 	NoClaims = 0,
 
@@ -50,7 +50,7 @@ export const enum ThingUserReadClaims {
 	AllClaims = 65535
 }
 export function validateThingUserReadClaims(userReadClaims) : boolean;
-export const enum ThingUserChangeClaims {
+export declare const enum ThingUserChangeClaims {
 	NoClaims = 0,
 
 	CanDeleteThing= 1,
@@ -84,13 +84,13 @@ export const enum ThingUserChangeClaims {
 	AllClaims = 524287
 }
 export function validateThingUserChangeClaims(userChangeClaims) : boolean;
-export const enum ThingKind {
+export declare const enum ThingKind {
 	NoMatter= "0",
 	genericId = "1",
 	genericTxt = "the bees are laborious"
 }
-export const DefaultThingPos : Number;
-export const enum RegisterByOnlyEmailStatus {
+export declare const DefaultThingPos : Number;
+export declare const enum RegisterByOnlyEmailStatus {
 	UserAlreadyRegistered = 1,
 	ConfirmPendingEmailSent = 2
 }
