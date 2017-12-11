@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import {ThingsHub} from 'thingshub-js-sdk';
+import * as thingshub from 'thingshub-js-sdk';
 
 @Component({
   selector: 'app-root',
@@ -9,6 +9,5 @@ import {ThingsHub} from 'thingshub-js-sdk';
 export class AppComponent {
   title = 'app';
   constructor() {
-
   }
 }
