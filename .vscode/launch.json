@@ -4,6 +4,7 @@
     // Per ulteriori informazioni, visitare: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
+
         {
             "type": "node",
             "request": "launch",
@@ -15,6 +16,14 @@
             "request": "launch",
             "name": "Launch ThingsHub Server",
             "program": "${workspaceFolder}\\server\\src\\server.js"
+        },
+        {
+            "name": "Launch Tracker App",
+            "type": "chrome",
+            "request": "launch",
+            "url": "http://localhost:4200/",
+            "sourceMaps": true,
+            "webRoot": "${workspaceRoot}"
         }
     ]
 }
