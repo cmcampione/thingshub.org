@@ -5,6 +5,8 @@ import { AppComponent } from './app.component';
 import { OnsenModule } from 'ngx-onsenui';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 
+import { AgmCoreModule } from '@agm/core';
+
 
 @NgModule({
   declarations: [
@@ -12,7 +14,10 @@ import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
   ],
   imports: [
     BrowserModule,
-    OnsenModule
+    OnsenModule,
+    AgmCoreModule.forRoot({
+      apiKey: 'AIzaSyD11pjYHyE0ekfygLBNJhvL1FgUp9-twkQ'
+    })
   ],
   providers: [],
   bootstrap: [AppComponent],
