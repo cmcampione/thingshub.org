@@ -23,7 +23,9 @@
         "../node_modules/onsenui/css/onsen-css-components.css",
         "styles.css"
       ],
-      "scripts": [],
+      "scripts": ["../node_modules/axios/dist/axios.min.js",
+      "../node_modules/socket.io-client/dist/socket.io.slim.js",
+    "../node_modules/thingshub-js-sdk/index.js"],
       "environmentSource": "environments/environment.ts",
       "environments": {
         "dev": "environments/environment.ts",
