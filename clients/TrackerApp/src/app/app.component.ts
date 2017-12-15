@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import * as thingshub from 'thingshub-js-sdk';
+
 
 @Component({
   selector: 'app-root',
@@ -29,5 +29,6 @@ export class AppComponent {
   }
 
   constructor() {
+    this.socket.subscribe();
   }
 }
