@@ -1,12 +1,12 @@
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
-		module.exports = factory(require("axios"), require("io"));
+		module.exports = factory(require("axios"), require("socket.io-client"));
 	else if(typeof define === 'function' && define.amd)
-		define(["axios", "io"], factory);
+		define(["axios", "socket.io-client"], factory);
 	else if(typeof exports === 'object')
-		exports["thingshub"] = factory(require("axios"), require("io"));
+		exports["thingshub"] = factory(require("axios"), require("socket.io-client"));
 	else
-		root["thingshub"] = factory(root["axios"], root["io"]);
+		root["thingshub"] = factory(root["axios"], root["socket.io-client"]);
 })(this, function(__WEBPACK_EXTERNAL_MODULE_4__, __WEBPACK_EXTERNAL_MODULE_35__) {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
