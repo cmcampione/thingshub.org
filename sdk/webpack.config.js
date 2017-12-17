@@ -8,10 +8,11 @@ module.exports = {
 	output: {
 		path: path.resolve(__dirname, "dist"),  
 		filename: "thingshub.js",
-		library: libraryName
+		library: libraryName,
+		libraryTarget: "umd"
 	},
 	externals:{
-		"socket.io-client": "io",
+		"socket.io-client": "socket.io-client",
 		"axios" : "axios"
 	},
 	resolve: {

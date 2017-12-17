@@ -4,4 +4,4 @@ interface NodeModule {
   id: string;
 }
 
-declare var thingshub:any;
+// declare var thingshub:any;
