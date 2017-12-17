@@ -12,7 +12,7 @@
 
         "sourceMap": true,
 
-        "module": "CommonJS",
+        "module": "CommonJs",
 
         "target": "es6",
 

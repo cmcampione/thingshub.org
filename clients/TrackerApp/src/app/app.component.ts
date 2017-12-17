@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import * as thingshub from 'thingshub-js-sdk';
 
 
 @Component({
@@ -12,7 +13,7 @@ export class AppComponent {
   lng = 7.809007;
 
   // tslint:disable-next-line:max-line-length
-  socket = new thingshub.SocketIOConnector('https://server1.carmelocampione.it:3000', this.authHook, this.onError, this.onConnectError, this.onStateChanged);
+  socket1 = new thingshub.SocketIOConnector('https://server1.carmelocampione.it:3000', this.authHook, this.onError, this.onConnectError, this.onStateChanged);
 
   private authHook() {
     return 'token=5e4ff11c-5391-465b-a9c4-9803e0b78799';
@@ -29,6 +30,6 @@ export class AppComponent {
   }
 
   constructor() {
-    this.socket.subscribe();
+    this.socket1.subscribe();
   }
 }
