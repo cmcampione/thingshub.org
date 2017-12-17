@@ -1,5 +1,14 @@
-var thingshub =
-/******/ (function(modules) { // webpackBootstrap
+(function webpackUniversalModuleDefinition(root, factory) {
+	if(typeof exports === 'object' && typeof module === 'object')
+		module.exports = factory(require("axios"), require("io"));
+	else if(typeof define === 'function' && define.amd)
+		define(["axios", "io"], factory);
+	else if(typeof exports === 'object')
+		exports["thingshub"] = factory(require("axios"), require("io"));
+	else
+		root["thingshub"] = factory(root["axios"], root["io"]);
+})(this, function(__WEBPACK_EXTERNAL_MODULE_4__, __WEBPACK_EXTERNAL_MODULE_35__) {
+return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
 /******/
@@ -149,7 +158,7 @@ module.exports = function isCallable(value) {
 /* 4 */
 /***/ (function(module, exports) {
 
-module.exports = axios;
+module.exports = __WEBPACK_EXTERNAL_MODULE_4__;
 
 /***/ }),
 /* 5 */
@@ -2225,7 +2234,7 @@ exports.SocketIOConnector = SocketIOConnector;
 /* 35 */
 /***/ (function(module, exports) {
 
-module.exports = io;
+module.exports = __WEBPACK_EXTERNAL_MODULE_35__;
 
 /***/ }),
 /* 36 */
@@ -2432,4 +2441,5 @@ exports.ThingsDataContext = ThingsDataContext;
 
 /***/ })
 /******/ ]);
+});
 //# sourceMappingURL=thingshub.js.map
