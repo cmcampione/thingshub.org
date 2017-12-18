@@ -11,7 +11,7 @@ module.exports = {
 		library: libraryName,
 		libraryTarget: "umd"
 	},
-	externals:{
+	externals: {
 		"socket.io-client": { 
 			amd: "socket.io-client", 
 			global: "io", // TODO: Can be unuseful?
