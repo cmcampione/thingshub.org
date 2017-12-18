@@ -29,14 +29,13 @@ export class AppComponent {
     console.log(change);
   }
 
-  private onUpdateThingValue(value) {
-    this.lat = value.lat;
-    this.lng = value.lng;
-    console.log(value);  
-  }
-
   constructor() {
     this.socket.subscribe();
-    this.socket.setHook("onUpdateThingValue", this.onUpdateThingValue);
+    // Use fat arrow sintax for "this" implicit binding
+    this.socket.setHook('onUpdateThingValue', (value) => {
+      this.lat = value.lat;
+      this.lng = value.lng;
+      console.log(value);
+    });
   }
 }
