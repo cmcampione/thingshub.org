@@ -13,11 +13,11 @@ module.exports = {
 	},
 	externals:{
 		"socket.io-client": { 
-			amd: 'socket.io-client', 
-			global: 'io', // TODO: Can be unuseful?
-			root: 'io',
-			commonjs: 'socket.io-client', 
-			commonjs2: 'socket.io-client' 
+			amd: "socket.io-client", 
+			global: "io", // TODO: Can be unuseful?
+			root: "io",
+			commonjs: "socket.io-client", 
+			commonjs2: "socket.io-client" 
 		},
 		"axios" : "axios"
 	},
