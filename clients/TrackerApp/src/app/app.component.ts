@@ -31,7 +31,7 @@ export class AppComponent {
 
   constructor() {
     this.socket.subscribe();
-    // Use fat arrow sintax for "this" implicit binding
+    // Uses of "fat arrow" sintax for "this" implicit binding
     this.socket.setHook('onUpdateThingValue', (value) => {
       this.lat = value.lat;
       this.lng = value.lng;
