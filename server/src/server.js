@@ -7,12 +7,14 @@ const httpStatus 		= require("http-status-codes");
 const https   			= require("https");
 const express 			= require("express");
 const expressValidator 	= require("express-validator");
+const session 			= require("express-session");
 const bodyParser 		= require("body-parser");
 const passport 			= require("passport");
 const LocalStrategy 	= require('passport-local').Strategy;
 const LocalApiStrategy 	= require("passport-localapikey-update").Strategy;
 const mongoose  		= require("mongoose");
 const cors 				= require("cors");
+const flash 			= require('connect-flash');
 
 const utils				= require("./utils");
 const usersManager		= require("./bl/usersMngr");
@@ -48,6 +50,8 @@ var corsOptions = {
 };
 app.use(cors(corsOptions));
 
+app.use(session({ secret: process.env.SESSION_SECRET }));
+
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: false }));
 
@@ -59,22 +63,31 @@ app.use(expressValidator());
 
 // Passport setup
 
-/* 
-passport.use(new LocalStrategy(
-	function(username, password, done) {
-	  User.findOne({ username: username }, function (err, user) {
-		if (err) { return done(err); }
-		if (!user) {
-		  return done(null, false, { message: 'Incorrect username.' });
-		}
-		if (!user.validPassword(password)) {
-		  return done(null, false, { message: 'Incorrect password.' });
-		}
-		return done(null, user);
-	  });
+passport.use(new LocalStrategy(async function(username, password, done) {
+	const user = await usersManager.findUserByUsername(username);
+	if (!user) {
+		return done(null, false, { message: 'Incorrect username' });
 	}
-  )); 
-  */
+	if (!user.comparePassword(password)) {
+		return done(null, false, { message: 'Incorrect password' });
+	}
+	return done(null, user);
+	})
+);
+
+passport.serializeUser(function(user, done) {
+	done(null, user.id);
+});
+  
+passport.deserializeUser(function(id, done) {
+	usersManager.findUserById(id)
+	.then(function(user) {
+		done(null, user);
+	})
+	.catch(function(err) {
+		done(err);
+	});
+});
 
 var localApiStrategyOptions = { 
 	apiKeyField: process.env.APIKEY_NAME,
@@ -98,6 +111,9 @@ passport.use(new LocalApiStrategy(localApiStrategyOptions,
 	}
 ));
 app.use(passport.initialize());
+app.use(passport.session());
+
+app.use(flash());
 
 // Routers
 
