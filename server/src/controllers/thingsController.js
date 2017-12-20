@@ -2,7 +2,7 @@
 
 "use strict";
 
-const httpStatusCodes 		= require("http-status-codes");
+const httpStatusCodes 	= require("http-status-codes");
 const express 			= require("express");
 const passport 			= require("passport");
 
