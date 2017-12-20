@@ -4,6 +4,7 @@ const path  			= require("path");
 const httpStatus 		= require("http-status-codes");
 const nodemailer 		= require("nodemailer");
 const express 			= require("express");
+const passport 			= require("passport");
 const ejs 				= require("ejs");
 
 const utils 			= require("../utils.js");
@@ -200,5 +201,11 @@ router.post("/confirmAccountByOnlyEmail", async (req, res, next) => {
 		next(new utils.ErrorCustom(httpStatus.INTERNAL_SERVER_ERROR, e.message, 7));
 	}
 });
+
+router.post('/login',
+  passport.authenticate('local', { successRedirect: '/',
+                                   failureRedirect: '/login',
+                                   failureFlash: true })
+);
 
 module.exports = router;
