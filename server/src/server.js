@@ -10,11 +10,11 @@ const expressValidator 	= require("express-validator");
 const session 			= require("express-session");
 const bodyParser 		= require("body-parser");
 const passport 			= require("passport");
-const LocalStrategy 	= require('passport-local').Strategy;
+const LocalStrategy 	= require("passport-local").Strategy;
 const LocalApiStrategy 	= require("passport-localapikey-update").Strategy;
 const mongoose  		= require("mongoose");
 const cors 				= require("cors");
-const flash 			= require('connect-flash');
+const flash 			= require("connect-flash");
 
 const utils				= require("./utils");
 const usersManager		= require("./bl/usersMngr");
@@ -66,13 +66,13 @@ app.use(expressValidator());
 passport.use(new LocalStrategy(async function(username, password, done) {
 	const user = await usersManager.findUserByUsername(username);
 	if (!user) {
-		return done(null, false, { message: 'Incorrect username' });
+		return done(null, false, { message: "Incorrect username" });
 	}
 	if (!user.comparePassword(password)) {
-		return done(null, false, { message: 'Incorrect password' });
+		return done(null, false, { message: "Incorrect password" });
 	}
 	return done(null, user);
-	})
+})
 );
 
 passport.serializeUser(function(user, done) {
@@ -81,12 +81,12 @@ passport.serializeUser(function(user, done) {
   
 passport.deserializeUser(function(id, done) {
 	usersManager.findUserById(id)
-	.then(function(user) {
-		done(null, user);
-	})
-	.catch(function(err) {
-		done(err);
-	});
+		.then(function(user) {
+			done(null, user);
+		})
+		.catch(function(err) {
+			done(err);
+		});
 });
 
 var localApiStrategyOptions = { 
