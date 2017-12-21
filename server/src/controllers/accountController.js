@@ -3,6 +3,7 @@
 const path  			= require("path");
 const httpStatus 		= require("http-status-codes");
 const nodemailer 		= require("nodemailer");
+const httpStatusCodes 	= require("http-status-codes");
 const express 			= require("express");
 const passport 			= require("passport");
 const ejs 				= require("ejs");
@@ -202,10 +203,27 @@ router.post("/confirmAccountByOnlyEmail", async (req, res, next) => {
 	}
 });
 
-router.post("/login",
-	passport.authenticate("local", { successRedirect: "/",
-		failureRedirect: "/login",
-		failureFlash: true })
-);
+router.post("/login", async function (req, res, next) {
+	passport.authenticate("local", async function(err, user, info) {
+		try {
+			if (err) { 
+				return next(err); 
+			}
+			if (!user) { 
+				return next(new utils.ErrorCustom(httpStatusCodes.UNAUTHORIZED, httpStatusCodes.getStatusText(httpStatusCodes.UNAUTHORIZED), 107));
+			}
+
+			res.json({user });
+
+		}  catch (e)  {
+			if (e instanceof utils.ErrorCustom) {
+				next(e);
+				return;
+			}
+			next(new utils.ErrorCustom(httpStatusCodes.INTERNAL_SERVER_ERROR, e.message, 108));
+		}
+
+	})(req, res, next);
+});
 
 module.exports = router;

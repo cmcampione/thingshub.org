@@ -14,7 +14,6 @@ const LocalStrategy 	= require("passport-local").Strategy;
 const LocalApiStrategy 	= require("passport-localapikey-update").Strategy;
 const mongoose  		= require("mongoose");
 const cors 				= require("cors");
-const flash 			= require("connect-flash");
 
 const utils				= require("./utils");
 const usersManager		= require("./bl/usersMngr");
@@ -112,8 +111,6 @@ passport.use(new LocalApiStrategy(localApiStrategyOptions,
 ));
 app.use(passport.initialize());
 app.use(passport.session());
-
-app.use(flash());
 
 // Routers
 
