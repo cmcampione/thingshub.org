@@ -202,10 +202,10 @@ router.post("/confirmAccountByOnlyEmail", async (req, res, next) => {
 	}
 });
 
-router.post('/login',
-  passport.authenticate('local', { successRedirect: '/',
-                                   failureRedirect: '/login',
-                                   failureFlash: true })
+router.post("/login",
+	passport.authenticate("local", { successRedirect: "/",
+		failureRedirect: "/login",
+		failureFlash: true })
 );
 
 module.exports = router;
