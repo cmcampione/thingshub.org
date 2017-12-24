@@ -40,11 +40,6 @@ export type HttpFailResult = any;
 
 export class Helpers {
 
-    public static get securityHeaders() : any {
-
-        return {};
-    }
-
     public static getRangeItemsFromResponse(response: any) : ItemsRange  {
         
         //TODO: It's very common find "response.headers" syntax so for now is good

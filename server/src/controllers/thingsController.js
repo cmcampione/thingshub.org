@@ -14,7 +14,7 @@ const ClientsConnectorsManager = require("../clientsConnectorsManager");
 const router = express.Router();
 
 router.get("/:id", function(req, res, next) {
-	passport.authenticate("localapikey", async function(err, user, info) {
+	passport.authenticate(["localapikey", "bearer"], { session: false }, async function(err, user, info) {
 		try {
 			if (err) { 
 				return next(err); 
@@ -41,7 +41,7 @@ router.get("/:id", function(req, res, next) {
 });
 
 router.get("/", function(req, res, next) {
-	passport.authenticate("localapikey", async function(err, user, info) {
+	passport.authenticate(["localapikey", "bearer"], { session: false }, async function(err, user, info) {
 		try {
 			if (err) { 
 				return next(err); 
@@ -79,7 +79,7 @@ router.get("/", function(req, res, next) {
 
 // Create Thing
 router.post("/", async function (req, res, next){
-	passport.authenticate("localapikey", async function(err, user, info) {
+	passport.authenticate(["localapikey", "bearer"], { session: false }, async function(err, user, info) {
 		try {
 			if (err) { 
 				return next(err); 
@@ -112,7 +112,7 @@ router.post("/", async function (req, res, next){
 
 // Update Thing
 router.put("/:id", async function (req, res, next){
-	passport.authenticate("localapikey", async function(err, user, info) {
+	passport.authenticate(["localapikey", "bearer"], { session: false }, async function(err, user, info) {
 		try {
 			if (err)
 				return next(err); 
@@ -157,7 +157,7 @@ router.put("/:id", async function (req, res, next){
 });
 
 router.put("/:id/value", async function (req, res, next){
-	passport.authenticate("localapikey", async function(err, user, info) {
+	passport.authenticate(["localapikey", "bearer"], { session: false }, async function(err, user, info) {
 		try {
 			if (err)
 				return next(err); 

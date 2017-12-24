@@ -49,12 +49,12 @@
       }
 
       var endPointAddress = {
-          server: "https://server1.carmelocampione.it:3000",
-          api: "https://server1.carmelocampione.it:3000/api"    
+          server: "https://localhost:3000",
+          api: "https://localhost:3000/api"    
       }
 
       function securityHeaderHook() {
-        return { thapikey: "5e4ff11c-5391-465b-a9c4-9803e0b78799" };
+        return { Authorization: "Bearer 5e4ff11c-5391-465b-a9c4-9803e0b78799" };
       }
 
       var thingsDatacontext = new thingshub.ThingsDataContext(endPointAddress, securityHeaderHook);
@@ -74,7 +74,7 @@
       });
 
 
-      var socket = new thingshub.SocketIOConnector("https://server1.carmelocampione.it:3000", authHook, onError, onConnectError, onStateChanged);
+      var socket = new thingshub.SocketIOConnector(endPointAddress.server, authHook, onError, onConnectError, onStateChanged);
       socket.subscribe();
       socket.setHook("api", onAPI);
       socket.setHook("onCreateThing", onCreateThing);
@@ -95,6 +95,7 @@
 <body>
 
 	<div>
+
       <form action="https://localhost:3000/api/account/login" method="post">
         <div>
             <label>Username:</label>
