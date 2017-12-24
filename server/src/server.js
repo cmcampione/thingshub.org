@@ -3,15 +3,17 @@
 const fs      			= require("fs");
 const path    			= require("path");
 const dotenv  			= require("dotenv");
-const httpStatus 		= require("http-status-codes");
+const httpStatusCodes 	= require("http-status-codes");
 const https   			= require("https");
 const express 			= require("express");
 const expressValidator 	= require("express-validator");
 const session 			= require("express-session");
+const MongoStore 		= require('connect-mongo')(session);
 const bodyParser 		= require("body-parser");
 const passport 			= require("passport");
 const LocalStrategy 	= require("passport-local").Strategy;
 const LocalApiStrategy 	= require("passport-localapikey-update").Strategy;
+const BearerStrategy	= require("passport-http-bearer").Strategy;
 const mongoose  		= require("mongoose");
 const cors 				= require("cors");
 
@@ -49,8 +51,6 @@ var corsOptions = {
 };
 app.use(cors(corsOptions));
 
-app.use(session({ secret: process.env.SESSION_SECRET }));
-
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: false }));
 
@@ -71,8 +71,7 @@ passport.use(new LocalStrategy(async function(username, password, done) {
 		return done(null, false, { message: "Incorrect password" });
 	}
 	return done(null, user);
-})
-);
+}));
 
 passport.serializeUser(function(user, done) {
 	done(null, user.id);
@@ -110,7 +109,30 @@ passport.use(new LocalApiStrategy(localApiStrategyOptions,
 	}
 ));
 app.use(passport.initialize());
-app.use(passport.session());
+
+passport.use(new BearerStrategy(async function(token, done) {
+	try {
+		const tk = utils.verifyToken(token);
+		const user = await usersManager.findUserByMasterApiKey(tk.mak);
+		if (!user) { 
+			return done(null, false, { message: "Unknown token" }); 
+		}
+		return done(null, user);
+	}
+	catch(e) {
+		return done(null, false, new utils.ErrorCustom(httpStatusCodes.UNAUTHORIZED, httpStatusCodes.getStatusText(httpStatusCodes.UNAUTHORIZED), 111)); 
+	}}));
+
+// Session support
+
+/* 
+app.use(session({ 	
+	secret: process.env.SESSION_SECRET,
+	store: new MongoStore({ mongooseConnection: mongoose.connection })
+}));
+
+app.use(passport.session()); 
+*/
 
 // Routers
 
@@ -134,7 +156,7 @@ app.use("/api/things", ThingsController);
 // Errors support
 
 app.use(function(req, res, next) {
-	throw new utils.ErrorCustom(httpStatus.NOT_FOUND, httpStatus.getStatusText(httpStatus.NOT_FOUND), 1);
+	throw new utils.ErrorCustom(httpStatusCodes.NOT_FOUND, httpStatusCodes.getStatusText(httpStatusCodes.NOT_FOUND), 1);
 });
   
 // Catch all for error messages.  Instead of a stack
@@ -144,7 +166,7 @@ app.use(function(req, res, next) {
 app.use((err, req, res, next) => {
 	if (err) {
 		if (err.statusCode == null) {
-			res.status(httpStatus.INTERNAL_SERVER_ERROR);
+			res.status(httpStatusCodes.INTERNAL_SERVER_ERROR);
 			res.json(utils.ErrorCustom.formatMessage(9, err));
 		} else {
 			res.status(err.statusCode);
