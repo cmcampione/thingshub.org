@@ -1,6 +1,6 @@
 "use strict";
 
-const httpStatus 		= require("http-status-codes");
+const httpStatusCodes 		= require("http-status-codes");
 
 const utils				= require("./utils");
 const usersManager		= require("./bl/usersMngr");
@@ -33,11 +33,20 @@ class ClientsConnectorSocketIO extends IClientsConnector {
 			
 			let token = socket.handshake.query.token;
 			if (!token)
-				return next(new utils.ErrorCustom(httpStatus.UNAUTHORIZED, httpStatus.getStatusText(httpStatus.UNAUTHORIZED), 11));
+				return next(new utils.ErrorCustom(httpStatusCodes.UNAUTHORIZED, httpStatusCodes.getStatusText(httpStatusCodes.UNAUTHORIZED), 11));
 
 			let user = await usersManager.findUserByMasterApiKey(token);
-			if (!user)
-				return next(new utils.ErrorCustom(httpStatus.UNAUTHORIZED, httpStatus.getStatusText(httpStatus.UNAUTHORIZED), 12));
+			if (!user) {
+				try {
+					const tk = utils.verifyToken(token);
+					user = await usersManager.findUserByMasterApiKey(tk.mak);
+					if (!user)
+						return next(new utils.ErrorCustom(httpStatusCodes.UNAUTHORIZED, httpStatusCodes.getStatusText(httpStatusCodes.UNAUTHORIZED), 112));
+				}
+				catch(e) {
+					return next(new utils.ErrorCustom(httpStatusCodes.UNAUTHORIZED, httpStatusCodes.getStatusText(httpStatusCodes.UNAUTHORIZED), 12));	
+				}
+			}
 
 			let userId = user._id.toString();
 			let userSockets = self.connections.get(userId);

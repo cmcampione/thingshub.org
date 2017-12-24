@@ -213,7 +213,15 @@ router.post("/login", async function (req, res, next) {
 				return next(new utils.ErrorCustom(httpStatusCodes.UNAUTHORIZED, httpStatusCodes.getStatusText(httpStatusCodes.UNAUTHORIZED), 107));
 			}
 
-			res.json({user });
+			res.json({ 
+				access_token: utils.createToken({ 
+					sub : user.id, 
+					exp : 3600, 
+					mak: user.masterApiKey, 
+					name: user.name }),
+				token_type: "bearer",
+    			expires_in: 3600
+			});
 
 		}  catch (e)  {
 			if (e instanceof utils.ErrorCustom) {
@@ -221,6 +229,29 @@ router.post("/login", async function (req, res, next) {
 				return;
 			}
 			next(new utils.ErrorCustom(httpStatusCodes.INTERNAL_SERVER_ERROR, e.message, 108));
+		}
+
+	})(req, res, next);
+});
+
+router.get('/logout', async function (req, res, next) {
+	passport.authenticate("local", async function(err, user, info) {
+		try {
+			if (err) { 
+				return next(err); 
+			}
+			if (!user) { 
+				return next(new utils.ErrorCustom(httpStatusCodes.UNAUTHORIZED, httpStatusCodes.getStatusText(httpStatusCodes.UNAUTHORIZED), 109));
+			}
+			req.logout();
+			res.send("");
+
+		}  catch (e)  {
+			if (e instanceof utils.ErrorCustom) {
+				next(e);
+				return;
+			}
+			next(new utils.ErrorCustom(httpStatusCodes.INTERNAL_SERVER_ERROR, e.message, 110));
 		}
 
 	})(req, res, next);
