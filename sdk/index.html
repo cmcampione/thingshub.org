@@ -17,10 +17,49 @@
     <script src="dist/thingshub.js"></script>
 
     <script>
-      function authHook() {
-        return "token=5e4ff11c-5391-465b-a9c4-9803e0b78799";
+
+      var endPointAddress = {
+          server: "https://localhost:3000",
+          api: "https://localhost:3000/api"    
       }
 
+      var accountManager = null;
+
+      function securityHeaderHook() {
+        return { Authorization: "Bearer " + accountManager.accessToken};
+      }
+      /* 
+      function securityHeaderHook() {
+        return { thapikey: accountManager.apiKey};
+      }
+      */
+
+      var accountDataContext = new thingshub.AccountDataContext(endPointAddress, securityHeaderHook);
+      accountManager = new thingshub.AccountManager("thingshub", accountDataContext);
+
+      var thingsDatacontext = new thingshub.ThingsDataContext(endPointAddress, securityHeaderHook);
+
+      var thingsGetParams =  {
+        parentThingId : null,
+        thingFilter : "",
+        valueFilter : "",
+        orderBy : "",
+        skip : 0,
+        top : 100
+      }
+      thingsDatacontext.getThings(thingsGetParams)
+      .then(function(res) {
+        console.log(res);
+      });
+
+      function authHook() {
+        return "token=" + accountManager.accessToken;
+      }
+/*       
+      function authHook() {
+        return "token=" + accountManager.apiKey;
+      }
+ */
       function onError(error) {
         console.log(error);
       }
@@ -47,32 +86,6 @@
       function onUpdateThingValue(value) {
         console.log(value);
       }
-
-      var endPointAddress = {
-          server: "https://localhost:3000",
-          api: "https://localhost:3000/api"    
-      }
-
-      function securityHeaderHook() {
-        return { Authorization: "Bearer 5e4ff11c-5391-465b-a9c4-9803e0b78799" };
-      }
-
-      var thingsDatacontext = new thingshub.ThingsDataContext(endPointAddress, securityHeaderHook);
-
-      var thingsGetParams =  {
-        parentThingId : null,
-        thingFilter : "",
-        valueFilter : "",
-        orderBy : "",
-        skip : 0,
-        top : 100
-      }
-
-      thingsDatacontext.getThings(thingsGetParams)
-      .then(function(res) {
-        console.log(res);
-      });
-
 
       var socket = new thingshub.SocketIOConnector(endPointAddress.server, authHook, onError, onConnectError, onStateChanged);
       socket.subscribe();

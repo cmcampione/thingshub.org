@@ -4,7 +4,14 @@
     Welcome to {{ title }}!
   </h1>
 </div>
-<div>
+
+<div *ngIf="!isLoggedIn">
+  <app-login></app-login> 
+</div>
+
+<button (click)="dummy()">Click me</button>
+
+<div *ngIf="isLoggedIn">
   <agm-map [latitude]="lat" [longitude]="lng">
     <agm-marker [latitude]="lat" [longitude]="lng"></agm-marker>
   </agm-map>

@@ -1,7 +1,6 @@
 import { Component } from '@angular/core';
 import * as thingshub from 'thingshub-js-sdk';
 
-
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -11,6 +10,12 @@ export class AppComponent {
   title = 'app';
   lat = 51.678418;
   lng = 7.809007;
+
+  private isLoggedIn = false;
+
+  private dummy() {
+    this.isLoggedIn = !this.isLoggedIn;
+  }
 
   // tslint:disable-next-line:max-line-length
   socket = new thingshub.SocketIOConnector('https://server1.carmelocampione.it:3000', this.authHook, this.onError, this.onConnectError, this.onStateChanged);
