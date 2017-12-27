@@ -589,9 +589,6 @@ class HttpRequestCanceler {
 }
 exports.HttpRequestCanceler = HttpRequestCanceler;
 class Helpers {
-    static get securityHeaders() {
-        return {};
-    }
     static getRangeItemsFromResponse(response) {
         //TODO: It's very common find "response.headers" syntax so for now is good
         var contentRange = response.headers["content-range"];
@@ -2075,13 +2072,12 @@ class UserDTO {
 	constructor(user, fullInfos) {
 		this.id = user._id;
 		this.name = user.name;
-		this.username = "";
-		this.emails = [];
   
 		if (!fullInfos) {
 			return;
 		}
   
+		this.emails = [];
 		this.username = user.userName;
 		user.emails.foreach(email => this.emails.push(new EmailDTO(email)));
 		this.masterApiKey = user.masterApiKey;
