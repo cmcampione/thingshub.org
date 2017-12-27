@@ -198,7 +198,6 @@ export declare class HttpRequestCanceler {
 }
 export declare type HttpFailResult = any;
 export declare class Helpers {
-	static readonly securityHeaders: any;
 	static getRangeItemsFromResponse(response: any): ItemsRange;
 }
 export interface EndPointAddress {

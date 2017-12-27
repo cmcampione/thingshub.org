@@ -112,11 +112,15 @@ app.use(passport.initialize());
 
 passport.use(new BearerStrategy(async function(token, done) {
 	try {
-		const tk = utils.verifyToken(token);
-		const user = await usersManager.findUserByMasterApiKey(tk.mak);
-		if (!user) { 
+		const user = await usersManager.findUserByMasterApiKey(token);
+		if (!user)
 			return done(null, false, { message: "Unknown token" }); 
-		}
+
+		const tk = utils.verifyToken(token);
+		user = await usersManager.findUserByMasterApiKey(tk.mak);
+		if (!user)
+			return done(null, false, { message: "Unknown token" }); 
+
 		return done(null, user);
 	}
 	catch(e) {
