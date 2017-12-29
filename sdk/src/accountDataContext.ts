@@ -3,11 +3,6 @@ import axios, { AxiosRequestConfig, AxiosPromise } from "axios";
 import {HttpFailResult, Helpers} from "./helpers";
 import {EndPointAddress} from "./endPointAddress";
 
-export interface LoginData {
-        username : string;
-        password : string;
-}
-
 export class AccountDataContext {
 
     private securityHeaderHook: () => object = null;
@@ -20,8 +15,12 @@ export class AccountDataContext {
         this.securityHeaderHook = securityHeaderHook;
     }
 
-    public login(loginData: LoginData) : Promise<any | HttpFailResult> {
-        return axios.post(this.accountUrl,qs.stringify(loginData), {
+    public login(username: string, password: string) : Promise<any | HttpFailResult> {
+        let loginData = {
+            username,
+            password
+        };
+        return axios.post(this.accountUrl + "/login",qs.stringify(loginData), {
             headers: {
                 "Content-Type": "application/x-www-form-urlencoded"
             }
@@ -31,7 +30,7 @@ export class AccountDataContext {
         });
     }
     public logout() : Promise<any | HttpFailResult> {
-        return axios.post(this.accountUrl, null, {
+        return axios.post(this.accountUrl + "/logout", null, {
             headers: this.securityHeaderHook()
         })
         .then(function(response: any) : any {
