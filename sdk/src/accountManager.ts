@@ -105,14 +105,13 @@ export class AccountManager {
         this._apiKey = value;
     }
 
-    public login(loginData : any, remember: boolean) : Promise<any | HttpFailResult> {
-        return this.accountDataContext.login(loginData)
-        .then(function(response: any) {
-            this.setLoginData(response, remember);
-            return response;
-        });
+    public async login(username: string, password: string, remember: boolean) : Promise<any> {
+
+        let response = await this.accountDataContext.login(username, password);
+        this.setLoginData(response, remember);
+        return response;
     }  
-    public async logout() : Promise<any  | HttpFailResult> {
+    public async logout() : Promise<any> {
         try
         {
             return await this.accountDataContext.logout();
