@@ -1,18 +1,14 @@
 <!--The content below is only a placeholder and can be replaced.-->
 <div style="text-align:center">
   <h1>
-    Welcome to {{ title }}!
+    {{ title }}!
   </h1>
 </div>
 
-<div *ngIf="!isLoggedIn">
-  <app-login></app-login> 
+<div *ngIf="!isLoggedIn.status">
+  <app-login [isLoggedIn]="isLoggedIn"></app-login> 
 </div>
 
-<button (click)="dummy()">Click me</button>
-
-<div *ngIf="isLoggedIn">
-  <agm-map [latitude]="lat" [longitude]="lng">
-    <agm-marker [latitude]="lat" [longitude]="lng"></agm-marker>
-  </agm-map>
+<div *ngIf="isLoggedIn.status">
+  <app-map></app-map>
 </div>

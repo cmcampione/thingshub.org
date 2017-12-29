@@ -204,6 +204,34 @@ export interface EndPointAddress {
 	server: string;
 	api: string;
 }
+export interface LoginData {
+	username: string;
+	password: string;
+}
+export declare class AccountDataContext {
+	private securityHeaderHook;
+	private accountUrl;
+	constructor(endPointAddress: EndPointAddress, securityHeaderHook: () => object);
+	login(loginData: LoginData): Promise<any | HttpFailResult>;
+	logout(): Promise<any | HttpFailResult>;
+}
+export declare class AccountManager {
+	private accountDataContext;
+	private _appName;
+	private _accessToken;
+	private _userId;
+	private _userName;
+	private _apiKey;
+	private resetLoginData();
+	private setLoginData(loginData, remember);
+	private readLoginData();
+	constructor(appName: string, accountDataContext: AccountDataContext);
+	apiKey: string;
+	readonly accessToken: string;
+	readonly isLoggedIn: boolean;
+	login(loginData: any, remember: boolean): Promise<any | HttpFailResult>;
+	logout(): Promise<any | HttpFailResult>;
+}
 export declare type UserInfo = any;
 export declare class Thing {
 	childrenSkip: number;
