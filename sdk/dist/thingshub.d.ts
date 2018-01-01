@@ -204,15 +204,12 @@ export interface EndPointAddress {
 	server: string;
 	api: string;
 }
-export interface LoginData {
-	username: string;
-	password: string;
-}
 export declare class AccountDataContext {
 	private securityHeaderHook;
 	private accountUrl;
 	constructor(endPointAddress: EndPointAddress, securityHeaderHook: () => object);
-	login(loginData: LoginData): Promise<any | HttpFailResult>;
+	login(username: string, password: string): Promise<any | HttpFailResult>;
+	loginBasic(username: string, password: string): Promise<any | HttpFailResult>;
 	logout(): Promise<any | HttpFailResult>;
 }
 export declare class AccountManager {
@@ -229,8 +226,8 @@ export declare class AccountManager {
 	apiKey: string;
 	readonly accessToken: string;
 	readonly isLoggedIn: boolean;
-	login(loginData: any, remember: boolean): Promise<any | HttpFailResult>;
-	logout(): Promise<any | HttpFailResult>;
+	login(username: string, password: string, remember: boolean): Promise<any>;
+	logout(): Promise<any>;
 }
 export declare type UserInfo = any;
 export declare class Thing {

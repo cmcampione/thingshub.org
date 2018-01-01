@@ -7,7 +7,7 @@
 		exports["thingshub"] = factory(require("axios"), require("socket.io-client"));
 	else
 		root["thingshub"] = factory(root["axios"], root["io"]);
-})(this, function(__WEBPACK_EXTERNAL_MODULE_1__, __WEBPACK_EXTERNAL_MODULE_37__) {
+})(this, function(__WEBPACK_EXTERNAL_MODULE_0__, __WEBPACK_EXTERNAL_MODULE_37__) {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -75,6 +75,12 @@ return /******/ (function(modules) { // webpackBootstrap
 /************************************************************************/
 /******/ ([
 /* 0 */
+/***/ (function(module, exports) {
+
+module.exports = __WEBPACK_EXTERNAL_MODULE_0__;
+
+/***/ }),
+/* 1 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -84,12 +90,6 @@ var implementation = __webpack_require__(20);
 
 module.exports = Function.prototype.bind || implementation;
 
-
-/***/ }),
-/* 1 */
-/***/ (function(module, exports) {
-
-module.exports = __WEBPACK_EXTERNAL_MODULE_1__;
 
 /***/ }),
 /* 2 */
@@ -109,7 +109,7 @@ module.exports = function requirePromise() {
 /* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var bind = __webpack_require__(0);
+var bind = __webpack_require__(1);
 
 module.exports = bind.call(Function.call, Object.prototype.hasOwnProperty);
 
@@ -235,7 +235,7 @@ var requirePromise = __webpack_require__(2);
 requirePromise();
 
 var ES = __webpack_require__(24);
-var bind = __webpack_require__(0);
+var bind = __webpack_require__(1);
 
 var promiseResolve = function PromiseResolve(C, value) {
 	return new C(function (resolve) {
@@ -562,7 +562,7 @@ exports.DefaultThingPos = DefaultThingPos;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const axios_1 = __webpack_require__(1);
+const axios_1 = __webpack_require__(0);
 // INFO: It is a wrapper for "axios" to abort Http calls
 class HttpRequestCanceler {
     constructor() {
@@ -866,6 +866,28 @@ function __export(m) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const promise_prototype_finally_1 = __webpack_require__(19);
 promise_prototype_finally_1.shim(); //https://stackoverflow.com/questions/35876549/typescript-type-definition-for-promise-prototype-finally
+const axios_1 = __webpack_require__(0);
+class RequireNewTokenMamager {
+    loginConfirmed() {
+    }
+    loginCancelled() {
+    }
+    requireLogin() {
+        return new Promise((resolve, reject) => { });
+    }
+    constructor() {
+        // Add a response interceptor
+        axios_1.default.interceptors.response.use(function (response) {
+            // Do something with response data
+            return response;
+        }, (err) => {
+            if (err.status === 401) {
+            }
+            return Promise.reject(err);
+        });
+    }
+}
+var dummy = new RequireNewTokenMamager();
 __export(__webpack_require__(14));
 __export(__webpack_require__(35));
 __export(__webpack_require__(36));
@@ -883,7 +905,7 @@ __export(__webpack_require__(44));
 "use strict";
 
 
-var bind = __webpack_require__(0);
+var bind = __webpack_require__(1);
 var define = __webpack_require__(5);
 
 var implementation = __webpack_require__(6);
@@ -1214,7 +1236,7 @@ var sign = __webpack_require__(11);
 var mod = __webpack_require__(12);
 var isPrimitive = __webpack_require__(30);
 var parseInteger = parseInt;
-var bind = __webpack_require__(0);
+var bind = __webpack_require__(1);
 var arraySlice = bind.call(Function.call, Array.prototype.slice);
 var strSlice = bind.call(Function.call, String.prototype.slice);
 var isBinary = bind.call(Function.call, RegExp.prototype.test, /^0b[01]+$/i);
@@ -2377,7 +2399,7 @@ exports.ThingDTO = ThingDTO;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const axios_1 = __webpack_require__(1);
+const axios_1 = __webpack_require__(0);
 const socketIo = __webpack_require__(37);
 var ConnectionStates;
 (function (ConnectionStates) {
@@ -2476,7 +2498,7 @@ module.exports = __WEBPACK_EXTERNAL_MODULE_37__;
 
 Object.defineProperty(exports, "__esModule", { value: true });
 const qs = __webpack_require__(39);
-const axios_1 = __webpack_require__(1);
+const axios_1 = __webpack_require__(0);
 class AccountDataContext {
     constructor(endPointAddress, securityHeaderHook) {
         this.securityHeaderHook = null;
@@ -2484,10 +2506,25 @@ class AccountDataContext {
         this.accountUrl = endPointAddress.api + "/account";
         this.securityHeaderHook = securityHeaderHook;
     }
-    login(loginData) {
+    login(username, password) {
+        let loginData = {
+            username,
+            password
+        };
         return axios_1.default.post(this.accountUrl + "/login", qs.stringify(loginData), {
             headers: {
                 "Content-Type": "application/x-www-form-urlencoded"
+            }
+        })
+            .then(function (response) {
+            return response.data;
+        });
+    }
+    loginBasic(username, password) {
+        return axios_1.default.post(this.accountUrl + "/login", "grant_type=client_credentials", {
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+                "Authorization": "Basic " + btoa(username + ":" + password)
             }
         })
             .then(function (response) {
@@ -2957,8 +2994,6 @@ class AccountManager {
         localStorage.removeItem(this._appName + "_Remember");
         localStorage.removeItem(this._appName + "_AccessToken");
         sessionStorage.removeItem(this._appName + "_AccessToken");
-        localStorage.removeItem(this._appName + "_AccessTokenDate");
-        sessionStorage.removeItem(this._appName + "_AccessTokenDate");
         localStorage.removeItem(this._appName + "_UserId");
         sessionStorage.removeItem(this._appName + "_UserId");
         localStorage.removeItem(this._appName + "_Username");
@@ -3006,9 +3041,9 @@ class AccountManager {
         this.resetLoginData();
         this._apiKey = value;
     }
-    login(loginData, remember) {
+    login(username, password, remember) {
         return __awaiter(this, void 0, void 0, function* () {
-            let response = yield this.accountDataContext.login(loginData);
+            let response = yield this.accountDataContext.login(username, password);
             this.setLoginData(response, remember);
             return response;
         });
@@ -3087,7 +3122,7 @@ exports.Thing = Thing;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const axios_1 = __webpack_require__(1);
+const axios_1 = __webpack_require__(0);
 const helpers_1 = __webpack_require__(15);
 class ThingsDataContext {
     constructor(endPointAddress, securityHeaderHook) {

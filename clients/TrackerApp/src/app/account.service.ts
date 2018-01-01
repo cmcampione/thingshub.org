@@ -24,7 +24,7 @@ export class AccountService {
 
   public async login(username, password, remember) : Promise<any> {
     
-    return await accountManager.login(username, password,, remember);
+    return await accountManager.login(username, password, remember);
     
   }
 
