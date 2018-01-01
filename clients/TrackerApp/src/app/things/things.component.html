@@ -1,3 +1,8 @@
 <p>
   things works!
 </p>
+<ul>
+  <li *ngFor="let thing of things">
+    <span>{{thing.id}}</span> {{thing.name}}
+  </li>
+</ul>
