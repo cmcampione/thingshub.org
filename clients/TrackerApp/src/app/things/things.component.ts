@@ -11,7 +11,7 @@ import { securityHeaderHook } from "../account.service";
 export class ThingsComponent implements OnInit {
 
   private thingsDataContext: thingshub.ThingsDataContext;
-  private things : thingshub.Thing[];
+  private things : thingshub.Thing[] = [];
 
   constructor() { 
     this.thingsDataContext = new thingshub.ThingsDataContext(endPointAddress, securityHeaderHook);
@@ -29,6 +29,12 @@ export class ThingsComponent implements OnInit {
     }
 
     let things = await this.thingsDataContext.getThings(thingsGetParams);
+
+    console.log(things);
+
+    for (let i = 0; i < things.things.length; i++)
+      this.things.push(things.things[i]);
+
 
     console.log(things);
   }
