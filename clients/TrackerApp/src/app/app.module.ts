@@ -10,12 +10,14 @@ import { AgmCoreModule } from '@agm/core';
 import { LoginComponent } from './login/login.component';
 import { MapComponent } from './map/map.component';
 import { AccountService } from './account.service';
+import { ThingsComponent } from './things/things.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     LoginComponent,
-    MapComponent
+    MapComponent,
+    ThingsComponent
   ],
   imports: [
     BrowserModule,
