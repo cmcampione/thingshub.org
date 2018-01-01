@@ -204,7 +204,7 @@ router.post("/confirmAccountByOnlyEmail", async (req, res, next) => {
 });
 
 router.post("/login", async function (req, res, next) {
-	passport.authenticate("local", async function(err, user, info) {
+	passport.authenticate(["local", "basic"], { session: false }, async function(err, user, info) {
 		try {
 			if (err) { 
 				return next(err); 
@@ -215,12 +215,10 @@ router.post("/login", async function (req, res, next) {
 
 			res.json({ 
 				access_token: utils.createToken({ 
-					sub : user.id, 
-					exp : 3600, 
-					mak: user.masterApiKey, 
+					sub : user._id.toString(), 
+					exp : 60, 
 					name: user.name }),
-				token_type: "bearer",
-    			expires_in: 3600
+				token_type: "bearer"
 			});
 
 		}  catch (e)  {

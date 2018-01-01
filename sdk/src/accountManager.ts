@@ -1,5 +1,6 @@
 import {HttpFailResult} from "./helpers";
 import {AccountDataContext} from "./accountDataContext";
+import axios from "axios";
 
 export class AccountManager {
 
@@ -28,8 +29,6 @@ export class AccountManager {
 
         localStorage.removeItem(this._appName + "_AccessToken");
         sessionStorage.removeItem(this._appName + "_AccessToken");        
-        localStorage.removeItem(this._appName + "_AccessTokenDate");
-        sessionStorage.removeItem(this._appName + "_AccessTokenDate");
 
         localStorage.removeItem(this._appName + "_UserId");
         sessionStorage.removeItem(this._appName + "_UserId");
@@ -81,6 +80,7 @@ export class AccountManager {
     }
 
     constructor(appName: string, accountDataContext: AccountDataContext) {
+
         this._appName = appName;
         this.accountDataContext = accountDataContext;
         this.readLoginData();

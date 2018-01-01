@@ -29,6 +29,10 @@ export class MapComponent implements OnInit {
   }
 
   constructor() { 
+    
+  }
+
+  ngOnInit() {
     this.socket.subscribe();
     // Uses of "fat arrow" sintax for "this" implicit binding
     this.socket.setHook('onUpdateThingValue', (value) => {
@@ -36,9 +40,6 @@ export class MapComponent implements OnInit {
       this.lng = value.lng;
       console.log(value);
     });
-  }
-
-  ngOnInit() {
   }
 
 }

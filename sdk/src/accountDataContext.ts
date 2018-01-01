@@ -29,6 +29,17 @@ export class AccountDataContext {
             return response.data;
         });
     }
+    public loginBasic(username: string, password: string) : Promise<any | HttpFailResult> {
+        return axios.post(this.accountUrl + "/login","grant_type=client_credentials", {
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+                "Authorization": "Basic " + btoa(username + ":" + password)
+            }
+        })
+        .then(function(response) : any {
+            return response.data;
+        });
+    }
     public logout() : Promise<any | HttpFailResult> {
         return axios.post(this.accountUrl + "/logout", null, {
             headers: this.securityHeaderHook()

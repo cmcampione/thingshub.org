@@ -26,7 +26,7 @@ export class LoginComponent implements OnInit {
       let loginData = await this.accountService.login(this.username, this.password, false);
       this.isLoggedIn.status = this.accountService.isLoggedIn;
     }
-    catch(e){
+    catch(e) {
       console.log(e);
     }
   }

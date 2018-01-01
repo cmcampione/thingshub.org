@@ -14,6 +14,7 @@ const passport 			= require("passport");
 const LocalStrategy 	= require("passport-local").Strategy;
 const LocalApiStrategy 	= require("passport-localapikey-update").Strategy;
 const BearerStrategy	= require("passport-http-bearer").Strategy;
+const BasicStrategy		= require("passport-http").BasicStrategy;
 const mongoose  		= require("mongoose");
 const cors 				= require("cors");
 
@@ -112,12 +113,13 @@ app.use(passport.initialize());
 
 passport.use(new BearerStrategy(async function(token, done) {
 	try {
-		const user = await usersManager.findUserByMasterApiKey(token);
-		if (!user)
-			return done(null, false, { message: "Unknown token" }); 
+		let user = await usersManager.findUserByMasterApiKey(token);
+		if (user)
+			return done(null, user); 
 
 		const tk = utils.verifyToken(token);
-		user = await usersManager.findUserByMasterApiKey(tk.mak);
+
+		user = await usersManager.findUserById(tk.sub);
 		if (!user)
 			return done(null, false, { message: "Unknown token" }); 
 
@@ -127,6 +129,17 @@ passport.use(new BearerStrategy(async function(token, done) {
 		return done(null, false, new utils.ErrorCustom(httpStatusCodes.UNAUTHORIZED, httpStatusCodes.getStatusText(httpStatusCodes.UNAUTHORIZED), 111)); 
 	}}));
 
+passport.use(new BasicStrategy( async function(username, password, done) {
+	const user = await usersManager.findUserByUsername(username);
+	if (!user) {
+		return done(null, false, { message: "Incorrect username" });
+	}
+	if (!user.comparePassword(password)) {
+		return done(null, false, { message: "Incorrect password" });
+	}
+	return done(null, user);
+}));
+	
 // Session support
 
 /* 
