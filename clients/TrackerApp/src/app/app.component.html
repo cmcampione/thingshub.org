@@ -5,11 +5,11 @@
   </h1>
 </div>
 
-<div *ngIf="!isLoggedIn.status">
-  <app-login [isLoggedIn]="isLoggedIn"></app-login> 
+<div *ngIf="!isLoggedIn">
+  <app-login (loginStatusChange)="loginStatusChange"></app-login> 
 </div>
 
-<!-- <div *ngIf="isLoggedIn.status">
+<!-- <div *ngIf="isLoggedIn($event)">
   <app-map></app-map>
 </div> -->
 
