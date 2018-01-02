@@ -1,6 +1,6 @@
+import axios from 'axios';
 import { Component } from '@angular/core';
 import { AccountService } from './account.service';
-import axios from "axios";
 
 @Component({
   selector: 'app-root',
@@ -8,22 +8,27 @@ import axios from "axios";
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
+
   title = 'Hardworking bees are working here';
 
-  private isLoggedIn = {
-    status: this.accountService.isLoggedIn
-  };
+  private isLoggedIn: boolean = this.accountService.isLoggedIn;
 
   constructor(private accountService: AccountService) {
-    // Add a response interceptor
     axios.interceptors.response.use(response => {
-      // Do something with response data
       return response;
     }, err => {
       if (err.response.status === 401) {
-        this.isLoggedIn.status = false;
+        if (this.isLoggedIn === true) {
+          // this.accountService.reset();
+          // this.isLoggedIn = this.accountService.isLoggedIn;
+          this.isLoggedIn = false;
+        }
       }
       return Promise.reject(err);
     });
+  }
+
+  public loginStatusChange(event) {
+    this.isLoggedIn = this.accountService.isLoggedIn;
   }
 }

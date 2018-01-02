@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter  } from '@angular/core';
 import { AccountService } from '../account.service';
 
 @Component({
@@ -10,24 +10,22 @@ export class LoginComponent implements OnInit {
 
   private username: string;
   private password: string;
-  
-  @Input() isLoggedIn;
+
+  @Output() loginStatusChange:  EventEmitter<void> = new EventEmitter();
 
   constructor(private accountService: AccountService) {
-    
+
   }
 
   ngOnInit() {
   }
 
   private async login() {
-
     try {
-      let loginData = await this.accountService.login(this.username, this.password, false);
-      this.isLoggedIn.status = this.accountService.isLoggedIn;
-    }
-    catch(e) {
-      console.log(e);
+      const loginData = await this.accountService.login(this.username, this.password, false);
+    } catch (e) {
+    } finally {
+      this.loginStatusChange.emit();
     }
   }
 }
