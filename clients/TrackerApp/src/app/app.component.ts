@@ -28,7 +28,7 @@ export class AppComponent {
     });
   }
 
-  public loginStatusChange(event) {
+  public onLoginStatusChange(event) {
     this.isLoggedIn = this.accountService.isLoggedIn;
   }
 }
