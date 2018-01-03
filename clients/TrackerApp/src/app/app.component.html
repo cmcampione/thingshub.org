@@ -6,7 +6,7 @@
 </div>
 
 <div *ngIf="!isLoggedIn">
-  <app-login (loginStatusChange)="loginStatusChange"></app-login> 
+  <app-login (onLoginStatusChange)="onLoginStatusChange"></app-login> 
 </div>
 
 <!-- <div *ngIf="isLoggedIn($event)">
