@@ -17,7 +17,7 @@ export class AppComponent {
     axios.interceptors.response.use(response => {
       return response;
     }, err => {
-      if (err.response.status === 401) {
+      if (err.response && err.response.status === 401) {
         if (this.isLoggedIn === true) {
           // this.accountService.reset();
           // this.isLoggedIn = this.accountService.isLoggedIn;
@@ -28,7 +28,7 @@ export class AppComponent {
     });
   }
 
-  public onLoginStatusChange(event) {
+  public loginStatusChange(event) {
     this.isLoggedIn = this.accountService.isLoggedIn;
   }
 }
