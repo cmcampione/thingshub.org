@@ -11,7 +11,7 @@ export class LoginComponent implements OnInit {
   private username: string;
   private password: string;
 
-  @Output() onLoginStatusChange:  EventEmitter<void> = new EventEmitter();
+  @Output() loginStatusChange:  EventEmitter<void> = new EventEmitter<any>();
 
   constructor(private accountService: AccountService) {
 
@@ -25,7 +25,7 @@ export class LoginComponent implements OnInit {
       const loginData = await this.accountService.login(this.username, this.password, false);
     } catch (e) {
     } finally {
-      this.onLoginStatusChange.emit();
+      this.loginStatusChange.emit();
     }
   }
 }
