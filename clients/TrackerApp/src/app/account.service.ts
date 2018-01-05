@@ -90,8 +90,12 @@ export class AccountService {
   }
 
   public async login(username, password, remember): Promise<any> {
+    try {
     const loginData = await accountManager.login(username, password, remember);
     this._isLoggedIn.next(accountManager.isLoggedIn);
     return loginData;
+    } catch (e) {
+      console.log(e);
+    }
   }
 }
