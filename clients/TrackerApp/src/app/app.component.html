@@ -6,13 +6,13 @@
 </div>
 
 <div *ngIf="!isLoggedIn">
-  <app-login (loginStatusChange)="loginStatusChange($event)"></app-login> 
+  <app-login></app-login>
 </div>
 
 <!-- <div *ngIf="isLoggedIn($event)">
   <app-map></app-map>
 </div> -->
 
-<div>
+<div *ngIf="isLoggedIn">
   <app-things></app-things>
 </div>
