@@ -9,26 +9,14 @@ import { AccountService } from './account.service';
 })
 export class AppComponent {
 
-  title = 'Hardworking bees are working here';
+  private title = 'Hardworking bees are working here';
 
   private isLoggedIn: boolean = this.accountService.isLoggedIn;
 
   constructor(private accountService: AccountService) {
-    axios.interceptors.response.use(response => {
-      return response;
-    }, err => {
-      if (err.response && err.response.status === 401) {
-        if (this.isLoggedIn === true) {
-          // this.accountService.reset();
-          // this.isLoggedIn = this.accountService.isLoggedIn;
-          this.isLoggedIn = false;
-        }
-      }
-      return Promise.reject(err);
-    });
-  }
 
-  public loginStatusChange() {
-    this.isLoggedIn = this.accountService.isLoggedIn;
+    accountService.isLoggedIn$.subscribe((status: boolean) => {
+      this.isLoggedIn = status;
+    });
   }
 }
