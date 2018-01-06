@@ -18,6 +18,11 @@ export class LoginComponent implements OnInit {
   }
 
   private async login() {
+    try {
       return await this.accountService.login(this.username, this.password, false);
+    }
+    catch(e) {
+      console.log(e);
+    }
   }
 }
