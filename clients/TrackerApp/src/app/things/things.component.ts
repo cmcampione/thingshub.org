@@ -30,8 +30,6 @@ export class ThingsComponent implements OnInit {
 
     const things = await this.thingsDataContext.getThings(thingsGetParams);
 
-    console.log(things);
-
     for (let i = 0; i < things.things.length; i++) {
       this.things.push(things.things[i]);
     }
