@@ -29,13 +29,13 @@ export class AccountService {
     return new Promise((resolve, reject) => {
       const subscription = this.isLoggedIn$.subscribe((status: boolean) => {
         if (status) {
+          subscription.unsubscribe();
           resolve(status);
         }
-        subscription.unsubscribe();
         return status;
       });
     });
-}
+  }
 
   getNewAccessToken() {
 
@@ -58,7 +58,7 @@ export class AccountService {
     },
     err => {
         const error = err.response;
-        if (error && error.status === 401 && error.config && !error.config.__isRetryRequest) {
+        if (error && error.status === 401 && error.data.internalCode != 107 && error.config && !error.config.__isRetryRequest) {
 
           this._isLoggedIn.next(false);
 
