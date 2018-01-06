@@ -3,7 +3,6 @@ import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs/Subject';
 import * as thingshub from 'thingshub-js-sdk';
 import { endPointAddress } from './utils';
-import { stagger } from '@angular/core/src/animation/dsl';
 
 let accountManager: thingshub.AccountManager = null;
 
@@ -28,12 +27,11 @@ export class AccountService {
 
   refreshToken(): Promise<any> {
     return new Promise((resolve, reject) => {
-      this.isLoggedIn$.subscribe((status: boolean) => {
+      const subscription = this.isLoggedIn$.subscribe((status: boolean) => {
         if (status) {
           resolve(status);
-        } else {
-          reject(status);
         }
+        subscription.unsubscribe();
         return status;
       });
     });
@@ -90,12 +88,8 @@ export class AccountService {
   }
 
   public async login(username, password, remember): Promise<any> {
-    try {
     const loginData = await accountManager.login(username, password, remember);
     this._isLoggedIn.next(accountManager.isLoggedIn);
     return loginData;
-    } catch (e) {
-      console.log(e);
-    }
   }
 }

@@ -15,6 +15,7 @@ export class AccountDataContext {
         this.securityHeaderHook = securityHeaderHook;
     }
 
+    // TODO: https://docs.google.com/spreadsheets/d/1Ks-K10kmLcHOom7igTkQ8wtRSJ-73i1hftUAE4E9q80/edit#gid=1455384855&range=C4
     public login(username: string, password: string) : Promise<any | HttpFailResult> {
         let loginData = {
             username,
@@ -27,6 +28,9 @@ export class AccountDataContext {
         })
         .then(function(response) : any {
             return response.data;
+        })
+        .catch(function(e) {
+            return e;
         });
     }
     public loginBasic(username: string, password: string) : Promise<any | HttpFailResult> {
