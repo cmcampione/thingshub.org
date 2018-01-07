@@ -1,8 +1,6 @@
-import axios from 'axios';
 import { Component } from '@angular/core';
 import { AccountUserData } from 'thingshub-js-sdk';
 import { AccountService } from './account.service';
-import { stagger } from '@angular/core/src/animation/dsl';
 
 @Component({
   selector: 'app-root',

@@ -16,7 +16,7 @@ export class AccountManager {
     //INFO: apiKey is never persistent
     private _apiKey : string = null;
 
-    private resetLoginData() : void {
+    public resetLoginData() : void {
         
         this._apiKey = null;
 

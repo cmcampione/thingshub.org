@@ -1,5 +1,5 @@
 import * as qs from "qs"
-import axios, { AxiosRequestConfig, AxiosPromise } from "axios";
+import axios from "axios";
 import * as jwtDecode from "jwt-decode";
 import {HttpFailResult, Helpers} from "./helpers";
 import {EndPointAddress} from "./endPointAddress";
@@ -40,10 +40,7 @@ export class AccountDataContext {
                     // set new access token after refreshing it
                     error.config.headers = this.accountActionControl.getSecurityHeader();
       
-                    return axios(error.config).catch(e => {
-                      console.log(e);
-                      return e;
-                    });
+                    return axios(error.config);
                 }).catch(e => {
       
                     // refreshing has failed => redirect to login
