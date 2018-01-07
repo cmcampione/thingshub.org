@@ -12,12 +12,13 @@ export class ThingsComponent implements OnInit {
 
   private thingsDataContext: thingshub.ThingsDataContext;
   private things: thingshub.Thing[] = [];
+  private things1: thingshub.Thing[] = [];
 
   constructor() {
     this.thingsDataContext = new thingshub.ThingsDataContext(endPointAddress, securityHeaderHook);
   }
 
-  async ngOnInit() {
+  ngOnInit() {
 
     const thingsGetParams =  {
       parentThingId : null,
@@ -28,13 +29,50 @@ export class ThingsComponent implements OnInit {
       top : 100
     };
 
-    const things = await this.thingsDataContext.getThings(thingsGetParams);
-
-    for (let i = 0; i < things.things.length; i++) {
+    this.thingsDataContext.getThings(thingsGetParams)
+    .then(things => {
+      for (let i = 0; i < things.things.length; i++) {
       this.things.push(things.things[i]);
-    }
+    }});
+    console.log("things = " + this.things);
 
-    console.log(things);
+    this.thingsDataContext.getThings(thingsGetParams)
+    .then(things => {
+      for (let i = 0; i < things.things.length; i++) {
+        this.things1.push(things.things[i]);
+      }
+    });
+    console.log("things1 = " + this.things1);
   }
 
+  private async recall() {
+    
+    const thingsGetParams =  {
+      parentThingId : null,
+      thingFilter : '',
+      valueFilter : '',
+      orderBy : '',
+      skip : 0,
+      top : 100
+    };
+
+    this.thingsDataContext.getThings(thingsGetParams)
+    .then(things => {
+      for (let i = 0; i < things.things.length; i++) {
+      this.things.push(things.things[i]);
+    }})
+    .catch(e => {
+      console.log(e);
+    });
+
+    this.thingsDataContext.getThings(thingsGetParams)
+    .then(things => {
+      for (let i = 0; i < things.things.length; i++) {
+        this.things1.push(things.things[i]);
+      }
+    })
+    .catch(e => {
+      console.log(e);
+    });
+  }
 }
