@@ -2500,8 +2500,10 @@ class AccountDataContext {
                     // refreshing has failed => redirect to login
                     // clear cookie (with logout action) and return to identityserver to new login
                     // (window as any).location = "/account/logout";
-                    this.accountActionControl.resetApp();
-                    return Promise.reject(e);
+                    if (!e) {
+                        this.accountActionControl.resetApp();
+                    }
+                    return Promise.reject(true);
                 });
             }
             return Promise.reject(error);

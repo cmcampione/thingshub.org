@@ -232,7 +232,7 @@ export declare class AccountManager {
 	private _userId;
 	private _userName;
 	private _apiKey;
-	private resetLoginData();
+	resetLoginData(): void;
 	private setLoginData(accountUserData, remember);
 	private readLoginData();
 	constructor(appName: string, accountDataContext: AccountDataContext);
