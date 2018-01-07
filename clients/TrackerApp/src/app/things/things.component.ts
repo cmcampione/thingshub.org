@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import * as thingshub from 'thingshub-js-sdk';
 import { endPointAddress } from '../utils';
-import { securityHeaderHook } from '../account.service';
+import { AccountService } from '../account.service';
 
 @Component({
   selector: 'app-things',
@@ -14,8 +14,8 @@ export class ThingsComponent implements OnInit {
   private things: thingshub.Thing[] = [];
   private things1: thingshub.Thing[] = [];
 
-  constructor() {
-    this.thingsDataContext = new thingshub.ThingsDataContext(endPointAddress, securityHeaderHook);
+  constructor(private accountService: AccountService) {
+    this.thingsDataContext = new thingshub.ThingsDataContext(endPointAddress, accountService.getSecurityHeader);
   }
 
   ngOnInit() {
