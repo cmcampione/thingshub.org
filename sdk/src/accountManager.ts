@@ -1,5 +1,5 @@
 import {HttpFailResult} from "./helpers";
-import {AccountDataContext} from "./accountDataContext";
+import {AccountDataContext, AccountUserData} from "./accountDataContext";
 import axios from "axios";
 
 export class AccountManager {
@@ -35,14 +35,14 @@ export class AccountManager {
         localStorage.removeItem(this._appName + "_Username");
         sessionStorage.removeItem(this._appName + "_Username");
     }
-    private setLoginData(loginData: any, remember: boolean) : void {
+    private setLoginData(accountUserData: AccountUserData, remember: boolean) : void {
         
         this._apiKey = null;
 
-        this._accessToken = loginData.access_token;
+        this._accessToken = accountUserData.accessToken;
 
-        this._userId = loginData.userId;
-        this._userName = loginData.userName;
+        this._userId = accountUserData.id;
+        this._userName = accountUserData.name;
 
         sessionStorage.setItem(this._appName + "_AccessToken", this._accessToken);
 
@@ -59,7 +59,7 @@ export class AccountManager {
         localStorage.setItem(this._appName + "_UserId", this._userId);
         localStorage.setItem(this._appName + "_Username", this._userName);
     }
-    private readLoginData() {
+    private readLoginData(): void {
 
         // INFO: By design ApiKey is never persistent
         this._apiKey = null;
@@ -107,9 +107,9 @@ export class AccountManager {
 
     public async login(username: string, password: string, remember: boolean) : Promise<any> {
 
-        let response = await this.accountDataContext.login(username, password);
-        this.setLoginData(response, remember);
-        return response;
+        const accountUserData: AccountUserData  = await this.accountDataContext.login(username, password);
+        this.setLoginData(accountUserData, remember);
+        return accountUserData;
     }  
     public async logout() : Promise<any> {
         try

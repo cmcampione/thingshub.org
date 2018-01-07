@@ -204,11 +204,24 @@ export interface EndPointAddress {
 	server: string;
 	api: string;
 }
+export interface AccountUserData {
+	accessToken: string;
+	id: string;
+	name: string;
+	exp: Date;
+}
+export interface AccountActionControl {
+	getSecurityHeader: () => object;
+	refreshToken: () => Promise<any>;
+	resetApp: () => void;
+}
 export declare class AccountDataContext {
-	private securityHeaderHook;
+	private accountActionControl;
 	private accountUrl;
-	constructor(endPointAddress: EndPointAddress, securityHeaderHook: () => object);
-	login(username: string, password: string): Promise<any | HttpFailResult>;
+	private authTokenRequest;
+	constructor(endPointAddress: EndPointAddress, accountActionControl: AccountActionControl);
+	private getNewAccessToken();
+	login(username: string, password: string): Promise<AccountUserData | HttpFailResult>;
 	loginBasic(username: string, password: string): Promise<any | HttpFailResult>;
 	logout(): Promise<any | HttpFailResult>;
 }
@@ -220,7 +233,7 @@ export declare class AccountManager {
 	private _userName;
 	private _apiKey;
 	private resetLoginData();
-	private setLoginData(loginData, remember);
+	private setLoginData(accountUserData, remember);
 	private readLoginData();
 	constructor(appName: string, accountDataContext: AccountDataContext);
 	apiKey: string;
