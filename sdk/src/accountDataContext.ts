@@ -71,7 +71,7 @@ export class AccountDataContext {
             });
         }
         return this.authTokenRequest;
-      }
+    }
 
     // TODO: https://docs.google.com/spreadsheets/d/1Ks-K10kmLcHOom7igTkQ8wtRSJ-73i1hftUAE4E9q80/edit#gid=1455384855&range=C4
     public login(username: string, password: string) : Promise<AccountUserData | HttpFailResult> {
@@ -101,6 +101,7 @@ export class AccountDataContext {
             return e;
         });
     }
+    // TODO: To check
     public loginBasic(username: string, password: string) : Promise<any | HttpFailResult> {
         return axios.post(this.accountUrl + "/login","grant_type=client_credentials", {
             headers: {

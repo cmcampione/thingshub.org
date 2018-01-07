@@ -250,7 +250,7 @@ async function getThings(user, parentThingId, thingFilter, valueFilter, orderBy,
 
 	let totalItems =  await countThings(mainThingsQuery);
 
-	if (skip >= totalItems)
+	if (skip > totalItems)
 		throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Skip param is not valid",53);
 
 	if (skip + top > totalItems)

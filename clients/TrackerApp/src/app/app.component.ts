@@ -1,6 +1,8 @@
 import axios from 'axios';
 import { Component } from '@angular/core';
+import { AccountUserData } from 'thingshub-js-sdk';
 import { AccountService } from './account.service';
+import { stagger } from '@angular/core/src/animation/dsl';
 
 @Component({
   selector: 'app-root',
@@ -15,8 +17,8 @@ export class AppComponent {
 
   constructor(private accountService: AccountService) {
 
-    accountService.isLoggedIn$.subscribe((status: boolean) => {
-      this.isLoggedIn = status;
+    accountService.isLoggedIn$.subscribe((accountUserData: AccountUserData) => {
+      this.isLoggedIn = accountUserData != null;
     });
   }
 }
