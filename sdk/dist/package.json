@@ -1,6 +1,6 @@
 {
   "name": "thingshub-js-sdk",
-  "version": "1.0.18",
+  "version": "1.0.19",
   "description": "",
   "main": "thingshub.js",
   "types": "thingshub.d.ts",

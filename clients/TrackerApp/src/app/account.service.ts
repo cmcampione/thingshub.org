@@ -11,6 +11,7 @@ export class AccountService {
   }
   private refreshToken = (): Promise<any> => {
 
+    // Show login Component
     this._isLoggedIn.next(null);
 
     return new Promise((resolve, reject) => {
@@ -18,11 +19,12 @@ export class AccountService {
         subscription.unsubscribe();
         if (accountUserData != null) {
           resolve(accountUserData);
+          return accountUserData;
         }
-        else {
-          reject(accountUserData);
-        }
-        return accountUserData;
+        // With accountUserData == null assert UserId changed without properly logout
+        const err = new Error("User is changed without appropriate logout action");
+        reject(err);
+        return err;
       });
     });
   }
@@ -30,7 +32,7 @@ export class AccountService {
   private actionControl : AccountActionControl = {
     getSecurityHeader : this.getSecurityHeader,
     refreshToken: this.refreshToken,
-    resetApp: () => {
+    resetApp: () => {      
       console.log("resetApp");
     }
   };
@@ -58,10 +60,14 @@ export class AccountService {
     if (!this.userId) {
       this.userId = loginData.id;
     }
-    if (this.userId != loginData.id)
+    // The user is changed without properly logout
+    if (this.userId != loginData.id) {
+      this.userId = null;
+      this.accountManager.resetLoginData();
       this._isLoggedIn.next(null);
-    else
-      this._isLoggedIn.next(loginData);
+      throw new Error("User is changed without appropriate logout action");
+    }
+    this._isLoggedIn.next(loginData);
     return loginData;
   }
 }
