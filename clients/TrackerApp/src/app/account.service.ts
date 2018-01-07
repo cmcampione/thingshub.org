@@ -18,14 +18,13 @@ export class AccountService {
 
   private authTokenRequest: Promise<any>;
 
-  public _isLoggedIn: Subject<boolean> = new Subject<boolean>();
+  private _isLoggedIn: Subject<boolean> = new Subject<boolean>();
   public isLoggedIn$ = this._isLoggedIn.asObservable();
 
-  resetGetAccessTokenRequest() {
-    this.authTokenRequest = null;
-  }
+  private refreshToken(): Promise<any> {
 
-  refreshToken(): Promise<any> {
+    this._isLoggedIn.next(false);
+
     return new Promise((resolve, reject) => {
       const subscription = this.isLoggedIn$.subscribe((status: boolean) => {
         if (status) {
@@ -37,17 +36,16 @@ export class AccountService {
     });
   }
 
-  getNewAccessToken() {
+  private getNewAccessToken() {
 
     if (!this.authTokenRequest) {
         this.authTokenRequest = this.refreshToken();
         this.authTokenRequest.then(response => {
-            this.resetGetAccessTokenRequest();
+          this.authTokenRequest = null;
         }).catch(error => {
-            this.resetGetAccessTokenRequest();
+          this.authTokenRequest = null;
         });
     }
-
     return this.authTokenRequest;
   }
 
@@ -60,15 +58,16 @@ export class AccountService {
         const error = err.response;
         if (error && error.status === 401 && error.data.internalCode != 107 && error.config && !error.config.__isRetryRequest) {
 
-          this._isLoggedIn.next(false);
-
           return this.getNewAccessToken().then(response => {
               error.config.__isRetryRequest = true;
 
               // set new access token after refreshing it
               error.config.headers = securityHeaderHook();
 
-              return axios(error.config);
+              return axios(error.config).catch(e => {
+                console.log(e);
+                return e;
+              });
           }).catch(e => {
 
               // refreshing has failed => redirect to login
