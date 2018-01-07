@@ -871,9 +871,9 @@ __export(__webpack_require__(35));
 __export(__webpack_require__(36));
 __export(__webpack_require__(15));
 __export(__webpack_require__(38));
-__export(__webpack_require__(42));
-__export(__webpack_require__(43));
-__export(__webpack_require__(44));
+__export(__webpack_require__(45));
+__export(__webpack_require__(46));
+__export(__webpack_require__(47));
 
 
 /***/ }),
@@ -2477,25 +2477,68 @@ module.exports = __WEBPACK_EXTERNAL_MODULE_37__;
 Object.defineProperty(exports, "__esModule", { value: true });
 const qs = __webpack_require__(39);
 const axios_1 = __webpack_require__(1);
+const jwtDecode = __webpack_require__(42);
 class AccountDataContext {
-    constructor(endPointAddress, securityHeaderHook) {
-        this.securityHeaderHook = null;
+    constructor(endPointAddress, accountActionControl) {
+        this.accountActionControl = accountActionControl;
         this.accountUrl = "";
         this.accountUrl = endPointAddress.api + "/account";
-        this.securityHeaderHook = securityHeaderHook;
+        axios_1.default.interceptors.response.use((response) => {
+            return response;
+        }, err => {
+            const error = err.response;
+            if (error && error.status === 401 && error.config && !error.config.__isRetryRequest) {
+                return this.getNewAccessToken().then(response => {
+                    error.config.__isRetryRequest = true;
+                    // set new access token after refreshing it
+                    error.config.headers = this.accountActionControl.getSecurityHeader();
+                    return axios_1.default(error.config).catch(e => {
+                        console.log(e);
+                        return e;
+                    });
+                }).catch(e => {
+                    // refreshing has failed => redirect to login
+                    // clear cookie (with logout action) and return to identityserver to new login
+                    // (window as any).location = "/account/logout";
+                    this.accountActionControl.resetApp();
+                    return Promise.reject(e);
+                });
+            }
+            return Promise.reject(error);
+        });
     }
+    getNewAccessToken() {
+        if (!this.authTokenRequest) {
+            this.authTokenRequest = this.accountActionControl.refreshToken();
+            this.authTokenRequest.then(response => {
+                this.authTokenRequest = null;
+            }).catch(error => {
+                this.authTokenRequest = null;
+            });
+        }
+        return this.authTokenRequest;
+    }
+    // TODO: https://docs.google.com/spreadsheets/d/1Ks-K10kmLcHOom7igTkQ8wtRSJ-73i1hftUAE4E9q80/edit#gid=1455384855&range=C4
     login(username, password) {
         let loginData = {
             username,
             password
         };
-        return axios_1.default.post(this.accountUrl + "/login", qs.stringify(loginData), {
+        const config = {
             headers: {
                 "Content-Type": "application/x-www-form-urlencoded"
-            }
-        })
+            },
+            __isRetryRequest: true
+        };
+        return axios_1.default.post(this.accountUrl + "/login", qs.stringify(loginData), config)
             .then(function (response) {
-            return response.data;
+            const accountUserDataRaw = jwtDecode(response.data.access_token);
+            return {
+                accessToken: response.data.access_token,
+                id: accountUserDataRaw.sub,
+                name: accountUserDataRaw.name,
+                exp: accountUserDataRaw.exp
+            };
         })
             .catch(function (e) {
             return e;
@@ -2514,7 +2557,7 @@ class AccountDataContext {
     }
     logout() {
         return axios_1.default.post(this.accountUrl + "/logout", null, {
-            headers: this.securityHeaderHook()
+            headers: this.accountActionControl.getSecurityHeader()
         })
             .then(function (response) {
             return response.data;
@@ -2946,6 +2989,122 @@ module.exports = function (str, opts) {
 
 "use strict";
 
+
+var base64_url_decode = __webpack_require__(43);
+
+function InvalidTokenError(message) {
+  this.message = message;
+}
+
+InvalidTokenError.prototype = new Error();
+InvalidTokenError.prototype.name = 'InvalidTokenError';
+
+module.exports = function (token,options) {
+  if (typeof token !== 'string') {
+    throw new InvalidTokenError('Invalid token specified');
+  }
+
+  options = options || {};
+  var pos = options.header === true ? 0 : 1;
+  try {
+    return JSON.parse(base64_url_decode(token.split('.')[pos]));
+  } catch (e) {
+    throw new InvalidTokenError('Invalid token specified: ' + e.message);
+  }
+};
+
+module.exports.InvalidTokenError = InvalidTokenError;
+
+
+/***/ }),
+/* 43 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var atob = __webpack_require__(44);
+
+function b64DecodeUnicode(str) {
+  return decodeURIComponent(atob(str).replace(/(.)/g, function (m, p) {
+    var code = p.charCodeAt(0).toString(16).toUpperCase();
+    if (code.length < 2) {
+      code = '0' + code;
+    }
+    return '%' + code;
+  }));
+}
+
+module.exports = function(str) {
+  var output = str.replace(/-/g, "+").replace(/_/g, "/");
+  switch (output.length % 4) {
+    case 0:
+      break;
+    case 2:
+      output += "==";
+      break;
+    case 3:
+      output += "=";
+      break;
+    default:
+      throw "Illegal base64url string!";
+  }
+
+  try{
+    return b64DecodeUnicode(output);
+  } catch (err) {
+    return atob(output);
+  }
+};
+
+
+/***/ }),
+/* 44 */
+/***/ (function(module, exports) {
+
+/**
+ * The code was extracted from:
+ * https://github.com/davidchambers/Base64.js
+ */
+
+var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
+
+function InvalidCharacterError(message) {
+  this.message = message;
+}
+
+InvalidCharacterError.prototype = new Error();
+InvalidCharacterError.prototype.name = 'InvalidCharacterError';
+
+function polyfill (input) {
+  var str = String(input).replace(/=+$/, '');
+  if (str.length % 4 == 1) {
+    throw new InvalidCharacterError("'atob' failed: The string to be decoded is not correctly encoded.");
+  }
+  for (
+    // initialize result and counters
+    var bc = 0, bs, buffer, idx = 0, output = '';
+    // get next character
+    buffer = str.charAt(idx++);
+    // character found in table? initialize bit storage and add its ascii value;
+    ~buffer && (bs = bc % 4 ? bs * 64 + buffer : buffer,
+      // and if not first of each 4 characters,
+      // convert the first 8 bits to one ascii character
+      bc++ % 4) ? output += String.fromCharCode(255 & bs >> (-2 * bc & 6)) : 0
+  ) {
+    // try to find character in table (0-63, not found => -1)
+    buffer = chars.indexOf(buffer);
+  }
+  return output;
+}
+
+
+module.exports = typeof window !== 'undefined' && window.atob && window.atob.bind(window) || polyfill;
+
+
+/***/ }),
+/* 45 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
@@ -2980,11 +3139,11 @@ class AccountManager {
         localStorage.removeItem(this._appName + "_Username");
         sessionStorage.removeItem(this._appName + "_Username");
     }
-    setLoginData(loginData, remember) {
+    setLoginData(accountUserData, remember) {
         this._apiKey = null;
-        this._accessToken = loginData.access_token;
-        this._userId = loginData.userId;
-        this._userName = loginData.userName;
+        this._accessToken = accountUserData.accessToken;
+        this._userId = accountUserData.id;
+        this._userName = accountUserData.name;
         sessionStorage.setItem(this._appName + "_AccessToken", this._accessToken);
         sessionStorage.setItem(this._appName + "_UserId", this._userId);
         sessionStorage.setItem(this._appName + "_Username", this._userName);
@@ -3024,9 +3183,9 @@ class AccountManager {
     }
     login(username, password, remember) {
         return __awaiter(this, void 0, void 0, function* () {
-            let response = yield this.accountDataContext.login(username, password);
-            this.setLoginData(response, remember);
-            return response;
+            const accountUserData = yield this.accountDataContext.login(username, password);
+            this.setLoginData(accountUserData, remember);
+            return accountUserData;
         });
     }
     logout() {
@@ -3044,7 +3203,7 @@ exports.AccountManager = AccountManager;
 
 
 /***/ }),
-/* 43 */
+/* 46 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3097,7 +3256,7 @@ exports.Thing = Thing;
 
 
 /***/ }),
-/* 44 */
+/* 47 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
