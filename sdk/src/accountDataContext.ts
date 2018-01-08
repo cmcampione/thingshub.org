@@ -23,6 +23,19 @@ export class AccountDataContext {
 
     private authTokenRequest: Promise<any>;
 
+    private getNewAccessToken() {
+
+        if (!this.authTokenRequest) {
+            this.authTokenRequest = this.accountActionControl.refreshToken();
+            this.authTokenRequest.then(response => {
+              this.authTokenRequest = null;
+            }).catch(error => {
+              this.authTokenRequest = null;
+            });
+        }
+        return this.authTokenRequest;
+    }
+
     constructor(endPointAddress: EndPointAddress, private accountActionControl: AccountActionControl) {
 
         this.accountUrl = endPointAddress.api + "/account";
@@ -47,6 +60,7 @@ export class AccountDataContext {
                     // clear cookie (with logout action) and return to identityserver to new login
                     // (window as any).location = "/account/logout";
 
+                    // TODO: Can be called many times - https://docs.google.com/spreadsheets/d/1Ks-K10kmLcHOom7igTkQ8wtRSJ-73i1hftUAE4E9q80/edit#gid=1455384855&range=D7
                     this.accountActionControl.resetApp();
       
                     return Promise.reject(e);
@@ -55,19 +69,6 @@ export class AccountDataContext {
       
               return Promise.reject(error);
           });
-    }
-
-    private getNewAccessToken() {
-
-        if (!this.authTokenRequest) {
-            this.authTokenRequest = this.accountActionControl.refreshToken();
-            this.authTokenRequest.then(response => {
-              this.authTokenRequest = null;
-            }).catch(error => {
-              this.authTokenRequest = null;
-            });
-        }
-        return this.authTokenRequest;
     }
 
     // TODO: https://docs.google.com/spreadsheets/d/1Ks-K10kmLcHOom7igTkQ8wtRSJ-73i1hftUAE4E9q80/edit#gid=1455384855&range=C4
