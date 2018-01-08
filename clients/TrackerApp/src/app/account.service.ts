@@ -6,7 +6,6 @@ import { endPointAddress } from './utils';
 @Injectable()
 export class AccountService {
 
-  private accountDataContext: AccountDataContext;
   private accountManager: AccountManager;
 
   private userId: string = null;
@@ -16,7 +15,7 @@ export class AccountService {
 
   private actionControl: AccountActionControl = {
     getSecurityHeader : () => {
-      return { Authorization: 'Bearer ' + this.accountManager.accessToken};
+      return this.getSecurityHeader();
     },
     refreshToken: (): Promise<any> => {
 
@@ -29,7 +28,7 @@ export class AccountService {
             resolve(accountUserData);
             return accountUserData;
           }
-          // With accountUserData == null assert UserId changed without properly logout
+          // With accountUserData == null assert UserId changed without appropriate logout
           const err = new Error('User is changed without appropriate logout action');
           reject(err);
           return err;
@@ -41,10 +40,13 @@ export class AccountService {
     }
   };
 
+  public getSecurityHeader = () => {
+    return { Authorization: 'Bearer ' + this.accountManager.accessToken};
+  }
+
   constructor() {
 
-    this.accountDataContext = new AccountDataContext(endPointAddress, this.actionControl);
-    this.accountManager = new AccountManager('thingshub', this.accountDataContext);
+    this.accountManager = new AccountManager('thingshub', new AccountDataContext(endPointAddress, this.actionControl));
   }
 
   public get isLoggedIn(): boolean {
@@ -56,7 +58,7 @@ export class AccountService {
     if (!this.userId) {
       this.userId = loginData.id;
     }
-    // The user is changed without properly logout
+    // The user is changed without appropriate logout
     if (this.userId !== loginData.id) {
       this.userId = null;
       this.accountManager.resetLoginData();
