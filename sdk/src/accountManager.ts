@@ -107,7 +107,7 @@ export class AccountManager {
 
     public async login(username: string, password: string, remember: boolean) : Promise<AccountUserData> {
 
-        const accountUserData: AccountUserData  = await this.accountDataContext.login(username, password);
+        const accountUserData: AccountUserData = await this.accountDataContext.login(username, password);
         this.setLoginData(accountUserData, remember);
         return accountUserData;
     }  

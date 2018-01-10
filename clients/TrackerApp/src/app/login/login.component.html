@@ -1,9 +1,13 @@
-  <div>
-      <div>
-          <ons-input [(ngModel)]="username" placeholder="username"></ons-input>
+<div class="login-form">
+      
+      <div class="text-input--underbar">
+          <ons-input [(value)]="username" placeholder="username"></ons-input>
       </div>
-      <div>
-          <ons-input [(ngModel)]="password" type="password" placeholder="password"></ons-input>
+      <div class="text-input--underbar">
+          <ons-input [(value)]="password" type="password" placeholder="password"></ons-input>
       </div>
-      <ons-button (click)="login()">Login</ons-button>
-  </div>
+    <br><br>
+        <ons-button modifier="large" class="login-button" (click)="login()">Login</ons-button>
+    <br><br>
+    <ons-button modifier="quiet" class="forgot-password">Forgot password?</ons-button>
+</div>

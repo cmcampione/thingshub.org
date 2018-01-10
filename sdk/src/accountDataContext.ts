@@ -94,9 +94,6 @@ export class AccountDataContext {
                 name: accountUserDataRaw.name,
                 exp: accountUserDataRaw.exp
             };
-        })
-        .catch(function(e) {
-            return e;
         });
     }
     // TODO: To check
