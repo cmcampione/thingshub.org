@@ -1,18 +1,27 @@
-<!--The content below is only a placeholder and can be replaced.-->
-<div style="text-align:center">
-  <h1>
-    {{ title }}!
-  </h1>
-</div>
+<ons-page>
 
-<div *ngIf="!isLoggedIn">
-  <app-login></app-login>
-</div>
+    <ons-toolbar>
+        <div class="center">{{title}}</div>
+        <div class="right">
+            <ons-toolbar-button>
+              <ons-icon icon="ion-navicon, material:md-menu"></ons-icon>
+            </ons-toolbar-button>
+        </div>
+    </ons-toolbar>
+    <div class="background"></div>
+    <div class="content">
 
-<!-- <div *ngIf="isLoggedIn">
-  <app-map></app-map>
-</div> -->
+      <div *ngIf="!isLoggedIn">
+        <app-login></app-login>
+      </div>
 
-<div *ngIf="isLoggedIn">
-  <app-things></app-things>
-</div>
+      <!-- <div *ngIf="isLoggedIn">
+        <app-map></app-map>
+      </div> -->
+
+      <div *ngIf="isLoggedIn">
+        <app-things></app-things>
+      </div>
+
+  </div>
+</ons-page>
