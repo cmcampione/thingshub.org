@@ -8,8 +8,9 @@ import { AccountService } from '../account.service';
 })
 export class LoginComponent implements OnInit {
 
-  private username: string = "";
-  private password: string = "";
+  private username = '';
+  private password = '';
+  private remember = false;
 
   constructor(private accountService: AccountService) {
   }

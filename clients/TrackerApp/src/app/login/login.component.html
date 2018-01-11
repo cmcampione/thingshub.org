@@ -1,13 +1,9 @@
 <div class="login-form">
-      
-      <div class="text-input--underbar">
-          <ons-input [(value)]="username" placeholder="username"></ons-input>
-      </div>
-      <div class="text-input--underbar">
-          <ons-input [(value)]="password" type="password" placeholder="password"></ons-input>
-      </div>
+    <ons-input class="text-input--underbar" [(value)]="username" type="email" required placeholder="username"></ons-input>
+    <ons-input class="text-input--underbar" [(value)]="password" type="password" required placeholder="password"></ons-input>
     <br><br>
-        <ons-button modifier="large" class="login-button" (click)="login()">Login</ons-button>
+    <ons-button modifier="large" class="login-button" (click)="login()">Login</ons-button>
+    <ons-switch modifier="quiet" class="remember-swith" var="remember">Remember</ons-switch>
     <br><br>
     <ons-button modifier="quiet" class="forgot-password">Forgot password?</ons-button>
 </div>
