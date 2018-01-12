@@ -14,8 +14,10 @@ input[type=email], input[type=password] {
   padding-bottom: 16px;
 }
 
-.remember-swith {
+.remember-checkbox {
   display: block;
+  margin: 8px auto 0 auto;
+  font-size: 14px;
 }
 
 .login-button {

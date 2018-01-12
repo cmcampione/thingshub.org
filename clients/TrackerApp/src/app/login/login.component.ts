@@ -10,7 +10,7 @@ export class LoginComponent implements OnInit {
 
   private username = '';
   private password = '';
-  private remember = false;
+  private remember = true;
 
   constructor(private accountService: AccountService) {
   }

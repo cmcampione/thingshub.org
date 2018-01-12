@@ -3,7 +3,11 @@
     <ons-input class="text-input--underbar" [(value)]="password" type="password" required placeholder="password"></ons-input>
     <br><br>
     <ons-button modifier="large" class="login-button" (click)="login()">Login</ons-button>
-    <ons-switch modifier="quiet" class="remember-swith" var="remember">Remember</ons-switch>
+    <label class="checkbox--noborder">
+        <div class="checkbox__checkmark checkbox--noborder__checkmark">Remember</div>
+        <ons-checkbox class="checkbox__input checkbox--noborder__input" [(ngModel)]="remember"></ons-checkbox>
+    </label>
+    
     <br><br>
     <ons-button modifier="quiet" class="forgot-password">Forgot password?</ons-button>
 </div>
