@@ -20,7 +20,7 @@ export class LoginComponent implements OnInit {
 
   private async login() {
     try {
-      const loginData = await this.accountService.login(this.username, this.password, false);
+      const loginData = await this.accountService.login(this.username, this.password, this.remember);
     } catch (e) {
       console.log(e);
     }
