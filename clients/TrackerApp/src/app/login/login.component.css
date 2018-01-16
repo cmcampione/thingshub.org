@@ -2,6 +2,9 @@
     text-align: center;
     width: 80%;
     margin: 60px auto 0;
+    border-style: solid;
+    border-color: black;
+    border-width: 1px;
 }
   
 input[type=email], input[type=password] {
@@ -14,20 +17,16 @@ input[type=email], input[type=password] {
   padding-bottom: 16px;
 }
 
-.remember-checkbox {
-  display: block;
-  margin: 8px auto 0 auto;
-  font-size: 14px;
-}
-
 .login-button {
   width: 100%;
   margin: 0 auto;
 }
 
+.remember-checkbox {
+  font-size: 14px;
+}
+
 .forgot-password-button {
-  display: block;
-  margin: 8px auto 0 auto;
   font-size: 14px;
 }
   
