@@ -2,9 +2,9 @@
     text-align: center;
     width: 80%;
     margin: 60px auto 0;
-    border-style: solid;
+    /* border-style: solid;
     border-color: black;
-    border-width: 1px;
+    border-width: 1px; */
 }
   
 input[type=email], input[type=password] {
@@ -24,9 +24,10 @@ input[type=email], input[type=password] {
 
 .remember-checkbox {
   font-size: 14px;
+  color: #0076ff;
 }
 
 .forgot-password-button {
-  font-size: 14px;
+  font-size: 14px;  
 }
   
