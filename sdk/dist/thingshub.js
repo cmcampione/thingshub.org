@@ -2497,6 +2497,7 @@ class AccountDataContext {
                     // refreshing has failed => redirect to login
                     // clear cookie (with logout action) and return to identityserver to new login
                     // (window as any).location = "/account/logout";
+                    // TODO: Can be called many times - https://docs.google.com/spreadsheets/d/1Ks-K10kmLcHOom7igTkQ8wtRSJ-73i1hftUAE4E9q80/edit#gid=1455384855&range=D7
                     this.accountActionControl.resetApp();
                     return Promise.reject(e);
                 });
@@ -2536,9 +2537,6 @@ class AccountDataContext {
                 name: accountUserDataRaw.name,
                 exp: accountUserDataRaw.exp
             };
-        })
-            .catch(function (e) {
-            return e;
         });
     }
     // TODO: To check

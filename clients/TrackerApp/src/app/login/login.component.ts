@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { AccountService } from '../account.service';
+import * as ons from 'onsenui';
 
 @Component({
   selector: 'app-login',
@@ -22,7 +23,11 @@ export class LoginComponent implements OnInit {
     try {
       const loginData = await this.accountService.login(this.username, this.password, this.remember);
     } catch (e) {
-      console.log(e);
+      ons.notification.toast('Username or password incorrect', {
+        timeout: 2000;
+        modifier: 'success thick'});
     }
   }
 }
+
+

@@ -219,8 +219,8 @@ export declare class AccountDataContext {
 	private accountActionControl;
 	private accountUrl;
 	private authTokenRequest;
-	constructor(endPointAddress: EndPointAddress, accountActionControl: AccountActionControl);
 	private getNewAccessToken();
+	constructor(endPointAddress: EndPointAddress, accountActionControl: AccountActionControl);
 	login(username: string, password: string): Promise<AccountUserData | HttpFailResult>;
 	loginBasic(username: string, password: string): Promise<any | HttpFailResult>;
 	logout(): Promise<any | HttpFailResult>;
