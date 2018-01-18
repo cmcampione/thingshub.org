@@ -31,8 +31,4 @@ input[type=email], input[type=password] {
   font-size: 14px;  
 }
 
-.toast--danger { 
-  left: auto; 
-  background-color: hsl(348, 100%, 61%); 
-}
   
