@@ -25,7 +25,7 @@ export class LoginComponent implements OnInit {
     } catch (e) {
       ons.notification.toast('Username or password incorrect', {
         timeout: 2000,
-        modifier: "danger",
+        modifier: 'danger',
         animation: 'fall'
       });
     }
