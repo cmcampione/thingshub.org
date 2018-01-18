@@ -1,6 +1,10 @@
 /* You can add global styles to this file, and also import other style files */
 
-.toast--danger { 
-    left: auto; 
-    background-color: hsl(348, 100%, 61%); 
+.toast--danger {
+    display: block;
+    top: auto; 
+    background-color: #0076ff;
+    text-align: center;
+    width: 80%;
+    margin: 60px auto 0;
 }
