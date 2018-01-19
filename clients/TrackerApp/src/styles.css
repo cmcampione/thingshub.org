@@ -2,8 +2,11 @@
 
 .toast--danger {
     display: block;
-    top: auto; 
     background-color: #0076ff;
     width: 80%;
     margin: 20px auto 0;
+}
+
+.toast--danger__message {
+    text-align: center;
 }
