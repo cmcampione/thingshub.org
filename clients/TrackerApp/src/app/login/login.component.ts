@@ -21,9 +21,17 @@ export class LoginComponent implements OnInit {
 
   private async login() {
     try {
+      if (!this.username || !this.password) {
+        ons.notification.toast('Incorrect username or password', {
+          timeout: 2000,
+          modifier: 'danger',
+          animation: 'fall'
+        });
+        return;
+      }
       const loginData = await this.accountService.login(this.username, this.password, this.remember);
     } catch (e) {
-      ons.notification.toast('Username or password incorrect', {
+      ons.notification.toast('Incorrect username or password', {
         timeout: 2000,
         modifier: 'danger',
         animation: 'fall'
