@@ -43,10 +43,14 @@ export class AccountService {
   public getSecurityHeader = () => {
     return { Authorization: 'Bearer ' + this.accountManager.accessToken};
   }
+  public getSecurityToken = () => {
+    return "token=" + this.accountManager.accessToken;
+  }
 
   constructor() {
 
-    this.accountManager = new AccountManager('thingshub', new AccountDataContext(endPointAddress, this.actionControl));
+    this.accountManager = new AccountManager('thingshub', 
+      new AccountDataContext(endPointAddress, this.actionControl));
   }
 
   public get isLoggedIn(): boolean {

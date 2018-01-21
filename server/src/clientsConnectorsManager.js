@@ -39,7 +39,7 @@ class ClientsConnectorSocketIO extends IClientsConnector {
 			if (!user) {
 				try {
 					const tk = utils.verifyToken(token);
-					user = await usersManager.findUserByMasterApiKey(tk.mak);
+					user = await usersManager.findUserById(tk.sub);
 					if (!user)
 						return next(new utils.ErrorCustom(httpStatusCodes.UNAUTHORIZED, httpStatusCodes.getStatusText(httpStatusCodes.UNAUTHORIZED), 112));
 				}
