@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import * as thingshub from 'thingshub-js-sdk';
+import { endPointAddress } from '../utils';
+import { AccountService } from '../account.service';
 
 @Component({
   selector: 'app-map',
@@ -12,11 +14,10 @@ export class MapComponent implements OnInit {
   lng = 7.809007;
 
   // tslint:disable-next-line:max-line-length
-  socket = new thingshub.SocketIOConnector('https://server1.carmelocampione.it:3000', this.authHook, this.onError, this.onConnectError, this.onStateChanged);
+  socket = new thingshub.SocketIOConnector(endPointAddress.server,
+      this.accountService.getSecurityToken, 
+      this.onError, this.onConnectError, this.onStateChanged);
 
-  private authHook() {
-    return 'token=5e4ff11c-5391-465b-a9c4-9803e0b78799';
-  }
   private onError(error) {
     console.log(error);
   }
@@ -28,7 +29,7 @@ export class MapComponent implements OnInit {
     console.log(change);
   }
 
-  constructor() { 
+  constructor(private accountService: AccountService) { 
     
   }
 
