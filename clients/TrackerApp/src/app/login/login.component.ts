@@ -11,7 +11,7 @@ export class LoginComponent implements OnInit {
 
   private username = '';
   private password = '';
-  private remember = true;
+  private remember = this.accountService.remember;
 
   constructor(private accountService: AccountService) {
   }

@@ -239,6 +239,7 @@ export declare class AccountManager {
 	apiKey: string;
 	readonly accessToken: string;
 	readonly isLoggedIn: boolean;
+	readonly remember: boolean;
 	login(username: string, password: string, remember: boolean): Promise<AccountUserData>;
 	logout(): Promise<any>;
 }

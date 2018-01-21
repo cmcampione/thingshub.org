@@ -28,7 +28,7 @@
     "onsenui": "^2.8.3",
     "rxjs": "^5.5.6",
     "socket.io-client": "~2.0.4",
-    "thingshub-js-sdk": "^1.0.21",
+    "thingshub-js-sdk": "^1.0.22",
     "zone.js": "^0.8.20"
   },
   "devDependencies": {

@@ -69,8 +69,7 @@ export class AccountManager {
         this._userId = sessionStorage.getItem(this._appName + "_UserId");
         this._userName = sessionStorage.getItem(this._appName + "_Username");
 
-        let remember = localStorage.getItem(this._appName + "_Remember") == "true" ? true : false;
-        if (remember == false)
+        if (this.remember == false)
             return;
 
         this._accessToken = localStorage.getItem(this._appName + "_AccessToken");
@@ -105,6 +104,9 @@ export class AccountManager {
         this._apiKey = value;
     }
 
+    public get remember() : boolean {
+        return localStorage.getItem(this._appName + "_Remember") == "true" ? true : false;
+    }
     public async login(username: string, password: string, remember: boolean) : Promise<AccountUserData> {
 
         const accountUserData: AccountUserData = await this.accountDataContext.login(username, password);
