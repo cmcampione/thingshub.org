@@ -3156,8 +3156,7 @@ class AccountManager {
         this._accessToken = sessionStorage.getItem(this._appName + "_AccessToken");
         this._userId = sessionStorage.getItem(this._appName + "_UserId");
         this._userName = sessionStorage.getItem(this._appName + "_Username");
-        let remember = localStorage.getItem(this._appName + "_Remember") == "true" ? true : false;
-        if (remember == false)
+        if (this.remember == false)
             return;
         this._accessToken = localStorage.getItem(this._appName + "_AccessToken");
         this._userId = localStorage.getItem(this._appName + "_UserId");
@@ -3176,6 +3175,9 @@ class AccountManager {
         // I do not know if I used the loginData before, so I reset LoginData
         this.resetLoginData();
         this._apiKey = value;
+    }
+    get remember() {
+        return localStorage.getItem(this._appName + "_Remember") == "true" ? true : false;
     }
     login(username, password, remember) {
         return __awaiter(this, void 0, void 0, function* () {

@@ -53,6 +53,10 @@ export class AccountService {
     return this.accountManager.isLoggedIn;
   }
 
+  public get remember(): boolean {
+    return this.accountManager.remember;
+  }
+
   public async login(username, password, remember): Promise<AccountUserData> {
     const loginData: AccountUserData = await this.accountManager.login(username, password, remember);
     if (!this.userId) {
