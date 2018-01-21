@@ -43,6 +43,7 @@ export class Connector {
             this.url = url;
 
             this.authHook = authHook;
+            
             this.errorHook = errorHook;
             this.connectErrorHook = connectErrorHook;
             this.stateChangedHook = stateChangedHook;
