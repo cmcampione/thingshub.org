@@ -44,7 +44,7 @@ export class AccountService {
     return { Authorization: 'Bearer ' + this.accountManager.accessToken};
   }
   public getSecurityToken = () => {
-    return "token=" + this.accountManager.accessToken;
+    return 'token=' + this.accountManager.accessToken;
   }
 
   constructor() {
