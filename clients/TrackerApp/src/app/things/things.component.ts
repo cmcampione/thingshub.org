@@ -34,7 +34,7 @@ export class ThingsComponent implements OnInit {
       for (let i = 0; i < things.things.length; i++) {
       this.things.push(things.things[i]);
     }});
-    console.log("things = " + this.things);
+    console.log('things = ' + this.things);
 
     this.thingsDataContext.getThings(thingsGetParams)
     .then(things => {
@@ -42,11 +42,11 @@ export class ThingsComponent implements OnInit {
         this.things1.push(things.things[i]);
       }
     });
-    console.log("things1 = " + this.things1);
+    console.log('things1 = ' + this.things1);
   }
 
   private async recall() {
-    
+
     const thingsGetParams =  {
       parentThingId : null,
       thingFilter : '',
