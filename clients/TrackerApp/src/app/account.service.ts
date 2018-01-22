@@ -49,7 +49,7 @@ export class AccountService {
 
   constructor() {
 
-    this.accountManager = new AccountManager('thingshub', 
+    this.accountManager = new AccountManager('thingshub',
       new AccountDataContext(endPointAddress, this.actionControl));
   }
 

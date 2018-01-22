@@ -1,6 +1,7 @@
+import axios from "axios";
+import * as jwtDecode from "jwt-decode";
 import {HttpFailResult} from "./helpers";
 import {AccountDataContext, AccountUserData} from "./accountDataContext";
-import axios from "axios";
 
 export class AccountManager {
 
@@ -17,9 +18,9 @@ export class AccountManager {
     private _apiKey : string = null;
 
     public resetLoginData() : void {
-        
-        this._apiKey = null;
 
+        this._apiKey = null;
+        
         this._accessToken = null;
 
         this._userId = null;
@@ -59,9 +60,15 @@ export class AccountManager {
         localStorage.setItem(this._appName + "_UserId", this._userId);
         localStorage.setItem(this._appName + "_Username", this._userName);
     }
-    private readLoginData(): void {
+    private getLoginData(apiKey?: string): void {
 
-        // INFO: By design ApiKey is never persistent
+        if (apiKey) {
+            this.resetLoginData();
+            // INFO: By design ApiKey is never persistent
+            this._apiKey = apiKey;
+            return;
+        }
+
         this._apiKey = null;
 
         this._accessToken = sessionStorage.getItem(this._appName + "_AccessToken");
@@ -78,11 +85,11 @@ export class AccountManager {
         this._userName = localStorage.getItem(this._appName + "_Username");
     }
 
-    constructor(appName: string, accountDataContext: AccountDataContext) {
+    constructor(appName: string, accountDataContext: AccountDataContext, apiKey?: string) {
 
         this._appName = appName;
         this.accountDataContext = accountDataContext;
-        this.readLoginData();
+        this.getLoginData(apiKey);
     }       
 
     public get apiKey() : string {
@@ -93,15 +100,18 @@ export class AccountManager {
     }
 
     public get isLoggedIn() : boolean {
-        return (this._apiKey != null) || (this.accessToken != null);
-    }
+        if (this._apiKey)
+            return true;
 
-    public set apiKey(value: string) {
+        if (!this.accessToken)
+            return false;
 
-        // I do not know if I used the loginData before, so I reset LoginData
-        this.resetLoginData();
+        const accountUserDataRaw: any = jwtDecode(this.accessToken);
 
-        this._apiKey = value;
+        let dateNow = new Date();
+        if (accountUserDataRaw.exp < Math.trunc(dateNow.getTime()/1000))
+            return false;
+        return true;
     }
 
     public get remember() : boolean {
@@ -110,7 +120,9 @@ export class AccountManager {
     public async login(username: string, password: string, remember: boolean) : Promise<AccountUserData> {
 
         this.resetLoginData();
+
         const accountUserData: AccountUserData = await this.accountDataContext.login(username, password);
+
         this.setLoginData(accountUserData, remember);
         return accountUserData;
     }  
