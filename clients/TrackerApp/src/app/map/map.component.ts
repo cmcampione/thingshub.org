@@ -13,7 +13,6 @@ export class MapComponent implements OnInit {
   lat = 51.678418;
   lng = 7.809007;
 
-  // tslint:disable-next-line:max-line-length
   socket = new thingshub.SocketIOConnector(endPointAddress.server,
       this.accountService.getSecurityToken, 
       this.onError, this.onConnectError, this.onStateChanged);

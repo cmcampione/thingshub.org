@@ -7,7 +7,7 @@
 		exports["thingshub"] = factory(require("axios"), require("socket.io-client"));
 	else
 		root["thingshub"] = factory(root["axios"], root["io"]);
-})(typeof self !== 'undefined' ? self : this, function(__WEBPACK_EXTERNAL_MODULE_1__, __WEBPACK_EXTERNAL_MODULE_37__) {
+})(typeof self !== 'undefined' ? self : this, function(__WEBPACK_EXTERNAL_MODULE_1__, __WEBPACK_EXTERNAL_MODULE_38__) {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -70,7 +70,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 18);
+/******/ 	return __webpack_require__(__webpack_require__.s = 19);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -80,7 +80,7 @@ return /******/ (function(modules) { // webpackBootstrap
 "use strict";
 
 
-var implementation = __webpack_require__(20);
+var implementation = __webpack_require__(21);
 
 module.exports = Function.prototype.bind || implementation;
 
@@ -167,8 +167,8 @@ module.exports = function isCallable(value) {
 "use strict";
 
 
-var keys = __webpack_require__(21);
-var foreach = __webpack_require__(23);
+var keys = __webpack_require__(22);
+var foreach = __webpack_require__(24);
 var hasSymbols = typeof Symbol === 'function' && typeof Symbol() === 'symbol';
 
 var toStr = Object.prototype.toString;
@@ -234,7 +234,7 @@ var requirePromise = __webpack_require__(2);
 
 requirePromise();
 
-var ES = __webpack_require__(24);
+var ES = __webpack_require__(25);
 var bind = __webpack_require__(0);
 
 var promiseResolve = function PromiseResolve(C, value) {
@@ -860,24 +860,57 @@ module.exports = {
 
 "use strict";
 
+
+var base64_url_decode = __webpack_require__(43);
+
+function InvalidTokenError(message) {
+  this.message = message;
+}
+
+InvalidTokenError.prototype = new Error();
+InvalidTokenError.prototype.name = 'InvalidTokenError';
+
+module.exports = function (token,options) {
+  if (typeof token !== 'string') {
+    throw new InvalidTokenError('Invalid token specified');
+  }
+
+  options = options || {};
+  var pos = options.header === true ? 0 : 1;
+  try {
+    return JSON.parse(base64_url_decode(token.split('.')[pos]));
+  } catch (e) {
+    throw new InvalidTokenError('Invalid token specified: ' + e.message);
+  }
+};
+
+module.exports.InvalidTokenError = InvalidTokenError;
+
+
+/***/ }),
+/* 19 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
 Object.defineProperty(exports, "__esModule", { value: true });
-const promise_prototype_finally_1 = __webpack_require__(19);
+const promise_prototype_finally_1 = __webpack_require__(20);
 promise_prototype_finally_1.shim(); //https://stackoverflow.com/questions/35876549/typescript-type-definition-for-promise-prototype-finally
 __export(__webpack_require__(14));
-__export(__webpack_require__(35));
 __export(__webpack_require__(36));
+__export(__webpack_require__(37));
 __export(__webpack_require__(15));
-__export(__webpack_require__(38));
+__export(__webpack_require__(39));
 __export(__webpack_require__(45));
 __export(__webpack_require__(46));
 __export(__webpack_require__(47));
 
 
 /***/ }),
-/* 19 */
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -888,7 +921,7 @@ var define = __webpack_require__(5);
 
 var implementation = __webpack_require__(6);
 var getPolyfill = __webpack_require__(13);
-var shim = __webpack_require__(34);
+var shim = __webpack_require__(35);
 
 var bound = bind.call(Function.call, getPolyfill());
 
@@ -902,7 +935,7 @@ module.exports = bound;
 
 
 /***/ }),
-/* 20 */
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -961,7 +994,7 @@ module.exports = function bind(that) {
 
 
 /***/ }),
-/* 21 */
+/* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -971,7 +1004,7 @@ module.exports = function bind(that) {
 var has = Object.prototype.hasOwnProperty;
 var toStr = Object.prototype.toString;
 var slice = Array.prototype.slice;
-var isArgs = __webpack_require__(22);
+var isArgs = __webpack_require__(23);
 var isEnumerable = Object.prototype.propertyIsEnumerable;
 var hasDontEnumBug = !isEnumerable.call({ toString: null }, 'toString');
 var hasProtoEnumBug = isEnumerable.call(function () {}, 'prototype');
@@ -1108,7 +1141,7 @@ module.exports = keysShim;
 
 
 /***/ }),
-/* 22 */
+/* 23 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1132,7 +1165,7 @@ module.exports = function isArguments(value) {
 
 
 /***/ }),
-/* 23 */
+/* 24 */
 /***/ (function(module, exports) {
 
 
@@ -1160,23 +1193,23 @@ module.exports = function forEach (obj, fn, ctx) {
 
 
 /***/ }),
-/* 24 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-module.exports = __webpack_require__(25);
-
-
-/***/ }),
 /* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var ES2015 = __webpack_require__(26);
+module.exports = __webpack_require__(26);
+
+
+/***/ }),
+/* 26 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var ES2015 = __webpack_require__(27);
 var assign = __webpack_require__(10);
 
 var ES2016 = assign(assign({}, ES2015), {
@@ -1193,14 +1226,14 @@ module.exports = ES2016;
 
 
 /***/ }),
-/* 26 */
+/* 27 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
 var has = __webpack_require__(3);
-var toPrimitive = __webpack_require__(27);
+var toPrimitive = __webpack_require__(28);
 
 var toStr = Object.prototype.toString;
 var hasSymbols = typeof Symbol === 'function' && typeof Symbol.iterator === 'symbol';
@@ -1212,7 +1245,7 @@ var MAX_SAFE_INTEGER = Number.MAX_SAFE_INTEGER || Math.pow(2, 53) - 1;
 var assign = __webpack_require__(10);
 var sign = __webpack_require__(11);
 var mod = __webpack_require__(12);
-var isPrimitive = __webpack_require__(30);
+var isPrimitive = __webpack_require__(31);
 var parseInteger = parseInt;
 var bind = __webpack_require__(0);
 var arraySlice = bind.call(Function.call, Array.prototype.slice);
@@ -1239,9 +1272,9 @@ var trim = function (value) {
 	return replace(value, trimRegex, '');
 };
 
-var ES5 = __webpack_require__(31);
+var ES5 = __webpack_require__(32);
 
-var hasRegExpMatcher = __webpack_require__(33);
+var hasRegExpMatcher = __webpack_require__(34);
 
 // https://people.mozilla.org/~jorendorff/es6-draft.html#sec-abstract-operations
 var ES6 = assign(assign({}, ES5), {
@@ -1765,7 +1798,7 @@ module.exports = ES6;
 
 
 /***/ }),
-/* 27 */
+/* 28 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1775,8 +1808,8 @@ var hasSymbols = typeof Symbol === 'function' && typeof Symbol.iterator === 'sym
 
 var isPrimitive = __webpack_require__(7);
 var isCallable = __webpack_require__(4);
-var isDate = __webpack_require__(28);
-var isSymbol = __webpack_require__(29);
+var isDate = __webpack_require__(29);
+var isSymbol = __webpack_require__(30);
 
 var ordinaryToPrimitive = function OrdinaryToPrimitive(O, hint) {
 	if (typeof O === 'undefined' || O === null) {
@@ -1846,7 +1879,7 @@ module.exports = function ToPrimitive(input, PreferredType) {
 
 
 /***/ }),
-/* 28 */
+/* 29 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1873,7 +1906,7 @@ module.exports = function isDateObject(value) {
 
 
 /***/ }),
-/* 29 */
+/* 30 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1907,7 +1940,7 @@ if (hasSymbols) {
 
 
 /***/ }),
-/* 30 */
+/* 31 */
 /***/ (function(module, exports) {
 
 module.exports = function isPrimitive(value) {
@@ -1916,7 +1949,7 @@ module.exports = function isPrimitive(value) {
 
 
 /***/ }),
-/* 31 */
+/* 32 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1929,7 +1962,7 @@ var sign = __webpack_require__(11);
 var mod = __webpack_require__(12);
 
 var IsCallable = __webpack_require__(4);
-var toPrimitive = __webpack_require__(32);
+var toPrimitive = __webpack_require__(33);
 
 var has = __webpack_require__(3);
 
@@ -2159,7 +2192,7 @@ module.exports = ES5;
 
 
 /***/ }),
-/* 32 */
+/* 33 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2203,7 +2236,7 @@ module.exports = function ToPrimitive(input, PreferredType) {
 
 
 /***/ }),
-/* 33 */
+/* 34 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2249,7 +2282,7 @@ module.exports = function isRegex(value) {
 
 
 /***/ }),
-/* 34 */
+/* 35 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2274,7 +2307,7 @@ module.exports = function shimPromiseFinally() {
 
 
 /***/ }),
-/* 35 */
+/* 36 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2371,14 +2404,14 @@ exports.ThingDTO = ThingDTO;
 
 
 /***/ }),
-/* 36 */
+/* 37 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
 const axios_1 = __webpack_require__(1);
-const socketIo = __webpack_require__(37);
+const socketIo = __webpack_require__(38);
 var ConnectionStates;
 (function (ConnectionStates) {
     ConnectionStates[ConnectionStates["Connecting"] = 0] = "Connecting";
@@ -2463,21 +2496,21 @@ exports.SocketIOConnector = SocketIOConnector;
 
 
 /***/ }),
-/* 37 */
+/* 38 */
 /***/ (function(module, exports) {
 
-module.exports = __WEBPACK_EXTERNAL_MODULE_37__;
+module.exports = __WEBPACK_EXTERNAL_MODULE_38__;
 
 /***/ }),
-/* 38 */
+/* 39 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const qs = __webpack_require__(39);
+const qs = __webpack_require__(40);
 const axios_1 = __webpack_require__(1);
-const jwtDecode = __webpack_require__(42);
+const jwtDecode = __webpack_require__(18);
 class AccountDataContext {
     constructor(endPointAddress, accountActionControl) {
         this.accountActionControl = accountActionControl;
@@ -2564,14 +2597,14 @@ exports.AccountDataContext = AccountDataContext;
 
 
 /***/ }),
-/* 39 */
+/* 40 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var stringify = __webpack_require__(40);
-var parse = __webpack_require__(41);
+var stringify = __webpack_require__(41);
+var parse = __webpack_require__(42);
 var formats = __webpack_require__(17);
 
 module.exports = {
@@ -2582,7 +2615,7 @@ module.exports = {
 
 
 /***/ }),
-/* 40 */
+/* 41 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2799,7 +2832,7 @@ module.exports = function (object, opts) {
 
 
 /***/ }),
-/* 41 */
+/* 42 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2980,39 +3013,6 @@ module.exports = function (str, opts) {
 
 
 /***/ }),
-/* 42 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var base64_url_decode = __webpack_require__(43);
-
-function InvalidTokenError(message) {
-  this.message = message;
-}
-
-InvalidTokenError.prototype = new Error();
-InvalidTokenError.prototype.name = 'InvalidTokenError';
-
-module.exports = function (token,options) {
-  if (typeof token !== 'string') {
-    throw new InvalidTokenError('Invalid token specified');
-  }
-
-  options = options || {};
-  var pos = options.header === true ? 0 : 1;
-  try {
-    return JSON.parse(base64_url_decode(token.split('.')[pos]));
-  } catch (e) {
-    throw new InvalidTokenError('Invalid token specified: ' + e.message);
-  }
-};
-
-module.exports.InvalidTokenError = InvalidTokenError;
-
-
-/***/ }),
 /* 43 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -3110,8 +3110,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const jwtDecode = __webpack_require__(18);
 class AccountManager {
-    constructor(appName, accountDataContext) {
+    constructor(appName, accountDataContext, apiKey) {
         this._appName = null;
         this._accessToken = null;
         this._userId = null;
@@ -3120,7 +3121,7 @@ class AccountManager {
         this._apiKey = null;
         this._appName = appName;
         this.accountDataContext = accountDataContext;
-        this.readLoginData();
+        this.getLoginData(apiKey);
     }
     resetLoginData() {
         this._apiKey = null;
@@ -3150,8 +3151,13 @@ class AccountManager {
         localStorage.setItem(this._appName + "_UserId", this._userId);
         localStorage.setItem(this._appName + "_Username", this._userName);
     }
-    readLoginData() {
-        // INFO: By design ApiKey is never persistent
+    getLoginData(apiKey) {
+        if (apiKey) {
+            this.resetLoginData();
+            // INFO: By design ApiKey is never persistent
+            this._apiKey = apiKey;
+            return;
+        }
         this._apiKey = null;
         this._accessToken = sessionStorage.getItem(this._appName + "_AccessToken");
         this._userId = sessionStorage.getItem(this._appName + "_UserId");
@@ -3169,18 +3175,22 @@ class AccountManager {
         return this._accessToken;
     }
     get isLoggedIn() {
-        return (this._apiKey != null) || (this.accessToken != null);
-    }
-    set apiKey(value) {
-        // I do not know if I used the loginData before, so I reset LoginData
-        this.resetLoginData();
-        this._apiKey = value;
+        if (this._apiKey)
+            return true;
+        if (!this.accessToken)
+            return false;
+        const accountUserDataRaw = jwtDecode(this.accessToken);
+        let dateNow = new Date();
+        if (accountUserDataRaw.exp < Math.trunc(dateNow.getTime() / 1000))
+            return false;
+        return true;
     }
     get remember() {
         return localStorage.getItem(this._appName + "_Remember") == "true" ? true : false;
     }
     login(username, password, remember) {
         return __awaiter(this, void 0, void 0, function* () {
+            this.resetLoginData();
             const accountUserData = yield this.accountDataContext.login(username, password);
             this.setLoginData(accountUserData, remember);
             return accountUserData;

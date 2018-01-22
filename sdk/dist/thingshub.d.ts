@@ -234,9 +234,9 @@ export declare class AccountManager {
 	private _apiKey;
 	resetLoginData(): void;
 	private setLoginData(accountUserData, remember);
-	private readLoginData();
-	constructor(appName: string, accountDataContext: AccountDataContext);
-	apiKey: string;
+	private getLoginData(apiKey?);
+	constructor(appName: string, accountDataContext: AccountDataContext, apiKey?: string);
+	readonly apiKey: string;
 	readonly accessToken: string;
 	readonly isLoggedIn: boolean;
 	readonly remember: boolean;
