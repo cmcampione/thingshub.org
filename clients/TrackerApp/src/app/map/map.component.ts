@@ -14,7 +14,7 @@ export class MapComponent implements OnInit {
   lng = 7.809007;
 
   socket = new thingshub.SocketIOConnector(endPointAddress.server,
-      this.accountService.getSecurityToken, 
+      this.accountService.getSecurityToken,
       this.onError, this.onConnectError, this.onStateChanged);
 
   private onError(error) {
@@ -28,8 +28,8 @@ export class MapComponent implements OnInit {
     console.log(change);
   }
 
-  constructor(private accountService: AccountService) { 
-    
+  constructor(private accountService: AccountService) {
+
   }
 
   ngOnInit() {
