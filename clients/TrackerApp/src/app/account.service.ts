@@ -19,7 +19,7 @@ export class AccountService {
     },
     refreshToken: (): Promise<any> => {
 
-      // Show login Component
+      // Shows login Component
       this._isLoggedIn.next(null);
       return new Promise((resolve, reject) => {
         const subscription = this.isLoggedIn$.subscribe((accountUserData: AccountUserData) => {
