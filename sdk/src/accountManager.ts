@@ -63,6 +63,7 @@ export class AccountManager {
     private getLoginData(apiKey?: string): void {
 
         if (apiKey) {
+            // Sanity check
             this.resetLoginData();
             // INFO: By design ApiKey is never persistent
             this._apiKey = apiKey;
@@ -100,7 +101,7 @@ export class AccountManager {
     }
 
     public get isLoggedIn() : boolean {
-        if (this._apiKey)
+        if (this.apiKey)
             return true;
 
         if (!this.accessToken)
