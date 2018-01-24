@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { AccountUserData } from 'thingshub-js-sdk';
+import { AccountService } from '../account.service';
 
 @Component({
   selector: 'app-content-page',
@@ -7,7 +9,15 @@ import { Component, OnInit } from '@angular/core';
 })
 export class ContentPageComponent implements OnInit {
 
-  constructor() { }
+  private title = 'Hardworking bees are working here';
+
+  private isLoggedIn: boolean = this.accountService.isLoggedIn;
+
+  constructor(private accountService: AccountService) {
+    accountService.isLoggedIn$.subscribe((accountUserData: AccountUserData) => {
+      this.isLoggedIn = accountUserData != null;
+    });
+   }
 
   ngOnInit() {
   }

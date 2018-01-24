@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
-import { AccountUserData } from 'thingshub-js-sdk';
-import { AccountService } from './account.service';
+import { SidePageComponent } from './side-page/side-page.component';
+import { ContentPageComponent } from './content-page/content-page.component';
 
 @Component({
   selector: 'app-root',
@@ -9,14 +9,9 @@ import { AccountService } from './account.service';
 })
 export class AppComponent {
 
-  private title = 'Hardworking bees are working here';
+  private sidePage = SidePageComponent;
+  private contentPage = ContentPageComponent;
 
-  private isLoggedIn: boolean = this.accountService.isLoggedIn;
-
-  constructor(private accountService: AccountService) {
-
-    accountService.isLoggedIn$.subscribe((accountUserData: AccountUserData) => {
-      this.isLoggedIn = accountUserData != null;
-    });
+  constructor() {
   }
 }
