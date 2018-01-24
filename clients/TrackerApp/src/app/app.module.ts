@@ -11,13 +11,17 @@ import { LoginComponent } from './login/login.component';
 import { MapComponent } from './map/map.component';
 import { AccountService } from './account.service';
 import { ThingsComponent } from './things/things.component';
+import { SidePageComponent } from './side-page/side-page.component';
+import { ContentPageComponent } from './content-page/content-page.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     LoginComponent,
     MapComponent,
-    ThingsComponent
+    ThingsComponent,
+    SidePageComponent,
+    ContentPageComponent
   ],
   imports: [
     BrowserModule,
