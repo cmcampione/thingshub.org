@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { AccountUserData } from 'thingshub-js-sdk';
 import { AccountService } from '../account.service';
+import { MenuService } from '../menu.service';
 
 @Component({
   // tslint:disable-next-line:component-selector
@@ -14,13 +15,17 @@ export class ContentPageComponent implements OnInit {
 
   private isLoggedIn: boolean = this.accountService.isLoggedIn;
 
-  constructor(private accountService: AccountService) {
+  constructor(private accountService: AccountService, private menuService: MenuService) {
     accountService.isLoggedIn$.subscribe((accountUserData: AccountUserData) => {
       this.isLoggedIn = accountUserData != null;
     });
    }
 
   ngOnInit() {
+  }
+
+  openMenu() {
+    this.menuService.open();
   }
 
 }
