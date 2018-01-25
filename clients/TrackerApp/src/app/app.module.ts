@@ -36,5 +36,6 @@ import { ContentPageComponent } from './content-page/content-page.component';
   schemas: [
     CUSTOM_ELEMENTS_SCHEMA,
   ],
+  entryComponents: [SidePageComponent, ContentPageComponent],
 })
 export class AppModule { }
