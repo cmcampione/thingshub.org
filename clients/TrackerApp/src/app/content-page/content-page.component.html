@@ -1,7 +1,7 @@
 <ons-toolbar>
     <div class="center">{{title}}</div>
     <div [hidden]="!isLoggedIn" class="right">
-        <ons-toolbar-button>
+        <ons-toolbar-button (click)="openMenu()">
           <ons-icon icon="ion-navicon, material:md-menu"></ons-icon>
         </ons-toolbar-button>
     </div>
