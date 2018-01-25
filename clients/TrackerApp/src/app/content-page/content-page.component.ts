@@ -3,7 +3,8 @@ import { AccountUserData } from 'thingshub-js-sdk';
 import { AccountService } from '../account.service';
 
 @Component({
-  selector: 'app-content-page',
+  // tslint:disable-next-line:component-selector
+  selector: 'ons-page',
   templateUrl: './content-page.component.html',
   styleUrls: ['./content-page.component.css']
 })
