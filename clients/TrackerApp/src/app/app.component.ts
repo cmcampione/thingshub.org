@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { SidePageComponent } from './side-page/side-page.component';
 import { ContentPageComponent } from './content-page/content-page.component';
 
@@ -9,8 +9,10 @@ import { ContentPageComponent } from './content-page/content-page.component';
 })
 export class AppComponent {
 
-  private sidePage = SidePageComponent;
+  private sidePage    = SidePageComponent;
   private contentPage = ContentPageComponent;
+
+  @ViewChild('splitter') splitter;
 
   constructor() {
   }
