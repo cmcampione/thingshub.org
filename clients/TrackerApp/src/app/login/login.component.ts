@@ -9,9 +9,9 @@ import * as ons from 'onsenui';
 })
 export class LoginComponent implements OnInit {
 
-  private username = '';
-  private password = '';
-  private remember = this.accountService.remember;
+  public username = '';
+  public password = '';
+  public remember = this.accountService.remember;
 
   constructor(private accountService: AccountService) {
   }
@@ -19,7 +19,7 @@ export class LoginComponent implements OnInit {
   ngOnInit() {
   }
 
-  private async login() {
+  public async login() {
     try {
       if (!this.username || !this.password) {
         ons.notification.toast('Incorrect username or password', {
