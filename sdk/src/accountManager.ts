@@ -19,8 +19,6 @@ export class AccountManager {
 
     public resetLoginData() : void {
 
-        this._apiKey = null;
-        
         this._accessToken = null;
 
         this._userId = null;
@@ -90,7 +88,21 @@ export class AccountManager {
 
         this._appName = appName;
         this.accountDataContext = accountDataContext;
+
         this.getLoginData(apiKey);
+
+        if (this.apiKey)
+            return;
+
+        if (!this.accessToken)
+            return;
+
+        const accountUserDataRaw: any = jwtDecode(this.accessToken);
+
+        let dateNow = new Date();
+        if (accountUserDataRaw.exp < Math.trunc(dateNow.getTime()/1000)) {
+            this.resetLoginData();
+        }
     }       
 
     public get apiKey() : string {
@@ -120,6 +132,7 @@ export class AccountManager {
     }
     public async login(username: string, password: string, remember: boolean) : Promise<AccountUserData> {
 
+        this._apiKey =  null;
         this.resetLoginData();
 
         const accountUserData: AccountUserData = await this.accountDataContext.login(username, password);
@@ -133,6 +146,7 @@ export class AccountManager {
             return await this.accountDataContext.logout();
         }
         finally {
+            this._apiKey = null;
             this.resetLoginData();
         }
     }

@@ -10,8 +10,8 @@ import { MenuService } from './menu.service';
 })
 export class AppComponent {
 
-  private sidePage    = SidePageComponent;
-  private contentPage = ContentPageComponent;
+  public sidePage    = SidePageComponent;
+  public contentPage = ContentPageComponent;
 
   @ViewChild('splitter') splitter;
 

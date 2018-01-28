@@ -11,8 +11,8 @@ import { AccountService } from '../account.service';
 export class ThingsComponent implements OnInit {
 
   private thingsDataContext: thingshub.ThingsDataContext;
-  private things: thingshub.Thing[] = [];
-  private things1: thingshub.Thing[] = [];
+  public things: thingshub.Thing[] = [];
+  public things1: thingshub.Thing[] = [];
 
   constructor(private accountService: AccountService) {
     this.thingsDataContext = new thingshub.ThingsDataContext(endPointAddress, accountService.getSecurityHeader);
@@ -45,7 +45,7 @@ export class ThingsComponent implements OnInit {
     console.log('things1 = ' + this.things1);
   }
 
-  private async recall() {
+  public async recall() {
 
     const thingsGetParams =  {
       parentThingId : null,

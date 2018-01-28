@@ -11,9 +11,9 @@ import { MenuService } from '../menu.service';
 })
 export class ContentPageComponent implements OnInit {
 
-  private title = 'Hardworking bees are working here';
+  public title = 'Hardworking bees are working here';
 
-  private isLoggedIn: boolean = this.accountService.isLoggedIn;
+  public isLoggedIn: boolean = this.accountService.isLoggedIn;
 
   constructor(private accountService: AccountService, private menuService: MenuService) {
     accountService.isLoggedIn$.subscribe((accountUserData: AccountUserData) => {
