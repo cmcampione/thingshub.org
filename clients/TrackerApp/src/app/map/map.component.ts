@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import * as moment from 'moment';
+import { Component, OnInit, LOCALE_ID, Inject } from '@angular/core';
 import * as thingshub from 'thingshub-js-sdk';
 import { endPointAddress } from '../utils';
 import { AccountService } from '../account.service';
@@ -10,10 +11,16 @@ import { AccountService } from '../account.service';
 })
 export class MapComponent implements OnInit {
 
-  lat = 51.678418;
-  lng = 7.809007;
+  public deviceId = "087073117560";
+  public surveyDateTime = "";
+  public lastEventDateTime = "";
+  public lastStatusMsg = "";
 
-  socket = new thingshub.SocketIOConnector(endPointAddress.server,
+  public lat = 51.678418;
+  public lng = 7.809007;
+
+  socket = new thingshub.SocketIOConnector(
+      endPointAddress.server,
       this.accountService.getSecurityToken,
       this.onError, this.onConnectError, this.onStateChanged);
 
@@ -28,7 +35,7 @@ export class MapComponent implements OnInit {
     console.log(change);
   }
 
-  constructor(private accountService: AccountService) {
+  constructor(@Inject(LOCALE_ID) private locale: string, private accountService: AccountService) {
 
   }
 
@@ -36,6 +43,15 @@ export class MapComponent implements OnInit {
     this.socket.subscribe();
     // Uses of "fat arrow" sintax for "this" implicit binding
     this.socket.setHook('onUpdateThingValue', (value) => {
+
+      if (this.deviceId != value.deviceId)
+        return;
+
+      moment.locale("IT-it");
+      this.deviceId = value.deviceId;
+      this.lastEventDateTime = moment(value.lastEventDateTime).format("L LTS");
+      this.lastStatusMsg = value.lastStatus.message;
+      this.surveyDateTime = moment(value.surveyDateTime).format("L LTS");
       this.lat = value.lat;
       this.lng = value.lng;
       console.log(value);
