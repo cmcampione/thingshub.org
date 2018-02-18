@@ -6,8 +6,8 @@ import {ThingPositionRaw} from "./thingPosition";
 
 export interface ThingsGetParams {
     parentThingId : string;
-    thingFilter : string;
-    valueFilter : string;
+    thingFilter : object;
+    valueFilter : object;
     orderBy : string;
     skip : number;
     top : number;
@@ -58,8 +58,8 @@ export class ThingsDataContext {
         
         var urlRaw = this.thingsUrl() + "?" +
                 (!!parameter.parentThingId ? ("&parentThingId=" + parameter.parentThingId) : "") +
-                (!!parameter.thingFilter ? ("&thingFilter=" + parameter.thingFilter) : "") +
-                (!!parameter.valueFilter ? ("&valueFilter=" + parameter.valueFilter) : "") +                
+                (!!parameter.thingFilter ? ("&thingFilter=" + JSON.stringify(parameter.thingFilter)) : "") +
+                (!!parameter.valueFilter ? ("&valueFilter=" + JSON.stringify(parameter.valueFilter)) : "") +                
                 (!!parameter.orderBy ? ("&orderBy=" + parameter.orderBy) : "") +
                 (!!parameter.skip ? ("&skip=" + parameter.skip) : "") +
                 (!!parameter.top ? ("&top=" + parameter.top) : "");
