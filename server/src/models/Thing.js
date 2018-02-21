@@ -22,6 +22,14 @@ const thingSchema = mongoose.Schema({
 	everyoneReadClaims    : { type: Number, default : thConstants.ThingUserReadClaims.NoClaims },
 	everyoneChangeClaims  : { type: Number, default : thConstants.ThingUserChangeClaims.NoClaims },
 
+	valueClaims : [{
+		fieldName		: String,
+		publicReadClaims: { type: Boolean, default : false },
+		publicChangeClaims: { type: Boolean, default : false },
+		everyoneReadClaims: { type: Boolean, default : false },
+		everyoneChangeClaims: { type: Boolean, default : false }
+	}],
+
 	usersRights : [{
 		userId            : mongoose.Schema.Types.ObjectId,
 		username          : String,
@@ -32,6 +40,12 @@ const thingSchema = mongoose.Schema({
 
 		userReadClaims    : { type: Number, default : thConstants.ThingUserReadClaims.NoClaims },
 		userChangeClaims  : { type: Number, default : thConstants.ThingUserChangeClaims.NoClaims },
+
+		valueClaims : [{
+			fieldName		: String,
+			userReadClaims: { type: Boolean, default : false },
+			userChangeClaims: { type: Boolean, default : false }
+		}],
 
 		shortPin          : Number
 	}],
