@@ -36,7 +36,7 @@ export class AccountDataContext {
         return this.authTokenRequest;
     }
 
-    constructor(endPointAddress: EndPointAddress, private accountActionControl: AccountActionControl) {
+    constructor(endPointAddress: EndPointAddress, private accountActionControl?: AccountActionControl) {
 
         this.accountUrl = endPointAddress.api + "/account";
 
@@ -45,7 +45,7 @@ export class AccountDataContext {
           },
           err => {
               const error = err.response;
-              if (error && error.status === 401 && error.config && !error.config.__isRetryRequest) {
+              if (accountActionControl && error && error.status === 401 && error.config && !error.config.__isRetryRequest) {
       
                 return this.getNewAccessToken().then(response => {
                     error.config.__isRetryRequest = true;
