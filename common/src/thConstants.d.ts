@@ -98,7 +98,7 @@ export declare const enum ThingUserChangeClaims {
 	// In beta test
 	CanOtherUsersChangeMyThingPos= 262144,
 
-	AllClaims = 524287
+	AllClaims = 1048575
 }
 // ShortCut
 // INFO: Max int value 0x7FFFFFFF;//2147483647 - 32 bit with sign. Javascript bit manipulation limit

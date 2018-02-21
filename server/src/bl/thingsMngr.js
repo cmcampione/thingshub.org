@@ -792,7 +792,7 @@ exports.updateThingValue = async (user, thingId, value) => {
 	if ((loggedInThingUserClaims.change & thConstants.ThingUserChangeClaims.CanChangeValue) == 0)
 		throw new utils.ErrorCustom(httpStatusCodes.FORBIDDEN, "Unauthorized user", 106);
 
-	// Do not campare value value :-) because is an object
+	// Do not compare value value :-) because is an object
 	if (value != null) {
 		
 		if ((loggedInThingUserClaims.change & thConstants.ThingUserChangeClaims.CanChangeValue) == 0)
