@@ -110,7 +110,7 @@ export class AccountDataContext {
     }
     public logout() : Promise<any | HttpFailResult> {
         return axios.post(this.accountUrl + "/logout", null, {
-            headers: this.accountActionControl.getSecurityHeader()
+            headers: this.accountActionControl ? this.accountActionControl.getSecurityHeader() : null
         })
         .then(function(response: any) : any {
             return response.data;
