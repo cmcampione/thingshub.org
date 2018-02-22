@@ -23,21 +23,10 @@
           api: "https://server1.carmelocampione.it:3000/api"
       }
 
-      var accountManager = null;
+      var accountDataContext = new thingshub.AccountDataContext(endPointAddress);
+      var accountManager = new thingshub.AccountManager("thingshub", accountDataContext, "");
 
-      function securityHeaderHook() {
-        return { Authorization: "Bearer " + accountManager.accessToken};
-      }
-      /* 
-      function securityHeaderHook() {
-        return { thapikey: accountManager.apiKey};
-      }
-      */
-
-      var accountDataContext = new thingshub.AccountDataContext(endPointAddress, securityHeaderHook);
-      accountManager = new thingshub.AccountManager("thingshub", accountDataContext);
-
-      var thingsDatacontext = new thingshub.ThingsDataContext(endPointAddress, securityHeaderHook);
+      var thingsDatacontext = new thingshub.ThingsDataContext(endPointAddress, accountManager.getSecurityHeader());
 
       var thingsGetParams =  {
         parentThingId : null,
@@ -52,14 +41,6 @@
         console.log(res);
       });
 
-      function authHook() {
-        return "token=" + accountManager.accessToken;
-      }
-/*       
-      function authHook() {
-        return "token=" + accountManager.apiKey;
-      }
- */
       function onError(error) {
         console.log(error);
       }
@@ -87,7 +68,7 @@
         console.log(value);
       }
 
-      var socket = new thingshub.SocketIOConnector(endPointAddress.server, authHook, onError, onConnectError, onStateChanged);
+      var socket = new thingshub.SocketIOConnector(endPointAddress.server, accountManager.getSecurityToken(), onError, onConnectError, onStateChanged);
       socket.subscribe();
       socket.setHook("api", onAPI);
       socket.setHook("onCreateThing", onCreateThing);
