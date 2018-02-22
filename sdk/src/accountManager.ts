@@ -112,6 +112,13 @@ export class AccountManager {
         return this._accessToken;
     }
 
+    public getSecurityHeader(): object {
+        return this.apiKey ? { thapikey: this.apiKey } : { Authorization: "Bearer " + this.accessToken} ;
+    }
+    public getSecurityToken(): string {
+        return this.apiKey ? "token=" + this.apiKey : "token=" + this.accessToken;
+    }
+
     public get isLoggedIn() : boolean {
         if (this.apiKey)
             return true;
