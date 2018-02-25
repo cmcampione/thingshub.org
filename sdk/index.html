@@ -83,6 +83,28 @@
         console.log(err);
       });
 
+      var mainThing = new thingshub.Thing();
+      var thingsManagerClaims = {
+
+        PublicReadClaims : thingshub.ThingUserReadClaims.NoClaims,
+        PublicChangeClaims: thingshub.ThingUserChangeClaims.NoClaims,
+
+        EveryoneReadClaims: thingshub.ThingUserReadClaims.NoClaims,
+        EveryoneChangeClaims: thingshub.ThingUserChangeClaims.NoClaims,
+
+        CreatorUserReadClaims: thingshub.ThingUserReadClaims.AllClaims,
+        CreatorUserChangeClaims: thingshub.ThingUserChangeClaims.AllClaims,
+      }
+      var thingsManager = new thingshub.ThingsManager(mainThing, "first thing", thingsManagerClaims, thingsDatacontext, socket );
+      var httpRequestCanceler = new thingshub.HttpRequestCanceler();
+      thingsManager.getMoreThings(httpRequestCanceler)
+      .then((data) => {
+        console.log(mainThing);
+      })
+      .catch((e) => {
+        console.log(e);
+      })
+
     </script>
     
 </head>
