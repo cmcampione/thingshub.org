@@ -19,7 +19,7 @@ export interface ThingsDataSet {
     itemsRange: ItemsRange
 }
 
-class ThingsManager {
+export class ThingsManager {
     
     private getThingsParams: ThingsGetParams;
     private getChindrenThingsParams: ThingsGetParams;
