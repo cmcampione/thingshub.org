@@ -1,5 +1,5 @@
 export const endPointAddress = {
-    server: 'https://server1.carmelocampione.it:3000',
-    api: 'https://server1.carmelocampione.it:3000/api'
+    server: 'https://api.thingshub.org:3000',
+    api: 'https://api.thingshub.org:3000/api'
 };
 

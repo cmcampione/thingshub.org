@@ -2520,7 +2520,7 @@ class AccountDataContext {
             return response;
         }, err => {
             const error = err.response;
-            if (error && error.status === 401 && error.config && !error.config.__isRetryRequest) {
+            if (accountActionControl && error && error.status === 401 && error.config && !error.config.__isRetryRequest) {
                 return this.getNewAccessToken().then(response => {
                     error.config.__isRetryRequest = true;
                     // set new access token after refreshing it
@@ -2586,7 +2586,7 @@ class AccountDataContext {
     }
     logout() {
         return axios_1.default.post(this.accountUrl + "/logout", null, {
-            headers: this.accountActionControl.getSecurityHeader()
+            headers: this.accountActionControl ? this.accountActionControl.getSecurityHeader() : null
         })
             .then(function (response) {
             return response.data;
@@ -3119,12 +3119,27 @@ class AccountManager {
         this._userName = null;
         //INFO: apiKey is never persistent
         this._apiKey = null;
+        this.getSecurityHeader = () => {
+            return this.apiKey ? { thapikey: this.apiKey } : { Authorization: "Bearer " + this.accessToken };
+        };
+        this.getSecurityToken = () => {
+            return this.apiKey ? "token=" + this.apiKey : "token=" + this.accessToken;
+        };
         this._appName = appName;
         this.accountDataContext = accountDataContext;
         this.getLoginData(apiKey);
+        if (this.apiKey)
+            return;
+        if (!this.accessToken)
+            return;
+        const accountUserDataRaw = jwtDecode(this.accessToken);
+        let dateNow = new Date();
+        if (accountUserDataRaw.exp < Math.trunc(dateNow.getTime() / 1000)) {
+            this.resetLoginData();
+        }
     }
+    //TODO: Why is public?
     resetLoginData() {
-        this._apiKey = null;
         this._accessToken = null;
         this._userId = null;
         this._userName = null;
@@ -3153,6 +3168,7 @@ class AccountManager {
     }
     getLoginData(apiKey) {
         if (apiKey) {
+            // Sanity check
             this.resetLoginData();
             // INFO: By design ApiKey is never persistent
             this._apiKey = apiKey;
@@ -3175,7 +3191,7 @@ class AccountManager {
         return this._accessToken;
     }
     get isLoggedIn() {
-        if (this._apiKey)
+        if (this.apiKey)
             return true;
         if (!this.accessToken)
             return false;
@@ -3190,6 +3206,7 @@ class AccountManager {
     }
     login(username, password, remember) {
         return __awaiter(this, void 0, void 0, function* () {
+            this._apiKey = null;
             this.resetLoginData();
             const accountUserData = yield this.accountDataContext.login(username, password);
             this.setLoginData(accountUserData, remember);
@@ -3202,6 +3219,7 @@ class AccountManager {
                 return yield this.accountDataContext.logout();
             }
             finally {
+                this._apiKey = null;
                 this.resetLoginData();
             }
         });
@@ -3306,8 +3324,8 @@ class ThingsDataContext {
     getThings(parameter, canceler) {
         var urlRaw = this.thingsUrl() + "?" +
             (!!parameter.parentThingId ? ("&parentThingId=" + parameter.parentThingId) : "") +
-            (!!parameter.thingFilter ? ("&thingFilter=" + parameter.thingFilter) : "") +
-            (!!parameter.valueFilter ? ("&valueFilter=" + parameter.valueFilter) : "") +
+            (!!parameter.thingFilter ? ("&thingFilter=" + JSON.stringify(parameter.thingFilter)) : "") +
+            (!!parameter.valueFilter ? ("&valueFilter=" + JSON.stringify(parameter.valueFilter)) : "") +
             (!!parameter.orderBy ? ("&orderBy=" + parameter.orderBy) : "") +
             (!!parameter.skip ? ("&skip=" + parameter.skip) : "") +
             (!!parameter.top ? ("&top=" + parameter.top) : "");

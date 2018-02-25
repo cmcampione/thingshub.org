@@ -368,9 +368,11 @@ async function createThingDTO(user, parentThing, thing, isSuperAdministrator) {
 				
 			let user = userId ? await usersManager.findUserById(userId) : await	usersManager.findUserByUsername(username);
 			if (user) {
-				userInfoDTO.id = user.Id;
+				userInfoDTO.id = user._id;
 				userInfoDTO.name = user.name;
 			}
+			if (userInfoDTO.id)
+				userInfoDTO.id = userInfoDTO.id.toString();
 		
 			usersInfosDTOs.push(userInfoDTO);
 		}
@@ -506,7 +508,7 @@ exports.createThing = async (user, thingDTO) => {
 		throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Kind can't be empty", 15);
 	if (!thingDTO.name)
 		throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Name can't be empty", 16);
-	if (thConstants.validateThingDeletedStates(thingDTO.deletedStatus) == false)
+	if (thConstants.validateThingDeletedStatus(thingDTO.deletedStatus) == false)
 		throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Thing DeletedStatus is incorrect", 17);
 	if (thConstants.validateThingUserStatus(thingDTO.userStatus) == false)
 		throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Thing UserStatus is incorrect", 18);
