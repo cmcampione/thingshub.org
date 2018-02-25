@@ -19,14 +19,14 @@
     <script>
 
       var endPointAddress = {
-          server: "https://server1.carmelocampione.it:3000",
-          api: "https://server1.carmelocampione.it:3000/api"
+          server: "https://api.thingshub.org:3000",
+          api: "https://api.thingshub.org:3000/api"
       }
 
       var accountDataContext = new thingshub.AccountDataContext(endPointAddress);
       var accountManager = new thingshub.AccountManager("thingshub", accountDataContext, "491e94d9-9041-4e5e-b6cb-9dad91bbf63d");
 
-      var thingsDatacontext = new thingshub.ThingsDataContext(endPointAddress, accountManager.getSecurityHeader());
+      var thingsDatacontext = new thingshub.ThingsDataContext(endPointAddress, accountManager.getSecurityHeader);
 
       var thingsGetParams =  {
         parentThingId : null,
@@ -68,7 +68,7 @@
         console.log(value);
       }
 
-      var socket = new thingshub.SocketIOConnector(endPointAddress.server, accountManager.getSecurityToken(), onError, onConnectError, onStateChanged);
+      var socket = new thingshub.SocketIOConnector(endPointAddress.server, accountManager.getSecurityToken, onError, onConnectError, onStateChanged);
       socket.subscribe();
       socket.setHook("api", onAPI);
       socket.setHook("onCreateThing", onCreateThing);
