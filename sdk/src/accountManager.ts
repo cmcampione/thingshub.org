@@ -17,6 +17,7 @@ export class AccountManager {
     //INFO: apiKey is never persistent
     private _apiKey : string = null;
 
+    //TODO: Why is public?
     public resetLoginData() : void {
 
         this._accessToken = null;
@@ -112,10 +113,10 @@ export class AccountManager {
         return this._accessToken;
     }
 
-    public getSecurityHeader(): object {
+    public getSecurityHeader = (): object => {
         return this.apiKey ? { thapikey: this.apiKey } : { Authorization: "Bearer " + this.accessToken} ;
     }
-    public getSecurityToken(): string {
+    public getSecurityToken = (): string => {
         return this.apiKey ? "token=" + this.apiKey : "token=" + this.accessToken;
     }
 
