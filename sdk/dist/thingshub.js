@@ -70,7 +70,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 19);
+/******/ 	return __webpack_require__(__webpack_require__.s = 5);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -166,6 +166,29 @@ module.exports = function isCallable(value) {
 
 "use strict";
 
+function __export(m) {
+    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
+}
+Object.defineProperty(exports, "__esModule", { value: true });
+const promise_prototype_finally_1 = __webpack_require__(20);
+promise_prototype_finally_1.shim(); //https://stackoverflow.com/questions/35876549/typescript-type-definition-for-promise-prototype-finally
+__export(__webpack_require__(15));
+__export(__webpack_require__(36));
+__export(__webpack_require__(37));
+__export(__webpack_require__(16));
+__export(__webpack_require__(39));
+__export(__webpack_require__(45));
+__export(__webpack_require__(46));
+__export(__webpack_require__(47));
+__export(__webpack_require__(48));
+
+
+/***/ }),
+/* 6 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
 
 var keys = __webpack_require__(22);
 var foreach = __webpack_require__(24);
@@ -224,7 +247,7 @@ module.exports = defineProperties;
 
 
 /***/ }),
-/* 6 */
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -299,7 +322,7 @@ module.exports = promiseFinally;
 
 
 /***/ }),
-/* 7 */
+/* 8 */
 /***/ (function(module, exports) {
 
 module.exports = function isPrimitive(value) {
@@ -308,7 +331,7 @@ module.exports = function isPrimitive(value) {
 
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, exports) {
 
 module.exports = Number.isNaN || function isNaN(a) {
@@ -317,7 +340,7 @@ module.exports = Number.isNaN || function isNaN(a) {
 
 
 /***/ }),
-/* 9 */
+/* 10 */
 /***/ (function(module, exports) {
 
 var $isNaN = Number.isNaN || function (a) { return a !== a; };
@@ -326,7 +349,7 @@ module.exports = Number.isFinite || function (x) { return typeof x === 'number' 
 
 
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, exports) {
 
 var has = Object.prototype.hasOwnProperty;
@@ -344,7 +367,7 @@ module.exports = function assign(target, source) {
 
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ (function(module, exports) {
 
 module.exports = function sign(number) {
@@ -353,7 +376,7 @@ module.exports = function sign(number) {
 
 
 /***/ }),
-/* 12 */
+/* 13 */
 /***/ (function(module, exports) {
 
 module.exports = function mod(number, modulo) {
@@ -363,7 +386,7 @@ module.exports = function mod(number, modulo) {
 
 
 /***/ }),
-/* 13 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -371,7 +394,7 @@ module.exports = function mod(number, modulo) {
 
 var requirePromise = __webpack_require__(2);
 
-var implementation = __webpack_require__(6);
+var implementation = __webpack_require__(7);
 
 module.exports = function getPolyfill() {
 	requirePromise();
@@ -380,7 +403,7 @@ module.exports = function getPolyfill() {
 
 
 /***/ }),
-/* 14 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -556,7 +579,7 @@ exports.DefaultThingPos = DefaultThingPos;
 
 
 /***/ }),
-/* 15 */
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -621,7 +644,7 @@ exports.Helpers = Helpers;
 
 
 /***/ }),
-/* 16 */
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -830,7 +853,7 @@ exports.isBuffer = function isBuffer(obj) {
 
 
 /***/ }),
-/* 17 */
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -855,7 +878,7 @@ module.exports = {
 
 
 /***/ }),
-/* 18 */
+/* 19 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -888,28 +911,6 @@ module.exports.InvalidTokenError = InvalidTokenError;
 
 
 /***/ }),
-/* 19 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-function __export(m) {
-    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
-}
-Object.defineProperty(exports, "__esModule", { value: true });
-const promise_prototype_finally_1 = __webpack_require__(20);
-promise_prototype_finally_1.shim(); //https://stackoverflow.com/questions/35876549/typescript-type-definition-for-promise-prototype-finally
-__export(__webpack_require__(14));
-__export(__webpack_require__(36));
-__export(__webpack_require__(37));
-__export(__webpack_require__(15));
-__export(__webpack_require__(39));
-__export(__webpack_require__(45));
-__export(__webpack_require__(46));
-__export(__webpack_require__(47));
-
-
-/***/ }),
 /* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -917,10 +918,10 @@ __export(__webpack_require__(47));
 
 
 var bind = __webpack_require__(0);
-var define = __webpack_require__(5);
+var define = __webpack_require__(6);
 
-var implementation = __webpack_require__(6);
-var getPolyfill = __webpack_require__(13);
+var implementation = __webpack_require__(7);
+var getPolyfill = __webpack_require__(14);
 var shim = __webpack_require__(35);
 
 var bound = bind.call(Function.call, getPolyfill());
@@ -1210,7 +1211,7 @@ module.exports = __webpack_require__(26);
 
 
 var ES2015 = __webpack_require__(27);
-var assign = __webpack_require__(10);
+var assign = __webpack_require__(11);
 
 var ES2016 = assign(assign({}, ES2015), {
 	// https://github.com/tc39/ecma262/pull/60
@@ -1238,13 +1239,13 @@ var toPrimitive = __webpack_require__(28);
 var toStr = Object.prototype.toString;
 var hasSymbols = typeof Symbol === 'function' && typeof Symbol.iterator === 'symbol';
 
-var $isNaN = __webpack_require__(8);
-var $isFinite = __webpack_require__(9);
+var $isNaN = __webpack_require__(9);
+var $isFinite = __webpack_require__(10);
 var MAX_SAFE_INTEGER = Number.MAX_SAFE_INTEGER || Math.pow(2, 53) - 1;
 
-var assign = __webpack_require__(10);
-var sign = __webpack_require__(11);
-var mod = __webpack_require__(12);
+var assign = __webpack_require__(11);
+var sign = __webpack_require__(12);
+var mod = __webpack_require__(13);
 var isPrimitive = __webpack_require__(31);
 var parseInteger = parseInt;
 var bind = __webpack_require__(0);
@@ -1806,7 +1807,7 @@ module.exports = ES6;
 
 var hasSymbols = typeof Symbol === 'function' && typeof Symbol.iterator === 'symbol';
 
-var isPrimitive = __webpack_require__(7);
+var isPrimitive = __webpack_require__(8);
 var isCallable = __webpack_require__(4);
 var isDate = __webpack_require__(29);
 var isSymbol = __webpack_require__(30);
@@ -1955,11 +1956,11 @@ module.exports = function isPrimitive(value) {
 "use strict";
 
 
-var $isNaN = __webpack_require__(8);
-var $isFinite = __webpack_require__(9);
+var $isNaN = __webpack_require__(9);
+var $isFinite = __webpack_require__(10);
 
-var sign = __webpack_require__(11);
-var mod = __webpack_require__(12);
+var sign = __webpack_require__(12);
+var mod = __webpack_require__(13);
 
 var IsCallable = __webpack_require__(4);
 var toPrimitive = __webpack_require__(33);
@@ -2200,7 +2201,7 @@ module.exports = ES5;
 
 var toStr = Object.prototype.toString;
 
-var isPrimitive = __webpack_require__(7);
+var isPrimitive = __webpack_require__(8);
 
 var isCallable = __webpack_require__(4);
 
@@ -2290,8 +2291,8 @@ module.exports = function isRegex(value) {
 
 var requirePromise = __webpack_require__(2);
 
-var getPolyfill = __webpack_require__(13);
-var define = __webpack_require__(5);
+var getPolyfill = __webpack_require__(14);
+var define = __webpack_require__(6);
 
 module.exports = function shimPromiseFinally() {
 	requirePromise();
@@ -2313,7 +2314,7 @@ module.exports = function shimPromiseFinally() {
 "use strict";
 
 
-const thConstants = __webpack_require__(14);
+const thConstants = __webpack_require__(15);
 
 exports.RegisterByOnlyEmailStatus = {
 	UserAlreadyRegistered : 1,
@@ -2510,7 +2511,7 @@ module.exports = __WEBPACK_EXTERNAL_MODULE_38__;
 Object.defineProperty(exports, "__esModule", { value: true });
 const qs = __webpack_require__(40);
 const axios_1 = __webpack_require__(1);
-const jwtDecode = __webpack_require__(18);
+const jwtDecode = __webpack_require__(19);
 class AccountDataContext {
     constructor(endPointAddress, accountActionControl) {
         this.accountActionControl = accountActionControl;
@@ -2605,7 +2606,7 @@ exports.AccountDataContext = AccountDataContext;
 
 var stringify = __webpack_require__(41);
 var parse = __webpack_require__(42);
-var formats = __webpack_require__(17);
+var formats = __webpack_require__(18);
 
 module.exports = {
     formats: formats,
@@ -2621,8 +2622,8 @@ module.exports = {
 "use strict";
 
 
-var utils = __webpack_require__(16);
-var formats = __webpack_require__(17);
+var utils = __webpack_require__(17);
+var formats = __webpack_require__(18);
 
 var arrayPrefixGenerators = {
     brackets: function brackets(prefix) { // eslint-disable-line func-name-matching
@@ -2838,7 +2839,7 @@ module.exports = function (object, opts) {
 "use strict";
 
 
-var utils = __webpack_require__(16);
+var utils = __webpack_require__(17);
 
 var has = Object.prototype.hasOwnProperty;
 
@@ -3110,7 +3111,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const jwtDecode = __webpack_require__(18);
+const jwtDecode = __webpack_require__(19);
 class AccountManager {
     constructor(appName, accountDataContext, apiKey) {
         this._appName = null;
@@ -3259,7 +3260,7 @@ class Thing {
         if (thingDTO) {
             Object.assign(this, thingDTO);
             if (thingDTO.value)
-                this.value = JSON.parse(thingDTO.value);
+                this.value = thingDTO.value;
         }
     }
     addThingChild(thingChildDTO) {
@@ -3289,7 +3290,7 @@ exports.Thing = Thing;
 
 Object.defineProperty(exports, "__esModule", { value: true });
 const axios_1 = __webpack_require__(1);
-const helpers_1 = __webpack_require__(15);
+const helpers_1 = __webpack_require__(16);
 class ThingsDataContext {
     constructor(endPointAddress, securityHeaderHook) {
         this.apiEndPointAddress = "";
@@ -3429,6 +3430,122 @@ class ThingsDataContext {
     }
 }
 exports.ThingsDataContext = ThingsDataContext;
+
+
+/***/ }),
+/* 48 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const _1 = __webpack_require__(5);
+class ThingsManager {
+    constructor(mainThing, thingKind, thingClaims, thingsDataContext, realTimeConnector) {
+        this.mainThing = mainThing;
+        this.thingKind = thingKind;
+        this.thingClaims = thingClaims;
+        this.thingsDataContext = thingsDataContext;
+        this.realTimeConnector = realTimeConnector;
+        // INFO:    In Books example where "this.mainThing" in a "root thing" 
+        //          "getMoreThings" fills "this.mainThing.children" with "books" collection 
+        //          and "this.mainThing.children[0..n].children" with "things" collection like "book comments"
+        this.getMoreThings = (canceler) => {
+            let self = this;
+            return new Promise((resolve, reject) => {
+                this.getMoreThingChildren(this.mainThing, this.getThingsParams, canceler)
+                    .then(function (data) {
+                    let promises = [];
+                    // Try to get all things children
+                    for (let i = 0; i < data.things.length; i++)
+                        promises.push(self.getMoreThingChildren(data.things[i], self.getChindrenThingsParams, canceler));
+                    Promise.all(promises)
+                        .then(function (data) {
+                        resolve(data);
+                        return data;
+                    })
+                        .catch(function (data) {
+                        reject(data);
+                        return data;
+                    });
+                    return data;
+                })
+                    .catch(function (data) {
+                    reject(data);
+                    return data;
+                });
+            });
+        };
+        this.getThingsParams = {
+            // Viene sovrascritto da thingsManager
+            parentThingId: null,
+            thingFilter: { $and: [{ kind: this.thingKind }, { deletedStatus: 1 /* Ok */ }] },
+            top: 10,
+            skip: 0,
+            orderBy: null,
+            valueFilter: null
+        };
+        this.getChindrenThingsParams = {
+            // Viene sovrascritto da thingsManager
+            parentThingId: null,
+            thingFilter: { deletedStatus: 1 /* Ok */ },
+            top: 10,
+            // Viene sovrascritto da thingsManager
+            skip: 0,
+            orderBy: null,
+            valueFilter: null
+        };
+    }
+    getThings(parameter, canceler) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let thingsDTOsDataSet = null;
+            let things = [];
+            try {
+                thingsDTOsDataSet = yield this.thingsDataContext.getThings(parameter, canceler);
+                for (let i = 0; i < thingsDTOsDataSet.things.length; i++) {
+                    var thing = new _1.Thing(thingsDTOsDataSet.things[i]);
+                    things.push(thing);
+                }
+            }
+            catch (e) {
+                throw e;
+            }
+            return {
+                things: things,
+                itemsRange: thingsDTOsDataSet.itemsRange
+            };
+        });
+    }
+    // INFO: Fills parentThing
+    // INFO: "thing.children " is fills filtered by "this.getChindrenThingsParams"
+    getMoreThingChildren(parentThing, parameter, canceler) {
+        parameter.skip = parentThing.childrenSkip;
+        parameter.parentThingId = parentThing.id;
+        return this.getThings(parameter, canceler)
+            .then(function (thingsDataSet) {
+            parentThing.childrenTotalItems = thingsDataSet.itemsRange.totalItems;
+            parentThing.childrenSkip = parentThing.childrenSkip + parameter.top;
+            //  Fix range
+            if (parentThing.childrenSkip > parentThing.childrenTotalItems)
+                parentThing.childrenSkip = parentThing.childrenTotalItems;
+            for (var i = 0; i < thingsDataSet.things.length; i++)
+                parentThing.children.push(thingsDataSet.things[i]);
+            return thingsDataSet;
+        });
+    }
+    getThingsTotalItems() {
+        return this.mainThing.childrenTotalItems;
+    }
+}
+exports.ThingsManager = ThingsManager;
 
 
 /***/ })

@@ -47,7 +47,7 @@ export class Thing {
         if (thingDTO) {
             Object.assign(this, thingDTO);
             if (thingDTO.value)
-                this.value = JSON.parse(thingDTO.value)
+                this.value = thingDTO.value;
         }
     }
 
