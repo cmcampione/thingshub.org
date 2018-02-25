@@ -1,15 +1,54 @@
-<div class="login-form">
-    <ons-input modifier="material" [(value)]="username" type="email" required placeholder="username"></ons-input>
-    <ons-input modifier="material" [(value)]="password" type="password" required placeholder="password"></ons-input>
-    <br><br>
-    <ons-button modifier="material" class="login-button" (click)="login()">Login</ons-button>
-    <br><br>
-    <div style="display:flex; align-items:center; justify-content:space-between">
-        <label class="checkbox checkbox--material remember-checkbox">
-            <input type="checkbox" class="checkbox__input checkbox--material__input" [(ngModel)]="remember">
-            <div class="checkbox__checkmark checkbox--material__checkmark"></div>
-            Remember
-        </label>        
-        <ons-button modifier="quiet" class="forgot-password-button">Forgot password?</ons-button>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <title>Things Hub</title>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+    <link rel="stylesheet" href="style.css">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="site-wrapper">
+
+      <div class="site-wrapper-inner">
+
+        <div class="cover-container">
+
+          <div class="masthead clearfix">
+            <div class="inner">
+                <h1 class="masthead-brand text-center">Welcome to Things Hub<span style="font-size:15px">.org</span>
+                </h1>
+            </div>
+          </div>
+
+          <div class="inner cover">
+            <h1 class="cover-heading">Future Internet of Things open souce platform</h1>
+            <p class="lead">Thanks for visiting our website. Our website will be launced soon, stay close stay connected.</p>
+          </div>
+
+        </div>
+
+      </div>
+
     </div>
-</div>
+
+
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+  </body>
+</html>
