@@ -1,6 +1,6 @@
 "use strict";
 
-const httpStatusCodes 		= require("http-status-codes");
+const httpStatusCodes 	= require("http-status-codes");
 
 const utils				= require("./utils");
 const usersManager		= require("./bl/usersMngr");
@@ -82,6 +82,7 @@ class ClientsConnectorSocketIO extends IClientsConnector {
 
 		});
 	}
+
 	api(usersIds, info) {
 		let self = this;
 		usersIds.forEach(userId => {

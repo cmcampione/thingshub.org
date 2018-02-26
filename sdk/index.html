@@ -86,14 +86,14 @@
       var mainThing = new thingshub.Thing();
       var thingsManagerClaims = {
 
-        PublicReadClaims : thingshub.ThingUserReadClaims.NoClaims,
-        PublicChangeClaims: thingshub.ThingUserChangeClaims.NoClaims,
+        publicReadClaims : thingshub.ThingUserReadClaims.NoClaims,
+        publicChangeClaims: thingshub.ThingUserChangeClaims.NoClaims,
 
-        EveryoneReadClaims: thingshub.ThingUserReadClaims.NoClaims,
-        EveryoneChangeClaims: thingshub.ThingUserChangeClaims.NoClaims,
+        everyoneReadClaims: thingshub.ThingUserReadClaims.NoClaims,
+        everyoneChangeClaims: thingshub.ThingUserChangeClaims.NoClaims,
 
-        CreatorUserReadClaims: thingshub.ThingUserReadClaims.AllClaims,
-        CreatorUserChangeClaims: thingshub.ThingUserChangeClaims.AllClaims,
+        creatorUserReadClaims: thingshub.ThingUserReadClaims.AllClaims,
+        creatorUserChangeClaims: thingshub.ThingUserChangeClaims.AllClaims
       }
       var thingsManager = new thingshub.ThingsManager(mainThing, "first thing", thingsManagerClaims, thingsDatacontext, socket );
       var httpRequestCanceler = new thingshub.HttpRequestCanceler();
