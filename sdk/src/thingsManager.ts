@@ -5,13 +5,13 @@ import { Thing, ThingUserReadClaims, ThingUserChangeClaims, ThingDeletedStates }
 
 export interface ThingClaims {
 
-    PublicReadClaims : ThingUserReadClaims;
-    PublicChangeClaims: ThingUserChangeClaims;
-    EveryoneReadClaims: ThingUserReadClaims;
-    EveryoneChangeClaims: ThingUserChangeClaims;
+    publicReadClaims : ThingUserReadClaims;
+    publicChangeClaims: ThingUserChangeClaims;
+    everyoneReadClaims: ThingUserReadClaims;
+    everyoneChangeClaims: ThingUserChangeClaims;
     
-    CreatorUserReadClaims: ThingUserReadClaims;
-    CreatorUserChangeClaims: ThingUserChangeClaims;
+    creatorUserReadClaims: ThingUserReadClaims;
+    creatorUserChangeClaims: ThingUserChangeClaims;
 }
 
 export interface ThingsDataSet {
