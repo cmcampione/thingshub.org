@@ -16,6 +16,8 @@
     
     <script src="dist/thingshub.js"></script>
 
+    <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+
     <script>
 
       var endPointAddress = {
@@ -27,19 +29,6 @@
       var accountManager = new thingshub.AccountManager("thingshub", accountDataContext, "491e94d9-9041-4e5e-b6cb-9dad91bbf63d");
 
       var thingsDatacontext = new thingshub.ThingsDataContext(endPointAddress, accountManager.getSecurityHeader);
-
-      var thingsGetParams =  {
-        parentThingId : null,
-        thingFilter : "",
-        valueFilter : "",
-        orderBy : "",
-        skip : 0,
-        top : 100
-      }
-      thingsDatacontext.getThings(thingsGetParams)
-      .then(function(res) {
-        console.log(res);
-      });
 
       function onError(error) {
         console.log(error);
@@ -83,7 +72,7 @@
         console.log(err);
       });
 
-      var mainThing = new thingshub.Thing();
+      var mainThing = new thingshub.Thing();      
       var thingsManagerClaims = {
 
         publicReadClaims : thingshub.ThingUserReadClaims.NoClaims,
@@ -99,20 +88,36 @@
       var httpRequestCanceler = new thingshub.HttpRequestCanceler();
       thingsManager.getMoreThings(httpRequestCanceler)
       .then((data) => {
-        console.log(mainThing);
+        console.log(mainThing);        
       })
       .catch((e) => {
         console.log(e);
       })
 
+      var app4 = new Vue({
+        el: '#things',
+        data: {
+          mainThing: mainThing
+        }
+      })
+
     </script>
-    
+
 </head>
 <body>
 
-	<div>
-      
-	</div>
+	<div id="things">
+    {{ mainThing.name }}
+      <ol>
+          <li v-for="thing in mainThing.children">
+            {{ thing.name }}
+          </li>
+      </ol>
+  </div>
+  
+  <script>
+    mainThing.name ="Ciao";
+  </script>
 
 </body>
 </html>
