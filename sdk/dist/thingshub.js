@@ -3455,6 +3455,12 @@ class ThingsManager {
         this.thingClaims = thingClaims;
         this.thingsDataContext = thingsDataContext;
         this.realTimeConnector = realTimeConnector;
+        this.onCreateThing = (thingDTO) => {
+            if (thingDTO.kind == this.thingKind) {
+                this.mainThing.addThingChild(thingDTO);
+                return;
+            }
+        };
         // INFO:    In Books example where "this.mainThing" in a "root thing" 
         //          "getMoreThings" fills "this.mainThing.children" with "books" collection 
         //          and "this.mainThing.children[0..n].children" with "things" collection like "book comments"
@@ -3503,6 +3509,7 @@ class ThingsManager {
             orderBy: null,
             valueFilter: null
         };
+        this.realTimeConnector.setHook("onCreateThing", this.onCreateThing);
     }
     getThings(parameter, canceler) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -3525,7 +3532,7 @@ class ThingsManager {
         });
     }
     // INFO: Fills parentThing
-    // INFO: "thing.children " is fills filtered by "this.getChindrenThingsParams"
+    // INFO: "thing.children" is filled filtered by "this.getChindrenThingsParams"
     getMoreThingChildren(parentThing, parameter, canceler) {
         parameter.skip = parentThing.childrenSkip;
         parameter.parentThingId = parentThing.id;

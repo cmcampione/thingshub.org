@@ -30,6 +30,8 @@
 
       var thingsDatacontext = new thingshub.ThingsDataContext(endPointAddress, accountManager.getSecurityHeader);
 
+      var mainThing = new thingshub.Thing();
+
       function onError(error) {
         console.log(error);
       }
@@ -45,10 +47,6 @@
         console.log(data);
       }
 
-      function onCreateThing(thingDTO) {
-        console.log(thingDTO);
-      }
-
       function onUpdateThing(thingDTO) {
         console.log(thingDTO);
       }
@@ -60,7 +58,6 @@
       var socket = new thingshub.SocketIOConnector(endPointAddress.server, accountManager.getSecurityToken, onError, onConnectError, onStateChanged);
       socket.subscribe();
       socket.setHook("api", onAPI);
-      socket.setHook("onCreateThing", onCreateThing);
       socket.setHook("onUpdateThing", onUpdateThing);
       socket.setHook("onUpdateThingValue", onUpdateThingValue);
       
@@ -71,8 +68,7 @@
       .catch(function(err) {
         console.log(err);
       });
-
-      var mainThing = new thingshub.Thing();      
+      
       var thingsManagerClaims = {
 
         publicReadClaims : thingshub.ThingUserReadClaims.NoClaims,
@@ -93,31 +89,27 @@
       .catch((e) => {
         console.log(e);
       })
-
-      var app4 = new Vue({
-        el: '#things',
-        data: {
-          mainThing: mainThing
-        }
-      })
-
     </script>
 
 </head>
 <body>
 
-	<div id="things">
-    {{ mainThing.name }}
+  <div id="things">
       <ol>
           <li v-for="thing in mainThing.children">
             {{ thing.name }}
           </li>
       </ol>
   </div>
-  
-  <script>
-    mainThing.name ="Ciao";
-  </script>
 
+  <script>
+      var app = new Vue({
+        el: '#things',
+        data: {
+          mainThing: mainThing
+        }
+      })
+  </script>
+  
 </body>
 </html>
