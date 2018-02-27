@@ -52,7 +52,7 @@ export class Thing {
     }
 
     public addThingChild(thingChildDTO : ThingDTO) {
-        this.children.unshift(new Thing(thingChildDTO))
+        this.children.unshift(new Thing(thingChildDTO));
     }
 
     public collapse() : void {
