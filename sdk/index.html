@@ -12,7 +12,7 @@
     </style>
 
     <script src="node_modules/axios/dist/axios.min.js"></script>
-    <script src="node_modules/realTimeConnector.io-client/dist/realTimeConnector.io.slim.js"></script>
+    <script src="node_modules/socket.io-client/dist/socket.io.slim.js"></script>
     
     <script src="dist/thingshub.js"></script>
 
@@ -98,6 +98,7 @@
       <ol>
           <li v-for="thing in mainThing.children">
             {{ thing.name }}
+            {{ thing.value }}
           </li>
       </ol>
   </div>
