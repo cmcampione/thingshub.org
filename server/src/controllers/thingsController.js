@@ -177,7 +177,7 @@ router.put("/:id/value", async function (req, res, next){
 			if (!blResult)
 				return; // TODO: According to the restful paradigm what should the PUT return?
 
-			ClientsConnectorsManager.onUpdateThingValue(blResult, value);
+			ClientsConnectorsManager.onUpdateThingValue(blResult, thingId, value);
 
 			// TODO: According to the restful paradigm what should the PUT return?
 			res.json(value);

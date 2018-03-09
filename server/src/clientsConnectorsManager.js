@@ -14,7 +14,7 @@ class IClientsConnector {
 
 	onCreateThing(usersIds, thingDTO) {}
 	onUpdateThing(usersIds, thingDTOs) {}
-	onUpdateThingValue(usersIds, value) {}
+	onUpdateThingValue(usersIds, thingId, value) {}
 }
 
 // Socket.io support
@@ -123,7 +123,7 @@ class ClientsConnectorSocketIO extends IClientsConnector {
 			}
 		}
 	}
-	onUpdateThingValue(usersIds, value) {
+	onUpdateThingValue(usersIds, thingId, value) {
 		
 		for(let userId of usersIds) {
 
@@ -132,7 +132,7 @@ class ClientsConnectorSocketIO extends IClientsConnector {
 				continue;
 
 			for(let socket of connections) {
-				socket.emit("onUpdateThingValue", value);
+				socket.emit("onUpdateThingValue", thingId, value);
 			}
 		}
 	}
@@ -161,9 +161,9 @@ class ClientsConnectorsManager {
 			element.onUpdateThing(usersIds, thingDTOs);
 		});
 	}
-	static onUpdateThingValue(usersIds, value) {
+	static onUpdateThingValue(usersIds, thingId, value) {
 		ClientsConnectorsManager.ClientsConnectors.forEach(element => {
-			element.onUpdateThingValue(usersIds, value);
+			element.onUpdateThingValue(usersIds, thingId, value);
 		});
 	}
 }
