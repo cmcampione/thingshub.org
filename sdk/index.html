@@ -12,7 +12,7 @@
     </style>
 
     <script src="node_modules/axios/dist/axios.min.js"></script>
-    <script src="node_modules/socket.io-client/dist/socket.io.slim.js"></script>
+    <script src="node_modules/realTimeConnector.io-client/dist/realTimeConnector.io.slim.js"></script>
     
     <script src="dist/thingshub.js"></script>
 
@@ -55,13 +55,13 @@
         console.log(value);
       }
 
-      var socket = new thingshub.SocketIOConnector(endPointAddress.server, accountManager.getSecurityToken, onError, onConnectError, onStateChanged);
-      socket.subscribe();
-      socket.setHook("api", onAPI);
-      socket.setHook("onUpdateThing", onUpdateThing);
-      socket.setHook("onUpdateThingValue", onUpdateThingValue);
+      var realTimeConnector = new thingshub.SocketIOConnector(endPointAddress.server, accountManager.getSecurityToken, onError, onConnectError, onStateChanged);
+      realTimeConnector.subscribe();
+      realTimeConnector.setHook("api", onAPI);
+      realTimeConnector.setHook("onUpdateThing", onUpdateThing);
+      realTimeConnector.setHook("onUpdateThingValue", onUpdateThingValue);
       
-      socket.api()
+      realTimeConnector.api()
       .then(function(res) {
         console.log(res);
       })
@@ -80,7 +80,7 @@
         creatorUserReadClaims: thingshub.ThingUserReadClaims.AllClaims,
         creatorUserChangeClaims: thingshub.ThingUserChangeClaims.AllClaims
       }
-      var thingsManager = new thingshub.ThingsManager(mainThing, "first thing", thingsManagerClaims, thingsDatacontext, socket );
+      var thingsManager = new thingshub.ThingsManager(mainThing, "first thing", thingsManagerClaims, thingsDatacontext, realTimeConnector );
       var httpRequestCanceler = new thingshub.HttpRequestCanceler();
       thingsManager.getMoreThings(httpRequestCanceler)
       .then((data) => {
