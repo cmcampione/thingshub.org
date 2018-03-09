@@ -11,10 +11,10 @@ import { AccountService } from '../account.service';
 })
 export class MapComponent implements OnInit {
 
-  public deviceId = "087073117560";
-  public surveyDateTime = "";
-  public lastEventDateTime = "";
-  public lastStatusMsg = "";
+  public deviceId = '087073117560';
+  public surveyDateTime = '';
+  public lastEventDateTime = '';
+  public lastStatusMsg = '';
 
   public lat = 51.678418;
   public lng = 7.809007;
@@ -42,16 +42,17 @@ export class MapComponent implements OnInit {
   ngOnInit() {
     this.socket.subscribe();
     // Uses of "fat arrow" sintax for "this" implicit binding
-    this.socket.setHook('onUpdateThingValue', (value) => {
+    this.socket.setHook('onUpdateThingValue', (thingId, value) => {
 
-      if (this.deviceId != value.deviceId)
+      if (this.deviceId !== value.deviceId) {
         return;
+      }
 
-      moment.locale("IT-it");
+      moment.locale('IT-it');
       this.deviceId = value.deviceId;
-      this.lastEventDateTime = moment(value.lastEventDateTime).format("L LTS");
+      this.lastEventDateTime = moment(value.lastEventDateTime).format('L LTS');
       this.lastStatusMsg = value.lastStatus.message;
-      this.surveyDateTime = moment(value.surveyDateTime).format("L LTS");
+      this.surveyDateTime = moment(value.surveyDateTime).format('L LTS');
       this.lat = value.lat;
       this.lng = value.lng;
       console.log(value);
