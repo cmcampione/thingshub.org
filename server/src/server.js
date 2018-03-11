@@ -20,7 +20,7 @@ const cors 				= require("cors");
 
 const utils				= require("./utils");
 const usersManager		= require("./bl/usersMngr");
-const clientsConnectorsManager = require("./clientsConnectorsManager");
+const RealtimeNotifier 	= require("./realtimeNotifier");
 
 // Env configuration
 
@@ -159,7 +159,7 @@ app.get("/api", async function (req, res) {
 	let users = await usersManager.find({});
 	let usersIds = users.map(user => user._id);
 
-	clientsConnectorsManager.api(usersIds, msg);
+	RealtimeNotifier.onAPI(usersIds, msg);
 
 	res.status(200).send(msg);
 });
@@ -218,4 +218,4 @@ httpsServer.listen(port, (err) => {
 
 // Realtime communication support
 
-clientsConnectorsManager.initialize(httpsServer);
+RealtimeNotifier.initialize(httpsServer);
