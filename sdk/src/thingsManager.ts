@@ -1,6 +1,6 @@
 import { HttpRequestCanceler, ItemsRange, HttpFailResult } from "./helpers";
 import { ThingsGetParams, ThingsDTOsDataSet, ThingsDataContext } from "./thingsDataContext";
-import { Connector } from "./connector";
+import { RealtimeConnector } from "./realtimeConnectors";
 import { Thing, ThingUserReadClaims, ThingUserChangeClaims, ThingDeletedStates, ThingDTO } from ".";
 
 export interface ThingClaims {
@@ -28,7 +28,7 @@ export class ThingsManager {
         private thingKind : string, 
         private thingClaims : ThingClaims,
         private thingsDataContext: ThingsDataContext,
-        private realTimeConnector: Connector
+        private realtimeConnector: RealtimeConnector
     ) {
         this.getThingsParams = {
             // Viene sovrascritto da thingsManager
@@ -50,11 +50,11 @@ export class ThingsManager {
             valueFilter: null
         }
 
-        this.realTimeConnector.setHook("onCreateThing", this.onCreateThing);
+        this.realtimeConnector.setHook("onCreateThing", this.onCreateThing);
     }
 
     private onCreateThing = (thingDTO: ThingDTO) : void => {
-        if (thingDTO.kind == this.thingKind) {
+        if (thingDTO.kind === this.thingKind) {
             this.mainThing.addThingChild(thingDTO);
             return;
         }

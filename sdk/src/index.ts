@@ -4,7 +4,7 @@ shim(); //https://stackoverflow.com/questions/35876549/typescript-type-definitio
 export * from "../../common/src/thConstants";
 export * from "../../common/src/dtos";
 
-export * from "./connector";
+export * from "./realtimeConnectors";
 export * from "./helpers";
 export * from "./endPointAddress";
 export * from "./accountDataContext";

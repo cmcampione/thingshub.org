@@ -1,26 +1,26 @@
 import axios, { AxiosRequestConfig, AxiosPromise } from "axios";
 import * as socketIo from "socket.io-client";
 
-export const enum ConnectionStates {
+export const enum RealtimeConnectionStates {
     Connecting = 0,
     Connected = 1,
     Reconnecting = 2,
     Disconnected = 4
 }
 
-export class Connector {
+export class RealtimeConnector {
 
-    protected connectionStatus : ConnectionStates = ConnectionStates.Disconnected;
+    protected connectionStatus : RealtimeConnectionStates = RealtimeConnectionStates.Disconnected;
 
     protected url: string = "";//   https://servername:port/route
     
     protected authHook: () => void = null;
 
     protected errorHook: (error: any) => void = null;
-    protected stateChangedHook: (newState: ConnectionStates) => void = null;
+    protected stateChangedHook: (newState: RealtimeConnectionStates) => void = null;
     protected connectErrorHook: (error: any) => void = null;
 
-    protected on_connectionStatusChange(newState : ConnectionStates) {
+    protected on_connectionStatusChange(newState : RealtimeConnectionStates) {
         if (this.connectionStatus == newState)
             return;
         
@@ -38,7 +38,7 @@ export class Connector {
         authHook : () => void,
         errorHook : (error) => void,
         connectErrorHook : (error) => void,
-        stateChangedHook : (change: ConnectionStates) => void) {
+        stateChangedHook : (change: RealtimeConnectionStates) => void) {
 
             this.url = url;
 
@@ -55,7 +55,7 @@ export class Connector {
     }
 }
 
-export class SocketIOConnector extends Connector {
+export class SocketIORealtimeConnector extends RealtimeConnector {
     
     private socket : SocketIOClient.Socket = null;
     
@@ -63,7 +63,7 @@ export class SocketIOConnector extends Connector {
         authHook : () => void,
         errorHook : (error) => void,
         connectErrorHook : (error) => void,
-        stateChangedHook : (change: ConnectionStates) => void) {
+        stateChangedHook : (change: RealtimeConnectionStates) => void) {
             super(url, authHook, errorHook, connectErrorHook, stateChangedHook);
     }
 
@@ -78,11 +78,11 @@ export class SocketIOConnector extends Connector {
 
     private on_connect() {
         if (this.on_connectionStatusChange)
-            this.on_connectionStatusChange(ConnectionStates.Connected);
+            this.on_connectionStatusChange(RealtimeConnectionStates.Connected);
     }
     private on_disconnect(reason) {
         if (this.on_connectionStatusChange)
-            this.on_connectionStatusChange(ConnectionStates.Disconnected);
+            this.on_connectionStatusChange(RealtimeConnectionStates.Disconnected);
     }
 
     public subscribe() : void {

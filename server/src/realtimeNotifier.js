@@ -138,34 +138,37 @@ class ClientsConnectorSocketIO extends IClientsConnector {
 	}
 }
 
-class ClientsConnectorsManager {
+class RealtimeNotifier {
+	
 	static initialize(server) {
 
-		ClientsConnectorsManager.ClientsConnectors = []; // List of ClientsConnectors
-		ClientsConnectorsManager.ClientsConnectors.push(new ClientsConnectorSocketIO(server));
+		RealtimeNotifier.ClientsConnectors = []; // List of ClientsConnectors
+		RealtimeNotifier.ClientsConnectors.push(new ClientsConnectorSocketIO(server));
 	}
-	static api(usersIds, info) {
+	static onAPI(usersIds, info) {
 
-		ClientsConnectorsManager.ClientsConnectors.forEach(element => {
+		RealtimeNotifier.ClientsConnectors.forEach(element => {
 			element.api(usersIds, info);
 		});
 	}
 	static onCreateThing(usersIds, thingDTO) {
 
-		ClientsConnectorsManager.ClientsConnectors.forEach(element => {
+		RealtimeNotifier.ClientsConnectors.forEach(element => {
 			element.onCreateThing(usersIds, thingDTO);
 		});
 	}
 	static onUpdateThing(usersIds, thingDTOs) {
-		ClientsConnectorsManager.ClientsConnectors.forEach(element => {
+
+		RealtimeNotifier.ClientsConnectors.forEach(element => {
 			element.onUpdateThing(usersIds, thingDTOs);
 		});
 	}
 	static onUpdateThingValue(usersIds, thingId, value) {
-		ClientsConnectorsManager.ClientsConnectors.forEach(element => {
+
+		RealtimeNotifier.ClientsConnectors.forEach(element => {
 			element.onUpdateThingValue(usersIds, thingId, value);
 		});
 	}
 }
 
-module.exports = ClientsConnectorsManager;
+module.exports = RealtimeNotifier;
