@@ -9,7 +9,7 @@ const passport 			= require("passport");
 const utils 			= require("../utils.js");
 const thConstants 		= require("../../../common/src/thConstants");
 const thingsMngr		= require("../bl/thingsMngr");
-const ClientsConnectorsManager = require("../clientsConnectorsManager");
+const RealtimeNotifier 	= require("../realtimeNotifier");
 
 const router = express.Router();
 
@@ -96,7 +96,7 @@ router.post("/", async function (req, res, next){
 			if (!blResult || !blResult.usersIdsToNotify || !blResult.thingDTO)
 				throw new utils.ErrorCustom(httpStatusCodes.INTERNAL_SERVER_ERROR, "Result not valid", 100);
 
-			ClientsConnectorsManager.onCreateThing(blResult.usersIdsToNotify, blResult.thingDTO);
+			RealtimeNotifier.onCreateThing(blResult.usersIdsToNotify, blResult.thingDTO);
 
 			res.json(blResult.thingDTO);
 
@@ -137,7 +137,7 @@ router.put("/:id", async function (req, res, next){
 				if (!blResult.thingDTOs)
 					throw new utils.ErrorCustom(httpStatusCodes.INTERNAL_SERVER_ERROR, "Result not valid", 96);
 				
-				ClientsConnectorsManager.onUpdateThing(blResult.usersIdsToNotify, blResult.thingDTOs);
+				RealtimeNotifier.onUpdateThing(blResult.usersIdsToNotify, blResult.thingDTOs);
 			}
 
 			// TODO: According to the restful paradigm what should the PUT return?
@@ -177,7 +177,7 @@ router.put("/:id/value", async function (req, res, next){
 			if (!blResult)
 				return; // TODO: According to the restful paradigm what should the PUT return?
 
-			ClientsConnectorsManager.onUpdateThingValue(blResult, thingId, value);
+			RealtimeNotifier.onUpdateThingValue(blResult, thingId, value);
 
 			// TODO: According to the restful paradigm what should the PUT return?
 			res.json(value);

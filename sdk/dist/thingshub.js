@@ -2413,14 +2413,14 @@ exports.ThingDTO = ThingDTO;
 Object.defineProperty(exports, "__esModule", { value: true });
 const axios_1 = __webpack_require__(1);
 const socketIo = __webpack_require__(38);
-var ConnectionStates;
-(function (ConnectionStates) {
-    ConnectionStates[ConnectionStates["Connecting"] = 0] = "Connecting";
-    ConnectionStates[ConnectionStates["Connected"] = 1] = "Connected";
-    ConnectionStates[ConnectionStates["Reconnecting"] = 2] = "Reconnecting";
-    ConnectionStates[ConnectionStates["Disconnected"] = 4] = "Disconnected";
-})(ConnectionStates = exports.ConnectionStates || (exports.ConnectionStates = {}));
-class Connector {
+var RealtimeConnectionStates;
+(function (RealtimeConnectionStates) {
+    RealtimeConnectionStates[RealtimeConnectionStates["Connecting"] = 0] = "Connecting";
+    RealtimeConnectionStates[RealtimeConnectionStates["Connected"] = 1] = "Connected";
+    RealtimeConnectionStates[RealtimeConnectionStates["Reconnecting"] = 2] = "Reconnecting";
+    RealtimeConnectionStates[RealtimeConnectionStates["Disconnected"] = 4] = "Disconnected";
+})(RealtimeConnectionStates = exports.RealtimeConnectionStates || (exports.RealtimeConnectionStates = {}));
+class RealtimeConnector {
     constructor(url, authHook, errorHook, connectErrorHook, stateChangedHook) {
         this.connectionStatus = 4 /* Disconnected */;
         this.url = ""; //   https://servername:port/route
@@ -2449,8 +2449,8 @@ class Connector {
             .then((response) => { return response; });
     }
 }
-exports.Connector = Connector;
-class SocketIOConnector extends Connector {
+exports.RealtimeConnector = RealtimeConnector;
+class SocketIORealtimeConnector extends RealtimeConnector {
     constructor(url, authHook, errorHook, connectErrorHook, stateChangedHook) {
         super(url, authHook, errorHook, connectErrorHook, stateChangedHook);
         this.socket = null;
@@ -2493,7 +2493,7 @@ class SocketIOConnector extends Connector {
         this.socket.off(eventName, hook);
     }
 }
-exports.SocketIOConnector = SocketIOConnector;
+exports.SocketIORealtimeConnector = SocketIORealtimeConnector;
 
 
 /***/ }),
@@ -3449,14 +3449,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const _1 = __webpack_require__(5);
 class ThingsManager {
-    constructor(mainThing, thingKind, thingClaims, thingsDataContext, realTimeConnector) {
+    constructor(mainThing, thingKind, thingClaims, thingsDataContext, realtimeConnector) {
         this.mainThing = mainThing;
         this.thingKind = thingKind;
         this.thingClaims = thingClaims;
         this.thingsDataContext = thingsDataContext;
-        this.realTimeConnector = realTimeConnector;
+        this.realtimeConnector = realtimeConnector;
         this.onCreateThing = (thingDTO) => {
-            if (thingDTO.kind == this.thingKind) {
+            if (thingDTO.kind === this.thingKind) {
                 this.mainThing.addThingChild(thingDTO);
                 return;
             }
@@ -3509,7 +3509,7 @@ class ThingsManager {
             orderBy: null,
             valueFilter: null
         };
-        this.realTimeConnector.setHook("onCreateThing", this.onCreateThing);
+        this.realtimeConnector.setHook("onCreateThing", this.onCreateThing);
     }
     getThings(parameter, canceler) {
         return __awaiter(this, void 0, void 0, function* () {

@@ -20,9 +20,14 @@
 
     <script>
 
-      var endPointAddress = {
+      /* var endPointAddress = {
           server: "https://api.thingshub.org:3000",
           api: "https://api.thingshub.org:3000/api"
+      } */
+
+      var endPointAddress = {
+          server: "https://localhost:3000",
+          api: "https://localhost:3000/api"
       }
 
       var accountDataContext = new thingshub.AccountDataContext(endPointAddress);
@@ -55,7 +60,7 @@
         console.log(value);
       }
 
-      var realTimeConnector = new thingshub.SocketIOConnector(endPointAddress.server, accountManager.getSecurityToken, onError, onConnectError, onStateChanged);
+      var realTimeConnector = new thingshub.SocketIORealtimeConnector(endPointAddress.server, accountManager.getSecurityToken, onError, onConnectError, onStateChanged);
       realTimeConnector.subscribe();
       realTimeConnector.setHook("api", onAPI);
       realTimeConnector.setHook("onUpdateThing", onUpdateThing);

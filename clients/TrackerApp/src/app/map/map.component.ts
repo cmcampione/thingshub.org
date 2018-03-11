@@ -19,7 +19,7 @@ export class MapComponent implements OnInit {
   public lat = 51.678418;
   public lng = 7.809007;
 
-  socket = new thingshub.SocketIOConnector(
+  socket = new thingshub.SocketIORealtimeConnector(
       endPointAddress.server,
       this.accountService.getSecurityToken,
       this.onError, this.onConnectError, this.onStateChanged);
