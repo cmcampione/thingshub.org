@@ -1,16 +1,16 @@
 "use strict";
 
-var http = require("http");
-var https = require("https");
-var gpsDataMod = require("./gpsData.js");
+import { request } from "http";
+import { request as _request } from "https";
+import { ResultStatus } from "./gpsData.js";
 
-module.exports.ElaboratorUIGPSData = function() {
+export function ElaboratorUIGPSData() {
 	this.elaborate = function elaborate(gpsData) {
 
 		console.log("LastEventDateTime: %s", gpsData.lastEventDateTime.toString());
 		console.log("LastStatusMessage: %s", gpsData.lastStatus.message);
         
-		if (gpsData.lastStatus.result == gpsDataMod.ResultStatus.Ok)
+		if (gpsData.lastStatus.result == ResultStatus.Ok)
 		{
 			console.log("SurveyDateTime: %s", gpsData.surveyDateTime.toString());
 			console.log("Device Id: %s", gpsData.deviceId);
@@ -21,9 +21,9 @@ module.exports.ElaboratorUIGPSData = function() {
 
 		console.log("-----------------------------------------------------------");
 	};
-};
+}
 
-module.exports.ElaboratorFreeAnts = function() {
+export function ElaboratorFreeAnts() {
 
 	//INFO: La X iniziale è per evitare la conversione implicita di javascript in int
 	let gpsId = "X" + process.env.MAIN_GPS;
@@ -56,7 +56,7 @@ module.exports.ElaboratorFreeAnts = function() {
 		};
 
 		var responseData = "";
-		var reqPut = http.request(optionsPutThingValue, function(res) {
+		var reqPut = request(optionsPutThingValue, function(res) {
 			res.on("data", function(d) {
 				responseData += d;
 			});
@@ -73,9 +73,9 @@ module.exports.ElaboratorFreeAnts = function() {
 		reqPut.write(jsonObject);
 		reqPut.end();
 	};
-};
+}
 
-module.exports.ElaboratorThingsHub = function() {
+export function ElaboratorThingsHub() {
 	
 	//INFO: La X iniziale è per evitare la conversione implicita di javascript in int
 	let gpsId = "X" + process.env.MAIN_GPS;
@@ -108,7 +108,7 @@ module.exports.ElaboratorThingsHub = function() {
 		};
 	
 		let responseData = "";
-		let reqPut = https.request(optionsPutThingValue, function(res) {
+		let reqPut = _request(optionsPutThingValue, function(res) {
 			res.on("data", function(d) {
 				responseData += d;
 			});
@@ -125,4 +125,4 @@ module.exports.ElaboratorThingsHub = function() {
 		reqPut.write(jsonObject);
 		reqPut.end();
 	};
-};
+}
