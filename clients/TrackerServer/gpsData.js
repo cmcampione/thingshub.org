@@ -1,6 +1,6 @@
 "use strict";
 
-module.exports.ResultStatus = {
+export const ResultStatus = {
 	Undefined : 0,
 	Ok : 1,
 	IncompleteLine : 2,
@@ -9,13 +9,13 @@ module.exports.ResultStatus = {
 	InternalError : 5
 };
 
-module.exports.ResultStatusData = function ResultStatusData(res, msg){
-	this.result = (res == undefined) ? module.exports.ResultStatus.Undefined : res;
+export function ResultStatusData(res, msg){
+	this.result = (res == undefined) ? ResultStatus.Undefined : res;
 	this.message = (msg == undefined) ? "" : msg;
-};
+}
 
-module.exports.Data = function() {
-	this.lastStatus = new module.exports.ResultStatusData();
+export function Data() {
+	this.lastStatus = new ResultStatusData();
 	this.deviceId = "";
 	this.lastEventDateTime = new Date();
 	this.surveyDateTime = "";
@@ -23,4 +23,4 @@ module.exports.Data = function() {
 	this.lng = 0.0;
 	this.speed = 0.0;
 	this.angle = 0.0;
-};
+}
