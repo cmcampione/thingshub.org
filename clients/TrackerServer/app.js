@@ -3,9 +3,9 @@
 console.log("-----------------------------------------------------------");
 
 const net         	= require("net");
-const path    			= require("path");
+const path    		= require("path");
 const dotenv  		= require("dotenv");
-const gpsDataMod     = require("./gpsData.js");
+const gpsDataMod    = require("./gpsData.js");
 const parser        = require("./parsers.js");
 const elaboratorsMod = require("./elaborators.js");
 
@@ -24,7 +24,7 @@ GPSs["X" + process.env.MAIN_GPS] = new gpsDataMod.Data();
 var elaborators = [];
 
 elaborators.push(new elaboratorsMod.ElaboratorUIGPSData());
-elaborators.push(new elaboratorsMod.ElaboratorFreeAnts());
+// elaborators.push(new elaboratorsMod.ElaboratorFreeAnts());
 elaborators.push(new elaboratorsMod.ElaboratorThingsHub());
 
 var server = net.createServer();  
