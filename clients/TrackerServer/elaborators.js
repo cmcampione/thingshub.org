@@ -1,16 +1,16 @@
 "use strict";
 
-import { request } from "http";
-import { request as _request } from "https";
-import { ResultStatus } from "./gpsData.js";
+var http = require("http");
+var https = require("https");
+var gpsDataMod = require("./gpsData.js");
 
-export function ElaboratorUIGPSData() {
+module.exports.ElaboratorUIGPSData = function() {
 	this.elaborate = function elaborate(gpsData) {
 
 		console.log("LastEventDateTime: %s", gpsData.lastEventDateTime.toString());
 		console.log("LastStatusMessage: %s", gpsData.lastStatus.message);
         
-		if (gpsData.lastStatus.result == ResultStatus.Ok)
+		if (gpsData.lastStatus.result == gpsDataMod.ResultStatus.Ok)
 		{
 			console.log("SurveyDateTime: %s", gpsData.surveyDateTime.toString());
 			console.log("Device Id: %s", gpsData.deviceId);
@@ -21,9 +21,9 @@ export function ElaboratorUIGPSData() {
 
 		console.log("-----------------------------------------------------------");
 	};
-}
+};
 
-export function ElaboratorFreeAnts() {
+module.exports.ElaboratorFreeAnts = function() {
 
 	//INFO: La X iniziale è per evitare la conversione implicita di javascript in int
 	let gpsId = "X" + process.env.MAIN_GPS;
@@ -56,7 +56,7 @@ export function ElaboratorFreeAnts() {
 		};
 
 		var responseData = "";
-		var reqPut = request(optionsPutThingValue, function(res) {
+		var reqPut = http.request(optionsPutThingValue, function(res) {
 			res.on("data", function(d) {
 				responseData += d;
 			});
@@ -73,9 +73,9 @@ export function ElaboratorFreeAnts() {
 		reqPut.write(jsonObject);
 		reqPut.end();
 	};
-}
+};
 
-export function ElaboratorThingsHub() {
+module.exports.ElaboratorThingsHub = function() {
 	
 	//INFO: La X iniziale è per evitare la conversione implicita di javascript in int
 	let gpsId = "X" + process.env.MAIN_GPS;
@@ -108,7 +108,7 @@ export function ElaboratorThingsHub() {
 		};
 	
 		let responseData = "";
-		let reqPut = _request(optionsPutThingValue, function(res) {
+		let reqPut = https.request(optionsPutThingValue, function(res) {
 			res.on("data", function(d) {
 				responseData += d;
 			});
@@ -125,4 +125,4 @@ export function ElaboratorThingsHub() {
 		reqPut.write(jsonObject);
 		reqPut.end();
 	};
-}
+};
