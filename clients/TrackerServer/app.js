@@ -2,32 +2,32 @@
 
 console.log("-----------------------------------------------------------");
 
-import { createServer } from "net";
-import { join } from "path";
-import { config } from "dotenv";
-import { Data, ResultStatus } from "./gpsData.js";
-import { parse } from "./parsers.js";
-import { ElaboratorUIGPSData, ElaboratorThingsHub } from "./elaborators.js";
+const net         	= require("net");
+const path    			= require("path");
+const dotenv  		= require("dotenv");
+const gpsDataMod     = require("./gpsData.js");
+const parser        = require("./parsers.js");
+const elaboratorsMod = require("./elaborators.js");
 
 // Env configuration
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
-const configPath = join(__dirname, "./", "trackerServer.env");
-config({ path: configPath });
+const configPath = path.join(__dirname, "./", "trackerServer.env");
+dotenv.config({ path: configPath });
 
 var GPSs = [];
 
 // INFO: The initial X is to avoid implicit Javascript conversion in int
-GPSs["X" + process.env.MAIN_GPS] = new Data();
+GPSs["X" + process.env.MAIN_GPS] = new gpsDataMod.Data();
 
 var elaborators = [];
 
-elaborators.push(new ElaboratorUIGPSData());
-//elaborators.push(new elaboratorsMod.ElaboratorFreeAnts());
-elaborators.push(new ElaboratorThingsHub());
+elaborators.push(new elaboratorsMod.ElaboratorUIGPSData());
+elaborators.push(new elaboratorsMod.ElaboratorFreeAnts());
+elaborators.push(new elaboratorsMod.ElaboratorThingsHub());
 
-var server = createServer();  
+var server = net.createServer();  
 server.on("connection", handleConnection);
 
 server.listen(process.env.TRACKER_SERVER_PORT, function() {  
@@ -52,16 +52,16 @@ function handleConnection(conn) {
 		console.log("connection data from %s: %j", remoteAddress, d);
 		console.log("-----------------------------------------------------------");
 
-		var currentGPSData = parse(d);
+		var currentGPSData = parser.parse(d);
 
 		var lastGPSData = GPSs["X" + currentGPSData.deviceId];
 		if (!lastGPSData)
-			lastGPSData = new Data();
+			lastGPSData = new gpsDataMod.Data();
 
 		lastGPSData.deviceId = currentGPSData.deviceId;
 		lastGPSData.lastEventDateTime = new Date();
 		lastGPSData.lastStatus = currentGPSData.lastStatus;
-		if (currentGPSData.lastStatus.result == ResultStatus.Ok) {
+		if (currentGPSData.lastStatus.result == gpsDataMod.ResultStatus.Ok) {
 			lastGPSData.surveyDateTime = currentGPSData.surveyDateTime;
 			lastGPSData.angle = currentGPSData.angle;
 			lastGPSData.lat = currentGPSData.lat;
