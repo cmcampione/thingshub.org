@@ -81,7 +81,7 @@ export declare const enum ThingUserChangeClaims {
 	// In beta test
 	CanOtherUsersChangeMyThingPos= 262144,
 
-	AllClaims = 524287
+	AllClaims = 1048575
 }
 export function validateThingUserChangeClaims(userChangeClaims) : boolean;
 export declare const enum ThingKind {
@@ -151,30 +151,30 @@ export declare class ThingDTO {
 	
 	public usersInfos : UserInfoDTO[];
 }
-export declare const enum ConnectionStates {
+export declare const enum RealtimeConnectionStates {
 	Connecting = 0,
 	Connected = 1,
 	Reconnecting = 2,
 	Disconnected = 4,
 }
-export declare class Connector {
-	protected connectionStatus: ConnectionStates;
+export declare class RealtimeConnector {
+	protected connectionStatus: RealtimeConnectionStates;
 	protected url: string;
 	protected authHook: () => void;
 	protected errorHook: (error: any) => void;
-	protected stateChangedHook: (newState: ConnectionStates) => void;
+	protected stateChangedHook: (newState: RealtimeConnectionStates) => void;
 	protected connectErrorHook: (error: any) => void;
-	protected on_connectionStatusChange(newState: ConnectionStates): void;
+	protected on_connectionStatusChange(newState: RealtimeConnectionStates): void;
 	subscribe(): void;
 	unsubscribe(): void;
 	setHook(eventName: string, hook: (...msg: any[]) => void): void;
 	remHook(eventName: any, hook: (...msg: any[]) => void): void;
-	constructor(url: string, authHook: () => void, errorHook: (error) => void, connectErrorHook: (error) => void, stateChangedHook: (change: ConnectionStates) => void);
+	constructor(url: string, authHook: () => void, errorHook: (error) => void, connectErrorHook: (error) => void, stateChangedHook: (change: RealtimeConnectionStates) => void);
 	api(): Promise<any | any>;
 }
-export declare class SocketIOConnector extends Connector {
+export declare class SocketIORealtimeConnector extends RealtimeConnector {
 	private socket;
-	constructor(url: string, authHook: () => void, errorHook: (error) => void, connectErrorHook: (error) => void, stateChangedHook: (change: ConnectionStates) => void);
+	constructor(url: string, authHook: () => void, errorHook: (error) => void, connectErrorHook: (error) => void, stateChangedHook: (change: RealtimeConnectionStates) => void);
 	private on_error(error);
 	private on_connect_error(error);
 	private on_connect();
@@ -220,7 +220,7 @@ export declare class AccountDataContext {
 	private accountUrl;
 	private authTokenRequest;
 	private getNewAccessToken();
-	constructor(endPointAddress: EndPointAddress, accountActionControl: AccountActionControl);
+	constructor(endPointAddress: EndPointAddress, accountActionControl?: AccountActionControl);
 	login(username: string, password: string): Promise<AccountUserData | HttpFailResult>;
 	loginBasic(username: string, password: string): Promise<any | HttpFailResult>;
 	logout(): Promise<any | HttpFailResult>;
@@ -238,6 +238,8 @@ export declare class AccountManager {
 	constructor(appName: string, accountDataContext: AccountDataContext, apiKey?: string);
 	readonly apiKey: string;
 	readonly accessToken: string;
+	getSecurityHeader: () => object;
+	getSecurityToken: () => string;
 	readonly isLoggedIn: boolean;
 	readonly remember: boolean;
 	login(username: string, password: string, remember: boolean): Promise<AccountUserData>;
@@ -274,8 +276,8 @@ export declare class Thing {
 export declare type ThingPositionRaw = any;
 export interface ThingsGetParams {
 	parentThingId: string;
-	thingFilter: string;
-	valueFilter: string;
+	thingFilter: object;
+	valueFilter: object;
 	orderBy: string;
 	skip: number;
 	top: number;
@@ -304,6 +306,33 @@ export declare class ThingsDataContext {
 	getThingValue(thingId: string, value: any): Promise<any | HttpFailResult>;
 	putThingValue(thingId: string, value: any): Promise<any | HttpFailResult>;
 	putThingsPositions(positions: ThingPositionRaw[]): Promise<any | HttpFailResult>;
+}
+export interface ThingClaims {
+	publicReadClaims: ThingUserReadClaims;
+	publicChangeClaims: ThingUserChangeClaims;
+	everyoneReadClaims: ThingUserReadClaims;
+	everyoneChangeClaims: ThingUserChangeClaims;
+	creatorUserReadClaims: ThingUserReadClaims;
+	creatorUserChangeClaims: ThingUserChangeClaims;
+}
+export interface ThingsDataSet {
+	things: Thing[];
+	itemsRange: ItemsRange;
+}
+export declare class ThingsManager {
+	private mainThing;
+	private thingKind;
+	private thingClaims;
+	private thingsDataContext;
+	private realtimeConnector;
+	private getThingsParams;
+	private getChindrenThingsParams;
+	constructor(mainThing: Thing, thingKind: string, thingClaims: ThingClaims, thingsDataContext: ThingsDataContext, realtimeConnector: RealtimeConnector);
+	private onCreateThing;
+	private getThings(parameter, canceler);
+	getMoreThingChildren(parentThing: Thing, parameter: ThingsGetParams, canceler: HttpRequestCanceler): Promise<ThingsDataSet>;
+	getMoreThings: (canceler: HttpRequestCanceler) => Promise<ThingsDataSet[]>;
+	getThingsTotalItems(): Number;
 }
 
 export as namespace thingshub;

@@ -1,6 +1,6 @@
 {
   "name": "thingshub-js-sdk",
-  "version": "1.0.25",
+  "version": "1.0.26",
   "description": "the bees are laborious",
   "main": "./src/index.js",
   "scripts": {
@@ -14,19 +14,19 @@
     "url": "https://github.com/cmcampione/thingshub.org.git"
   },
   "dependencies": {
-    "axios": "^0.17.1",
+    "axios": "^0.18.0",
     "g": "^2.0.1",
     "jwt-decode": "^2.2.0",
-    "npm": "^5.7.1",
-    "promise.prototype.finally": "~3.1.0",
-    "qs": "^6.5.1",
-    "socket.io-client": "~2.0.4"
+    "npm": "^6.1.0",
+    "promise.prototype.finally": "^3.1.0",
+    "qs": "^6.5.2",
+    "socket.io-client": "^2.1.1"
   },
   "devDependencies": {
     "@types/jwt-decode": "^2.2.1",
-    "@types/promise.prototype.finally": "~2.0.2",
+    "@types/promise.prototype.finally": "^2.0.2",
     "@types/socket.io-client": "^1.4.32",
-    "ts-loader": "^3.5.0",
-    "webpack": "^3.11.0"
+    "ts-loader": "^4.4.2",
+    "webpack": "^4.14.0"
   }
 }
