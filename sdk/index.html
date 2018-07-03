@@ -20,16 +20,17 @@
 
     <script>
 
-      /* var endPointAddress = {
+      var endPointAddress = {
           server: "https://api.thingshub.org:3000",
           api: "https://api.thingshub.org:3000/api"
-      } */
+      }
 
+      /*
       var endPointAddress = {
           server: "https://localhost:3000",
           api: "https://localhost:3000/api"
       }
-
+  */
       var accountDataContext = new thingshub.AccountDataContext(endPointAddress);
       var accountManager = new thingshub.AccountManager("thingshub", accountDataContext, "491e94d9-9041-4e5e-b6cb-9dad91bbf63d");
 
