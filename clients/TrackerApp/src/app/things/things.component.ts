@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import * as thingshub from 'thingshub-js-sdk';
 import { endPointAddress } from '../utils';
 import { AccountService } from '../account.service';
-
 @Component({
   selector: 'app-things',
   templateUrl: './things.component.html',
@@ -20,10 +19,10 @@ export class ThingsComponent implements OnInit {
 
   ngOnInit() {
 
-    const thingsGetParams =  {
+    const thingsGetParams: thingshub.ThingsGetParams =  {
       parentThingId : null,
-      thingFilter : '',
-      valueFilter : '',
+      thingFilter : null,
+      valueFilter : null,
       orderBy : '',
       skip : 0,
       top : 100
@@ -47,10 +46,10 @@ export class ThingsComponent implements OnInit {
 
   public async recall() {
 
-    const thingsGetParams =  {
+    const thingsGetParams: thingshub.ThingsGetParams = {
       parentThingId : null,
-      thingFilter : '',
-      valueFilter : '',
+      thingFilter : null,
+      valueFilter : null,
       orderBy : '',
       skip : 0,
       top : 100
