@@ -6,7 +6,7 @@ Hope
 
 cd ./sdk
 
-npm run build
+"npm run build-prod" or "npm run build-dev"
 
 --> only once install https://www.npmjs.com/package/dts-bundle-generator
 --> npm i dts-bundle-generator -g
