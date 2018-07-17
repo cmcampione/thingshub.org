@@ -1,10 +1,10 @@
 {
   "name": "thingshub-js-sdk",
-  "version": "1.0.26",
+  "version": "1.0.28",
   "description": "the bees are laborious",
   "main": "./src/index.js",
   "scripts": {
-    "build": "webpack",
+    "build": "webpack --debug",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
@@ -26,7 +26,10 @@
     "@types/jwt-decode": "^2.2.1",
     "@types/promise.prototype.finally": "^2.0.2",
     "@types/socket.io-client": "^1.4.32",
+    "copy-webpack-plugin": "^4.5.2",
+    "dts-bundle-generator": "^1.6.0",
     "ts-loader": "^4.4.2",
-    "webpack": "^4.14.0"
+    "webpack": "^4.15.1",
+    "webpack-cli": "^3.0.8"
   }
 }
