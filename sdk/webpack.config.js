@@ -33,12 +33,12 @@ module.exports = {
 		]
 	},
 	plugins: [
-		/* new CopyWebpackPlugin([
+		new CopyWebpackPlugin([
 			{ from: 'dist/package.json', to : '../clients/TrackerApp/node_modules/thingshub-js-sdk/', force: true },
 			{ from: 'dist/README.md', to : '../clients/TrackerApp/node_modules/thingshub-js-sdk/', force: true },
 			{ from: 'dist/thingshub.js', to : '../clients/TrackerApp/node_modules/thingshub-js-sdk/', force: true },
 			{ from: 'dist/thingshub.js.map', to : '../clients/TrackerApp/node_modules/thingshub-js-sdk/', force: true },
 			{ from: 'dist/thingshub.d.ts', to : '../clients/TrackerApp/node_modules/thingshub-js-sdk/', force: true }
-		],{}) */
+		],{})
 	  ]
 };
