@@ -5,6 +5,8 @@ import {AccountDataContext, AccountUserData} from "./accountDataContext";
 
 export class AccountManager {
 
+    private dummy: string = "carmelo";
+
     private accountDataContext: AccountDataContext;
     
     private _appName: string = null;    
@@ -130,6 +132,7 @@ export class AccountManager {
         const accountUserDataRaw: any = jwtDecode(this.accessToken);
 
         let dateNow = new Date();
+        let dateNowN = Math.trunc(dateNow.getTime()/1000);
         if (accountUserDataRaw.exp < Math.trunc(dateNow.getTime()/1000))
             return false;
         return true;
