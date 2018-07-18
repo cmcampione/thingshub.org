@@ -1,0 +1,28 @@
+{
+  "name": "thingshub-js-sdk",
+  "version": "1.0.28",
+  "description": "",
+  "main": "thingshub.js",
+  "types": "thingshub.d.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cmcampione/thingshub.org.git"
+  },
+  "keywords": [
+    "IoT",
+    "nodejs"
+  ],
+  "author": "Carmelo Campione",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/cmcampione/thingshub.org/issues"
+  },
+  "dependencies": {
+    "axios": "^0.17.1",    
+    "socket.io-client": "~2.0.4"
+  },
+  "homepage": "https://github.com/cmcampione/thingshub.org#readme"
+}

@@ -27,8 +27,8 @@
     "@types/jwt-decode": "^2.2.1",
     "@types/promise.prototype.finally": "^2.0.2",
     "@types/socket.io-client": "^1.4.32",
-    "copy-webpack-plugin": "^4.5.2",
     "dts-bundle-generator": "^1.6.0",
+    "filemanager-webpack-plugin": "^1.0.27",
     "ts-loader": "^4.4.2",
     "webpack": "^4.15.1",
     "webpack-cli": "^3.0.8"
