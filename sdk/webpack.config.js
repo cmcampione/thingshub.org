@@ -1,5 +1,5 @@
 const path = require("path");
-const CopyWebpackPlugin = require('copy-webpack-plugin');
+const FileManagerPlugin = require("filemanager-webpack-plugin");
 
 const libraryName = "thingshub";
 
@@ -33,12 +33,16 @@ module.exports = {
 		]
 	},
 	plugins: [
-		new CopyWebpackPlugin([
-			{ from: 'dist/package.json', to : '../clients/TrackerApp/node_modules/thingshub-js-sdk/', force: true },
-			{ from: 'dist/README.md', to : '../clients/TrackerApp/node_modules/thingshub-js-sdk/', force: true },
-			{ from: 'dist/thingshub.js', to : '../clients/TrackerApp/node_modules/thingshub-js-sdk/', force: true },
-			{ from: 'dist/thingshub.js.map', to : '../clients/TrackerApp/node_modules/thingshub-js-sdk/', force: true },
-			{ from: 'dist/thingshub.d.ts', to : '../clients/TrackerApp/node_modules/thingshub-js-sdk/', force: true }
-		],{})
-	  ]
+		new FileManagerPlugin({
+			onEnd: {
+				copy: [
+					{ source: "./dist/package.json", destination: "../dummy/" },
+					{ source: "./dist/README.md", destination: "../dummy/" },
+					{ source: "./dist/thingshub.js", destination: "../dummy/" },
+					{ source: "./dist/thingshub.js.map", destination: "../dummy/" },
+					{ source: "./dist/thingshub.d.ts", destination: "../dummy/" }
+				]
+			}
+		})
+	]
 };
