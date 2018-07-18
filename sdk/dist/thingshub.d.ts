@@ -226,7 +226,6 @@ export declare class AccountDataContext {
 	logout(): Promise<any | HttpFailResult>;
 }
 export declare class AccountManager {
-	private dummy;
 	private accountDataContext;
 	private _appName;
 	private _accessToken;
