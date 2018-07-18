@@ -36,11 +36,11 @@ module.exports = {
 		new FileManagerPlugin({
 			onEnd: {
 				copy: [
-					{ source: "./dist/package.json", destination: "../dummy/" },
-					{ source: "./dist/README.md", destination: "../dummy/" },
-					{ source: "./dist/thingshub.js", destination: "../dummy/" },
-					{ source: "./dist/thingshub.js.map", destination: "../dummy/" },
-					{ source: "./dist/thingshub.d.ts", destination: "../dummy/" }
+					{ source: "./dist/package.json", destination: "../clients/TrackerApp/node_modules/thingshub-js-sdk/" },
+					{ source: "./dist/README.md", destination: "../clients/TrackerApp/node_modules/thingshub-js-sdk/" },
+					{ source: "./dist/thingshub.js", destination: "../clients/TrackerApp/node_modules/thingshub-js-sdk/" },
+					{ source: "./dist/thingshub.js.map", destination: "../clients/TrackerApp/node_modules/thingshub-js-sdk/" },
+					{ source: "./dist/thingshub.d.ts", destination: "../clients/TrackerApp/node_modules/thingshub-js-sdk/" }
 				]
 			}
 		})
