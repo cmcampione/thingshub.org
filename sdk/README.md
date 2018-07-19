@@ -6,12 +6,13 @@ Hope
 
 cd ./sdk
 
-"npm run build-prod" or "npm run build-dev"
+npm run build-prod 
 
---> only once install https://www.npmjs.com/package/dts-bundle-generator
---> npm i dts-bundle-generator -g
+or
 
-dts-bundle-generator -o ./dist/thingshub.d.ts ./src/index.ts  --umd-module-name thingshub
+npm run build-dev
+
+./node_modules/.bin/dts-bundle-generator -o ./dist/thingshub.d.ts ./src/index.ts  --umd-module-name thingshub
 
 --> inc version number of ./package.json and ./dist/package.json
 

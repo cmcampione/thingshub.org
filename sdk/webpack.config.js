@@ -1,5 +1,5 @@
 const path = require("path");
-const WebpackShellPlugin = require('webpack-shell-plugin');
+const WebpackShellPlugin = require("webpack-shell-plugin");
 const FileManagerPlugin = require("filemanager-webpack-plugin");
 
 const libraryName = "thingshub";
@@ -35,9 +35,9 @@ module.exports = {
 	},
 	plugins: [
 		new WebpackShellPlugin({
-			onBuildStart: ['echo "Starting"'],
-			onBuildEnd: ['echo "Ending"']
-		  }),
+			onBuildStart: ["echo \"Starting\""],
+			onBuildEnd: ["echo \"Ending\""]
+		}),
 		new FileManagerPlugin({
 			onEnd: {
 				copy: [
