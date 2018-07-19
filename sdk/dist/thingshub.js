@@ -3434,11 +3434,13 @@ class AccountDataContext {
         return axios_1.default.post(this.accountUrl + "/login", qs.stringify(loginData), config)
             .then(function (response) {
             const accountUserDataRaw = jwtDecode(response.data.access_token);
+            let dateNow = new Date();
             return {
                 accessToken: response.data.access_token,
                 id: accountUserDataRaw.sub,
                 name: accountUserDataRaw.name,
-                exp: accountUserDataRaw.exp
+                exp: accountUserDataRaw.exp,
+                deltaTime: Math.trunc(dateNow.getTime() / 1000) - accountUserDataRaw.exp
             };
         });
     }
@@ -3489,11 +3491,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const jwtDecode = __webpack_require__(/*! jwt-decode */ "./node_modules/jwt-decode/lib/index.js");
 class AccountManager {
     constructor(appName, accountDataContext, apiKey) {
-        this.dummy = "maria";
         this._appName = null;
         this._accessToken = null;
         this._userId = null;
         this._userName = null;
+        this.deltaTime = null;
         //INFO: apiKey is never persistent
         this._apiKey = null;
         this.getSecurityHeader = () => {
@@ -3523,6 +3525,8 @@ class AccountManager {
         localStorage.removeItem(this._appName + "_Remember");
         localStorage.removeItem(this._appName + "_AccessToken");
         sessionStorage.removeItem(this._appName + "_AccessToken");
+        localStorage.removeItem(this._appName + "_DeltaTime");
+        sessionStorage.removeItem(this._appName + "_DeltaTime");
         localStorage.removeItem(this._appName + "_UserId");
         sessionStorage.removeItem(this._appName + "_UserId");
         localStorage.removeItem(this._appName + "_Username");
@@ -3533,15 +3537,18 @@ class AccountManager {
         this._accessToken = accountUserData.accessToken;
         this._userId = accountUserData.id;
         this._userName = accountUserData.name;
+        this.deltaTime = accountUserData.deltaTime;
         sessionStorage.setItem(this._appName + "_AccessToken", this._accessToken);
         sessionStorage.setItem(this._appName + "_UserId", this._userId);
         sessionStorage.setItem(this._appName + "_Username", this._userName);
+        sessionStorage.setItem(this._appName + "_DeltaTime", this.deltaTime.toString());
         localStorage.setItem(this._appName + "_Remember", remember == true ? "true" : "false");
         if (remember == false)
             return;
         localStorage.setItem(this._appName + "_AccessToken", this._accessToken);
         localStorage.setItem(this._appName + "_UserId", this._userId);
         localStorage.setItem(this._appName + "_Username", this._userName);
+        localStorage.setItem(this._appName + "_DeltaTime", this.deltaTime.toString());
     }
     getLoginData(apiKey) {
         if (apiKey) {
@@ -3555,11 +3562,13 @@ class AccountManager {
         this._accessToken = sessionStorage.getItem(this._appName + "_AccessToken");
         this._userId = sessionStorage.getItem(this._appName + "_UserId");
         this._userName = sessionStorage.getItem(this._appName + "_Username");
+        this.deltaTime = parseInt(sessionStorage.getItem(this._appName + "_DeltaTime"));
         if (this.remember == false)
             return;
         this._accessToken = localStorage.getItem(this._appName + "_AccessToken");
         this._userId = localStorage.getItem(this._appName + "_UserId");
         this._userName = localStorage.getItem(this._appName + "_Username");
+        this.deltaTime = parseInt(localStorage.getItem(this._appName + "_DeltaTime"));
     }
     get apiKey() {
         return this._apiKey;
@@ -3575,7 +3584,7 @@ class AccountManager {
         const accountUserDataRaw = jwtDecode(this.accessToken);
         let dateNow = new Date();
         let dateNowN = Math.trunc(dateNow.getTime() / 1000);
-        if (accountUserDataRaw.exp < Math.trunc(dateNow.getTime() / 1000))
+        if (accountUserDataRaw.exp + this.deltaTime < Math.trunc(dateNow.getTime() / 1000))
             return false;
         return true;
     }

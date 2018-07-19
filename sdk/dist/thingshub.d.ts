@@ -155,7 +155,7 @@ export declare const enum RealtimeConnectionStates {
 	Connecting = 0,
 	Connected = 1,
 	Reconnecting = 2,
-	Disconnected = 4,
+	Disconnected = 4
 }
 export declare class RealtimeConnector {
 	protected connectionStatus: RealtimeConnectionStates;
@@ -169,16 +169,16 @@ export declare class RealtimeConnector {
 	unsubscribe(): void;
 	setHook(eventName: string, hook: (...msg: any[]) => void): void;
 	remHook(eventName: any, hook: (...msg: any[]) => void): void;
-	constructor(url: string, authHook: () => void, errorHook: (error) => void, connectErrorHook: (error) => void, stateChangedHook: (change: RealtimeConnectionStates) => void);
+	constructor(url: string, authHook: () => void, errorHook: (error: any) => void, connectErrorHook: (error: any) => void, stateChangedHook: (change: RealtimeConnectionStates) => void);
 	api(): Promise<any | any>;
 }
 export declare class SocketIORealtimeConnector extends RealtimeConnector {
 	private socket;
-	constructor(url: string, authHook: () => void, errorHook: (error) => void, connectErrorHook: (error) => void, stateChangedHook: (change: RealtimeConnectionStates) => void);
-	private on_error(error);
-	private on_connect_error(error);
-	private on_connect();
-	private on_disconnect(reason);
+	constructor(url: string, authHook: () => void, errorHook: (error: any) => void, connectErrorHook: (error: any) => void, stateChangedHook: (change: RealtimeConnectionStates) => void);
+	private on_error;
+	private on_connect_error;
+	private on_connect;
+	private on_disconnect;
 	subscribe(): void;
 	unsubscribe(): void;
 	setHook(eventName: string, hook: (...msg: any[]) => void): void;
@@ -209,6 +209,7 @@ export interface AccountUserData {
 	id: string;
 	name: string;
 	exp: Date;
+	deltaTime: number;
 }
 export interface AccountActionControl {
 	getSecurityHeader: () => object;
@@ -216,10 +217,10 @@ export interface AccountActionControl {
 	resetApp: () => void;
 }
 export declare class AccountDataContext {
-	private accountActionControl;
+	private accountActionControl?;
 	private accountUrl;
 	private authTokenRequest;
-	private getNewAccessToken();
+	private getNewAccessToken;
 	constructor(endPointAddress: EndPointAddress, accountActionControl?: AccountActionControl);
 	login(username: string, password: string): Promise<AccountUserData | HttpFailResult>;
 	loginBasic(username: string, password: string): Promise<any | HttpFailResult>;
@@ -231,10 +232,11 @@ export declare class AccountManager {
 	private _accessToken;
 	private _userId;
 	private _userName;
+	private deltaTime;
 	private _apiKey;
 	resetLoginData(): void;
-	private setLoginData(accountUserData, remember);
-	private getLoginData(apiKey?);
+	private setLoginData;
+	private getLoginData;
 	constructor(appName: string, accountDataContext: AccountDataContext, apiKey?: string);
 	readonly apiKey: string;
 	readonly accessToken: string;
@@ -289,11 +291,11 @@ export interface ThingsDTOsDataSet {
 export declare class ThingsDataContext {
 	private apiEndPointAddress;
 	private securityHeaderHook;
-	private thingsUrl(thingId?);
-	private thingsValueUrl(thingId);
-	private thingsPositionsUrl();
-	private thingChildrenUrl(parentThingId, childrenId?);
-	private thingDeleteChildUrl(parentThingId, childThingId);
+	private thingsUrl;
+	private thingsValueUrl;
+	private thingsPositionsUrl;
+	private thingChildrenUrl;
+	private thingDeleteChildUrl;
 	constructor(endPointAddress: EndPointAddress, securityHeaderHook: () => object);
 	getThing(thingId: string): Promise<ThingDTO | HttpFailResult>;
 	getThings(parameter: ThingsGetParams, canceler?: HttpRequestCanceler): Promise<ThingsDTOsDataSet | HttpFailResult>;
@@ -329,7 +331,7 @@ export declare class ThingsManager {
 	private getChindrenThingsParams;
 	constructor(mainThing: Thing, thingKind: string, thingClaims: ThingClaims, thingsDataContext: ThingsDataContext, realtimeConnector: RealtimeConnector);
 	private onCreateThing;
-	private getThings(parameter, canceler);
+	private getThings;
 	getMoreThingChildren(parentThing: Thing, parameter: ThingsGetParams, canceler: HttpRequestCanceler): Promise<ThingsDataSet>;
 	getMoreThings: (canceler: HttpRequestCanceler) => Promise<ThingsDataSet[]>;
 	getThingsTotalItems(): Number;
