@@ -8,7 +8,7 @@ export interface AccountUserData {
     accessToken: string;
     id: string;
     name: string;
-    exp: Date;
+    exp: number
 }
 
 export interface AccountActionControl {
@@ -87,6 +87,8 @@ export class AccountDataContext {
         .then(function(response) : AccountUserData {
 
             const accountUserDataRaw: any = jwtDecode(response.data.access_token);
+
+            let dateNow = new Date();
 
             return {
                 accessToken: response.data.access_token,
