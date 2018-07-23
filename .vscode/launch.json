@@ -24,6 +24,13 @@
             "url": "http://localhost:4200/",
             "sourceMaps": true,
             "webRoot": "${workspaceRoot}"
+        },
+        {
+            "name": "Launch SDK webpack",
+            "type": "node",
+            "request": "launch",
+            "program": "${workspaceRoot}\\sdk\\node_modules\\webpack-dev-server\\bin\\webpack-dev-server.js",
+            "cwd": "${workspaceRoot}\\sdk"
         }
     ]
 }
