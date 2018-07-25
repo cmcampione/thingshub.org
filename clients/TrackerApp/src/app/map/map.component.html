@@ -16,7 +16,7 @@
       Last status: {{ lastStatusMsg }}
     </label>
   </ons-card>
-  <agm-map [latitude]="lat" [longitude]="lng">
+  <agm-map [latitude]="lat" [longitude]="lng" [zoom]=16>
     <agm-marker [latitude]="lat" [longitude]="lng"></agm-marker>
   </agm-map>
 </ons-card>

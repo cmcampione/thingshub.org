@@ -85,7 +85,7 @@ export class ThingsManager {
     }
 
     // INFO: Fills parentThing
-    // INFO: "thing.children" is filled filtered by "this.getChindrenThingsParams"
+    // INFO: "parentThing.children" is filled filtered by "this.getChindrenThingsParams"
     public getMoreThingChildren(parentThing : Thing, parameter: ThingsGetParams, canceler: HttpRequestCanceler) : Promise<ThingsDataSet> {
 
         parameter.skip = parentThing.childrenSkip;

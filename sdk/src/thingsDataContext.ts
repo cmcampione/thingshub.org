@@ -142,7 +142,7 @@ export class ThingsDataContext {
         })
     }
 
-    public  getThingValue(thingId : string, value: any) : Promise<any | HttpFailResult> {
+    public  getThingValue(thingId : string) : Promise<any | HttpFailResult> {
         return axios.get(this.thingsValueUrl(thingId), {
             headers: this.securityHeaderHook()
         })
