@@ -33,10 +33,9 @@ module.exports = {
 			{ test: /\.tsx?$/, loader: "ts-loader" }
 		]
 	},
-	plugins: [
+	plugins: [		
 		new WebpackShellPlugin({
-			onBuildStart: ["echo \"Starting\""],
-			onBuildEnd: ["echo \"Ending\""]
+			onBuildEnd: [".\\node_modules\\.bin\\dts-bundle-generator -o ./dist/thingshub.d.ts ./src/index.ts  --umd-module-name thingshub"]
 		}),
 		new FileManagerPlugin({
 			onEnd: {
@@ -48,6 +47,6 @@ module.exports = {
 					{ source: "./dist/thingshub.d.ts", destination: "../clients/TrackerApp/node_modules/thingshub-js-sdk/" }
 				]
 			}
-		})
+		}),
 	]
 };

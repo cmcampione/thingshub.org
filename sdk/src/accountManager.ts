@@ -5,6 +5,8 @@ import {AccountDataContext, AccountUserData} from "./accountDataContext";
 
 export class AccountManager {
 
+    private dummy8: string = "carmelo";
+
     private accountDataContext: AccountDataContext;
 
     private _appName: string = null;    

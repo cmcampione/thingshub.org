@@ -208,8 +208,7 @@ export interface AccountUserData {
 	accessToken: string;
 	id: string;
 	name: string;
-	exp: Date;
-	deltaTime: number;
+	exp: number;
 }
 export interface AccountActionControl {
 	getSecurityHeader: () => object;
@@ -227,6 +226,7 @@ export declare class AccountDataContext {
 	logout(): Promise<any | HttpFailResult>;
 }
 export declare class AccountManager {
+	private dummy8;
 	private accountDataContext;
 	private _appName;
 	private _accessToken;
