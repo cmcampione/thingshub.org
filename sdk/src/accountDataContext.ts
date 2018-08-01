@@ -88,8 +88,6 @@ export class AccountDataContext {
 
             const accountUserDataRaw: any = jwtDecode(response.data.access_token);
 
-            let dateNow = new Date();
-
             return {
                 accessToken: response.data.access_token,
                 id: accountUserDataRaw.sub,

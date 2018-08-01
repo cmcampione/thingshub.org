@@ -11,6 +11,10 @@ import { AccountService } from '../account.service';
 })
 export class MapComponent implements OnInit {
 
+  private thingsDataContext: thingshub.ThingsDataContext;
+
+  private thingKind = 'c3aa4d95-4cb4-415c-a251-7fe846e0fd17';
+  private thingId = '';
   public deviceId = '087073117560';
   public surveyDateTime = '';
   public lastEventDateTime = '';
@@ -36,27 +40,55 @@ export class MapComponent implements OnInit {
   }
 
   constructor(@Inject(LOCALE_ID) private locale: string, private accountService: AccountService) {
+    this.thingsDataContext = new thingshub.ThingsDataContext(endPointAddress, accountService.getSecurityHeader);
+  }
 
+  private setValue(value: any) {
+    this.deviceId = value.deviceId;
+    this.lastEventDateTime = moment(value.lastEventDateTime).format('L LTS');
+    this.lastStatusMsg = value.lastStatus.message;
+    this.surveyDateTime = moment(value.surveyDateTime).format('L LTS');
+    this.lat = value.lat;
+    this.lng = value.lng;
+
+    console.log(value);
   }
 
   ngOnInit() {
+
+    const thingsGetParams: thingshub.ThingsGetParams =  {
+      parentThingId : null,
+      thingFilter : {kind: this.thingKind },
+      valueFilter : null,
+      orderBy : '',
+      skip : 0,
+      top : 100
+    };
+    this.thingsDataContext.getThings(thingsGetParams)
+    .then(things => {
+
+      moment.locale('IT-it');
+
+      for (let i = 0; i < things.things.length; i++) {
+
+        this.setValue(things.things[i].value);
+
+        this.thingId = things.things[i].id;
+    }})
+    .catch(e => {
+      console.log(e);
+    });
+
     this.socket.subscribe();
     // Uses of "fat arrow" sintax for "this" implicit binding
     this.socket.setHook('onUpdateThingValue', (thingId, value) => {
 
-      if (this.deviceId !== value.deviceId) {
+      if (this.thingId !== thingId || this.deviceId !== value.deviceId) {
         return;
       }
 
       moment.locale('IT-it');
-      this.deviceId = value.deviceId;
-      this.lastEventDateTime = moment(value.lastEventDateTime).format('L LTS');
-      this.lastStatusMsg = value.lastStatus.message;
-      this.surveyDateTime = moment(value.surveyDateTime).format('L LTS');
-      this.lat = value.lat;
-      this.lng = value.lng;
-      console.log(value);
+      this.setValue(value);
     });
   }
-
 }
