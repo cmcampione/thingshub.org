@@ -15,6 +15,7 @@ export class MapComponent implements OnInit {
 
   private thingKind = 'c3aa4d95-4cb4-415c-a251-7fe846e0fd17';
   private thingId = '';
+  
   public deviceId = '087073117560';
   public surveyDateTime = '';
   public lastEventDateTime = '';
@@ -44,6 +45,8 @@ export class MapComponent implements OnInit {
   }
 
   private setValue(value: any) {
+    const now = Date.now();
+
     this.deviceId = value.deviceId;
     this.lastEventDateTime = moment(value.lastEventDateTime).format('L LTS');
     this.lastStatusMsg = value.lastStatus.message;
