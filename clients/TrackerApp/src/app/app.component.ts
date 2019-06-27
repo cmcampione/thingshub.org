@@ -13,7 +13,7 @@ export class AppComponent {
   public sidePage    = SidePageComponent;
   public contentPage = ContentPageComponent;
 
-  @ViewChild('splitter') splitter;
+  @ViewChild('splitter', {static: false}) splitter;
 
   constructor(private menuService: MenuService) {
     this.menuService.menu$.subscribe(() => this.splitter.nativeElement.side.open());

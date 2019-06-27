@@ -23,7 +23,7 @@
     "@angular/platform-browser-dynamic": "^8.0.3",
     "@angular/router": "^8.0.3",
     "axios": "^0.19.0",
-    "core-js": "^3.1.4",
+    "core-js": "^2.5.0",
     "moment": "^2.24.0",
     "ngx-onsenui": "^7.0.0",
     "onsenui": "^2.10.8",
