@@ -305,7 +305,7 @@ export declare class ThingsDataContext {
 	getThingChildrenIds(parentThingId: string): Promise<string[] | HttpFailResult>;
 	addChildToParent(parentThingId: string, childThingId: string): Promise<any | HttpFailResult>;
 	deleteThingChild(parentThingId: string, childThingId: string): Promise<any | HttpFailResult>;
-	getThingValue(thingId: string, value: any): Promise<any | HttpFailResult>;
+	getThingValue(thingId: string): Promise<any | HttpFailResult>;
 	putThingValue(thingId: string, value: any): Promise<any | HttpFailResult>;
 	putThingsPositions(positions: ThingPositionRaw[]): Promise<any | HttpFailResult>;
 }
@@ -338,3 +338,5 @@ export declare class ThingsManager {
 }
 
 export as namespace thingshub;
+
+export {};
