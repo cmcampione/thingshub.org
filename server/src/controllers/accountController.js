@@ -106,7 +106,7 @@ router.get("/registerByOnlyEmail/:email/:culture", async (req, res, next) => {
 		const user = await usersMngr.findUserByUsername(email);
 		if (user) {
 			// The client can redirect user to login page and recovery password
-			res.json(new dtos.RegisterByOnlyEmailDTO(email, "", dtos.RegisterByOnlyEmailStatus.UserAlreadyRegistered));
+			res.json(new dtos.RegisterByOnlyEmailDTO(email,"", dtos.RegisterByOnlyEmailStatus.UserAlreadyRegistered));
 			return;
 		}
 
@@ -232,7 +232,7 @@ router.post("/login", async function (req, res, next) {
 	})(req, res, next);
 });
 
-router.get('/logout', async function (req, res, next) {
+router.get("/logout", async function (req, res, next) {
 	passport.authenticate("local", async function(err, user, info) {
 		try {
 			if (err) { 

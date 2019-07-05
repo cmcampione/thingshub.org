@@ -1,10 +1,10 @@
 "use strict";
 
 const httpStatusCodes 	= require("http-status-codes");
-const fs   				= require('fs');
-const path 				= require('path');
-const uuid 				= require('uuid/v4');
-const jwt  				= require('jsonwebtoken');
+const fs   				= require("fs");
+const path 				= require("path");
+const uuid 				= require("uuid/v4");
+const jwt  				= require("jsonwebtoken");
 
 const UserDTO 			= require("../../common/src/dtos").UserDTO;
 
@@ -68,16 +68,16 @@ const publicKey = fs.readFileSync(path.join(__dirname, "../certs/certificate.pem
  * @return {String} The JWT Token
  */
 exports.createToken = ({ exp = 3600, sub = "", name = "" } = {}) => {
-  const token = jwt.sign({
-	jti : uuid(),
-	sub,
-	name,
-    exp : Math.floor(Date.now() / 1000) + exp,
-  }, privateKey, {
-	algorithm: 'RS256',
-  });
+	const token = jwt.sign({
+		jti : uuid(),
+		sub,
+		name,
+		exp : Math.floor(Date.now() / 1000) + exp,
+	}, privateKey, {
+		algorithm: "RS256",
+	});
 
-  return token;
+	return token;
 };
 
 /**
