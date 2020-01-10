@@ -29,10 +29,10 @@ void loop()
  // if wifi is down, try reconnecting every 30 seconds
   if (WiFi.status() != WL_CONNECTED) {
     wifi_reconnection = true;
-    if (millis() >= check_wifi) {      
+    if (millis() - check_wifi >= check_wifi_interval) {
+      check_wifi = millis();
       WiFi.disconnect();
-      WiFi.begin(wifi_ssid, wifi_password);      
-      check_wifi = millis() + check_wifi_interval;
+      WiFi.begin(wifi_ssid, wifi_password);            
       Serial.println("Reconnecting to WiFi...");
     }
   }
