@@ -1,8 +1,8 @@
 #include "WiFi.h"
 
 // WiFi
-const char* wifi_ssid      = "Infostrada-702DC4";
-const char* wifi_password  = "HmqVyUeNQL";
+const char* wifi_ssid      = "";
+const char* wifi_password  = "";
 
 const unsigned long check_wifi_interval = 30000;
 unsigned long       check_wifi          = 0;
