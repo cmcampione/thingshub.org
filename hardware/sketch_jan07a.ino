@@ -1,3 +1,5 @@
+// Per la gestione dello overflow ho utilizzato la soluzione proposta da https://www.leonardomiliani.com/2012/come-gestire-loverflow-di-millis/
+
 #include "WiFi.h"
 
 // WiFi
