@@ -2,7 +2,7 @@
 
 #include "WiFi.h"
 #include "HTTPClient.h"
-#include "SocketIOclient.h"
+#include "PubSubClient.h"
 #include "BuilDefine.h"
 
 #define DEBUG
@@ -22,10 +22,10 @@ class WiFiManager {
     static const char* wifi_password;
 
     static const unsigned long  check_wifi_interval;
-
+    
     static boolean              wifi_reconnection;
     static unsigned long        check_wifi;
-
+   
   public:
     WiFiManager() {
     }
@@ -72,34 +72,44 @@ boolean             WiFiManager::wifi_reconnection   = false;
 
 ////////////////////////////////
 
-const char* root_ca = \
-"-----BEGIN CERTIFICATE-----\n" \
-"MIIDSjCCAjKgAwIBAgIQRK+wgNajJ7qJMDmGLvhAazANBgkqhkiG9w0BAQUFADA/\n" \
-"MSQwIgYDVQQKExtEaWdpdGFsIFNpZ25hdHVyZSBUcnVzdCBDby4xFzAVBgNVBAMT\n" \
-"DkRTVCBSb290IENBIFgzMB4XDTAwMDkzMDIxMTIxOVoXDTIxMDkzMDE0MDExNVow\n" \
-"PzEkMCIGA1UEChMbRGlnaXRhbCBTaWduYXR1cmUgVHJ1c3QgQ28uMRcwFQYDVQQD\n" \
-"Ew5EU1QgUm9vdCBDQSBYMzCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEB\n" \
-"AN+v6ZdQCINXtMxiZfaQguzH0yxrMMpb7NnDfcdAwRgUi+DoM3ZJKuM/IUmTrE4O\n" \
-"rz5Iy2Xu/NMhD2XSKtkyj4zl93ewEnu1lcCJo6m67XMuegwGMoOifooUMM0RoOEq\n" \
-"OLl5CjH9UL2AZd+3UWODyOKIYepLYYHsUmu5ouJLGiifSKOeDNoJjj4XLh7dIN9b\n" \
-"xiqKqy69cK3FCxolkHRyxXtqqzTWMIn/5WgTe1QLyNau7Fqckh49ZLOMxt+/yUFw\n" \
-"7BZy1SbsOFU5Q9D8/RhcQPGX69Wam40dutolucbY38EVAjqr2m7xPi71XAicPNaD\n" \
-"aeQQmxkqtilX4+U9m5/wAl0CAwEAAaNCMEAwDwYDVR0TAQH/BAUwAwEB/zAOBgNV\n" \
-"HQ8BAf8EBAMCAQYwHQYDVR0OBBYEFMSnsaR7LHH62+FLkHX/xBVghYkQMA0GCSqG\n" \
-"SIb3DQEBBQUAA4IBAQCjGiybFwBcqR7uKGY3Or+Dxz9LwwmglSBd49lZRNI+DT69\n" \
-"ikugdB/OEIKcdBodfpga3csTS7MgROSR6cz8faXbauX+5v3gTt23ADq1cEmv8uXr\n" \
-"AvHRAosZy5Q6XkjEGB5YGV8eAlrwDPGxrancWYaLbumR9YbK+rlmM6pZW87ipxZz\n" \
-"R8srzJmwN0jP41ZL9c8PDHIyh8bwRLtTcm1D9SZImlJnt1ir/md2cXjbDaJWFBM5\n" \
-"JDGFoqgCWjBH4d1QB7wCCZAA62RjYJsWvIjJEubSfZGL+T0yjWW06XyxV3bqxbYo\n" \
-"Ob8VZRzI9neWagqNdwvYkQsEjgfbKbYK7p2CNTUQ\n" \
-"-----END CERTIFICATE-----\n";
+const char* mqtt_server = "mqtt.thingshub.org";
+#define mqtt_port 1883
+#define MQTT_USER "muschitta"
+#define MQTT_PASSWORD "aviremu"
 
-/////////////////////////////
+#define MQTT_SERIAL_RECEIVER_CH "onUpdateThingValue"
 
-SocketIOclient  webSocket;
+WiFiClient wifiClient;
+PubSubClient mqtt_client(wifiClient);
 
-void event(socketIOmessageType_t type, uint8_t * payload, size_t length) {
-  DPRINTLN("ciao");
+void mqtt_reconnect() {
+  // Loop until we're reconnected
+  while (!mqtt_client.connected()) {
+    Serial.print("Attempting MQTT connection...");
+    // Create a random client ID
+    String clientId = "Ant-";
+    clientId += String(random(0xffff), HEX);
+    // Attempt to connect
+    if (mqtt_client.connect(clientId.c_str(), MQTT_USER, MQTT_PASSWORD)) {
+      Serial.println("mqtt connected");
+      mqtt_client.subscribe(MQTT_SERIAL_RECEIVER_CH);
+    } else {
+      Serial.print("mqtt failed, rc=");
+      Serial.print(mqtt_client.state());
+      Serial.println("mqtt try again in 5 seconds");
+      // Wait 5 seconds before retrying
+      delay(5000);
+    }
+  }
+}
+
+void mqtt_callback(char* topic, byte *payload, unsigned int length) {
+    Serial.println("-------new message from broker-----");
+    Serial.print("channel:");
+    Serial.println(topic);
+    Serial.print("data:");  
+    Serial.write(payload, length);
+    Serial.println();
 }
 
 //////////////////////////
@@ -108,15 +118,18 @@ int ledPin = 2;
 
 void setup()
 {
+  randomSeed(micros());
+   
   Serial.begin(115200);
 
   // WiFi setup
   WiFiManager::connect();
 
   //
-  webSocket.onEvent(event);
-  webSocket.beginSocketIOSSLWithCA("api.thingshub.org", 3000, "/socket.io/?EIO=3&token=491e94d9-9041-4e5e-b6cb-9dad91bbf63d", root_ca, "");
-
+  mqtt_client.setServer(mqtt_server, mqtt_port);
+  mqtt_client.setCallback(mqtt_callback);
+  mqtt_reconnect();
+  
   //
   pinMode(ledPin, OUTPUT);
 }
@@ -126,7 +139,7 @@ void loop()
   WiFiManager::checkAndTryReconnecting();
 
   ///////////////////////
-
+  
   if ((WiFi.status() == WL_CONNECTED)) { //Check the current connection status
 
 //    HTTPClient http;
@@ -148,8 +161,9 @@ void loop()
 //    http.end(); //Free the resources
 
     ///////////////
-    webSocket.loop();
-  }
 
-  //delay(10000);
+    mqtt_client.loop();
+  }
+ 
+//  delay(10000);
 }
