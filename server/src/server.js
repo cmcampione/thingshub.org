@@ -59,7 +59,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 // This line must be immediately after any of the bodyParser middlewares!
-app.use(expressValidator());
+//app.use(expressValidator());
 
 // Passport setup
 
