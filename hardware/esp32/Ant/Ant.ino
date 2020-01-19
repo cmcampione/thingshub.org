@@ -3,7 +3,7 @@
 #include "WiFi.h"
 #include "HTTPClient.h"
 #include "SocketIOclient.h"
-#include "BuilDefine.h"
+#include "BuildDefine.h"
 
 #define DEBUG
 #ifdef DEBUG    //Macros are usually in all capital letters.
@@ -30,10 +30,10 @@ class WiFiManager {
     WiFiManager() {
     }
     static void connect() {
-       do {
+       do {       
         WiFi.begin(WiFiManager::wifi_ssid, WiFiManager::wifi_password);
-        delay(500);
-        DPRINTLN("Connecting to WiFi...");
+        delay(5000);
+        DPRINTLN("Connecting to WiFi...");        
       } while (WiFi.status() != WL_CONNECTED);
       DPRINTLN("Connected to the WiFi");      
     }
