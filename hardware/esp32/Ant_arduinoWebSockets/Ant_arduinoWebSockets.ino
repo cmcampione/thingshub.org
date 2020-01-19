@@ -77,39 +77,40 @@ boolean             WiFiManager::wifi_reconnection   = false;
 
 //////////////////////////////////
 
+const int msgCapacity = 300;
 class SocketIOManager {
   private:
     static SocketIOclient webSocket;
-    static std::map<String, std::function<void (const StaticJsonDocument<300>&)>> events;
-    static StaticJsonDocument<300> doc;
+    static std::map<String, std::function<void (const StaticJsonDocument<msgCapacity>&)>> events;
+    static StaticJsonDocument<msgCapacity> jMsg;
   private:
-    static void trigger(const StaticJsonDocument<300>& doc) {
-      const char* event = doc[0];
+    static void trigger(const StaticJsonDocument<msgCapacity>& jMsg) {
+      const char* event = jMsg[0];
       auto e = events.find(event);
       if(e != events.end()) {
         DPRINTF("trigger event %s\n", event);
-        e->second(doc);
+        e->second(jMsg);
       } else {
         DPRINTF("event %s not found. %d events available\n", event, events.size());
       }
     }
     static void handleSIOEvent(socketIOmessageType_t type, uint8_t * payload, size_t length) {
       DPRINTF("socketIOmessageType_t = %c\n", type);
-      DPRINTF("payload = %s\n", payload);
+      DPRINTF("payload = %s\n", length == 0 ? (uint8_t *)"" : payload);
       switch(type) {
         case sIOtype_EVENT:
-          DeserializationError error = deserializeJson(doc, payload);
+          DeserializationError error = deserializeJson(jMsg, payload);
           if (error) {
             DPRINT(F("deserializeJson() failed: "));
             DPRINTLN(error.c_str());
             return;
           }
-          trigger(doc);          
+          trigger(jMsg);          
         break;
       }
     }
   public:
-    static void on(const char* event, std::function<void (const StaticJsonDocument<300>& doc)> func) {
+    static void on(const char* event, std::function<void (const StaticJsonDocument<msgCapacity>&)> func) {
 	    events[event] = func;
     }
     static void remove(const char* event) {
@@ -130,8 +131,8 @@ class SocketIOManager {
 };
 
 SocketIOclient SocketIOManager::webSocket;
-std::map<String, std::function<void (const StaticJsonDocument<300>&)>> SocketIOManager::events;
-StaticJsonDocument<300> SocketIOManager::doc;
+std::map<String, std::function<void (const StaticJsonDocument<msgCapacity>&)>> SocketIOManager::events;
+StaticJsonDocument<msgCapacity> SocketIOManager::jMsg;
 
 // HTTPClient 
 
@@ -163,20 +164,11 @@ const char* root_ca = \
 
 /////////////////////////////
 
-void onUpdateThingValue(const StaticJsonDocument<300>& doc) {
+void onUpdateThingValue(const StaticJsonDocument<msgCapacity>& jMsg) {
   DPRINTLN("-------------------------");
-  const char* thingId = doc[1];
+  const char* thingId = jMsg[1];
   DPRINTF("ThingId = %s\n",thingId);    
  }
-
-/*
-SocketIOclient  webSocket;
-
-void event(socketIOmessageType_t type, uint8_t * payload, size_t length) {
-  DPRINTF("socketIOmessageType_t = %c\n", type);
-  DPRINTF("payload = %s\n", payload);
-}
-*/
 
 //////////////////////////
 
@@ -189,13 +181,7 @@ void setup()
   // WiFi setup
   WiFiManager::connect();
 
-  /*
-  webSocket.onEvent(event);
-  webSocket.beginSocketIOSSLWithCA("api.thingshub.org", 3000, "/socket.io/?EIO=3&token=491e94d9-9041-4e5e-b6cb-9dad91bbf63d", root_ca, "");
-  */
-
   //
-
   SocketIOManager::on("onUpdateThingValue", onUpdateThingValue);
   SocketIOManager::beginSocketIOSSLWithCA("api.thingshub.org", 3000, "/socket.io/?EIO=3&token=491e94d9-9041-4e5e-b6cb-9dad91bbf63d", root_ca, "");
 
@@ -235,11 +221,7 @@ void loop()
 //      restCallInterval = millis();
 //    }
 
-    ///////////////
-    //webSocket.loop();
-
+    //
     SocketIOManager::loop();
   }
-
-  //delay(10000);
 }
