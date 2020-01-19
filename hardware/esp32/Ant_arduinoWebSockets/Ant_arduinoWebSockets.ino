@@ -1,5 +1,8 @@
 // Per la gestione dello overflow ho utilizzato la soluzione proposta da https://www.leonardomiliani.com/2012/come-gestire-loverflow-di-millis/
 
+#include <map>
+#include <vector>
+#include <ArduinoJson.h>
 #include "WiFi.h"
 #include "HTTPClient.h"
 #include "SocketIOclient.h"
@@ -8,9 +11,11 @@
 #define DEBUG
 #ifdef DEBUG    //Macros are usually in all capital letters.
   #define DPRINT(...)    Serial.print(__VA_ARGS__)     //DPRINT is a macro, debug print
+  #define DPRINTF(...)    Serial.printf(__VA_ARGS__)     //DPRINT is a macro, debug print
   #define DPRINTLN(...)  Serial.println(__VA_ARGS__)   //DPRINTLN is a macro, debug print with new line
 #else
   #define DPRINT(...)     //now defines a blank line
+  #define DPRINTF(...)    //now defines a blank line
   #define DPRINTLN(...)   //now defines a blank line
 #endif
 
@@ -70,6 +75,68 @@ const unsigned long WiFiManager::check_wifi_interval = 15000;
 unsigned long       WiFiManager::check_wifi          = 0;
 boolean             WiFiManager::wifi_reconnection   = false;
 
+//////////////////////////////////
+
+class SocketIOManager {
+  private:
+    static SocketIOclient webSocket;
+    static std::map<String, std::function<void (const StaticJsonDocument<300>&)>> events;
+    static StaticJsonDocument<300> doc;
+  private:
+    static void trigger(const StaticJsonDocument<300>& doc) {
+      const char* event = doc[0];
+      auto e = events.find(event);
+      if(e != events.end()) {
+        DPRINTF("trigger event %s\n", event);
+        e->second(doc);
+      } else {
+        DPRINTF("event %s not found. %d events available\n", event, events.size());
+      }
+    }
+    static void handleSIOEvent(socketIOmessageType_t type, uint8_t * payload, size_t length) {
+      DPRINTF("socketIOmessageType_t = %c\n", type);
+      DPRINTF("payload = %s\n", payload);
+      switch(type) {
+        case sIOtype_EVENT:
+          DeserializationError error = deserializeJson(doc, payload);
+          if (error) {
+            DPRINT(F("deserializeJson() failed: "));
+            DPRINTLN(error.c_str());
+            return;
+          }
+          trigger(doc);          
+        break;
+      }
+    }
+  public:
+    static void on(const char* event, std::function<void (const StaticJsonDocument<300>& doc)> func) {
+	    events[event] = func;
+    }
+    static void remove(const char* event) {
+      auto e = events.find(event);
+      if(e != events.end()) {
+        events.erase(e);
+      } else {
+        DPRINTF("[SIoC] event %s not found, can not be removed\n", event);
+      }
+    }
+    static void beginSocketIOSSLWithCA(const char * host, uint16_t port, const char * url = "/socket.io/?EIO=3", const char * CA_cert = NULL, const char * protocol = "arduino") {
+      SocketIOManager::webSocket.onEvent(handleSIOEvent);
+      SocketIOManager::webSocket.beginSocketIOSSLWithCA(host, port, url, CA_cert, protocol);
+    }
+    static void loop() {
+      SocketIOManager::webSocket.loop();
+    }
+};
+
+SocketIOclient SocketIOManager::webSocket;
+std::map<String, std::function<void (const StaticJsonDocument<300>&)>> SocketIOManager::events;
+StaticJsonDocument<300> SocketIOManager::doc;
+
+// HTTPClient 
+
+//unsigned long restCallInterval = 0;
+
 ////////////////////////////////
 
 const char* root_ca = \
@@ -96,11 +163,20 @@ const char* root_ca = \
 
 /////////////////////////////
 
+void onUpdateThingValue(const StaticJsonDocument<300>& doc) {
+  DPRINTLN("-------------------------");
+  const char* thingId = doc[1];
+  DPRINTF("ThingId = %s\n",thingId);    
+ }
+
+/*
 SocketIOclient  webSocket;
 
 void event(socketIOmessageType_t type, uint8_t * payload, size_t length) {
-  DPRINTLN("ciao");
+  DPRINTF("socketIOmessageType_t = %c\n", type);
+  DPRINTF("payload = %s\n", payload);
 }
+*/
 
 //////////////////////////
 
@@ -113,13 +189,20 @@ void setup()
   // WiFi setup
   WiFiManager::connect();
 
-  //
+  /*
   webSocket.onEvent(event);
   webSocket.beginSocketIOSSLWithCA("api.thingshub.org", 3000, "/socket.io/?EIO=3&token=491e94d9-9041-4e5e-b6cb-9dad91bbf63d", root_ca, "");
+  */
+
+  //
+
+  SocketIOManager::on("onUpdateThingValue", onUpdateThingValue);
+  SocketIOManager::beginSocketIOSSLWithCA("api.thingshub.org", 3000, "/socket.io/?EIO=3&token=491e94d9-9041-4e5e-b6cb-9dad91bbf63d", root_ca, "");
 
   //
   pinMode(ledPin, OUTPUT);
 }
+
 void loop()
 {
   // if wifi is down, try reconnecting every 30 seconds
@@ -129,26 +212,33 @@ void loop()
 
   if ((WiFi.status() == WL_CONNECTED)) { //Check the current connection status
 
-//    HTTPClient http;
-// 
-//    http.begin("api.thingshub.org", 3000, "/api", root_ca); //Specify the URL and certificate
-//    
-//    int httpCode = http.GET();                                                  //Make the request
-//    if (httpCode > 0) { //Check for the returning code
-// 
-//        String payload = http.getString();
+    // HTTPClient
+//    if (millis() - restCallInterval >= 5000) {
+//      HTTPClient http;
+//   
+//      http.begin("api.thingshub.org", 3000, "/api", root_ca); //Specify the URL and certificate
+//      
+//      int httpCode = http.GET();                                                  //Make the request
+//      if (httpCode > 0) { //Check for the returning code
+//   
+//          String payload = http.getString();
+//          DPRINTLN(httpCode);
+//          DPRINTLN(payload);
+//        }
+//   
+//      else {
 //        Serial.println(httpCode);
-//        Serial.println(payload);
 //      }
-// 
-//    else {
-//      Serial.println(httpCode);
+//   
+//      http.end(); //Free the resources
+
+//      restCallInterval = millis();
 //    }
-// 
-//    http.end(); //Free the resources
 
     ///////////////
-    webSocket.loop();
+    //webSocket.loop();
+
+    SocketIOManager::loop();
   }
 
   //delay(10000);
