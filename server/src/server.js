@@ -6,7 +6,6 @@ const dotenv  			= require("dotenv");
 const httpStatusCodes 	= require("http-status-codes");
 const https   			= require("https");
 const express 			= require("express");
-const expressValidator 	= require("express-validator");
 const session 			= require("express-session");
 const MongoStore 		= require("connect-mongo")(session);
 const bodyParser 		= require("body-parser");
@@ -58,9 +57,6 @@ app.use(bodyParser.urlencoded({ extended: false }));
 // parse application/json
 app.use(bodyParser.json());
 
-// This line must be immediately after any of the bodyParser middlewares!
-//app.use(expressValidator());
-
 // Passport setup
 
 passport.use(new LocalStrategy(async function(username, password, done) {
@@ -109,7 +105,6 @@ passport.use(new LocalApiStrategy(localApiStrategyOptions,
 		});
 	}
 ));
-app.use(passport.initialize());
 
 passport.use(new BearerStrategy(async function(token, done) {
 	try {
@@ -139,6 +134,8 @@ passport.use(new BasicStrategy( async function(username, password, done) {
 	}
 	return done(null, user);
 }));
+
+app.use(passport.initialize());
 	
 // Session support
 
@@ -206,7 +203,7 @@ const options = {
 };
 const httpsServer = https.createServer(options, app);
 
-const port = process.env.PORT || 3000;
+const port = process.env.SERVER_PORT || 3000;
 httpsServer.listen(port, (err) => {
 	if (err) {
 		console.log(err);

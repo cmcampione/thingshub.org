@@ -6,6 +6,8 @@ const nodemailer 		= require("nodemailer");
 const httpStatusCodes 	= require("http-status-codes");
 const express 			= require("express");
 const passport 			= require("passport");
+const {param, body, validationResult}	= require('express-validator');
+
 const ejs 				= require("ejs");
 
 const utils 			= require("../utils.js");
@@ -88,14 +90,13 @@ async function SendConfirmationEmailByOnlyEmail(email, culture, confirmationToke
  * @returns {undefined}
  */
 
-router.get("/registerByOnlyEmail/:email/:culture", async (req, res, next) => {
+router.get("/registerByOnlyEmail/:email/:culture", [
+		param("email", "Email is not valid").normalizeEmail({ gmail_remove_dots: false }).isEmail()
+	],
+	async (req, res, next) => {
 	try {
-		req.checkParams("email", "Email is not valid").isEmail();
-		req.sanitize("email").normalizeEmail({ gmail_remove_dots: false });
-
 		try {
-			const result = await req.getValidationResult();
-			result.throw();
+			validationResult(req).throw();
 		} catch (e) {
 			throw (new utils.ErrorCustom(httpStatus.BAD_REQUEST, e.mapped(), 2));
 		}
@@ -114,7 +115,7 @@ router.get("/registerByOnlyEmail/:email/:culture", async (req, res, next) => {
 		if (userPending) {
 			// TODO: It may happen that the email is not sent for some problem, but the pending mail
 			// has been created,
-			// If this is the case, you must notify the Group of Administrators
+			// If this happen, you must notify the Group of Administrators
 
 			await SendConfirmationEmailByOnlyEmail(email, culture, userPending.confirmationToken);
 
@@ -154,19 +155,22 @@ router.get("/registerByOnlyEmail/:email/:culture", async (req, res, next) => {
 	}
 });
 
-router.post("/confirmAccountByOnlyEmail", async (req, res, next) => {
+router.post("/confirmAccountByOnlyEmail", [
+		body("email", "Email is not valid").normalizeEmail({ gmail_remove_dots: false }).isEmail(),
+		body("name", "Name is not valid").notEmpty(),
+		body("password", `Password must be at least ${process.env.PASSWORD_MIN_LEN} characters long`).isLength({min : process.env.PASSWORD_MIN_LEN}),
+		body("confirmationToken", "Confirmation Token not valid").notEmpty()
+	],
+	async (req, res, next) => {
 	try {
-		req.checkBody("email", "Email is not valid").isEmail();
-		req.checkBody("name", "Name is not valid").notEmpty();
-		req.checkBody("password", `Password must be at least ${process.env.PASSWORD_MIN_LEN} characters long`).len(process.env.PASSWORD_MIN_LEN);
-		req.checkBody("confirmPassword", "Passwords do not match").equals(req.body.password);
-		req.checkBody("confirmationToken", "Confirmation Token not valid").notEmpty();
-
-		req.sanitize("email").normalizeEmail({ gmail_remove_dots: false });
-
+		// if a password has been provided, then a confirmation must also be provided.
+		if (req.body.password) {
+			await body('confirmPassword')
+			  .equals(req.body.password).withMessage('Passwords do not match')
+			  .run(req);
+		}
 		try {
-			const result = await req.getValidationResult();
-			result.throw();
+			validationResult(req).throw();
 		} catch (e) {
 			throw (new utils.ErrorCustom(httpStatus.BAD_REQUEST, e.mapped(), 4));
 		}
@@ -203,7 +207,8 @@ router.post("/confirmAccountByOnlyEmail", async (req, res, next) => {
 	}
 });
 
-router.post("/login", async function (req, res, next) {
+router.post("/login", 
+ 	async function (req, res, next) {
 	passport.authenticate(["local", "basic"], { session: false }, async function(err, user, info) {
 		try {
 			if (err) { 
@@ -233,7 +238,7 @@ router.post("/login", async function (req, res, next) {
 });
 
 router.get("/logout", async function (req, res, next) {
-	passport.authenticate("local", async function(err, user, info) {
+	passport.authenticate(["local", "basic"], async function(err, user, info) {
 		try {
 			if (err) { 
 				return next(err); 
