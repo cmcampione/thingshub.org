@@ -19,6 +19,11 @@
   #define DPRINTLN(...)   //now defines a blank line
 #endif
 
+//////////////////////////
+
+int ledPin = 2;
+int ledStatus = LOW;
+
 // WiFi
 
 class WiFiManager {
@@ -167,12 +172,10 @@ const char* root_ca = \
 void onUpdateThingValue(const StaticJsonDocument<msgCapacity>& jMsg) {
   DPRINTLN("-------------------------");
   const char* thingId = jMsg[1];
-  DPRINTF("ThingId = %s\n",thingId);    
+  DPRINTF("ThingId = %s\n",thingId);
+  ledStatus = ledStatus == LOW ? HIGH : LOW;
+  digitalWrite(ledPin, ledStatus);
  }
-
-//////////////////////////
-
-int ledPin = 2;
 
 void setup()
 {
