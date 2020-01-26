@@ -11,7 +11,7 @@ export class Thing {
     public childrenSkip: number = 0
     public childrenTotalItems = Number.MAX_SAFE_INTEGER
 
-    public children : Thing[] = []
+    public children: Thing[] = []
 
     public id: string = ""
     

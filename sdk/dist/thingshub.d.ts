@@ -339,7 +339,7 @@ export declare class ThingsManager {
 	private onCreateThing;
 	private getThings;
 	getMoreThingChildren(parentThing: Thing, parameter: ThingsGetParams, canceler: HttpRequestCanceler): Promise<ThingsDataSet>;
-	getMoreThings: (canceler: HttpRequestCanceler) => Promise<ThingsDataSet[]>;
+	getMoreThings(canceler: HttpRequestCanceler): Promise<void>;
 	getThingsTotalItems(): Number;
 }
 
