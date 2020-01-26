@@ -221,9 +221,15 @@ export declare class AccountDataContext {
 	private authTokenRequest;
 	private getNewAccessToken;
 	constructor(endPointAddress: EndPointAddress, accountActionControl?: AccountActionControl);
-	login(username: string, password: string): Promise<AccountUserData | HttpFailResult>;
-	loginBasic(username: string, password: string): Promise<any | HttpFailResult>;
-	logout(): Promise<any | HttpFailResult>;
+	login({ username, password }: {
+		username: string;
+		password: string;
+	}): Promise<AccountUserData>;
+	loginBasic({ username, password }: {
+		username: string;
+		password: string;
+	}): Promise<any>;
+	logout(): Promise<any>;
 }
 export declare class AccountManager {
 	private dummy8;
@@ -238,12 +244,12 @@ export declare class AccountManager {
 	private setLoginData;
 	private getLoginData;
 	constructor(appName: string, accountDataContext: AccountDataContext, apiKey?: string);
-	readonly apiKey: string;
-	readonly accessToken: string;
+	get apiKey(): string;
+	get accessToken(): string;
 	getSecurityHeader: () => object;
 	getSecurityToken: () => string;
-	readonly isLoggedIn: boolean;
-	readonly remember: boolean;
+	get isLoggedIn(): boolean;
+	get remember(): boolean;
 	login(username: string, password: string, remember: boolean): Promise<AccountUserData>;
 	logout(): Promise<any>;
 }
@@ -297,17 +303,17 @@ export declare class ThingsDataContext {
 	private thingChildrenUrl;
 	private thingDeleteChildUrl;
 	constructor(endPointAddress: EndPointAddress, securityHeaderHook: () => object);
-	getThing(thingId: string): Promise<ThingDTO | HttpFailResult>;
-	getThings(parameter: ThingsGetParams, canceler?: HttpRequestCanceler): Promise<ThingsDTOsDataSet | HttpFailResult>;
-	createThing(ThingDTO: ThingDTO): Promise<ThingDTO | HttpFailResult>;
-	updateThing(thingId: string, ThingDTO: ThingDTO): Promise<ThingDTO | HttpFailResult>;
-	deleteThing(thingId: string): Promise<any | HttpFailResult>;
-	getThingChildrenIds(parentThingId: string): Promise<string[] | HttpFailResult>;
-	addChildToParent(parentThingId: string, childThingId: string): Promise<any | HttpFailResult>;
-	deleteThingChild(parentThingId: string, childThingId: string): Promise<any | HttpFailResult>;
-	getThingValue(thingId: string): Promise<any | HttpFailResult>;
-	putThingValue(thingId: string, value: any): Promise<any | HttpFailResult>;
-	putThingsPositions(positions: ThingPositionRaw[]): Promise<any | HttpFailResult>;
+	getThing(thingId: string): Promise<ThingDTO>;
+	getThings(parameter: ThingsGetParams, canceler?: HttpRequestCanceler): Promise<ThingsDTOsDataSet>;
+	createThing(ThingDTO: ThingDTO): Promise<ThingDTO>;
+	updateThing(thingId: string, ThingDTO: ThingDTO): Promise<ThingDTO>;
+	deleteThing(thingId: string): Promise<any>;
+	getThingChildrenIds(parentThingId: string): Promise<string[]>;
+	addChildToParent(parentThingId: string, childThingId: string): Promise<any>;
+	deleteThingChild(parentThingId: string, childThingId: string): Promise<any>;
+	getThingValue(thingId: string): Promise<any>;
+	putThingValue(thingId: string, value: any): Promise<any>;
+	putThingsPositions(positions: ThingPositionRaw[]): Promise<any>;
 }
 export interface ThingClaims {
 	publicReadClaims: ThingUserReadClaims;

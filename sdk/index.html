@@ -36,8 +36,6 @@
 
       var thingsDatacontext = new thingshub.ThingsDataContext(endPointAddress, accountManager.getSecurityHeader);
 
-      var mainThing = new thingshub.Thing();
-
       function onError(error) {
         console.log(error);
       }
@@ -75,6 +73,7 @@
         console.log(err);
       });
       
+      var mainThing = new thingshub.Thing();
       var thingsManagerClaims = {
 
         publicReadClaims : thingshub.ThingUserReadClaims.NoClaims,

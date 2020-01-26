@@ -1,6 +1,5 @@
 import axios from "axios";
 import * as jwtDecode from "jwt-decode";
-import {HttpFailResult} from "./helpers";
 import {AccountDataContext, AccountUserData} from "./accountDataContext";
 
 export class AccountManager {
@@ -161,7 +160,7 @@ export class AccountManager {
         this._apiKey =  null;
         this.resetLoginData();
 
-        const accountUserData: AccountUserData = await this.accountDataContext.login(username, password);
+        const accountUserData: AccountUserData = await this.accountDataContext.login({ username, password });
 
         this.setLoginData(accountUserData, remember);
         return accountUserData;
