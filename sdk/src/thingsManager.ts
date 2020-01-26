@@ -87,62 +87,38 @@ export class ThingsManager {
 
     // INFO: Fills parentThing
     // INFO: "parentThing.children" is filled filtered by "this.getChindrenThingsParams"
-    public getMoreThingChildren(parentThing : Thing, parameter: ThingsGetParams, canceler: HttpRequestCanceler) : Promise<ThingsDataSet> {
+    public async getMoreThingChildren(parentThing : Thing, parameter: ThingsGetParams, canceler: HttpRequestCanceler) : Promise<ThingsDataSet> {
 
         parameter.skip = parentThing.childrenSkip;
         parameter.parentThingId = parentThing.id;
 
-        return this.getThings(parameter, canceler)
-        .then(function (thingsDataSet : ThingsDataSet) : ThingsDataSet  {
+        const thingsDataSet = await this.getThings(parameter, canceler);
+        parentThing.childrenTotalItems = thingsDataSet.itemsRange.totalItems;
+        parentThing.childrenSkip = parentThing.childrenSkip + parameter.top;
+        //  Fix range
+        if (parentThing.childrenSkip > parentThing.childrenTotalItems)
+            parentThing.childrenSkip = parentThing.childrenTotalItems;
 
-            parentThing.childrenTotalItems = thingsDataSet.itemsRange.totalItems;
-            parentThing.childrenSkip = parentThing.childrenSkip + parameter.top;
-            //  Fix range
-            if (parentThing.childrenSkip > parentThing.childrenTotalItems)
-                parentThing.childrenSkip = parentThing.childrenTotalItems;            
-
-            for (var i = 0; i < thingsDataSet.things.length;i++)
-                parentThing.children.push(thingsDataSet.things[i]);   
-
-            return thingsDataSet;
-        });
+        for (var i = 0; i < thingsDataSet.things.length; i++)
+            parentThing.children.push(thingsDataSet.things[i]);
+        
+        return thingsDataSet;
     }
-    // INFO:    In Books example where "this.mainThing" in a "root thing" 
+    // INFO:    In Books example where "this.mainThing" is a "root thing" 
     //          "getMoreThings" fills "this.mainThing.children" with "books" collection 
     //          and "this.mainThing.children[0..n].children" with "things" collection like "book comments"
-    public getMoreThings = (canceler : HttpRequestCanceler) : Promise<ThingsDataSet[]> => {
-        
+    public async getMoreThings(canceler : HttpRequestCanceler) : Promise<void> {
         let self = this;
+        
+        var data = await this.getMoreThingChildren(this.mainThing, this.getThingsParams, canceler);
+        
+        let promises : Promise<ThingsDataSet>[] = [];
 
-        return new Promise<ThingsDataSet[]>((resolve, reject) => {
+        // Try to get all things children
+        for (let i = 0; i < data.things.length; i++)
+            promises.push(self.getMoreThingChildren(data.things[i], self.getChindrenThingsParams, canceler));
 
-            this.getMoreThingChildren(this.mainThing, this.getThingsParams, canceler)
-            .then(function (data : ThingsDataSet) : any {
-
-                let promises : Promise<ThingsDataSet>[] = [];
-
-                // Try to get all things children
-                for (let i = 0; i < data.things.length; i++)
-                    promises.push(self.getMoreThingChildren(data.things[i], self.getChindrenThingsParams, canceler));
-
-                Promise.all(promises)
-                .then(function(data : ThingsDataSet[]) : any {
-                    resolve(data);
-                    return data;
-                })
-                .catch(function(data) : HttpFailResult {
-                    reject(data);
-                    return data;
-                });
-
-                return data;
-                
-            })
-            .catch(function(data) : HttpFailResult {
-                reject(data);
-                return data;
-            })
-        });
+        Promise.all(promises);
     }
 
     public getThingsTotalItems() : Number {
