@@ -1,7 +1,6 @@
 import * as qs from "qs"
 import axios from "axios";
 import * as jwtDecode from "jwt-decode";
-import {HttpFailResult, Helpers} from "./helpers";
 import {EndPointAddress} from "./endPointAddress";
 
 export interface AccountUserData {
@@ -43,28 +42,25 @@ export class AccountDataContext {
         axios.interceptors.response.use((response) => {
             return response;
           },
-          err => {
+          async err => {
               const error = err.response;
               if (accountActionControl && error && error.status === 401 && error.config && !error.config.__isRetryRequest) {
       
-                return this.getNewAccessToken().then(response => {
-                    error.config.__isRetryRequest = true;
-      
-                    // set new access token after refreshing it
-                    error.config.headers = this.accountActionControl.getSecurityHeader();
-      
-                    return axios(error.config);
-                }).catch(e => {
-      
-                    // refreshing has failed => redirect to login
-                    // clear cookie (with logout action) and return to identityserver to new login
-                    // (window as any).location = "/account/logout";
-
-                    // TODO: Can be called many times - https://docs.google.com/spreadsheets/d/1Ks-K10kmLcHOom7igTkQ8wtRSJ-73i1hftUAE4E9q80/edit#gid=1455384855&range=D7
-                    this.accountActionControl.resetApp();
-      
-                    return Promise.reject(e);
-                });
+                try {
+                      const response = await this.getNewAccessToken();
+                      error.config.__isRetryRequest = true;
+                      // set new access token after refreshing it
+                      error.config.headers = this.accountActionControl.getSecurityHeader();
+                      return axios(error.config);
+                  }
+                  catch (e) {
+                      // refreshing has failed => redirect to login
+                      // clear cookie (with logout action) and return to identityserver to new login
+                      // (window as any).location = "/account/logout";
+                      // TODO: Can be called many times - https://docs.google.com/spreadsheets/d/1Ks-K10kmLcHOom7igTkQ8wtRSJ-73i1hftUAE4E9q80/edit#gid=1455384855&range=D7
+                      this.accountActionControl.resetApp();
+                      return Promise.reject(e);
+                  }
               }
       
               return Promise.reject(error);
@@ -72,7 +68,8 @@ export class AccountDataContext {
     }
 
     // TODO: https://docs.google.com/spreadsheets/d/1Ks-K10kmLcHOom7igTkQ8wtRSJ-73i1hftUAE4E9q80/edit#gid=1455384855&range=C4
-    public login(username: string, password: string) : Promise<AccountUserData | HttpFailResult> {
+    public async login({ username, password }: { username: string; password: string; }) 
+        : Promise<AccountUserData> {
         let loginData = {
             username,
             password
@@ -83,37 +80,29 @@ export class AccountDataContext {
             },
             __isRetryRequest: true
         };
-        return axios.post(this.accountUrl + "/login",qs.stringify(loginData), config)
-        .then(function(response) : AccountUserData {
-
-            const accountUserDataRaw: any = jwtDecode(response.data.access_token);
-
-            return {
-                accessToken: response.data.access_token,
-                id: accountUserDataRaw.sub,
-                name: accountUserDataRaw.name,
-                exp: accountUserDataRaw.exp
-            };
-        });
+        const response = await axios.post(this.accountUrl + "/login", qs.stringify(loginData), config);
+        const accountUserDataRaw: any = jwtDecode(response.data.access_token);
+        return {
+            accessToken: response.data.access_token,
+            id: accountUserDataRaw.sub,
+            name: accountUserDataRaw.name,
+            exp: accountUserDataRaw.exp
+        };
     }
     // TODO: To check
-    public loginBasic(username: string, password: string) : Promise<any | HttpFailResult> {
-        return axios.post(this.accountUrl + "/login","grant_type=client_credentials", {
+    public async loginBasic({ username, password }: { username: string; password: string; }) : Promise<any> {
+        const response = await axios.post(this.accountUrl + "/login", "grant_type=client_credentials", {
             headers: {
                 "Content-Type": "application/x-www-form-urlencoded",
                 "Authorization": "Basic " + btoa(username + ":" + password)
             }
-        })
-        .then(function(response) : any {
-            return response.data;
         });
+        return response.data;
     }
-    public logout() : Promise<any | HttpFailResult> {
-        return axios.post(this.accountUrl + "/logout", null, {
+    public async logout() : Promise<any> {
+        const response = await axios.post(this.accountUrl + "/logout", null, {
             headers: this.accountActionControl ? this.accountActionControl.getSecurityHeader() : null
-        })
-        .then(function(response: any) : any {
-            return response.data;
         });
+        return response.data;
     }
 }

@@ -32,6 +32,7 @@ export class ThingsManager {
     ) {
         this.getThingsParams = {
             // Viene sovrascritto da thingsManager
+            // Override by thingsManager
             parentThingId: null,
             thingFilter: {$and: [{kind: this.thingKind}, {deletedStatus: ThingDeletedStates.Ok}]},
             top: 10,
