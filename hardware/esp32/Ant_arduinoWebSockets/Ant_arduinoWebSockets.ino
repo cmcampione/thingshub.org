@@ -177,6 +177,11 @@ void onUpdateThingValue(const StaticJsonDocument<msgCapacity>& jMsg) {
   digitalWrite(ledPin, ledStatus);
  }
 
+class Config {
+  
+};
+
+
 void setup()
 {
   Serial.begin(115200);
