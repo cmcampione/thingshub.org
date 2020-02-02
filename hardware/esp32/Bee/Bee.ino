@@ -6,6 +6,7 @@
 #include "WiFi.h"
 #include "HTTPClient.h"
 #include "SocketIOclient.h"
+#include "RCSwitch.h"
 #include "BuildDefine.h"
 
 #define DEBUG
@@ -19,15 +20,119 @@
   #define DPRINTLN(...)   //now defines a blank line
 #endif
 
-//////////////////////////
-
+//
 int ledPin = 2;
 int ledStatus = LOW;
 
-// WiFi
+//
+struct Sensor {
+  Sensor() : millis(0),now(false) {}
+  bool          now;
+  unsigned long millis;
+  String        value;
+};
+const int sensorsCount      = 2;
+const int sensorsFieldCount = 4;
+const int sensorsCapacity   = JSON_OBJECT_SIZE(1) + JSON_ARRAY_SIZE(sensorsCount) + sensorsCount*JSON_OBJECT_SIZE(sensorsFieldCount) + 91;
+struct BeeStatus {
+  static const char* thing;  
+  static std::map<long,Sensor> sensors;
+  static void ToJson(StaticJsonDocument<sensorsCapacity>& doc) {
+//    {
+//      "sensors": [
+//        {
+//          "id": "123456",
+//          "now": "true",
+//          "millis": 123456,
+//          "value": "dummyVal"
+//        },
+//        {
+//          "id": "123456",
+//          "now": "false",
+//          "millis": 123456,
+//          "value": "dummyVal"
+//        }
+//      ]
+//    }
+#ifdef DEBUG_BEESTATUS
+    // Declare a buffer to hold the result
+    char output[512];// To check
+    int count = 0;    
+#endif
+    doc.clear();
+    JsonArray sensors = doc.createNestedArray("sensors");
+    for (std::map<long,Sensor>::iterator it = BeeStatus::sensors.begin(); it != BeeStatus::sensors.end(); it++)
+    {
+      Sensor& sensorValue = it->second;
+      
+      JsonObject sensor = sensors.createNestedObject();
+      sensor["id"]     = it->first;
+      sensor["now"]    = sensorValue.now;
+      sensor["millis"] = sensorValue.millis;
+      sensor["value"]  = sensorValue.value;
+      
+      sensorValue.now = false;
+      
+#ifdef DEBUG_BEESTATUS      
+      serializeJson(sensor, output);
+      DPRINT(count++);
+      DPRINT(": ");
+      DPRINTLN(output);
+#endif
+    }
+#ifdef DEBUG_BEESTATUS
+    // Produce a minified JSON document
+    serializeJson(doc, output);
+    DPRINTLN(output);
+#endif    
+  }
+};
+const char* BeeStatus::thing = "f4c3c80b-d561-4a7b-80a5-f4805fdab9bb";
+std::map<long,Sensor> BeeStatus::sensors = {
+  {31669624,Sensor()},
+  {8171288,Sensor()}  
+};
 
-class WiFiManager {
+//
+class RCSensorsManager {
+  private:
+    static RCSwitch mySwitch;
+    static const int pin; // To Check: Interrupt or pin? In my dev board i use D4 gpio ant it works
   public:
+    static void init() {
+      RCSensorsManager::mySwitch.enableReceive(RCSensorsManager::pin);  // Pin 4 or interrupt?
+    }
+  public:
+    static bool checkSensorsStatus() {
+      if (mySwitch.available()) {
+        DPRINT("Received ");
+        DPRINT( mySwitch.getReceivedValue());
+        DPRINT(" / ");
+        DPRINT( mySwitch.getReceivedBitlength());
+        DPRINT("bit ");
+        DPRINT("Protocol: ");
+        DPRINT( mySwitch.getReceivedProtocol());    
+        DPRINTLN();
+        long sensorId = mySwitch.getReceivedValue();
+        if (BeeStatus::sensors.find(sensorId) != BeeStatus::sensors.end()) {
+          Sensor& sensorValue = BeeStatus::sensors[sensorId];
+          sensorValue.now = true;
+          sensorValue.millis = millis();
+          sensorValue.value  = "true";
+          DPRINTLN("Sensor id found");          
+        }
+        mySwitch.resetAvailable();
+        return true;
+      }
+      return false;
+    }
+};
+ RCSwitch RCSensorsManager::mySwitch = RCSwitch();
+ const int RCSensorsManager::pin = 4;
+
+// WiFi
+class WiFiManager {
+  private:
     static const char* wifi_ssid;
     static const char* wifi_password;
 
@@ -80,9 +185,8 @@ const unsigned long WiFiManager::check_wifi_interval = 15000;
 unsigned long       WiFiManager::check_wifi          = 0;
 boolean             WiFiManager::wifi_reconnection   = false;
 
-//////////////////////////////////
-
-const int msgCapacity = 300;
+// SocketIO
+const int msgCapacity = 300;// To Check
 class SocketIOManager {
   private:
     static SocketIOclient webSocket;
@@ -139,12 +243,7 @@ SocketIOclient SocketIOManager::webSocket;
 std::map<String, std::function<void (const StaticJsonDocument<msgCapacity>&)>> SocketIOManager::events;
 StaticJsonDocument<msgCapacity> SocketIOManager::jMsg;
 
-// HTTPClient 
-
-//unsigned long restCallInterval = 0;
-
-////////////////////////////////
-
+//
 const char* root_ca = \
 "-----BEGIN CERTIFICATE-----\n" \
 "MIIDSjCCAjKgAwIBAgIQRK+wgNajJ7qJMDmGLvhAazANBgkqhkiG9w0BAQUFADA/\n" \
@@ -167,6 +266,9 @@ const char* root_ca = \
 "Ob8VZRzI9neWagqNdwvYkQsEjgfbKbYK7p2CNTUQ\n" \
 "-----END CERTIFICATE-----\n";
 
+// HTTPClient 
+unsigned long restCallInterval = 0;
+
 /////////////////////////////
 
 void onUpdateThingValue(const StaticJsonDocument<msgCapacity>& jMsg) {
@@ -177,59 +279,56 @@ void onUpdateThingValue(const StaticJsonDocument<msgCapacity>& jMsg) {
   digitalWrite(ledPin, ledStatus);
  }
 
-class Config {
-  
-};
-
-
 void setup()
 {
-  Serial.begin(115200);
-
-  // WiFi setup
-  WiFiManager::connect();
-
   //
-  SocketIOManager::on("onUpdateThingValue", onUpdateThingValue);
-  SocketIOManager::beginSocketIOSSLWithCA("api.thingshub.org", 3000, "/socket.io/?EIO=3&token=491e94d9-9041-4e5e-b6cb-9dad91bbf63d", root_ca, "");
-
+  Serial.begin(115200);
   //
   pinMode(ledPin, OUTPUT);
+  // RFSensor setup
+  RCSensorsManager::init();
+  // WiFi setup
+  WiFiManager::connect();
+  // SocketIO setup
+  SocketIOManager::on("onUpdateThingValue", onUpdateThingValue);
+  SocketIOManager::beginSocketIOSSLWithCA("api.thingshub.org", 3000, "/socket.io/?EIO=3&token=491e94d9-9041-4e5e-b6cb-9dad91bbf63d/value", root_ca, "");
 }
 
 void loop()
 {
-  // if wifi is down, try reconnecting every 30 seconds
+  // Check RC Sensor State change
+  bool immediately = RCSensorsManager::checkSensorsStatus();
+  //
+  StaticJsonDocument<sensorsCapacity> doc;
+  BeeStatus::ToJson(doc);
+  // Check if wifi is down, try reconnecting every WiFiManager::check_wifi_interval seconds
   WiFiManager::checkAndTryReconnecting();
+  if (WiFi.status() != WL_CONNECTED)
+    return;
+  //
+  if ((immediately == true) || (millis() - restCallInterval >= 5000)) {
+    
+    immediately = false;
+    restCallInterval = millis();
+    
+    HTTPClient http;
+    String url = String("/api/things/") + String(BeeStatus::thing) + String("/value");
+    http.begin("api.thingshub.org", 3000, url, root_ca); //Specify the URL and certificate
+    http.addHeader("thapikey", "491e94d9-9041-4e5e-b6cb-9dad91bbf63d");
+    http.addHeader("Content-Type", "application/json");
 
-  ///////////////////////
+    char jsonDoc[512];
+    serializeJson(doc, jsonDoc);
 
-  if ((WiFi.status() == WL_CONNECTED)) { //Check the current connection status
-
-    // HTTPClient
-//    if (millis() - restCallInterval >= 5000) {
-//      HTTPClient http;
-//   
-//      http.begin("api.thingshub.org", 3000, "/api", root_ca); //Specify the URL and certificate
-//      
-//      int httpCode = http.GET();                                                  //Make the request
-//      if (httpCode > 0) { //Check for the returning code
-//   
-//          String payload = http.getString();
-//          DPRINTLN(httpCode);
-//          DPRINTLN(payload);
-//        }
-//   
-//      else {
-//        Serial.println(httpCode);
-//      }
-//   
-//      http.end(); //Free the resources
-
-//      restCallInterval = millis();
-//    }
-
-    //
-    SocketIOManager::loop();
+    int httpCode = http.PUT(jsonDoc);
+    DPRINTLN(httpCode);
+    if (httpCode > 0) { //Check for the returning code
+      String payload = http.getString();
+      DPRINTLN(payload);
+   }
+    
+    http.end();  //Free resources    
   }
+  //
+  //SocketIOManager::loop();
 }
