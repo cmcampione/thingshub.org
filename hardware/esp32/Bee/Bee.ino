@@ -9,95 +9,102 @@
 #include "RCSwitch.h"
 #include "BuildDefine.h"
 
-#define DEBUG
-#ifdef DEBUG    //Macros are usually in all capital letters.
-  #define DPRINT(...)    Serial.print(__VA_ARGS__)     //DPRINT is a macro, debug print
-  #define DPRINTF(...)    Serial.printf(__VA_ARGS__)     //DPRINT is a macro, debug print
-  #define DPRINTLN(...)  Serial.println(__VA_ARGS__)   //DPRINTLN is a macro, debug print with new line
-#else
-  #define DPRINT(...)     //now defines a blank line
-  #define DPRINTF(...)    //now defines a blank line
-  #define DPRINTLN(...)   //now defines a blank line
-#endif
+//
+const int msgCapacity = 300;// To Check. Do not move from here, some compilation error or compiler bug
 
 //
 int ledPin = 2;
 int ledStatus = LOW;
 
 //
+typedef std::function<void(const char* value)> SensorHandler;
 struct Sensor {
   Sensor() : millis(0),now(false) {}
   bool          now;
   unsigned long millis;
   String        value;
+  SensorHandler sensorHandler;
 };
+
+void onSensorTogglePin2(const char* value) {  
+  ledStatus = ledStatus == LOW ? HIGH : LOW;
+  digitalWrite(ledPin, ledStatus);
+}
+
 const int sensorsCount      = 2;
 const int sensorsFieldCount = 4;
 const int sensorsCapacity   = JSON_OBJECT_SIZE(1) + JSON_ARRAY_SIZE(sensorsCount) + sensorsCount*JSON_OBJECT_SIZE(sensorsFieldCount) + 91;
-struct BeeStatus {
-  static const char* thing;  
-  static std::map<long,Sensor> sensors;
-  static void ToJson(StaticJsonDocument<sensorsCapacity>& doc) {
-//    {
-//      "sensors": [
-//        {
-//          "id": "123456",
-//          "now": "true",
-//          "millis": 123456,
-//          "value": "dummyVal"
-//        },
-//        {
-//          "id": "123456",
-//          "now": "false",
-//          "millis": 123456,
-//          "value": "dummyVal"
-//        }
-//      ]
-//    }
-#ifdef DEBUG_BEESTATUS
-    // Declare a buffer to hold the result
-    char output[512];// To check
-    int count = 0;    
-#endif
-    doc.clear();
-    JsonArray sensors = doc.createNestedArray("sensors");
-    for (std::map<long,Sensor>::iterator it = BeeStatus::sensors.begin(); it != BeeStatus::sensors.end(); it++)
-    {
-      Sensor& sensorValue = it->second;
-      
-      JsonObject sensor = sensors.createNestedObject();
-      sensor["id"]     = it->first;
-      sensor["now"]    = sensorValue.now;
-      sensor["millis"] = sensorValue.millis;
-      sensor["value"]  = sensorValue.value;
-      
-      sensorValue.now = false;
-      
-#ifdef DEBUG_BEESTATUS      
-      serializeJson(sensor, output);
-      DPRINT(count++);
-      DPRINT(": ");
-      DPRINTLN(output);
-#endif
+class BeeStatus {
+  public:
+    static const char* thing;
+    static std::map<long,Sensor> sensors;
+  public:
+    static void Init() {
+      sensors[8171288].sensorHandler = onSensorTogglePin2;
+      sensors[31669624].sensorHandler = onSensorTogglePin2;
     }
-#ifdef DEBUG_BEESTATUS
-    // Produce a minified JSON document
-    serializeJson(doc, output);
-    DPRINTLN(output);
-#endif    
-  }
+    
+    static void ToJson(StaticJsonDocument<sensorsCapacity>& doc) {
+    // Sensor model sample
+    /*
+      {
+        "sensors": [
+          {
+            "id": "123456",
+            "now": "true",
+            "millis": 123456,
+            "value": "dummyVal"
+          },
+          {
+            "id": "123456",
+            "now": "false",
+            "millis": 123456,
+            "value": "dummyVal"
+          }
+        ]
+      }
+    */
+  #ifdef DEBUG_BEESTATUS
+      // Declare a buffer to hold the result
+      char output[512];// To check
+      int count = 0;    
+  #endif
+      doc.clear();
+      JsonArray sensors = doc.createNestedArray("sensors");
+      for (std::map<long,Sensor>::iterator it = BeeStatus::sensors.begin(); it != BeeStatus::sensors.end(); it++)
+      {
+        Sensor& sensorValue = it->second;
+        
+        JsonObject sensor = sensors.createNestedObject();
+        sensor["id"]     = it->first;
+        sensor["now"]    = sensorValue.now;
+        sensor["millis"] = sensorValue.millis;
+        sensor["value"]  = sensorValue.value;
+        
+        sensorValue.now = false;
+        
+  #ifdef DEBUG_BEESTATUS      
+        serializeJson(sensor, output);
+        DPRINT(count++);
+        DPRINT(": ");
+        DPRINTLN(output);
+  #endif
+      }
+  #ifdef DEBUG_BEESTATUS
+      // Produce a minified JSON document
+      serializeJson(doc, output);
+      DPRINTLN(output);
+  #endif    
+    }
 };
 const char* BeeStatus::thing = "f4c3c80b-d561-4a7b-80a5-f4805fdab9bb";
-std::map<long,Sensor> BeeStatus::sensors = {
-  {31669624,Sensor()},
-  {8171288,Sensor()}  
-};
+std::map<long,Sensor> BeeStatus::sensors;
 
 //
 class RCSensorsManager {
   private:
     static RCSwitch mySwitch;
-    static const int pin; // To Check: Interrupt or pin? In my dev board i use D4 gpio ant it works
+    static const int pin; // To Check: Interrupt or pin? In my dev board i use D4 gpio and it works
   public:
     static void init() {
       RCSensorsManager::mySwitch.enableReceive(RCSensorsManager::pin);  // Pin 4 or interrupt?
@@ -105,6 +112,7 @@ class RCSensorsManager {
   public:
     static bool checkSensorsStatus() {
       if (mySwitch.available()) {
+#ifdef DEBUG_RCSENSORSMANAGER
         DPRINT("Received ");
         DPRINT( mySwitch.getReceivedValue());
         DPRINT(" / ");
@@ -113,13 +121,18 @@ class RCSensorsManager {
         DPRINT("Protocol: ");
         DPRINT( mySwitch.getReceivedProtocol());    
         DPRINTLN();
+#endif
         long sensorId = mySwitch.getReceivedValue();
         if (BeeStatus::sensors.find(sensorId) != BeeStatus::sensors.end()) {
           Sensor& sensorValue = BeeStatus::sensors[sensorId];
           sensorValue.now = true;
           sensorValue.millis = millis();
           sensorValue.value  = "true";
-          DPRINTLN("Sensor id found");          
+          if (sensorValue.sensorHandler)
+            sensorValue.sensorHandler("true");
+#ifdef DEBUG_RCSENSORSMANAGER            
+          DPRINTLN("Sensor id found");
+#endif
         }
         mySwitch.resetAvailable();
         return true;
@@ -186,7 +199,6 @@ unsigned long       WiFiManager::check_wifi          = 0;
 boolean             WiFiManager::wifi_reconnection   = false;
 
 // SocketIO
-const int msgCapacity = 300;// To Check
 class SocketIOManager {
   private:
     static SocketIOclient webSocket;
@@ -285,13 +297,15 @@ void setup()
   Serial.begin(115200);
   //
   pinMode(ledPin, OUTPUT);
+  // BeeStatus setup
+  BeeStatus::Init();
   // RFSensor setup
   RCSensorsManager::init();
   // WiFi setup
   WiFiManager::connect();
   // SocketIO setup
   SocketIOManager::on("onUpdateThingValue", onUpdateThingValue);
-  SocketIOManager::beginSocketIOSSLWithCA("api.thingshub.org", 3000, "/socket.io/?EIO=3&token=491e94d9-9041-4e5e-b6cb-9dad91bbf63d/value", root_ca, "");
+  SocketIOManager::beginSocketIOSSLWithCA("api.thingshub.org", 3000, "/socket.io/?EIO=3&token=491e94d9-9041-4e5e-b6cb-9dad91bbf63d", root_ca, "");
 }
 
 void loop()
@@ -330,5 +344,5 @@ void loop()
     http.end();  //Free resources    
   }
   //
-  //SocketIOManager::loop();
+  SocketIOManager::loop();
 }
