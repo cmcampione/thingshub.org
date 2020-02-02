@@ -26,12 +26,20 @@ struct Sensor {
   SensorHandler sensorHandler;
 };
 
-void onSensorTogglePin2(const char* value) {  
-  ledStatus = ledStatus == LOW ? HIGH : LOW;
+void onSensorDummy(const char* value) {  
+}
+
+void onSensorPin2On(const char* value) {  
+  ledStatus = HIGH;
   digitalWrite(ledPin, ledStatus);
 }
 
-const int sensorsCount      = 2;
+void onSensorPin2Off(const char* value) {  
+  ledStatus = LOW;
+  digitalWrite(ledPin, ledStatus);
+}
+
+const int sensorsCount      = 3;
 const int sensorsFieldCount = 4;
 const int sensorsCapacity   = JSON_OBJECT_SIZE(1) + JSON_ARRAY_SIZE(sensorsCount) + sensorsCount*JSON_OBJECT_SIZE(sensorsFieldCount) + 91;
 class BeeStatus {
@@ -39,12 +47,12 @@ class BeeStatus {
     static const char* thing;
     static std::map<long,Sensor> sensors;
   public:
-    static void Init() {
-      sensors[8171288].sensorHandler = onSensorTogglePin2;
-      sensors[31669624].sensorHandler = onSensorTogglePin2;
+    static void init() {
+      sensors[8171288].sensorHandler = onSensorPin2On;
+      sensors[8171284].sensorHandler = onSensorPin2Off;
+      sensors[31669624].sensorHandler = onSensorDummy;
     }
-    
-    static void ToJson(StaticJsonDocument<sensorsCapacity>& doc) {
+    static void toJson(StaticJsonDocument<sensorsCapacity>& doc) {
     // Sensor model sample
     /*
       {
@@ -298,7 +306,7 @@ void setup()
   //
   pinMode(ledPin, OUTPUT);
   // BeeStatus setup
-  BeeStatus::Init();
+  BeeStatus::init();
   // RFSensor setup
   RCSensorsManager::init();
   // WiFi setup
@@ -314,7 +322,7 @@ void loop()
   bool immediately = RCSensorsManager::checkSensorsStatus();
   //
   StaticJsonDocument<sensorsCapacity> doc;
-  BeeStatus::ToJson(doc);
+  BeeStatus::toJson(doc);
   // Check if wifi is down, try reconnecting every WiFiManager::check_wifi_interval seconds
   WiFiManager::checkAndTryReconnecting();
   if (WiFi.status() != WL_CONNECTED)
@@ -344,5 +352,5 @@ void loop()
     http.end();  //Free resources    
   }
   //
-  SocketIOManager::loop();
+  //SocketIOManager::loop();
 }
