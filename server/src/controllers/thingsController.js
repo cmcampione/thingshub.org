@@ -156,6 +156,7 @@ router.put("/:id", async function (req, res, next){
 	})(req, res, next);
 });
 
+// Update Thing Value
 router.put("/:id/value", async function (req, res, next){
 	passport.authenticate(["localapikey", "bearer"], { session: false }, async function(err, user, info) {
 		try {
