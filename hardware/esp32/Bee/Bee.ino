@@ -45,12 +45,35 @@ const int sensorsCapacity   = JSON_OBJECT_SIZE(1) + JSON_ARRAY_SIZE(sensorsCount
 class BeeStatus {
   public:
     static const char* thing;
+  private:
     static std::map<long,Sensor> sensors;
   public:
     static void init() {
       sensors[8171288].sensorHandler = onSensorPin2On;
       sensors[8171284].sensorHandler = onSensorPin2Off;
       sensors[31669624].sensorHandler = onSensorDummy;
+    }
+    static void setSensorValue(long idSensor, const char* value) {
+      if (BeeStatus::sensors.find(idSensor) != BeeStatus::sensors.end()) {
+        Sensor& sensorValue = BeeStatus::sensors[idSensor];
+        sensorValue.now = true;
+        sensorValue.millis = millis();
+        sensorValue.value  = value;
+        if (sensorValue.sensorHandler)
+          sensorValue.sensorHandler(value);
+#ifdef DEBUG_BEESTATUS            
+        DPRINTLN("Sensor id found");
+#endif
+      }
+    }
+    static bool checkChanges() {
+      for (std::map<long,Sensor>::const_iterator it = BeeStatus::sensors.begin(); it != BeeStatus::sensors.end(); it++)
+      {
+        const Sensor& sensorValue = it->second;
+        if (sensorValue.now)
+          return true;
+      }
+      return false;
     }
     static void toJson(StaticJsonDocument<sensorsCapacity>& doc) {
     // Sensor model sample
@@ -118,7 +141,7 @@ class RCSensorsManager {
       RCSensorsManager::mySwitch.enableReceive(RCSensorsManager::pin);  // Pin 4 or interrupt?
     }
   public:
-    static bool checkSensorsStatus() {
+    static void checkSensorsStatus() {
       if (mySwitch.available()) {
 #ifdef DEBUG_RCSENSORSMANAGER
         DPRINT("Received ");
@@ -131,21 +154,10 @@ class RCSensorsManager {
         DPRINTLN();
 #endif
         long sensorId = mySwitch.getReceivedValue();
-        if (BeeStatus::sensors.find(sensorId) != BeeStatus::sensors.end()) {
-          Sensor& sensorValue = BeeStatus::sensors[sensorId];
-          sensorValue.now = true;
-          sensorValue.millis = millis();
-          sensorValue.value  = "true";
-          if (sensorValue.sensorHandler)
-            sensorValue.sensorHandler("true");
-#ifdef DEBUG_RCSENSORSMANAGER            
-          DPRINTLN("Sensor id found");
-#endif
-        }
+        BeeStatus::setSensorValue(sensorId,"true");
+
         mySwitch.resetAvailable();
-        return true;
       }
-      return false;
     }
 };
  RCSwitch RCSensorsManager::mySwitch = RCSwitch();
@@ -295,8 +307,18 @@ void onUpdateThingValue(const StaticJsonDocument<msgCapacity>& jMsg) {
   DPRINTLN("-------------------------");
   const char* thingId = jMsg[1];
   DPRINTF("ThingId = %s\n",thingId);
-  ledStatus = ledStatus == LOW ? HIGH : LOW;
-  digitalWrite(ledPin, ledStatus);
+  if (strcmp(thingId, BeeStatus::thing) != 0)
+    return;
+  auto mainObj = jMsg[2].as<JsonObject>();
+  auto sensors = mainObj["sensors"].as<JsonArray>();
+  for (auto sensor : sensors) {
+    long sensorId = sensor["id"];
+    const char* value = sensor["value"];
+    //BeeStatus::setSensorValue(sensorId, value);
+
+    DPRINTF("SensorId = %d\n",sensorId);
+    DPRINTF("Value = %s\n",value);
+  }
  }
 
 void setup()
@@ -319,18 +341,21 @@ void setup()
 void loop()
 {
   // Check RC Sensor State change
-  bool immediately = RCSensorsManager::checkSensorsStatus();
-  //
-  StaticJsonDocument<sensorsCapacity> doc;
-  BeeStatus::toJson(doc);
+  RCSensorsManager::checkSensorsStatus();  
   // Check if wifi is down, try reconnecting every WiFiManager::check_wifi_interval seconds
   WiFiManager::checkAndTryReconnecting();
   if (WiFi.status() != WL_CONNECTED)
     return;
   //
+  SocketIOManager::loop();
+  //
+  bool immediately = BeeStatus::checkChanges();
+  //
   if ((immediately == true) || (millis() - restCallInterval >= 5000)) {
-    
-    immediately = false;
+    //
+    StaticJsonDocument<sensorsCapacity> doc;
+    BeeStatus::toJson(doc);
+
     restCallInterval = millis();
     
     HTTPClient http;
@@ -350,7 +375,5 @@ void loop()
    }
     
     http.end();  //Free resources    
-  }
-  //
-  //SocketIOManager::loop();
+  }  
 }
