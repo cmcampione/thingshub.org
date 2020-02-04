@@ -10,7 +10,7 @@
 #include "BuildDefine.h"
 
 //
-const int msgCapacity = 300;// To Check. Do not move from here, some compilation error or compiler bug
+const int msgCapacity = 2*JSON_ARRAY_SIZE(3) + JSON_OBJECT_SIZE(1) + 3*JSON_OBJECT_SIZE(4) + 180;// To Check. Do not move from here, some compilation error or compiler bug
 
 //
 int ledPin = 2;
@@ -141,7 +141,7 @@ class RCSensorsManager {
       RCSensorsManager::mySwitch.enableReceive(RCSensorsManager::pin);  // Pin 4 or interrupt?
     }
   public:
-    static void checkSensorsStatus() {
+    static void updateSensorsStatus() {
       if (mySwitch.available()) {
 #ifdef DEBUG_RCSENSORSMANAGER
         DPRINT("Received ");
@@ -185,7 +185,7 @@ class WiFiManager {
       } while (WiFi.status() != WL_CONNECTED);
       DPRINTLN("Connected to the WiFi");      
     }
-    static void checkAndTryReconnecting() {
+    static void checkConnection() {
       // if wifi is down, try reconnecting every 15 seconds
       if (WiFi.status() != WL_CONNECTED) {
         WiFiManager::wifi_reconnection = true;
@@ -223,27 +223,35 @@ class SocketIOManager {
   private:
     static SocketIOclient webSocket;
     static std::map<String, std::function<void (const StaticJsonDocument<msgCapacity>&)>> events;
-    static StaticJsonDocument<msgCapacity> jMsg;
   private:
     static void trigger(const StaticJsonDocument<msgCapacity>& jMsg) {
       const char* event = jMsg[0];
       auto e = events.find(event);
       if(e != events.end()) {
+#ifdef DEBUG_SOCKETIOMANAGER
         DPRINTF("trigger event %s\n", event);
+#endif
         e->second(jMsg);
       } else {
+#ifdef DEBUG_SOCKETIOMANAGER        
         DPRINTF("event %s not found. %d events available\n", event, events.size());
+#endif
       }
     }
     static void handleSIOEvent(socketIOmessageType_t type, uint8_t * payload, size_t length) {
+      StaticJsonDocument<msgCapacity> jMsg;
+#ifdef DEBUG_SOCKETIOMANAGER
       DPRINTF("socketIOmessageType_t = %c\n", type);
       DPRINTF("payload = %s\n", length == 0 ? (uint8_t *)"" : payload);
+#endif      
       switch(type) {
         case sIOtype_EVENT:
           DeserializationError error = deserializeJson(jMsg, payload);
           if (error) {
+#ifdef DEBUG_SOCKETIOMANAGER            
             DPRINT(F("deserializeJson() failed: "));
             DPRINTLN(error.c_str());
+#endif
             return;
           }
           trigger(jMsg);          
@@ -259,7 +267,9 @@ class SocketIOManager {
       if(e != events.end()) {
         events.erase(e);
       } else {
+#ifdef DEBUG_SOCKETIOMANAGER        
         DPRINTF("[SIoC] event %s not found, can not be removed\n", event);
+#endif        
       }
     }
     static void beginSocketIOSSLWithCA(const char * host, uint16_t port, const char * url = "/socket.io/?EIO=3", const char * CA_cert = NULL, const char * protocol = "arduino") {
@@ -273,7 +283,6 @@ class SocketIOManager {
 
 SocketIOclient SocketIOManager::webSocket;
 std::map<String, std::function<void (const StaticJsonDocument<msgCapacity>&)>> SocketIOManager::events;
-StaticJsonDocument<msgCapacity> SocketIOManager::jMsg;
 
 //
 const char* root_ca = \
@@ -305,14 +314,31 @@ unsigned long restCallInterval = 0;
 
 void onUpdateThingValue(const StaticJsonDocument<msgCapacity>& jMsg) {
   DPRINTLN("-------------------------");
+
+  if (jMsg.isNull())
+    return;
+  if (!jMsg.is<JsonArray>())
+    return;
+  if (jMsg.size() != 3)
+    return;
+
   const char* thingId = jMsg[1];
   DPRINTF("ThingId = %s\n",thingId);
   if (strcmp(thingId, BeeStatus::thing) != 0)
     return;
-  auto mainObj = jMsg[2].as<JsonObject>();
-  auto sensors = mainObj["sensors"].as<JsonArray>();
+
+  auto beeObj = jMsg[2].as<JsonObject>();
+  if (!beeObj.containsKey("sensors"))
+    return;
+
+  auto sensors = beeObj["sensors"].as<JsonArray>();
   for (auto sensor : sensors) {
+    if (!sensor.containsKey("id"))
+      continue;
     long sensorId = sensor["id"];
+
+    if (!sensor.containsKey("value"))
+      continue;
     const char* value = sensor["value"];
     //BeeStatus::setSensorValue(sensorId, value);
 
@@ -341,9 +367,9 @@ void setup()
 void loop()
 {
   // Check RC Sensor State change
-  RCSensorsManager::checkSensorsStatus();  
-  // Check if wifi is down, try reconnecting every WiFiManager::check_wifi_interval seconds
-  WiFiManager::checkAndTryReconnecting();
+  RCSensorsManager::updateSensorsStatus();  
+  // Check if wifi is ok, eventually try reconnecting every "WiFiManager::check_wifi_interval" milliseconds
+  WiFiManager::checkConnection();
   if (WiFi.status() != WL_CONNECTED)
     return;
   //
@@ -351,7 +377,7 @@ void loop()
   //
   bool immediately = BeeStatus::checkChanges();
   //
-  if ((immediately == true) || (millis() - restCallInterval >= 5000)) {
+  /* if ((immediately == true) || (millis() - restCallInterval >= 5000)) {
     //
     StaticJsonDocument<sensorsCapacity> doc;
     BeeStatus::toJson(doc);
@@ -375,5 +401,5 @@ void loop()
    }
     
     http.end();  //Free resources    
-  }  
+  } */  
 }
