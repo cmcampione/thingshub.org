@@ -778,7 +778,7 @@ exports.updateThing = async (user, thingId, thingDTO) => {
 	};
 };
 
-exports.updateThingValue = async (user, thingId, value, asCommand) => {
+exports.updateThingValue = async (user, thingId, value, asCmd) => {
 
 	if (!thingId)
 		throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Thing's Id can't be null", 104);
@@ -802,7 +802,7 @@ exports.updateThingValue = async (user, thingId, value, asCommand) => {
 
 		let usersIdsToNotify = await getUsersIdsToNotify(thing, true);
 
-		if (asCommand == false) {
+		if (asCmd == false) {
 			thing.set({value});
 			thingModel.save(thing);
 		}
