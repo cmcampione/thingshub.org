@@ -14,7 +14,7 @@ class IClientsConnector {
 
 	onCreateThing(usersIds, thingDTO) {}
 	onUpdateThing(usersIds, thingDTOs) {}
-	onUpdateThingValue(usersIds, thingId, value) {}
+	onUpdateThingValue(usersIds, thingId, value, asCmd) {}
 }
 
 // Socket.io support
@@ -123,7 +123,7 @@ class ClientsConnectorSocketIO extends IClientsConnector {
 			}
 		}
 	}
-	onUpdateThingValue(usersIds, thingId, value) {
+	onUpdateThingValue(usersIds, thingId, value, asCmd) {
 		
 		for(let userId of usersIds) {
 
@@ -132,7 +132,7 @@ class ClientsConnectorSocketIO extends IClientsConnector {
 				continue;
 
 			for(let socket of connections) {
-				socket.emit("onUpdateThingValue", thingId, value);
+				socket.emit("onUpdateThingValue", thingId, value, asCmd);
 			}
 		}
 	}
@@ -163,10 +163,10 @@ class RealtimeNotifier {
 			element.onUpdateThing(usersIds, thingDTOs);
 		});
 	}
-	static onUpdateThingValue(usersIds, thingId, value) {
+	static onUpdateThingValue(usersIds, thingId, value, asCmd) {
 
 		RealtimeNotifier.ClientsConnectors.forEach(element => {
-			element.onUpdateThingValue(usersIds, thingId, value);
+			element.onUpdateThingValue(usersIds, thingId, value, asCmd);
 		});
 	}
 }

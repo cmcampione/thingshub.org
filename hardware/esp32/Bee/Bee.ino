@@ -238,7 +238,7 @@ class SocketIOManager {
 #endif
       }
     }
-    static void handleSIOEvent(socketIOmessageType_t type, uint8_t * payload, size_t length) {
+    static void handleEvent(socketIOmessageType_t type, uint8_t * payload, size_t length) {
       StaticJsonDocument<msgCapacity> jMsg;
 #ifdef DEBUG_SOCKETIOMANAGER
       DPRINTF("socketIOmessageType_t = %c\n", type);
@@ -272,8 +272,8 @@ class SocketIOManager {
 #endif        
       }
     }
-    static void beginSocketIOSSLWithCA(const char * host, uint16_t port, const char * url = "/socket.io/?EIO=3", const char * CA_cert = NULL, const char * protocol = "arduino") {
-      SocketIOManager::webSocket.onEvent(handleSIOEvent);
+    static void beginSocketSSLWithCA(const char * host, uint16_t port, const char * url = "/socket.io/?EIO=3", const char * CA_cert = NULL, const char * protocol = "arduino") {
+      SocketIOManager::webSocket.onEvent(handleEvent);
       SocketIOManager::webSocket.beginSocketIOSSLWithCA(host, port, url, CA_cert, protocol);
     }
     static void loop() {
@@ -361,7 +361,7 @@ void setup()
   WiFiManager::connect();
   // SocketIO setup
   SocketIOManager::on("onUpdateThingValue", onUpdateThingValue);
-  SocketIOManager::beginSocketIOSSLWithCA("api.thingshub.org", 3000, "/socket.io/?EIO=3&token=491e94d9-9041-4e5e-b6cb-9dad91bbf63d", root_ca, "");
+  SocketIOManager::beginSocketSSLWithCA("api.thingshub.org", 3000, "/socket.io/?EIO=3&token=491e94d9-9041-4e5e-b6cb-9dad91bbf63d", root_ca, "");
 }
 
 void loop()
