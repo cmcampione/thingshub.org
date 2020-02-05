@@ -319,7 +319,7 @@ void onUpdateThingValue(const StaticJsonDocument<msgCapacity>& jMsg) {
     return;
   if (!jMsg.is<JsonArray>())
     return;
-  if (jMsg.size() != 3)
+  if (jMsg.size() != 4)
     return;
 
   const char* thingId = jMsg[1];
@@ -327,7 +327,10 @@ void onUpdateThingValue(const StaticJsonDocument<msgCapacity>& jMsg) {
   if (strcmp(thingId, BeeStatus::thing) != 0)
     return;
 
-  auto beeObj = jMsg[2].as<JsonObject>();
+  bool asCmd = jMsg[2];
+  DPRINTF("ThingId = %s\n",asCmd);
+
+  auto beeObj = jMsg[3].as<JsonObject>();
   if (!beeObj.containsKey("sensors"))
     return;
 
@@ -340,10 +343,12 @@ void onUpdateThingValue(const StaticJsonDocument<msgCapacity>& jMsg) {
     if (!sensor.containsKey("value"))
       continue;
     const char* value = sensor["value"];
-    //BeeStatus::setSensorValue(sensorId, value);
-
+    
     DPRINTF("SensorId = %d\n",sensorId);
     DPRINTF("Value = %s\n",value);
+
+    if (asCmd)
+      BeeStatus::setSensorValue(sensorId, value);
   }
  }
 
