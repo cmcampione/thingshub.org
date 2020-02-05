@@ -174,11 +174,11 @@ router.put("/:id/value", async function (req, res, next){
 			if (!value)
 				throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "The body message is empty", 106);
 
-			let blResult = await thingsMngr.updateThingValue(user, thingId, value);
+			let blResult = await thingsMngr.updateThingValue(user, thingId, value, false);
 			if (!blResult)
 				return; // TODO: According to the restful paradigm what should the PUT return?
 
-			RealtimeNotifier.onUpdateThingValue(blResult, thingId, value);
+			RealtimeNotifier.onUpdateThingValue(blResult, thingId, value, false);
 
 			// TODO: According to the restful paradigm what should the PUT return?
 			res.json(value);
@@ -189,6 +189,43 @@ router.put("/:id/value", async function (req, res, next){
 				return;
 			}
 			next(new utils.ErrorCustom(httpStatusCodes.INTERNAL_SERVER_ERROR, e.message, 89));
+		}
+	})(req, res, next);
+});
+
+// send Thing command
+router.put("/:id/cmd", async function (req, res, next){
+	passport.authenticate(["localapikey", "bearer"], { session: false }, async function(err, user, info) {
+		try {
+			if (err)
+				return next(err); 
+
+			if (!user)
+				return next(new utils.ErrorCustom(httpStatusCodes.UNAUTHORIZED, httpStatusCodes.getStatusText(httpStatusCodes.UNAUTHORIZED), 113));
+
+			let thingId = req.params.id;
+			if (!thingId)
+				throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Thing's Id can't be null", 114);
+
+			let value = req.body;
+			if (!value)
+				throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "The body message is empty", 115);
+
+			let blResult = await thingsMngr.updateThingValue(user, thingId, value, true);
+			if (!blResult)
+				return; // TODO: According to the restful paradigm what should the PUT return?
+
+			RealtimeNotifier.onUpdateThingValue(blResult, thingId, value, true);
+
+			// TODO: According to the restful paradigm what should the PUT return?
+			res.json(value);
+
+		}  catch (e)  {
+			if (e instanceof utils.ErrorCustom) {
+				next(e);
+				return;
+			}
+			next(new utils.ErrorCustom(httpStatusCodes.INTERNAL_SERVER_ERROR, e.message, 116));
 		}
 	})(req, res, next);
 });
