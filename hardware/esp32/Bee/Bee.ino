@@ -327,10 +327,10 @@ void onUpdateThingValue(const StaticJsonDocument<msgCapacity>& jMsg) {
   if (strcmp(thingId, BeeStatus::thing) != 0)
     return;
 
-  bool asCmd = jMsg[2];
-  DPRINTF("ThingId = %s\n",asCmd);
+  bool asCmd = jMsg[3];
+  DPRINTF("asCmd = %d\n",asCmd);
 
-  auto beeObj = jMsg[3].as<JsonObject>();
+  auto beeObj = jMsg[2].as<JsonObject>();
   if (!beeObj.containsKey("sensors"))
     return;
 
@@ -382,7 +382,7 @@ void loop()
   //
   bool immediately = BeeStatus::checkChanges();
   //
-  /* if ((immediately == true) || (millis() - restCallInterval >= 5000)) {
+  if ((immediately == true) || (millis() - restCallInterval >= 5000)) {
     //
     StaticJsonDocument<sensorsCapacity> doc;
     BeeStatus::toJson(doc);
@@ -406,5 +406,5 @@ void loop()
    }
     
     http.end();  //Free resources    
-  } */  
+  } 
 }
