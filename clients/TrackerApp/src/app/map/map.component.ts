@@ -84,7 +84,7 @@ export class MapComponent implements OnInit {
 
     this.socket.subscribe();
     // Uses of "fat arrow" sintax for "this" implicit binding
-    this.socket.setHook('onUpdateThingValue', (thingId, value) => {
+    this.socket.setHook('onUpdateThingValue', (thingId, value, asCmd) => {
 
       if (this.thingId !== thingId || this.deviceId !== value.deviceId) {
         return;
