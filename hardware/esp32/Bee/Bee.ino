@@ -26,7 +26,7 @@ struct Sensor {
   SensorHandler sensorHandler;
 };
 
-void onSensorDummy(const char* value) {  
+void onSensorFake(const char* value) {  
 }
 
 void onSensorPin2On(const char* value) {  
@@ -51,7 +51,7 @@ class BeeStatus {
     static void init() {
       sensors[8171288].sensorHandler = onSensorPin2On;
       sensors[8171284].sensorHandler = onSensorPin2Off;
-      sensors[31669624].sensorHandler = onSensorDummy;
+      sensors[31669624].sensorHandler = onSensorFake;
     }
     static void setSensorValue(long idSensor, const char* value) {
       if (BeeStatus::sensors.find(idSensor) != BeeStatus::sensors.end()) {
