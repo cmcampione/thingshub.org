@@ -2,7 +2,7 @@
     <div class="center">{{title}}</div>
     <div [hidden]="!isLoggedIn" class="right">
         <ons-toolbar-button (click)="openMenu()">
-          <ons-icon icon="ion-navicon, material:md-menu"></ons-icon>
+          <ons-icon icon="ion-ios-menu, material:md-menu"></ons-icon>
         </ons-toolbar-button>
     </div>
 </ons-toolbar>
@@ -13,8 +13,12 @@
     <app-login></app-login>
   </div>
 
-  <div *ngIf="isLoggedIn">
+  <div *ngIf="isLoggedIn">    
     <app-map></app-map>
+  </div>
+
+  <div *ngIf="isLoggedIn">
+    <app-sensors></app-sensors>
   </div>
 
   <div *ngIf="isLoggedIn">
