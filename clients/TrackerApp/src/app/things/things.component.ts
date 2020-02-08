@@ -19,7 +19,7 @@ export class ThingsComponent implements OnInit {
 
   ngOnInit() {
 
-    const thingsGetParams: thingshub.ThingsGetParams =  {
+    const thingsGetParams: thingshub.ThingsGetParams = {
       parentThingId : null,
       thingFilter : null,
       valueFilter : null,
