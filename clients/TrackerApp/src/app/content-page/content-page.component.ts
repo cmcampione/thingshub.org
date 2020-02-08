@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { AccountUserData } from 'thingshub-js-sdk';
 import { AccountService } from '../account.service';
 import { MenuService } from '../menu.service';
+import { RealTimeConnectorService } from '../real-time-connector.service';
 
 @Component({
   // tslint:disable-next-line:component-selector
@@ -15,7 +16,9 @@ export class ContentPageComponent implements OnInit {
 
   public isLoggedIn: boolean = this.accountService.isLoggedIn;
 
-  constructor(private accountService: AccountService, private menuService: MenuService) {
+  constructor(private accountService: AccountService, 
+    private realTimeConnector: RealTimeConnectorService,
+    private menuService: MenuService) {
     accountService.isLoggedIn$.subscribe((accountUserData: AccountUserData) => {
       this.isLoggedIn = accountUserData != null;
     });
@@ -28,4 +31,7 @@ export class ContentPageComponent implements OnInit {
     this.menuService.open();
   }
 
+  OnDestroy() {
+    //this.realTimeConnector.realTimeConnectorRaw.unsubscribe();
+  }
 }

@@ -3,6 +3,7 @@ import { Component, OnInit, LOCALE_ID, Inject } from '@angular/core';
 import * as thingshub from 'thingshub-js-sdk';
 import { endPointAddress } from '../utils';
 import { AccountService } from '../account.service';
+import { RealTimeConnectorService } from '../real-time-connector.service';
 
 @Component({
   selector: 'app-map',
@@ -24,23 +25,9 @@ export class MapComponent implements OnInit {
   public lat = 51.678418;
   public lng = 7.809007;
 
-  socket = new thingshub.SocketIORealtimeConnector(
-      endPointAddress.server,
-      this.accountService.getSecurityToken,
-      this.onError, this.onConnectError, this.onStateChanged);
-
-  private onError(error: any) {
-    console.log(error);
-  }
-  private onConnectError(error: any) {
-    console.log(error);
-  }
-
-  private onStateChanged(change: any) {
-    console.log(change);
-  }
-
-  constructor(@Inject(LOCALE_ID) private locale: string, private accountService: AccountService) {
+  constructor(@Inject(LOCALE_ID) private locale: string, 
+    private accountService: AccountService,
+    private realTimeConnector: RealTimeConnectorService) {
     this.thingsDataContext = new thingshub.ThingsDataContext(endPointAddress, accountService.getSecurityHeader);
   }
 
@@ -82,9 +69,8 @@ export class MapComponent implements OnInit {
       console.log(e);
     });
 
-    this.socket.subscribe();
     // Uses of "fat arrow" sintax for "this" implicit binding
-    this.socket.setHook('onUpdateThingValue', (thingId, value, asCmd) => {
+    this.realTimeConnector.realTimeConnectorRaw.setHook('onUpdateThingValue', (thingId, value, asCmd) => {
 
       if (this.thingId !== thingId || this.deviceId !== value.deviceId) {
         return;

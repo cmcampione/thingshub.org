@@ -18,4 +18,8 @@ export class AppComponent {
   constructor(private menuService: MenuService) {
     this.menuService.menu$.subscribe(() => this.splitter.nativeElement.side.open());
   }
+
+  OnDestroy() {
+    //this.realTimeConnector.realTimeConnectorRaw.unsubscribe();
+  }
 }
