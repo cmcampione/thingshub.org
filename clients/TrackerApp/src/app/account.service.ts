@@ -48,7 +48,6 @@ export class AccountService {
   }
 
   constructor() {
-
     this.accountManager = new AccountManager('thingshub',
       new AccountDataContext(endPointAddress, this.actionControl));
   }
@@ -61,7 +60,7 @@ export class AccountService {
     return this.accountManager.remember;
   }
 
-  public async login(username, password, remember): Promise<AccountUserData> {
+  public async login(username: string, password: string, remember: boolean): Promise<AccountUserData> {
     const loginData: AccountUserData = await this.accountManager.login(username, password, remember);
     if (!this.userId) {
       this.userId = loginData.id;

@@ -1,4 +1,4 @@
-export interface Alarm {
+export interface Sensor {
     id: number;
     now: boolean;
     millis: number;
