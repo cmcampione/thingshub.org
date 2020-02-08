@@ -14,12 +14,14 @@ import { ThingsComponent } from './things/things.component';
 import { MenuService } from './menu.service';
 import { SidePageComponent } from './side-page/side-page.component';
 import { ContentPageComponent } from './content-page/content-page.component';
+import { SensorsComponent } from './sensors/sensors.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     LoginComponent,
     MapComponent,
+    SensorsComponent,
     ThingsComponent,
     SidePageComponent,
     ContentPageComponent
