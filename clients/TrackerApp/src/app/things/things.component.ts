@@ -31,14 +31,14 @@ export class ThingsComponent implements OnInit {
     this.thingsDataContext.getThings(thingsGetParams)
     .then(things => {
       for (let i = 0; i < things.things.length; i++) {
-      this.things.push(things.things[i]);
+      this.things.push(new thingshub.Thing(things.things[i]));
     }});
     console.log('things = ' + this.things);
 
     this.thingsDataContext.getThings(thingsGetParams)
     .then(things => {
       for (let i = 0; i < things.things.length; i++) {
-        this.things1.push(things.things[i]);
+        this.things1.push(new thingshub.Thing(things.things[i]));
       }
     });
     console.log('things1 = ' + this.things1);
@@ -58,7 +58,7 @@ export class ThingsComponent implements OnInit {
     this.thingsDataContext.getThings(thingsGetParams)
     .then(things => {
       for (let i = 0; i < things.things.length; i++) {
-      this.things.push(things.things[i]);
+      this.things.push(new thingshub.Thing(things.things[i]));
     }})
     .catch(e => {
       console.log(e);
@@ -67,7 +67,7 @@ export class ThingsComponent implements OnInit {
     this.thingsDataContext.getThings(thingsGetParams)
     .then(things => {
       for (let i = 0; i < things.things.length; i++) {
-        this.things1.push(things.things[i]);
+        this.things1.push(new thingshub.Thing(things.things[i]));
       }
     })
     .catch(e => {

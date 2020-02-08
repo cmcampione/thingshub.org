@@ -29,14 +29,14 @@ export class MapComponent implements OnInit {
       this.accountService.getSecurityToken,
       this.onError, this.onConnectError, this.onStateChanged);
 
-  private onError(error) {
+  private onError(error: any) {
     console.log(error);
   }
-  private onConnectError(error) {
+  private onConnectError(error: any) {
     console.log(error);
   }
 
-  private onStateChanged(change) {
+  private onStateChanged(change: any) {
     console.log(change);
   }
 
