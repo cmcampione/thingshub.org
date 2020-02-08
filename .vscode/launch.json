@@ -23,7 +23,7 @@
             "request": "launch",
             "url": "http://localhost:4200/",
             "sourceMaps": true,
-            "webRoot": "${workspaceRoot}"
+            "webRoot": "${workspaceRoot}\\clients\\TrackerApp"
         },
         {
             "name": "Launch SDK webpack",
