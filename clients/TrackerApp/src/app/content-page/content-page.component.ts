@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { AccountUserData } from 'thingshub-js-sdk';
 import { AccountService } from '../account.service';
 import { MenuService } from '../menu.service';
@@ -11,7 +11,7 @@ import * as thingshub from 'thingshub-js-sdk';
   templateUrl: './content-page.component.html',
   styleUrls: ['./content-page.component.css']
 })
-export class ContentPageComponent implements OnInit {
+export class ContentPageComponent implements OnInit, OnDestroy {
 
   public title = 'Hardworking bees are working here';
 
@@ -28,8 +28,8 @@ export class ContentPageComponent implements OnInit {
         this.realTimeConnector.realTimeConnectorRaw.subscribe();
       }
       else {
-        // ToTry
-        //this.realTimeConnector.realTimeConnectorRaw.unsubscribe();
+        // ToTry better
+        this.realTimeConnector.realTimeConnectorRaw.unsubscribe();
       }
     });
     this.realTimeConnector.connectionStatus.subscribe({
@@ -47,6 +47,9 @@ export class ContentPageComponent implements OnInit {
     this.menuService.open();
   }
 
-  OnDestroy() {    
+  ngOnDestroy() {   
+    if (this.isLoggedIn) {
+      this.realTimeConnector.realTimeConnectorRaw.unsubscribe();
+    }    
   }
 }
