@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, ViewChild, OnDestroy } from '@angular/core';
 import { SidePageComponent } from './side-page/side-page.component';
 import { ContentPageComponent } from './content-page/content-page.component';
 import { MenuService } from './menu.service';
@@ -8,7 +8,7 @@ import { MenuService } from './menu.service';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent {
+export class AppComponent implements OnDestroy {
 
   public sidePage    = SidePageComponent;
   public contentPage = ContentPageComponent;
@@ -16,10 +16,10 @@ export class AppComponent {
   @ViewChild('splitter', {static: false}) splitter;
 
   constructor(private menuService: MenuService) {
-    this.menuService.menu$.subscribe(() => this.splitter.nativeElement.side.open());
+    this.menuService.toggle.subscribe(() => this.splitter.nativeElement.side.open());
   }
 
-  OnDestroy() {
+  ngOnDestroy() {
     //this.realTimeConnector.realTimeConnectorRaw.unsubscribe();
   }
 }
