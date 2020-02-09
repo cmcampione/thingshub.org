@@ -1,5 +1,5 @@
 import * as moment from 'moment';
-import { Component, OnInit, LOCALE_ID, Inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, LOCALE_ID, Inject } from '@angular/core';
 import * as thingshub from 'thingshub-js-sdk';
 import { endPointAddress } from '../utils';
 import { AccountService } from '../account.service';
@@ -10,7 +10,7 @@ import { RealTimeConnectorService } from '../real-time-connector.service';
   templateUrl: './map.component.html',
   styleUrls: ['./map.component.css']
 })
-export class MapComponent implements OnInit {
+export class MapComponent implements OnInit, OnDestroy  {
 
   private thingsDataContext: thingshub.ThingsDataContext;
 
@@ -44,6 +44,15 @@ export class MapComponent implements OnInit {
     console.log(value);
   }
 
+  private readonly onUpdateThingValue = (thingId, value, asCmd): void => {
+    if (this.thingId !== thingId || this.deviceId !== value.deviceId) {
+      return;
+    }
+
+    moment.locale('IT-it');
+    this.setValue(value);
+  };
+
   ngOnInit() {
 
     const thingsGetParams: thingshub.ThingsGetParams =  {
@@ -70,14 +79,10 @@ export class MapComponent implements OnInit {
     });
 
     // Uses of "fat arrow" sintax for "this" implicit binding
-    this.realTimeConnector.realTimeConnectorRaw.setHook('onUpdateThingValue', (thingId, value, asCmd) => {
+    this.realTimeConnector.realTimeConnectorRaw.setHook('onUpdateThingValue', this.onUpdateThingValue);
+  }
 
-      if (this.thingId !== thingId || this.deviceId !== value.deviceId) {
-        return;
-      }
-
-      moment.locale('IT-it');
-      this.setValue(value);
-    });
+  ngOnDestroy() {
+    //this.realTimeConnector.realTimeConnectorRaw.remHook('onUpdateThingValue', this.onUpdateThingValue);
   }
 }
