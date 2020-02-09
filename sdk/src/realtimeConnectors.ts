@@ -103,6 +103,7 @@ export class SocketIORealtimeConnector extends RealtimeConnector {
             return;
 
         this.socket.disconnect();
+        this.socket = null;
     }
 
     public setHook(eventName : string, hook : (...msg: any[]) => void) : void {

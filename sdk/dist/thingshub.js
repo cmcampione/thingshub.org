@@ -2879,6 +2879,7 @@ class SocketIORealtimeConnector extends RealtimeConnector {
         if (!this.socket)
             return;
         this.socket.disconnect();
+        this.socket = null;
     }
     setHook(eventName, hook) {
         this.socket.on(eventName, hook);
