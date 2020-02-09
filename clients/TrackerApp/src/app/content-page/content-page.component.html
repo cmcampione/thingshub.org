@@ -1,5 +1,6 @@
 <ons-toolbar>
     <div class="center">{{title}}</div>
+    <div class="center">{{connectionStatus}}</div>
     <div [hidden]="!isLoggedIn" class="right">
         <ons-toolbar-button (click)="openMenu()">
           <ons-icon icon="ion-ios-menu, material:md-menu"></ons-icon>
