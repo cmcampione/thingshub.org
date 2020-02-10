@@ -1,4 +1,4 @@
-import axios, { AxiosRequestConfig, AxiosPromise, CancelToken } from "axios";
+import axios from "axios";
 import {HttpRequestCanceler, ItemsRange, Helpers} from "./helpers";
 import {EndPointAddress} from "./endPointAddress";
 import {ThingDTO} from "../../common/src/dtos";
