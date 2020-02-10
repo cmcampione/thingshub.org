@@ -110,6 +110,9 @@ export class SocketIORealtimeConnector extends RealtimeConnector {
         this.socket.on(eventName, hook);
     }
     public remHook(eventName : any, hook : (...msg: any[]) => void) : void {
+        // Could happen after unsubscribe so this.socket is null
+        if (!this.socket)
+            return;
         this.socket.off(eventName, hook);
     }
 }
