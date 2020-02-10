@@ -78,11 +78,10 @@ export class MapComponent implements OnInit, OnDestroy  {
       console.log(e);
     });
 
-    // Uses of "fat arrow" sintax for "this" implicit binding
     this.realTimeConnector.realTimeConnectorRaw.setHook('onUpdateThingValue', this.onUpdateThingValue);
   }
 
   ngOnDestroy() {
-    //this.realTimeConnector.realTimeConnectorRaw.remHook('onUpdateThingValue', this.onUpdateThingValue);
+    this.realTimeConnector.realTimeConnectorRaw.remHook('onUpdateThingValue', this.onUpdateThingValue);
   }
 }
