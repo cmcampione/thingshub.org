@@ -24,17 +24,17 @@ export class ThingsManagerService {
   private thingsDatacontext = new thingshub.ThingsDataContext(endPointAddress, this.accountService.getSecurityHeader);
 
   private thingsManager = new thingshub.ThingsManager(this.mainThing, 
-    "", 
+    "Home appliance", 
     this.thingsManagerClaims, 
     this.thingsDatacontext, 
     this.realTimeConnector.realTimeConnectorRaw);
 
+  private readonly onUpdateThingValue: (...msg: any[]) => void = (thingId, value, asCmd) => {
+  };
+
   constructor(private accountService: AccountService, 
     private realTimeConnector: RealTimeConnectorService) {
-      this.realTimeConnector.realTimeConnectorRaw.subscribe();
-    // Uses of "fat arrow" sintax for "this" implicit binding
-    this.realTimeConnector.realTimeConnectorRaw.setHook('onUpdateThingValue', (thingId, value, asCmd) => {
-     
-    });
+      this.realTimeConnector.realTimeConnectorRaw.subscribe();    
+      this.realTimeConnector.realTimeConnectorRaw.setHook('onUpdateThingValue', this.onUpdateThingValue);
   }
 }
