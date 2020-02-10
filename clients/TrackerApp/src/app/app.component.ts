@@ -19,7 +19,6 @@ export class AppComponent implements OnDestroy {
     this.menuService.toggle.subscribe(() => this.splitter.nativeElement.side.open());
   }
 
-  ngOnDestroy() {
-    //this.realTimeConnector.realTimeConnectorRaw.unsubscribe();
+  ngOnDestroy() {    
   }
 }
