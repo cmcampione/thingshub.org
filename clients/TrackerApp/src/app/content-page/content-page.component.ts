@@ -22,7 +22,7 @@ export class ContentPageComponent implements OnInit, OnDestroy {
   constructor(private accountService: AccountService, 
     private menuService: MenuService,
     private realTimeConnector: RealTimeConnectorService) {
-    accountService.isLoggedIn$.subscribe((accountUserData: AccountUserData) => {
+      accountService.isLoggedIn$.subscribe((accountUserData: AccountUserData) => {
       this.isLoggedIn = accountUserData != null;
       if (this.isLoggedIn) {
         this.realTimeConnector.realTimeConnectorRaw.subscribe();
