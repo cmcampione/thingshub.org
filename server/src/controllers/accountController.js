@@ -6,7 +6,7 @@ const nodemailer 		= require("nodemailer");
 const httpStatusCodes 	= require("http-status-codes");
 const express 			= require("express");
 const passport 			= require("passport");
-const {param, body, validationResult}	= require('express-validator');
+const {param, body, validationResult}	= require("express-validator");
 
 const ejs 				= require("ejs");
 
@@ -91,9 +91,9 @@ async function SendConfirmationEmailByOnlyEmail(email, culture, confirmationToke
  */
 
 router.get("/registerByOnlyEmail/:email/:culture", [
-		param("email", "Email is not valid").normalizeEmail({ gmail_remove_dots: false }).isEmail()
-	],
-	async (req, res, next) => {
+	param("email", "Email is not valid").normalizeEmail({ gmail_remove_dots: false }).isEmail()
+],
+async (req, res, next) => {
 	try {
 		try {
 			validationResult(req).throw();
@@ -156,18 +156,18 @@ router.get("/registerByOnlyEmail/:email/:culture", [
 });
 
 router.post("/confirmAccountByOnlyEmail", [
-		body("email", "Email is not valid").normalizeEmail({ gmail_remove_dots: false }).isEmail(),
-		body("name", "Name is not valid").notEmpty(),
-		body("password", `Password must be at least ${process.env.PASSWORD_MIN_LEN} characters long`).isLength({min : process.env.PASSWORD_MIN_LEN}),
-		body("confirmationToken", "Confirmation Token not valid").notEmpty()
-	],
-	async (req, res, next) => {
+	body("email", "Email is not valid").normalizeEmail({ gmail_remove_dots: false }).isEmail(),
+	body("name", "Name is not valid").notEmpty(),
+	body("password", `Password must be at least ${process.env.PASSWORD_MIN_LEN} characters long`).isLength({min : process.env.PASSWORD_MIN_LEN}),
+	body("confirmationToken", "Confirmation Token not valid").notEmpty()
+],
+async (req, res, next) => {
 	try {
 		// if a password has been provided, then a confirmation must also be provided.
 		if (req.body.password) {
-			await body('confirmPassword')
-			  .equals(req.body.password).withMessage('Passwords do not match')
-			  .run(req);
+			await body("confirmPassword")
+				.equals(req.body.password).withMessage("Passwords do not match")
+				.run(req);
 		}
 		try {
 			validationResult(req).throw();
@@ -208,34 +208,34 @@ router.post("/confirmAccountByOnlyEmail", [
 });
 
 router.post("/login", 
- 	async function (req, res, next) {
-	passport.authenticate(["local", "basic"], { session: false }, async function(err, user, info) {
-		try {
-			if (err) { 
-				return next(err); 
-			}
-			if (!user) { 
-				return next(new utils.ErrorCustom(httpStatusCodes.UNAUTHORIZED, httpStatusCodes.getStatusText(httpStatusCodes.UNAUTHORIZED), 107));
+	async function (req, res, next) {
+		passport.authenticate(["local", "basic"], { session: false }, async function(err, user, info) {
+			try {
+				if (err) { 
+					return next(err); 
+				}
+				if (!user) { 
+					return next(new utils.ErrorCustom(httpStatusCodes.UNAUTHORIZED, httpStatusCodes.getStatusText(httpStatusCodes.UNAUTHORIZED), 107));
+				}
+
+				res.json({ 
+					access_token: utils.createToken({ 
+						sub : user._id.toString(), 
+						exp : 60, 
+						name: user.name }),
+					token_type: "bearer"
+				});
+
+			}  catch (e)  {
+				if (e instanceof utils.ErrorCustom) {
+					next(e);
+					return;
+				}
+				next(new utils.ErrorCustom(httpStatusCodes.INTERNAL_SERVER_ERROR, e.message, 108));
 			}
 
-			res.json({ 
-				access_token: utils.createToken({ 
-					sub : user._id.toString(), 
-					exp : 60, 
-					name: user.name }),
-				token_type: "bearer"
-			});
-
-		}  catch (e)  {
-			if (e instanceof utils.ErrorCustom) {
-				next(e);
-				return;
-			}
-			next(new utils.ErrorCustom(httpStatusCodes.INTERNAL_SERVER_ERROR, e.message, 108));
-		}
-
-	})(req, res, next);
-});
+		})(req, res, next);
+	});
 
 router.get("/logout", async function (req, res, next) {
 	passport.authenticate(["local", "basic"], async function(err, user, info) {
