@@ -1,16 +1,16 @@
-import { Injectable } from '@angular/core';
+import { Injectable, OnDestroy, Inject, InjectionToken  } from '@angular/core';
 import * as thingshub from 'thingshub-js-sdk';
 import { endPointAddress } from './utils';
 import { AccountService } from './account.service';
 import { RealTimeConnectorService } from './real-time-connector.service';
 
-@Injectable({
-  providedIn: 'root'
-})
-export class ThingsManagerService {
+export const THING_KIND = new InjectionToken<string>('ThingKind');
 
-  private mainThing = new thingshub.Thing();
-  private thingsManagerClaims = {
+@Injectable()
+export class ThingsManagerService implements OnDestroy {
+
+  public readonly mainThing = new thingshub.Thing();
+  private readonly thingsManagerClaims = {
 
     publicReadClaims : thingshub.ThingUserReadClaims.NoClaims,
     publicChangeClaims: thingshub.ThingUserChangeClaims.NoClaims,
@@ -21,20 +21,26 @@ export class ThingsManagerService {
     creatorUserReadClaims: thingshub.ThingUserReadClaims.AllClaims,
     creatorUserChangeClaims: thingshub.ThingUserChangeClaims.AllClaims
   };
-  private thingsDatacontext = new thingshub.ThingsDataContext(endPointAddress, this.accountService.getSecurityHeader);
+  private readonly thingsDatacontext = new thingshub.ThingsDataContext(endPointAddress, this.accountService.getSecurityHeader);
 
-  private thingsManager = new thingshub.ThingsManager(this.mainThing,
-    'Home appliance',
-    this.thingsManagerClaims,
-    this.thingsDatacontext,
-    this.realTimeConnector.realTimeConnectorRaw);
+  public readonly thingsManager: thingshub.ThingsManager;
 
   private readonly onUpdateThingValue: (...msg: any[]) => void = (thingId, value, asCmd) => {
   }
 
-  constructor(private accountService: AccountService,
-    private realTimeConnector: RealTimeConnectorService) {
+  constructor(@Inject(THING_KIND) private thingKind: string, private readonly accountService: AccountService,
+    private readonly realTimeConnector: RealTimeConnectorService) {
       this.realTimeConnector.realTimeConnectorRaw.subscribe();
       this.realTimeConnector.realTimeConnectorRaw.setHook('onUpdateThingValue', this.onUpdateThingValue);
+      this.thingsManager = new thingshub.ThingsManager(this.mainThing,
+        thingKind,
+        this.thingsManagerClaims,
+        this.thingsDatacontext,
+        this.realTimeConnector.realTimeConnectorRaw);
+  }
+
+  ngOnDestroy() {
+    this.realTimeConnector.realTimeConnectorRaw.remHook('onUpdateThingValue', this.onUpdateThingValue);
+    this.realTimeConnector.realTimeConnectorRaw.unsubscribe();
   }
 }
