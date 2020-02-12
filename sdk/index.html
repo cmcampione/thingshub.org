@@ -87,18 +87,30 @@
       }
       var thingsManager = new thingshub.ThingsManager(mainThing, "first thing", thingsManagerClaims, thingsDatacontext, realTimeConnector );
       var httpRequestCanceler = new thingshub.HttpRequestCanceler();
-      thingsManager.getMoreThings(httpRequestCanceler)
-      .then((data) => {
-        console.log(mainThing);        
-      })
-      .catch((e) => {
-        console.log(e);
-      })
+
+      setInterval(() => {
+        thingsManager.getMoreThings(httpRequestCanceler)
+        .then((data) => {
+          console.log(mainThing);        
+        })
+        .catch((e) => {
+          console.log(e);
+        })
+      }, 2000);
+
+      function cancel() {
+        httpRequestCanceler.cancel();
+      }
+      function cancelReset() {
+        httpRequestCanceler.reset();
+      }
+
     </script>
 
 </head>
 <body>
-
+  <button onclick="cancel()">Cancel</button>
+  <button onclick="cancelReset()">Reset Cancel</button>
   <div id="things">
       <ol>
           <li v-for="thing in mainThing.children">
@@ -107,7 +119,6 @@
           </li>
       </ol>
   </div>
-
   <script>
       var app = new Vue({
         el: '#things',
