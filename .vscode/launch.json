@@ -18,12 +18,12 @@
             "program": "${workspaceFolder}\\server\\src\\server.js"
         },
         {
-            "name": "Launch Tracker App",
+            "name": "Launch Pera Colta App",
             "type": "chrome",
             "request": "launch",
             "url": "http://localhost:4200/",
             "sourceMaps": true,
-            "webRoot": "${workspaceRoot}\\clients\\TrackerApp"
+            "webRoot": "${workspaceRoot}\\clients\\PeraColta"
         },
         {
             "name": "Launch SDK webpack",
