@@ -18,7 +18,7 @@
             "program": "${workspaceFolder}\\server\\src\\server.js"
         },
         {
-            "name": "Launch Pera Colta App",
+            "name": "Launch PeraColta App",
             "type": "chrome",
             "request": "launch",
             "url": "http://localhost:4200/",
