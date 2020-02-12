@@ -34,7 +34,6 @@ import { SensorsComponent } from './sensors/sensors.component';
       apiKey: 'AIzaSyD11pjYHyE0ekfygLBNJhvL1FgUp9-twkQ'
     })
   ],
-  providers: [AccountService, MenuService],
   bootstrap: [AppComponent],
   schemas: [
     CUSTOM_ELEMENTS_SCHEMA,

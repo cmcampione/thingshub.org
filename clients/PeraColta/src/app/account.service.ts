@@ -3,7 +3,9 @@ import { Subject } from 'rxjs';
 import { AccountDataContext, AccountUserData, AccountActionControl, AccountManager } from 'thingshub-js-sdk';
 import { endPointAddress } from './utils';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class AccountService {
 
   private accountManager: AccountManager;
