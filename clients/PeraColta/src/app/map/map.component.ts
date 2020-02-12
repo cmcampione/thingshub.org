@@ -16,7 +16,7 @@ export class MapComponent implements OnInit, OnDestroy  {
 
   private thingKind = 'c3aa4d95-4cb4-415c-a251-7fe846e0fd17';
   private thingId = '';
-  
+
   public deviceId = '087073117560';
   public surveyDateTime = '';
   public lastEventDateTime = '';
@@ -25,8 +25,8 @@ export class MapComponent implements OnInit, OnDestroy  {
   public lat = 51.678418;
   public lng = 7.809007;
 
-  constructor(@Inject(LOCALE_ID) private locale: string, 
-    private accountService: AccountService,
+  constructor(@Inject(LOCALE_ID) private locale: string,
+    accountService: AccountService,
     private realTimeConnector: RealTimeConnectorService) {
     this.thingsDataContext = new thingshub.ThingsDataContext(endPointAddress, accountService.getSecurityHeader);
   }
@@ -51,7 +51,7 @@ export class MapComponent implements OnInit, OnDestroy  {
 
     moment.locale('IT-it');
     this.setValue(value);
-  };
+  }
 
   ngOnInit() {
 
