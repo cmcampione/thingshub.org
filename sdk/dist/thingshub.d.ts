@@ -1,3 +1,5 @@
+import { CancelToken } from 'axios';
+
 export declare const enum ThingDeletedStates {
 	NoMatter  = 0,  // Interna state. Do not useful for external usage
 	Ok        = 1,
@@ -190,11 +192,11 @@ export interface ItemsRange {
 	totalItems: number;
 }
 export declare class HttpRequestCanceler {
-	cancelerToken: any;
-	executor: any;
-	setup(): void;
-	reset(): void;
+	cancelerToken: CancelToken;
+	private executor;
+	constructor();
 	cancel(): void;
+	reset(): void;
 }
 export declare type HttpFailResult = any;
 export declare class Helpers {
@@ -244,12 +246,12 @@ export declare class AccountManager {
 	private setLoginData;
 	private getLoginData;
 	constructor(appName: string, accountDataContext: AccountDataContext, apiKey?: string);
-	get apiKey(): string;
-	get accessToken(): string;
+	readonly apiKey: string;
+	readonly accessToken: string;
 	getSecurityHeader: () => object;
 	getSecurityToken: () => string;
-	get isLoggedIn(): boolean;
-	get remember(): boolean;
+	readonly isLoggedIn: boolean;
+	readonly remember: boolean;
 	login(username: string, password: string, remember: boolean): Promise<AccountUserData>;
 	logout(): Promise<any>;
 }
