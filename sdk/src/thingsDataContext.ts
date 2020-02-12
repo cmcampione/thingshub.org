@@ -39,7 +39,7 @@ export class ThingsDataContext {
         return this.apiEndPointAddress + "/things/" + parentThingId + "/childrenIds/" + childThingId 
     }
 
-    public  constructor(endPointAddress: EndPointAddress, securityHeaderHook: () => object) {
+    public constructor(endPointAddress: EndPointAddress, securityHeaderHook: () => object) {
 
         this.apiEndPointAddress = endPointAddress.api;
         this.securityHeaderHook = securityHeaderHook;
@@ -62,9 +62,6 @@ export class ThingsDataContext {
                 (!!parameter.skip ? ("&skip=" + parameter.skip) : "") +
                 (!!parameter.top ? ("&top=" + parameter.top) : "");
 
-        if (canceler)
-            canceler.setup();
-
         return axios.get(urlRaw, {
                 headers: this.securityHeaderHook(),
                 cancelToken: (canceler) ? canceler.cancelerToken : null
@@ -75,11 +72,14 @@ export class ThingsDataContext {
                 itemsRange: Helpers.getRangeItemsFromResponse(response)
             }
         })
+        .catch(function(response) {
+            // ToDo: response in undefined if request was cancelled
+            if (axios.isCancel(response)) {
+                console.log('Request canceled', response.message);
+              }
+            throw(response);
+        })       
         .finally(function() {
-            /*
-            if (canceler)
-                canceler.reset();
-            */
         });
     }
     
