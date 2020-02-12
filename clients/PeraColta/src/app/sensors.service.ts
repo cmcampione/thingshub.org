@@ -8,7 +8,7 @@ import { ThingsManagerService, THING_KIND } from './things-manager.service';
 })
 export class SensorsService {
 
-  constructor() { }
+  constructor(private readonly thingsManager: ThingsManagerService) { }
 
   getSensors(): Observable<Sensor[]> {
     return of(null);
