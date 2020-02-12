@@ -25,18 +25,19 @@ export class ThingsManagerService implements OnDestroy {
 
   public readonly thingsManager: thingshub.ThingsManager;
 
-  private readonly onUpdateThingValue: (...msg: any[]) => void = (thingId, value, asCmd) => {
+  private readonly onUpdateThingValue = (thingId, value, asCmd): void => {
   }
 
-  constructor(@Inject(THING_KIND) private thingKind: string, private readonly accountService: AccountService,
+  constructor(@Inject(THING_KIND) thingKind: string, private readonly accountService: AccountService,
     private readonly realTimeConnector: RealTimeConnectorService) {
-      this.realTimeConnector.realTimeConnectorRaw.subscribe();
-      this.realTimeConnector.realTimeConnectorRaw.setHook('onUpdateThingValue', this.onUpdateThingValue);
-      this.thingsManager = new thingshub.ThingsManager(this.mainThing,
+
+    this.thingsManager = new thingshub.ThingsManager(this.mainThing,
         thingKind,
         this.thingsManagerClaims,
         this.thingsDatacontext,
         this.realTimeConnector.realTimeConnectorRaw);
+      this.realTimeConnector.realTimeConnectorRaw.subscribe();
+      this.realTimeConnector.realTimeConnectorRaw.setHook('onUpdateThingValue', this.onUpdateThingValue);
   }
 
   ngOnDestroy() {
