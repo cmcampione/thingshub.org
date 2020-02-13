@@ -5,7 +5,10 @@ import { SensorsService } from '../sensors.service';
 @Component({
   selector: 'app-sensors',
   templateUrl: './sensors.component.html',
-  styleUrls: ['./sensors.component.css']
+  styleUrls: ['./sensors.component.css'],
+  providers: [
+    { provide: 'thingKind', useValue: 'first thing' }
+  ]
 })
 export class SensorsComponent implements OnInit {
 
@@ -13,11 +16,9 @@ export class SensorsComponent implements OnInit {
 
   selectedSensor: Sensor;
 
-  constructor(private sensorService: SensorsService) { }
+  constructor(private readonly sensorsService: SensorsService) { }
 
   getSensors(): void {
-    this.sensorService.getSensors()
-      .subscribe(sensors => this.sensors = sensors);
   }
 
   ngOnInit() {

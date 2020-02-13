@@ -1,13 +1,13 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import * as thingshub from 'thingshub-js-sdk';
-import { ThingsManagerService, THING_KIND } from '../things-manager.service';
+import { ThingsManagerService } from '../things-manager.service';
 
 @Component({
   selector: 'app-things',
   templateUrl: './things.component.html',
   styleUrls: ['./things.component.css'],
   providers: [ThingsManagerService,
-    { provide: THING_KIND, useValue: 'first thing' }
+    { provide: 'thingKind', useValue: 'first thing' }
   ]
 })
 export class ThingsComponent implements OnInit, OnDestroy {
