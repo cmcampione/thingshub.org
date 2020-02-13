@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import {HttpRequestCanceler } from 'thingshub-js-sdk';
 import { ThingsManagerService } from '../things-manager.service';
 import { Sensor } from '../sensor';
 import { SensorsService } from '../sensors.service';
@@ -8,14 +9,15 @@ import { SensorsService } from '../sensors.service';
   templateUrl: './sensors.component.html',
   styleUrls: ['./sensors.component.css'],
   providers: [
-    { provide: 'thingKind', useValue: 'Home Appliance' },
+    { provide: 'thingKind', useValue: 'Home appliance' },
     ThingsManagerService,
+    HttpRequestCanceler,
     {
       provide: SensorsService,
-      useFactory: (thingsManager: ThingsManagerService) => {
-        return new SensorsService(thingsManager);
+      useFactory: (thingsManager: ThingsManagerService, canceler : HttpRequestCanceler) => {
+        return new SensorsService(thingsManager, canceler);
       },
-      deps: [ThingsManagerService]
+      deps: [ThingsManagerService, HttpRequestCanceler]
     }
   ]
 })
@@ -23,18 +25,11 @@ export class SensorsComponent implements OnInit {
 
   sensors: Sensor[];
 
-  selectedSensor: Sensor;
-
-  constructor(private readonly sensorsService: SensorsService) { }
-
-  getSensors(): void {
+  constructor(private readonly sensorsService: SensorsService) {
+    this.sensors = sensorsService.sensors;    
   }
 
-  ngOnInit() {
-    this.getSensors();
-  }
-
-  onSelect(sensor: Sensor): void {
-    this.selectedSensor = sensor;
+  async ngOnInit() {
+    await this.sensorsService.init();
   }
 }
