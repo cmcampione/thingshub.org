@@ -1,5 +1,22 @@
 <ons-card>
-    <p>
-      sensors works!
-    </p>    
-  </ons-card>
+  <ons-list>
+    <ons-list-header>sensors works!</ons-list-header>
+    <div *ngFor="let sensor of sensors">
+      <ons-list-item expandable>
+        <label>name:
+          <input [(ngModel)]="sensor.name" placeholder="name"/>
+        </label>
+        <div class="expandable-content">
+          <div>
+            Id: {{sensor.id}}
+          </div>
+          <div>
+            Value: {{sensor.value}}
+        </div>
+        </div>
+      </ons-list-item>       
+    </div>
+  </ons-list>
+
+  <button (click)="recall()">recall</button>
+</ons-card>
