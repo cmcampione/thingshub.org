@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { ThingsManagerService } from '../things-manager.service';
 import { Sensor } from '../sensor';
 import { SensorsService } from '../sensors.service';
 
@@ -7,7 +8,15 @@ import { SensorsService } from '../sensors.service';
   templateUrl: './sensors.component.html',
   styleUrls: ['./sensors.component.css'],
   providers: [
-    { provide: 'thingKind', useValue: 'first thing' }
+    { provide: 'thingKind', useValue: 'Home Appliance' },
+    ThingsManagerService,
+    {
+      provide: SensorsService,
+      useFactory: (thingsManager: ThingsManagerService) => {
+        return new SensorsService(thingsManager);
+      },
+      deps: [ThingsManagerService]
+    }
   ]
 })
 export class SensorsComponent implements OnInit {
