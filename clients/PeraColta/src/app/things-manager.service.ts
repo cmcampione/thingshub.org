@@ -4,6 +4,7 @@ import { endPointAddress } from './utils';
 import { AccountService } from './account.service';
 import { RealTimeConnectorService } from './real-time-connector.service';
 
+// it's no iniectable because keep things state
 @Injectable()
 export class ThingsManagerService implements OnDestroy {
 
