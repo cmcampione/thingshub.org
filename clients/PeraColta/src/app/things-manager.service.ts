@@ -4,8 +4,6 @@ import { endPointAddress } from './utils';
 import { AccountService } from './account.service';
 import { RealTimeConnectorService } from './real-time-connector.service';
 
-export const THING_KIND = new InjectionToken<string>('ThingKind');
-
 @Injectable()
 export class ThingsManagerService implements OnDestroy {
 
@@ -28,7 +26,7 @@ export class ThingsManagerService implements OnDestroy {
   private readonly onUpdateThingValue = (thingId, value, asCmd): void => {
   }
 
-  constructor(@Inject(THING_KIND) thingKind: string, private readonly accountService: AccountService,
+  constructor(@Inject('thingKind') thingKind: string, private readonly accountService: AccountService,
     private readonly realTimeConnector: RealTimeConnectorService) {
 
     this.thingsManager = new thingshub.ThingsManager(this.mainThing,
