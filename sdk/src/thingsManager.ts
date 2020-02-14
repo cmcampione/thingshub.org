@@ -53,17 +53,17 @@ export class ThingsManager {
     }
     public init() {
         this.realtimeConnector.setHook("onCreateThing", this.onCreateThing);
-        this.realtimeConnector.setHook("onCreateThing", this.onUpdateThingValue);
+        this.realtimeConnector.setHook("onUpdateThingValue", this.onUpdateThingValue);
     }
 
     public done() {
-        this.realtimeConnector.remHook("onCreateThing", this.onUpdateThingValue);
+        this.realtimeConnector.remHook("onUpdateThingValue", this.onUpdateThingValue);
         this.realtimeConnector.remHook("onCreateThing", this.onCreateThing);
     }
 
     private  searchThingById(id: string): Thing {
         return this.mainThing.children.find((thing) => {
-            return thing.id == id;
+            return thing.id === id;
         })
     }
 
