@@ -61,7 +61,7 @@ export class ThingsManager {
         this.realtimeConnector.remHook("onCreateThing", this.onCreateThing);
     }
 
-    private  searchThingById(id: string): Thing {
+    private searchThingById(id: string): Thing {
         return this.mainThing.children.find((thing) => {
             return thing.id === id;
         })
