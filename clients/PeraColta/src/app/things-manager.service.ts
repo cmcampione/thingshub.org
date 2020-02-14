@@ -1,4 +1,4 @@
-import { Injectable, OnDestroy, Inject, InjectionToken  } from '@angular/core';
+import { Injectable, OnDestroy, Inject  } from '@angular/core';
 import * as thingshub from 'thingshub-js-sdk';
 import { endPointAddress } from './utils';
 import { AccountService } from './account.service';
@@ -35,12 +35,20 @@ export class ThingsManagerService implements OnDestroy {
         this.thingsManagerClaims,
         this.thingsDatacontext,
         this.realTimeConnector.realTimeConnectorRaw);
-      this.realTimeConnector.realTimeConnectorRaw.subscribe();
-      this.realTimeConnector.realTimeConnectorRaw.setHook('onUpdateThingValue', this.onUpdateThingValue);
+  }
+
+  public init() {
+    this.thingsManager.init();
+    this.realTimeConnector.realTimeConnectorRaw.setHook('onUpdateThingValue', this.onUpdateThingValue);
+  }
+
+  public done() {
+    this.realTimeConnector.realTimeConnectorRaw.remHook('onUpdateThingValue', this.onUpdateThingValue);
+    this.thingsManager.done();
   }
 
   ngOnDestroy() {
-    this.realTimeConnector.realTimeConnectorRaw.remHook('onUpdateThingValue', this.onUpdateThingValue);
-    this.realTimeConnector.realTimeConnectorRaw.unsubscribe();
+    //this.realTimeConnector.realTimeConnectorRaw.remHook('onUpdateThingValue', this.onUpdateThingValue);
+    //this.thingsManager.done();
   }
 }

@@ -20,11 +20,12 @@ export class ThingsComponent implements OnInit, OnDestroy {
   }
 
   async ngOnInit() {
+    this.thingsManager.init();
     await this.thingsManager.thingsManager.getMoreThings(this.canceler);
   }
 
   ngOnDestroy() {
-
+    this.thingsManager.done();
   }
 
   public async recall() {

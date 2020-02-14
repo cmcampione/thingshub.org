@@ -19,15 +19,14 @@ export class ContentPageComponent implements OnInit, OnDestroy {
 
   public isLoggedIn: boolean = this.accountService.isLoggedIn;
 
-  constructor(private accountService: AccountService, 
+  constructor(private accountService: AccountService,
     private menuService: MenuService,
     private realTimeConnector: RealTimeConnectorService) {
       accountService.isLoggedIn$.subscribe((accountUserData: AccountUserData) => {
       this.isLoggedIn = accountUserData != null;
       if (this.isLoggedIn) {
         this.realTimeConnector.realTimeConnectorRaw.subscribe();
-      }
-      else {
+      } else {
         // ToTry better
         this.realTimeConnector.realTimeConnectorRaw.unsubscribe();
       }
@@ -36,20 +35,20 @@ export class ContentPageComponent implements OnInit, OnDestroy {
       next: (v) => this.connectionStatus = v
     });
    }
-   
+
   ngOnInit() {
     if (this.isLoggedIn) {
       this.realTimeConnector.realTimeConnectorRaw.subscribe();
-    }   
+    }
   }
 
   openMenu() {
     this.menuService.open();
   }
 
-  ngOnDestroy() {   
+  ngOnDestroy() {
     if (this.isLoggedIn) {
       this.realTimeConnector.realTimeConnectorRaw.unsubscribe();
-    }    
+    }
   }
 }

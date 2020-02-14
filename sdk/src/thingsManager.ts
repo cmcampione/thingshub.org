@@ -50,8 +50,13 @@ export class ThingsManager {
             orderBy: null,
             valueFilter: null
         }
-
+    }
+    public init() {
         this.realtimeConnector.setHook("onCreateThing", this.onCreateThing);
+    }
+
+    public done() {
+        this.realtimeConnector.remHook("onCreateThing", this.onCreateThing);
     }
 
     private onCreateThing = (thingDTO: ThingDTO) : void => {
@@ -63,8 +68,8 @@ export class ThingsManager {
 
     private async getThings(parameter: ThingsGetParams , canceler: HttpRequestCanceler) : Promise<ThingsDataSet> {
 
-        let thingsDTOsDataSet : ThingsDTOsDataSet = null
-        let things : Thing[] = []
+        let thingsDTOsDataSet : ThingsDTOsDataSet = null;
+        let things : Thing[] = [];
         
         try {
 
@@ -104,9 +109,9 @@ export class ThingsManager {
         
         return thingsDataSet;
     }
-    // INFO:    In Books example where "this.mainThing" is a "root thing" 
+    // INFO:    In Books example where "this.mainThing" is a "generic root thing" 
     //          "getMoreThings" fills "this.mainThing.children" with "books" collection 
-    //          and "this.mainThing.children[0..n].children" with "things" collection like "book comments"
+    //          and "this.mainThing.children[0..n].children" with "generic root thing" like "book comments" collection
     public async getMoreThings(canceler : HttpRequestCanceler) : Promise<void> {
         let self = this;
         

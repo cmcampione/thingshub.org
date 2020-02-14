@@ -246,12 +246,12 @@ export declare class AccountManager {
 	private setLoginData;
 	private getLoginData;
 	constructor(appName: string, accountDataContext: AccountDataContext, apiKey?: string);
-	get apiKey(): string;
-	get accessToken(): string;
+	readonly apiKey: string;
+	readonly accessToken: string;
 	getSecurityHeader: () => object;
 	getSecurityToken: () => string;
-	get isLoggedIn(): boolean;
-	get remember(): boolean;
+	readonly isLoggedIn: boolean;
+	readonly remember: boolean;
 	login(username: string, password: string, remember: boolean): Promise<AccountUserData>;
 	logout(): Promise<any>;
 }
@@ -338,6 +338,8 @@ export declare class ThingsManager {
 	private getThingsParams;
 	private getChindrenThingsParams;
 	constructor(mainThing: Thing, thingKind: string, thingClaims: ThingClaims, thingsDataContext: ThingsDataContext, realtimeConnector: RealtimeConnector);
+	init(): void;
+	done(): void;
 	private onCreateThing;
 	private getThings;
 	getMoreThingChildren(parentThing: Thing, parameter: ThingsGetParams, canceler: HttpRequestCanceler): Promise<ThingsDataSet>;
