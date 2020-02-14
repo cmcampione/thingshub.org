@@ -4222,7 +4222,8 @@ class ThingsManager {
             if (!thing)
                 return;
             if (asCmd)
-                thing.value = value;
+                return;
+            thing.value = value;
         };
         this.getThingsParams = {
             // Viene sovrascritto da thingsManager
@@ -4247,10 +4248,10 @@ class ThingsManager {
     }
     init() {
         this.realtimeConnector.setHook("onCreateThing", this.onCreateThing);
-        this.realtimeConnector.setHook("onCreateThing", this.onUpdateThingValue);
+        this.realtimeConnector.setHook("onUpdateThingValue", this.onUpdateThingValue);
     }
     done() {
-        this.realtimeConnector.remHook("onCreateThing", this.onUpdateThingValue);
+        this.realtimeConnector.remHook("onUpdateThingValue", this.onUpdateThingValue);
         this.realtimeConnector.remHook("onCreateThing", this.onCreateThing);
     }
     searchThingById(id) {
