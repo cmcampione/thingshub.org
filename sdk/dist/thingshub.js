@@ -4217,6 +4217,13 @@ class ThingsManager {
                 return;
             }
         };
+        this.onUpdateThingValue = (thingId, value, asCmd) => {
+            let thing = this.searchThingById(thingId);
+            if (!thing)
+                return;
+            if (asCmd)
+                thing.value = value;
+        };
         this.getThingsParams = {
             // Viene sovrascritto da thingsManager
             // Override by thingsManager
@@ -4240,9 +4247,16 @@ class ThingsManager {
     }
     init() {
         this.realtimeConnector.setHook("onCreateThing", this.onCreateThing);
+        this.realtimeConnector.setHook("onCreateThing", this.onUpdateThingValue);
     }
     done() {
+        this.realtimeConnector.remHook("onCreateThing", this.onUpdateThingValue);
         this.realtimeConnector.remHook("onCreateThing", this.onCreateThing);
+    }
+    searchThingById(id) {
+        return this.mainThing.children.find((thing) => {
+            return thing.id == id;
+        });
     }
     getThings(parameter, canceler) {
         return __awaiter(this, void 0, void 0, function* () {

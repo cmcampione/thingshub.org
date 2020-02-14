@@ -340,7 +340,9 @@ export declare class ThingsManager {
 	constructor(mainThing: Thing, thingKind: string, thingClaims: ThingClaims, thingsDataContext: ThingsDataContext, realtimeConnector: RealtimeConnector);
 	init(): void;
 	done(): void;
-	private onCreateThing;
+	private searchThingById;
+	private readonly onCreateThing;
+	private readonly onUpdateThingValue;
 	private getThings;
 	getMoreThingChildren(parentThing: Thing, parameter: ThingsGetParams, canceler: HttpRequestCanceler): Promise<ThingsDataSet>;
 	getMoreThings(canceler: HttpRequestCanceler): Promise<void>;
