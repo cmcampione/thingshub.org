@@ -13,9 +13,6 @@ import { SensorsService } from '../sensors.service';
     ThingsService,
     {
       provide: SensorsService,
-      useFactory: (thingsService: ThingsService) => {
-        return new SensorsService(thingsService);
-      },
       deps: [ThingsService]
     }
   ]
