@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import {HttpRequestCanceler } from 'thingshub-js-sdk';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { HttpRequestCanceler } from 'thingshub-js-sdk';
 import { ThingsManagerService } from '../things-manager.service';
 import { Sensor } from '../sensor';
 import { SensorsService } from '../sensors.service';
@@ -11,25 +11,36 @@ import { SensorsService } from '../sensors.service';
   providers: [
     { provide: 'thingKind', useValue: 'Home appliance' },
     ThingsManagerService,
-    HttpRequestCanceler,
     {
       provide: SensorsService,
-      useFactory: (thingsManager: ThingsManagerService, canceler : HttpRequestCanceler) => {
-        return new SensorsService(thingsManager, canceler);
+      useFactory: (thingsManager: ThingsManagerService) => {
+        return new SensorsService(thingsManager);
       },
-      deps: [ThingsManagerService, HttpRequestCanceler]
+      deps: [ThingsManagerService]
     }
   ]
 })
-export class SensorsComponent implements OnInit {
+export class SensorsComponent implements OnInit, OnDestroy {
 
-  sensors: Sensor[];
+  private canceler = new HttpRequestCanceler();
+  public readonly sensors: Sensor[];
 
   constructor(private readonly sensorsService: SensorsService) {
-    this.sensors = sensorsService.sensors;    
+    this.sensors = sensorsService.sensors;
   }
 
   async ngOnInit() {
-    await this.sensorsService.init();
+    await this.sensorsService.init(this.canceler);
+  }
+  ngOnDestroy() {
+    this.sensorsService.done();
+  }
+
+  public async recall() {
+    try {
+      await this.sensorsService.thingsManager.thingsManager.getMoreThings(this.canceler);
+    } catch (e) {
+      console.log(e);
+    }
   }
 }
