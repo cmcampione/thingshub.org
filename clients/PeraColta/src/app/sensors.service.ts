@@ -18,13 +18,13 @@ export class SensorsService implements OnDestroy {
     this.thingsService.init();
     await this.thingsService.thingsManager.getMoreThings(canceler);
     this.things.forEach(thing => {
-      thing.value.sensors.forEach((sensor: { id: any; now: any; value: any; }) => {
+      thing.value.sensors.forEach((sensor: { id: number; now: any; millis: number; value: any; }) => {
         this.sensors.push({
           thingId: thing.id,
           name: thing.name,
           id: sensor.id,
           now: sensor.now,
-          millis: sensor.now,
+          millis: sensor.millis,
           value: sensor.value});
       });
     });
