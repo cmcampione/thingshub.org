@@ -1,6 +1,6 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import { Sensor } from './sensor';
-import { ThingsManagerService } from './things-manager.service';
+import { ThingsService } from './things.service';
 import { Thing, HttpRequestCanceler } from 'thingshub-js-sdk';
 
 // it's no iniectable because keep things state
@@ -10,13 +10,13 @@ export class SensorsService implements OnDestroy {
   private things: Thing[];
   public sensors: Sensor[] = [];
 
-  constructor(public readonly thingsManager: ThingsManagerService) {
-    this.things = this.thingsManager.mainThing.children;
+  constructor(public readonly thingsService: ThingsService) {
+    this.things = this.thingsService.mainThing.children;
   }
 
   async init(canceler: HttpRequestCanceler) {
-    this.thingsManager.init();
-    await this.thingsManager.thingsManager.getMoreThings(canceler);
+    this.thingsService.init();
+    await this.thingsService.thingsManager.getMoreThings(canceler);
     this.things.forEach(thing => {
       thing.value.sensors.forEach((sensor: { id: any; now: any; value: any; }) => {
         this.sensors.push({
@@ -30,10 +30,10 @@ export class SensorsService implements OnDestroy {
     });
   }
   done() {
-    this.thingsManager.done();
+    this.thingsService.done();
   }
 
   ngOnDestroy() {
-    //this.thingsManager.done();
+    this.thingsService.done();
   }
 }

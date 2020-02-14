@@ -3,10 +3,10 @@
     <!-- <div [hidden]="!isLoggedIn" class="left">
       <div class="center">{{connectionStatus}}</div>
     </div> -->
-    <div [hidden]="!isLoggedIn" class="right">
-        <ons-toolbar-button (click)="openMenu()">
-          <ons-icon icon="ion-ios-menu, material:md-menu"></ons-icon>
-        </ons-toolbar-button>
+    <div *ngIf="isLoggedIn" class="right">
+      <ons-toolbar-button (click)="openMenu()">
+        <ons-icon icon="ion-ios-menu, material:md-menu"></ons-icon>
+      </ons-toolbar-button>
     </div>
 </ons-toolbar>
 <div class="background"></div>
@@ -18,14 +18,8 @@
 
   <div *ngIf="isLoggedIn">    
     <app-map></app-map>
-  </div>
-
-  <div *ngIf="isLoggedIn">
     <app-sensors></app-sensors>
+    <!-- <app-things></app-things> -->
   </div>
-
-  <!-- <div *ngIf="isLoggedIn">
-    <app-things></app-things>
-  </div> -->
 
 </div>
