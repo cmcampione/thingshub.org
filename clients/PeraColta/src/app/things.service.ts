@@ -6,7 +6,7 @@ import { RealTimeConnectorService } from './real-time-connector.service';
 
 // it's no iniectable because keep things state
 @Injectable()
-export class ThingsManagerService implements OnDestroy {
+export class ThingsService implements OnDestroy {
 
   public readonly mainThing = new thingshub.Thing();
   private readonly thingsManagerClaims = {
@@ -48,7 +48,7 @@ export class ThingsManagerService implements OnDestroy {
   }
 
   ngOnDestroy() {
-    //this.realTimeConnector.realTimeConnectorRaw.remHook('onUpdateThingValue', this.onUpdateThingValue);
-    //this.thingsManager.done();
+    this.realTimeConnector.realTimeConnectorRaw.remHook('onUpdateThingValue', this.onUpdateThingValue);
+    this.thingsManager.done();
   }
 }

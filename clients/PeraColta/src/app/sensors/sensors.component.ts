@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { HttpRequestCanceler } from 'thingshub-js-sdk';
-import { ThingsManagerService } from '../things-manager.service';
+import { ThingsService } from '../things.service';
 import { Sensor } from '../sensor';
 import { SensorsService } from '../sensors.service';
 
@@ -10,13 +10,13 @@ import { SensorsService } from '../sensors.service';
   styleUrls: ['./sensors.component.css'],
   providers: [
     { provide: 'thingKind', useValue: 'Home appliance' },
-    ThingsManagerService,
+    ThingsService,
     {
       provide: SensorsService,
-      useFactory: (thingsManager: ThingsManagerService) => {
-        return new SensorsService(thingsManager);
+      useFactory: (thingsService: ThingsService) => {
+        return new SensorsService(thingsService);
       },
-      deps: [ThingsManagerService]
+      deps: [ThingsService]
     }
   ]
 })
@@ -38,7 +38,7 @@ export class SensorsComponent implements OnInit, OnDestroy {
 
   public async recall() {
     try {
-      await this.sensorsService.thingsManager.thingsManager.getMoreThings(this.canceler);
+      await this.sensorsService.thingsService.thingsManager.getMoreThings(this.canceler);
     } catch (e) {
       console.log(e);
     }
