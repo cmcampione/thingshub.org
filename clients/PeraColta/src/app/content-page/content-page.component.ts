@@ -6,7 +6,6 @@ import { RealTimeConnectorService } from '../real-time-connector.service';
 import * as thingshub from 'thingshub-js-sdk';
 
 @Component({
-  // tslint:disable-next-line:component-selector
   selector: 'ons-page',
   templateUrl: './content-page.component.html',
   styleUrls: ['./content-page.component.css']
