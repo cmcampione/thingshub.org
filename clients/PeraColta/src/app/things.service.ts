@@ -28,7 +28,7 @@ export class ThingsService implements OnDestroy {
   }
 
   constructor(@Inject('thingKind') thingKind: string, private readonly accountService: AccountService,
-    private readonly realTimeConnector: RealTimeConnectorService) {
+    public readonly realTimeConnector: RealTimeConnectorService) {
 
     this.thingsManager = new thingshub.ThingsManager(this.mainThing,
         thingKind,
