@@ -53,17 +53,34 @@ export class ThingsManager {
     }
     public init() {
         this.realtimeConnector.setHook("onCreateThing", this.onCreateThing);
+        this.realtimeConnector.setHook("onCreateThing", this.onUpdateThingValue);
     }
 
     public done() {
+        this.realtimeConnector.remHook("onCreateThing", this.onUpdateThingValue);
         this.realtimeConnector.remHook("onCreateThing", this.onCreateThing);
     }
 
-    private onCreateThing = (thingDTO: ThingDTO) : void => {
+    private  searchThingById(id: string): Thing {
+        return this.mainThing.children.find((thing) => {
+            return thing.id == id;
+        })
+    }
+
+    private readonly onCreateThing = (thingDTO: ThingDTO) : void => {
         if (thingDTO.kind === this.thingKind) {
             this.mainThing.addThingChild(thingDTO);
             return;
         }
+    }
+
+    private readonly onUpdateThingValue = (thingId: string, value: any, asCmd: boolean): void => {
+        let thing: Thing = this.searchThingById(thingId);
+        if (!thing)
+            return;
+        if (asCmd)
+            return;
+        thing.value = value;
     }
 
     private async getThings(parameter: ThingsGetParams , canceler: HttpRequestCanceler) : Promise<ThingsDataSet> {

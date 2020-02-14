@@ -33,7 +33,7 @@ export class SensorsService implements OnDestroy {
     this.thingsService.done();
   }
 
-  // https://github.com/angular/angular/issues/28857
+  // ToDo: It's not called see https://github.com/angular/angular/issues/28857
   ngOnDestroy() {
     this.thingsService.done();
   }
