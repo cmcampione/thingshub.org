@@ -2,11 +2,11 @@
 
 #include <map>
 #include <vector>
-#include <ArduinoJson.h>
 #include "WiFi.h"
 #include "HTTPClient.h"
 #include "SocketIOclient.h"
 #include "RCSwitch.h"
+#include "ArduinoJson.h"
 #include "BuildDefine.h"
 
 //
@@ -19,7 +19,7 @@ int ledStatus = LOW;
 //
 typedef std::function<void(const char* value)> SensorHandler;
 struct Sensor {
-  Sensor() : millis(0),now(false) {}
+  Sensor() : millis(0),now(false), value("false") {}
   bool          now;
   unsigned long millis;
   String        value;
@@ -41,6 +41,11 @@ void onSensorPin2Off(const char* value) {
   digitalWrite(ledPin, ledStatus);
 }
 
+void onSensorPin2OnOff(const char* value) {  
+  ledStatus = strcmp(value, "true") == 0 ? HIGH : LOW;
+  digitalWrite(ledPin, ledStatus);
+}
+
 const int sensorsCount      = 3;
 const int sensorsFieldCount = 4;
 const int sensorsCapacity   = JSON_OBJECT_SIZE(1) + JSON_ARRAY_SIZE(sensorsCount) + sensorsCount*JSON_OBJECT_SIZE(sensorsFieldCount) + 91;
@@ -55,10 +60,10 @@ class BeeStatus {
       sensors[8171284].sensorHandler = onSensorPin2Off;
       sensors[31669624].sensorHandler = onSensorPin2Toggle;
     }
-    static void setSensorValue(long idSensor, const char* value) {
+    static void setSensorValue(long idSensor, bool now, const char* value) {
       if (BeeStatus::sensors.find(idSensor) != BeeStatus::sensors.end()) {
         Sensor& sensorValue = BeeStatus::sensors[idSensor];
-        sensorValue.now = true;
+        sensorValue.now = now;
         sensorValue.millis = millis();
         sensorValue.value  = value;
         if (sensorValue.sensorHandler)
@@ -156,7 +161,7 @@ class RCSensorsManager {
         DPRINTLN();
 #endif
         long sensorId = mySwitch.getReceivedValue();
-        BeeStatus::setSensorValue(sensorId,"true");
+        BeeStatus::setSensorValue(sensorId, true, "true");
 
         mySwitch.resetAvailable();
       }
@@ -324,13 +329,17 @@ void onUpdateThingValue(const StaticJsonDocument<msgCapacity>& jMsg) {
   if (jMsg.size() != 4)
     return;
 
-  const char* thingId = jMsg[1];
-  DPRINTF("ThingId = %s\n",thingId);
-  if (strcmp(thingId, BeeStatus::thing) != 0)
-    return;
-
+  // Only Command for this bee
   bool asCmd = jMsg[3];
   DPRINTF("asCmd = %d\n",asCmd);
+  if (!asCmd)
+    return;
+
+  const char* thingId = jMsg[1];
+  DPRINTF("ThingId = %s\n",thingId);
+  // Only one thing for this bee
+  if (strcmp(thingId, BeeStatus::thing) != 0)
+    return;
 
   auto beeObj = jMsg[2].as<JsonObject>();
   if (!beeObj.containsKey("sensors"))
@@ -341,16 +350,19 @@ void onUpdateThingValue(const StaticJsonDocument<msgCapacity>& jMsg) {
     if (!sensor.containsKey("id"))
       continue;
     long sensorId = sensor["id"];
-
-    if (!sensor.containsKey("value"))
-      continue;
-    const char* value = sensor["value"];
-    
     DPRINTF("SensorId = %d\n",sensorId);
-    DPRINTF("Value = %s\n",value);
 
-    if (asCmd)
-      BeeStatus::setSensorValue(sensorId, value);
+    const char* value = "";
+    bool now = true;
+    if (sensor.containsKey("value")) {
+      value = sensor["value"];
+      DPRINTF("Value = %s\n",value);
+    }
+    if (sensor.containsKey("now")) {
+      now = sensor["now"];
+      DPRINTF("Now = %d\n", now);
+    }
+    BeeStatus::setSensorValue(sensorId, now, value);
   }
  }
 

@@ -20,6 +20,7 @@ export class ThingsService implements OnDestroy {
     creatorUserReadClaims: thingshub.ThingUserReadClaims.AllClaims,
     creatorUserChangeClaims: thingshub.ThingUserChangeClaims.AllClaims
   };
+  // ToDo: Could be a singleton. Need to create a ThingsDataContextService
   private readonly thingsDatacontext = new thingshub.ThingsDataContext(endPointAddress, this.accountService.getSecurityHeader);
 
   public readonly thingsManager: thingshub.ThingsManager;
@@ -41,14 +42,11 @@ export class ThingsService implements OnDestroy {
     this.thingsManager.init();
     this.realTimeConnector.realTimeConnectorRaw.setHook('onUpdateThingValue', this.onUpdateThingValue);
   }
-
   public done() {
     this.realTimeConnector.realTimeConnectorRaw.remHook('onUpdateThingValue', this.onUpdateThingValue);
     this.thingsManager.done();
   }
-
   ngOnDestroy() {
-    this.realTimeConnector.realTimeConnectorRaw.remHook('onUpdateThingValue', this.onUpdateThingValue);
-    this.thingsManager.done();
+    this.done();
   }
 }
