@@ -27,7 +27,10 @@ export class ThingsDataContext {
         return this.apiEndPointAddress + "/things/" + (thingId || ""); 
     }
     private thingsValueUrl(thingId: string) : string { 
-        return this.apiEndPointAddress + "/things/" + thingId + "/value" 
+        return this.apiEndPointAddress + "/things/" + thingId + "/value"
+    }
+    private thingsCmdUrl(thingId: string) : string { 
+        return this.apiEndPointAddress + "/things/" + thingId + "/cmd"
     }
     private thingsPositionsUrl() : string {
         return this.apiEndPointAddress + "/things/positions" 
@@ -134,8 +137,9 @@ export class ThingsDataContext {
         });
         return response.data;
     }
-    public async putThingValue(thingId : string, value : any): Promise<any> {
-        const response = await axios.put(this.thingsValueUrl(thingId), value, {
+    public async putThingValue(thingId : string, asCmd: boolean, value : any): Promise<any> {
+        let url: string = asCmd ? this.thingsCmdUrl(thingId) : this.thingsValueUrl(thingId);
+        const response = await axios.put(url, value, {
             headers: this.securityHeaderHook()
         });
         return response.data;

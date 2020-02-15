@@ -37,7 +37,6 @@ export class ThingsService implements OnDestroy {
         this.thingsDatacontext,
         this.realTimeConnector.realTimeConnectorRaw);
   }
-
   public init() {
     this.thingsManager.init();
     this.realTimeConnector.realTimeConnectorRaw.setHook('onUpdateThingValue', this.onUpdateThingValue);
@@ -48,5 +47,9 @@ export class ThingsService implements OnDestroy {
   }
   ngOnDestroy() {
     this.done();
+  }
+
+  public async putThingValue(thingId: string, asCmd: boolean, value: any): Promise<any> {
+    return await this.thingsDatacontext.putThingValue(thingId, asCmd, value);
   }
 }

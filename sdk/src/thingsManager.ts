@@ -83,6 +83,7 @@ export class ThingsManager {
         thing.value = value;
     }
 
+    // INFO: Does not change mainThing
     private async getThings(parameter: ThingsGetParams , canceler: HttpRequestCanceler) : Promise<ThingsDataSet> {
 
         let thingsDTOsDataSet : ThingsDTOsDataSet = null;
@@ -108,7 +109,8 @@ export class ThingsManager {
     }
 
     // INFO: Fills parentThing
-    // INFO: "parentThing.children" is filled filtered by "this.getChindrenThingsParams"
+    // INFO: Does not change mainThing, but parentThing is changed    
+    // INFO: "parameter" is changed
     public async getMoreThingChildren(parentThing : Thing, parameter: ThingsGetParams, canceler: HttpRequestCanceler) : Promise<ThingsDataSet> {
 
         parameter.skip = parentThing.childrenSkip;
@@ -145,5 +147,10 @@ export class ThingsManager {
 
     public getThingsTotalItems() : Number {
         return this.mainThing.childrenTotalItems;
+    }
+
+    // Only a wrapper
+    public async putThingValue(thingId: string, asCmd: boolean, value: any): Promise<any> {
+        return await this.thingsDataContext.putThingValue(thingId, asCmd, value);
     }
 }

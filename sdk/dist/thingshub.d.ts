@@ -301,6 +301,7 @@ export declare class ThingsDataContext {
 	private securityHeaderHook;
 	private thingsUrl;
 	private thingsValueUrl;
+	private thingsCmdUrl;
 	private thingsPositionsUrl;
 	private thingChildrenUrl;
 	private thingDeleteChildUrl;
@@ -314,7 +315,7 @@ export declare class ThingsDataContext {
 	addChildToParent(parentThingId: string, childThingId: string): Promise<any>;
 	deleteThingChild(parentThingId: string, childThingId: string): Promise<any>;
 	getThingValue(thingId: string): Promise<any>;
-	putThingValue(thingId: string, value: any): Promise<any>;
+	putThingValue(thingId: string, asCmd: boolean, value: any): Promise<any>;
 	putThingsPositions(positions: ThingPositionRaw[]): Promise<any>;
 }
 export interface ThingClaims {
@@ -347,6 +348,7 @@ export declare class ThingsManager {
 	getMoreThingChildren(parentThing: Thing, parameter: ThingsGetParams, canceler: HttpRequestCanceler): Promise<ThingsDataSet>;
 	getMoreThings(canceler: HttpRequestCanceler): Promise<void>;
 	getThingsTotalItems(): Number;
+	putThingValue(thingId: string, asCmd: boolean, value: any): Promise<any>;
 }
 
 export as namespace thingshub;

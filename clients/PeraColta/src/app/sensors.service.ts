@@ -39,6 +39,8 @@ export class SensorsService implements OnDestroy {
     let thing = this.searchThingById(thingId);
     if (!thing)
       return;
+    if (!value.sensors)
+      return;
     value.sensors.forEach((sensorRaw: SensorRaw) => {
       let sensor = this.searchSensorById(sensorRaw.id);
       if (sensor) {
@@ -72,5 +74,14 @@ export class SensorsService implements OnDestroy {
   // ToDo: It's not called see https://github.com/angular/angular/issues/28857
   ngOnDestroy() {
     this.done();
+  }
+
+  public async setSensorValue(sensor : Sensor, value: any): Promise<any> {
+    let thing: Thing = this.searchThingById(sensor.thingId);
+    if (!thing)
+      return; // Sanity check
+    let sensorsRaw = {sensors: [value]}
+    // asCmd
+    return await this.thingsService.putThingValue(thing.id, true, sensorsRaw);
   }
 }
