@@ -1,10 +1,7 @@
-import axios from "axios";
 import * as jwtDecode from "jwt-decode";
 import {AccountDataContext, AccountUserData} from "./accountDataContext";
 
 export class AccountManager {
-
-    private dummy8: string = "carmelo";
 
     private accountDataContext: AccountDataContext;
 

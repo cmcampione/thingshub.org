@@ -48,14 +48,14 @@ export class ThingsDataContext {
         this.securityHeaderHook = securityHeaderHook;
     }
 
-    public async getThing(thingId: string) : Promise<ThingDTO> {
+    public async getThing(thingId: string): Promise<ThingDTO> {
         const response = await axios.get(this.thingsUrl(thingId), {
             headers: this.securityHeaderHook()
         });
         return response.data;
     }
     // INFO: To abort call "canceler.cancel()"
-    public  getThings(parameter: ThingsGetParams, canceler?: HttpRequestCanceler) : Promise<ThingsDTOsDataSet> {
+    public getThings(parameter: ThingsGetParams, canceler?: HttpRequestCanceler): Promise<ThingsDTOsDataSet> {
         
         var urlRaw = this.thingsUrl() + "?" +
                 (!!parameter.parentThingId ? ("&parentThingId=" + parameter.parentThingId) : "") +
@@ -87,21 +87,21 @@ export class ThingsDataContext {
     }
     
     // TOCHECK: Check Returned data
-    public async createThing(ThingDTO: ThingDTO) : Promise<ThingDTO> {
+    public async createThing(ThingDTO: ThingDTO): Promise<ThingDTO> {
         const response = await axios.post(this.thingsUrl(), ThingDTO, {
             headers: this.securityHeaderHook()
         });
         return response.data;
     }
     // TOCHECK: Check Returned data
-    public async updateThing(thingId: string, ThingDTO: ThingDTO) : Promise<ThingDTO> {
+    public async updateThing(thingId: string, ThingDTO: ThingDTO): Promise<ThingDTO> {
         const response = await axios.put(this.thingsUrl(thingId), ThingDTO, {
             headers: this.securityHeaderHook()
         });
         return response.data;
     }
     // TOCHECK: Check Returned data
-    public async deleteThing(thingId: string) : Promise<any> {
+    public async deleteThing(thingId: string): Promise<any> {
         const response = await axios.delete(this.thingsUrl(thingId), {
             headers: this.securityHeaderHook()
         });
@@ -109,7 +109,7 @@ export class ThingsDataContext {
     }
 
     // TOCHECK: Check Returned data
-    public async getThingChildrenIds(parentThingId : string) : Promise<string[]> {
+    public async getThingChildrenIds(parentThingId : string): Promise<string[]> {
         const response = await axios.get(this.thingChildrenUrl(parentThingId), {
             headers: this.securityHeaderHook()
         });
@@ -117,21 +117,21 @@ export class ThingsDataContext {
     }
 
     // TOCHECK: Check Returned data
-    public async addChildToParent(parentThingId : string, childThingId : string) : Promise<any> {
+    public async addChildToParent(parentThingId : string, childThingId : string): Promise<any> {
         const response = await axios.post(this.thingChildrenUrl(parentThingId), JSON.stringify(childThingId), {
             headers: this.securityHeaderHook()
         });
         return response.data;
     }
     // TOCHECK: Check Returned data
-    public async deleteThingChild(parentThingId : string, childThingId : string) : Promise<any> {
+    public async deleteThingChild(parentThingId : string, childThingId : string): Promise<any> {
         const response = await axios.delete(this.thingDeleteChildUrl(parentThingId, childThingId), {
             headers: this.securityHeaderHook()
         });
         return response.data;
     }
 
-    public async getThingValue(thingId : string) : Promise<any> {
+    public async getThingValue(thingId : string): Promise<any> {
         const response = await axios.get(this.thingsValueUrl(thingId), {
             headers: this.securityHeaderHook()
         });
@@ -146,7 +146,7 @@ export class ThingsDataContext {
     }
 
     // TOCHECK: Check Returned data
-    public async putThingsPositions(positions: ThingPositionRaw[]) : Promise<any> {
+    public async putThingsPositions(positions: ThingPositionRaw[]): Promise<any> {
         const response = await axios.put(this.thingsPositionsUrl(), positions, {
             headers: this.securityHeaderHook()
         });
