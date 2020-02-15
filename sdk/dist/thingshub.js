@@ -2982,6 +2982,9 @@ class ThingsDataContext {
     thingsValueUrl(thingId) {
         return this.apiEndPointAddress + "/things/" + thingId + "/value";
     }
+    thingsCmdUrl(thingId) {
+        return this.apiEndPointAddress + "/things/" + thingId + "/cmd";
+    }
     thingsPositionsUrl() {
         return this.apiEndPointAddress + "/things/positions";
     }
@@ -3090,9 +3093,10 @@ class ThingsDataContext {
             return response.data;
         });
     }
-    putThingValue(thingId, value) {
+    putThingValue(thingId, asCmd, value) {
         return __awaiter(this, void 0, void 0, function* () {
-            const response = yield axios_1.default.put(this.thingsValueUrl(thingId), value, {
+            let url = asCmd ? this.thingsCmdUrl(thingId) : this.thingsValueUrl(thingId);
+            const response = yield axios_1.default.put(url, value, {
                 headers: this.securityHeaderHook()
             });
             return response.data;
@@ -3188,6 +3192,7 @@ class ThingsManager {
             return thing.id === id;
         });
     }
+    // INFO: Does not change mainThing
     getThings(parameter, canceler) {
         return __awaiter(this, void 0, void 0, function* () {
             let thingsDTOsDataSet = null;
@@ -3209,7 +3214,8 @@ class ThingsManager {
         });
     }
     // INFO: Fills parentThing
-    // INFO: "parentThing.children" is filled filtered by "this.getChindrenThingsParams"
+    // INFO: Does not change mainThing, but parentThing is changed    
+    // INFO: "parameter" is changed
     getMoreThingChildren(parentThing, parameter, canceler) {
         return __awaiter(this, void 0, void 0, function* () {
             parameter.skip = parentThing.childrenSkip;
@@ -3241,6 +3247,12 @@ class ThingsManager {
     }
     getThingsTotalItems() {
         return this.mainThing.childrenTotalItems;
+    }
+    // Only a wrapper
+    putThingValue(thingId, asCmd, value) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.thingsDataContext.putThingValue(thingId, asCmd, value);
+        });
     }
 }
 exports.ThingsManager = ThingsManager;
