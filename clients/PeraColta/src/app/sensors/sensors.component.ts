@@ -25,12 +25,23 @@ export class SensorsComponent implements OnInit, OnDestroy {
   constructor(private readonly sensorsService: SensorsService) {
     this.sensors = sensorsService.sensors;
   }
-
   async ngOnInit() {
     await this.sensorsService.init(this.canceler);
   }
   ngOnDestroy() {
     this.sensorsService.done();
+  }
+
+  public async recognize(sensor: Sensor) {
+    try {
+      await this.sensorsService.setSensorValue(sensor, {
+        id: sensor.id,
+        now: false,
+        value: "false"
+      });
+    } catch (e) {
+      console.log(e);
+    }
   }
 
   public async recall() {

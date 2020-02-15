@@ -58,7 +58,7 @@ class BeeStatus {
     static void init() {
       sensors[8171288].sensorHandler = onSensorPin2On;
       sensors[8171284].sensorHandler = onSensorPin2Off;
-      sensors[31669624].sensorHandler = onSensorPin2Toggle;
+      sensors[31669624].sensorHandler = onSensorPin2OnOff;
     }
     static void setSensorValue(long idSensor, bool now, const char* value) {
       if (BeeStatus::sensors.find(idSensor) != BeeStatus::sensors.end()) {
