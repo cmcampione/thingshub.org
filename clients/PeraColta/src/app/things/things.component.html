@@ -3,9 +3,9 @@
     <ons-list-header>things works!</ons-list-header>
     <div *ngFor="let thing of things">
       <ons-list-item expandable>
-        <label>name:
-          <input [(ngModel)]="thing.name" placeholder="name"/>
-        </label>
+        <div>
+          name:{{thing.name}}
+        </div>
         <div class="expandable-content">
           <div>
             Id: {{thing.id}}
