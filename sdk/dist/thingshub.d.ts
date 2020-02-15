@@ -234,7 +234,6 @@ export declare class AccountDataContext {
 	logout(): Promise<any>;
 }
 export declare class AccountManager {
-	private dummy8;
 	private accountDataContext;
 	private _appName;
 	private _accessToken;

@@ -44,7 +44,11 @@ export class AccountDataContext {
           },
           async err => {
               const error = err.response;
-              if (accountActionControl && error && error.status === 401 && error.config && !error.config.__isRetryRequest) {
+              if (accountActionControl &&
+                error &&
+                error.status === 401 &&
+                error.config &&
+                !error.config.__isRetryRequest) {
       
                 try {
                       const response = await this.getNewAccessToken();
