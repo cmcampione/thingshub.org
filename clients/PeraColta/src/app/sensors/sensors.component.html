@@ -3,9 +3,9 @@
     <ons-list-header>sensors works!</ons-list-header>
     <div *ngFor="let sensor of sensors">
       <ons-list-item expandable>
-        <label>name:
-          <input [(ngModel)]="sensor.name" placeholder="name"/>
-        </label>
+        <div>
+          name: {{sensor.name}}
+        </div>
         <div class="expandable-content">
           <div>
             Id: {{sensor.id}}
