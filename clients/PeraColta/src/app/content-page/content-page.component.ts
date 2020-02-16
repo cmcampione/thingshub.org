@@ -16,23 +16,26 @@ export class ContentPageComponent implements OnInit, OnDestroy {
 
   public connectionStatus: thingshub.RealtimeConnectionStates = thingshub.RealtimeConnectionStates.Disconnected;
 
-  public isLoggedIn: boolean = this.accountService.isLoggedIn;
+  public isLoggedIn: boolean = false;
+
+  private readonly checkLogin = (accountUserData: AccountUserData) => {
+    this.isLoggedIn = accountUserData != null;
+    if (this.isLoggedIn) {
+      this.realTimeConnector.realTimeConnectorRaw.subscribe();
+    }
+    else {
+      // ToDo: ToTry better
+      this.realTimeConnector.realTimeConnectorRaw.unsubscribe();
+    }
+  };
 
   constructor(private accountService: AccountService,
     private menuService: MenuService,
     private realTimeConnector: RealTimeConnectorService) {
-      accountService.isLoggedIn$.subscribe((accountUserData: AccountUserData) => {
-      this.isLoggedIn = accountUserData != null;
-      if (this.isLoggedIn) {
-        this.realTimeConnector.realTimeConnectorRaw.subscribe();
-      } else {
-        // ToTry better
-        this.realTimeConnector.realTimeConnectorRaw.unsubscribe();
-      }
-    });
-    this.realTimeConnector.connectionStatus.subscribe({
-      next: (v) => this.connectionStatus = v
-    });
+      this.accountService.isLoggedIn.subscribe(this.checkLogin);
+      this.realTimeConnector.connectionStatus.subscribe({
+        next: (v) => this.connectionStatus = v
+      });
    }
 
   ngOnInit() {
@@ -40,14 +43,20 @@ export class ContentPageComponent implements OnInit, OnDestroy {
       this.realTimeConnector.realTimeConnectorRaw.subscribe();
     }
   }
+  ngOnDestroy() {
+    if (this.isLoggedIn) {
+      this.realTimeConnector.realTimeConnectorRaw.unsubscribe();
+    }
+  }
 
   openMenu() {
     this.menuService.open();
   }
-
-  ngOnDestroy() {
-    if (this.isLoggedIn) {
-      this.realTimeConnector.realTimeConnectorRaw.unsubscribe();
+  async logout() {
+    try {
+      await this.accountService.logout();
+    } catch(e) {
+      console.log(e);
     }
   }
 }

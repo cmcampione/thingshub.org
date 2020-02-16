@@ -38,6 +38,7 @@ export class LoginComponent implements OnInit {
         animation: 'fall'
       });
     }
+    this.password = "";
   }
 }
 

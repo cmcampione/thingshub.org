@@ -167,6 +167,9 @@ export class AccountManager {
         {
             return await this.accountDataContext.logout();
         }
+        catch(e) {
+            throw(e);
+        }
         finally {
             this._apiKey = null;
             this.resetLoginData();

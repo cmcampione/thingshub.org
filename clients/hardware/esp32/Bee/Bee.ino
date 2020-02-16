@@ -352,7 +352,7 @@ void onUpdateThingValue(const StaticJsonDocument<msgCapacity>& jMsg) {
     long sensorId = sensor["id"];
     DPRINTF("SensorId = %d\n",sensorId);
 
-    const char* value = "";
+    const char* value = "";// ToDo: To Check
     bool now = true;
     if (sensor.containsKey("value")) {
       value = sensor["value"];

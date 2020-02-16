@@ -39,7 +39,7 @@ export class AccountDataContext {
 
         this.accountUrl = endPointAddress.api + "/account";
 
-        axios.interceptors.response.use((response) => {
+        /* axios.interceptors.response.use((response) => {
             return response;
           },
           async err => {
@@ -68,7 +68,7 @@ export class AccountDataContext {
               }
       
               return Promise.reject(error);
-          });
+          }); */
     }
 
     // TODO: https://docs.google.com/spreadsheets/d/1Ks-K10kmLcHOom7igTkQ8wtRSJ-73i1hftUAE4E9q80/edit#gid=1455384855&range=C4
@@ -104,7 +104,7 @@ export class AccountDataContext {
         return response.data;
     }
     public async logout() : Promise<any> {
-        const response = await axios.post(this.accountUrl + "/logout", null, {
+        const response = await axios.get(this.accountUrl + "/logout", {
             headers: this.accountActionControl ? this.accountActionControl.getSecurityHeader() : null
         });
         return response.data;

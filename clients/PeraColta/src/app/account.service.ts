@@ -12,9 +12,8 @@ export class AccountService {
 
   private userId: string = null;
 
-  private _isLoggedIn: Subject<AccountUserData> = new Subject<AccountUserData>();
-  public isLoggedIn$ = this._isLoggedIn.asObservable();
-
+  public isLoggedIn: Subject<AccountUserData> = new Subject<AccountUserData>();
+  
   private actionControl: AccountActionControl = {
     getSecurityHeader : () => {
       return this.getSecurityHeader();
@@ -22,9 +21,9 @@ export class AccountService {
     refreshToken: (): Promise<any> => {
 
       // Shows login Component
-      this._isLoggedIn.next(null);
+      this.isLoggedIn.next(null);
       return new Promise((resolve, reject) => {
-        const subscription = this.isLoggedIn$.subscribe((accountUserData: AccountUserData) => {
+        const subscription = this.isLoggedIn.subscribe((accountUserData: AccountUserData) => {
           subscription.unsubscribe();
           if (accountUserData != null) {
             resolve(accountUserData);
@@ -54,10 +53,6 @@ export class AccountService {
       new AccountDataContext(endPointAddress, this.actionControl));
   }
 
-  public get isLoggedIn(): boolean {
-    return this.accountManager.isLoggedIn;
-  }
-
   public get remember(): boolean {
     return this.accountManager.remember;
   }
@@ -71,10 +66,21 @@ export class AccountService {
     if (this.userId !== loginData.id) {
       this.userId = null;
       this.accountManager.resetLoginData();
-      this._isLoggedIn.next(null);
+      this.isLoggedIn.next(null);
       throw new Error('User is changed without appropriate logout action');
     }
-    this._isLoggedIn.next(loginData);
+    this.isLoggedIn.next(loginData);
     return loginData;
+  }
+  public async logout() {
+    try {
+      await this.accountManager.logout();
+    } catch(e) {
+      throw(e);
+    } finally {
+      this.userId = null;
+      this.accountManager.resetLoginData();
+      this.isLoggedIn.next(null);
+    }
   }
 }
