@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "tracker-app": {
+    "peracolta": {
       "root": "",
       "sourceRoot": "src",
       "projectType": "application",
@@ -50,18 +50,18 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "tracker-app:build"
+            "browserTarget": "peracolta:build"
           },
           "configurations": {
             "production": {
-              "browserTarget": "tracker-app:build:production"
+              "browserTarget": "peracolta:build:production"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "tracker-app:build"
+            "browserTarget": "peracolta:build"
           }
         },
         "test": {
@@ -97,7 +97,7 @@
         }
       }
     },
-    "tracker-app-e2e": {
+    "peracolta-e2e": {
       "root": "",
       "sourceRoot": "e2e",
       "projectType": "application",
@@ -106,7 +106,7 @@
           "builder": "@angular-devkit/build-angular:protractor",
           "options": {
             "protractorConfig": "./protractor.conf.js",
-            "devServerTarget": "tracker-app:serve"
+            "devServerTarget": "peracolta:serve"
           }
         },
         "lint": {
@@ -123,7 +123,7 @@
       }
     }
   },
-  "defaultProject": "tracker-app",
+  "defaultProject": "peracolta",
   "schematics": {
     "@schematics/angular:component": {
       "prefix": "app",

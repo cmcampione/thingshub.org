@@ -1,6 +1,6 @@
 import { AppPage } from './app.po';
 
-describe('tracker-app App', () => {
+describe('peracolta App', () => {
   let page: AppPage;
 
   beforeEach(() => {
