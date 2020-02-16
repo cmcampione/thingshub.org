@@ -238,7 +238,7 @@ router.post("/login",
 	});
 
 router.get("/logout", async function (req, res, next) {
-	passport.authenticate(["local", "basic"], async function(err, user, info) {
+	passport.authenticate(["bearer"], { session: false }, async function(err, user, info) {
 		try {
 			if (err) { 
 				return next(err); 
