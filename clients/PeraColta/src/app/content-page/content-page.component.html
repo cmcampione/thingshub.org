@@ -1,14 +1,17 @@
 <ons-toolbar>
-    <div class="center">{{title}}</div>
-    <!-- <div [hidden]="!isLoggedIn" class="left">
-      <div class="center">{{connectionStatus}}</div>
-    </div> -->
-    <div *ngIf="isLoggedIn" class="right">
-      <ons-toolbar-button (click)="openMenu()">
-        <ons-icon icon="ion-ios-menu, material:md-menu"></ons-icon>
-      </ons-toolbar-button>
-    </div>
+  <!-- *ngIf does not works -->
+  <div [hidden]="!isLoggedIn" class="left">
+    <div class="center">{{connectionStatus}}</div>
+  </div>
+  <div class="center">{{title}}</div>
+  <div [hidden]="!isLoggedIn" class="right">
+    <button (click)="logout()">Logout</button>
+    <ons-toolbar-button (click)="openMenu()">
+      <ons-icon icon="ion-ios-menu, material:md-menu"></ons-icon>
+    </ons-toolbar-button>
+  </div>
 </ons-toolbar>
+
 <div class="background"></div>
 <div class="content">
 
@@ -16,7 +19,7 @@
     <app-login></app-login>
   </div>
 
-  <div *ngIf="isLoggedIn">    
+  <div *ngIf="isLoggedIn">
     <app-map></app-map>
     <app-sensors></app-sensors>
     <app-things></app-things>
