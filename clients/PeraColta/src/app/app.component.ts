@@ -4,6 +4,7 @@ import { ContentPageComponent } from './content-page/content-page.component';
 import { MenuService } from './menu.service';
 import { AccountService } from './account.service';
 import { AccountUserData } from 'thingshub-js-sdk';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-root',
@@ -15,6 +16,9 @@ export class AppComponent implements OnDestroy {
   public sidePage    = SidePageComponent;
   public contentPage = ContentPageComponent;
 
+  private readonly subscriptionIsLoggedIn: Subscription = null;
+  private readonly subscriptionMenuToggle: Subscription = null;
+
   @ViewChild('splitter', {static: false}) splitter;
 
   public isLoggedIn: boolean = false;
@@ -23,10 +27,12 @@ export class AppComponent implements OnDestroy {
   };
   
   constructor(private accountService: AccountService, private menuService: MenuService) {
-    this.accountService.isLoggedIn.subscribe(this.checkLogin);
-    this.menuService.toggle.subscribe(() => this.splitter.nativeElement.side.open());
+    this.subscriptionIsLoggedIn = this.accountService.isLoggedIn.subscribe(this.checkLogin);
+    this.subscriptionMenuToggle = this.menuService.toggle.subscribe(() => this.splitter.nativeElement.side.open());
   }
 
-  ngOnDestroy() {    
+  ngOnDestroy() {
+    this.subscriptionMenuToggle.unsubscribe();
+    this.subscriptionIsLoggedIn.unsubscribe();
   }
 }

@@ -4,6 +4,7 @@ import { AccountService } from '../account.service';
 import { MenuService } from '../menu.service';
 import { RealTimeConnectorService } from '../real-time-connector.service';
 import * as thingshub from 'thingshub-js-sdk';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'ons-page',
@@ -17,7 +18,6 @@ export class ContentPageComponent implements OnInit, OnDestroy {
   public connectionStatus: thingshub.RealtimeConnectionStates = thingshub.RealtimeConnectionStates.Disconnected;
 
   public isLoggedIn: boolean = false;
-
   private readonly checkLogin = (accountUserData: AccountUserData) => {
     this.isLoggedIn = accountUserData != null;
     if (this.isLoggedIn) {
@@ -28,12 +28,15 @@ export class ContentPageComponent implements OnInit, OnDestroy {
       this.realTimeConnector.realTimeConnectorRaw.unsubscribe();
     }
   };
+  private readonly subscriptionIsLoggedIn: Subscription = null;
+
+  private readonly subscriptionRealTimeConnector: Subscription = null;
 
   constructor(private accountService: AccountService,
     private menuService: MenuService,
     private realTimeConnector: RealTimeConnectorService) {
-      this.accountService.isLoggedIn.subscribe(this.checkLogin);
-      this.realTimeConnector.connectionStatus.subscribe({
+      this.subscriptionIsLoggedIn = this.accountService.isLoggedIn.subscribe(this.checkLogin);
+      this.subscriptionRealTimeConnector = this.realTimeConnector.connectionStatus.subscribe({
         next: (v) => this.connectionStatus = v
       });
    }
@@ -47,6 +50,8 @@ export class ContentPageComponent implements OnInit, OnDestroy {
     if (this.isLoggedIn) {
       this.realTimeConnector.realTimeConnectorRaw.unsubscribe();
     }
+    this.subscriptionRealTimeConnector.unsubscribe();
+    this.subscriptionIsLoggedIn.unsubscribe();
   }
 
   openMenu() {

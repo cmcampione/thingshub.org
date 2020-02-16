@@ -9,7 +9,6 @@ import { Subject } from 'rxjs';
 })
 export class RealTimeConnectorService {
 
-  // ToDo: Could be injected to chande connection type
   public readonly connectionStatus = new Subject<thingshub.RealtimeConnectionStates>();
 
   private readonly onStateChanged = (change: thingshub.RealtimeConnectionStates): void => {
@@ -25,6 +24,7 @@ export class RealTimeConnectorService {
     console.log(error);
   }
 
+  // ToDo: Could be injected to chande connection type
   public readonly realTimeConnectorRaw = new thingshub.SocketIORealtimeConnector(
     endPointAddress.server,
     this.accountService.getSecurityToken,

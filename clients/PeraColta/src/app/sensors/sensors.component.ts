@@ -32,7 +32,7 @@ export class SensorsComponent implements OnInit, OnDestroy {
     this.sensorsService.done();
   }
 
-  public async recognize(sensor: Sensor) {
+  public async acknowledge(sensor: Sensor) {
     try {
       await this.sensorsService.setSensorValue(sensor, {
         id: sensor.id,
