@@ -31,14 +31,16 @@ export class LoginComponent implements OnInit {
       }
       const loginData = await this.accountService.login(this.username, this.password, this.remember);
     } catch (e) {
+      this.username = "";
       const msg = (e instanceof Error) ? e.message : e.data.message;
       ons.notification.toast(msg, {
         timeout: 2000,
         modifier: 'danger',
         animation: 'fall'
       });
+    } finally {
+      this.password = "";
     }
-    this.password = "";
   }
 }
 
