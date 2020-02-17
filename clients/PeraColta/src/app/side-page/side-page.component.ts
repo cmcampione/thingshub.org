@@ -10,11 +10,11 @@ import { Subscription } from 'rxjs';
 })
 export class SidePageComponent implements OnInit, OnDestroy {
 
-  public isLoggedIn: boolean = false;
+  private readonly subscriptionIsLoggedIn: Subscription = null;
+  public isLoggedIn = false;
   private readonly checkLogin = (accountUserData: AccountUserData) => {
     this.isLoggedIn = accountUserData != null;
-  };
-  private readonly subscriptionIsLoggedIn: Subscription = null;
+  }
 
   constructor(private accountService: AccountService) {
     this.subscriptionIsLoggedIn = this.accountService.isLoggedIn.subscribe(this.checkLogin);
