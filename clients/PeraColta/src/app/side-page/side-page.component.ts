@@ -25,5 +25,4 @@ export class SidePageComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.subscriptionIsLoggedIn.unsubscribe();
   }
-
 }
