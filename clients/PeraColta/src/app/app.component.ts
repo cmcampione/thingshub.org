@@ -21,10 +21,10 @@ export class AppComponent implements OnDestroy {
 
   @ViewChild('splitter', {static: false}) splitter;
 
-  public isLoggedIn: boolean = false;
+  public isLoggedIn = false;
   private readonly checkLogin = (accountUserData: AccountUserData) => {
     this.isLoggedIn = accountUserData != null;
-  };
+  }
   
   constructor(private accountService: AccountService, private menuService: MenuService) {
     this.subscriptionIsLoggedIn = this.accountService.isLoggedIn.subscribe(this.checkLogin);

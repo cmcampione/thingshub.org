@@ -16,21 +16,19 @@ export class ContentPageComponent implements OnInit, OnDestroy {
   public title = 'Hardworking bees are working here';
 
   public connectionStatus: thingshub.RealtimeConnectionStates = thingshub.RealtimeConnectionStates.Disconnected;
+  private readonly subscriptionIsLoggedIn: Subscription = null;
+  private readonly subscriptionRealTimeConnector: Subscription = null;
 
-  public isLoggedIn: boolean = false;
+  public isLoggedIn = false;
   private readonly checkLogin = (accountUserData: AccountUserData) => {
     this.isLoggedIn = accountUserData != null;
     if (this.isLoggedIn) {
       this.realTimeConnector.realTimeConnectorRaw.subscribe();
-    }
-    else {
+    } else {
       // ToDo: ToTry better
       this.realTimeConnector.realTimeConnectorRaw.unsubscribe();
     }
-  };
-  private readonly subscriptionIsLoggedIn: Subscription = null;
-
-  private readonly subscriptionRealTimeConnector: Subscription = null;
+  }
 
   constructor(private accountService: AccountService,
     private menuService: MenuService,
@@ -60,7 +58,7 @@ export class ContentPageComponent implements OnInit, OnDestroy {
   async logout() {
     try {
       await this.accountService.logout();
-    } catch(e) {
+    } catch (e) {
       console.log(e);
     }
   }
