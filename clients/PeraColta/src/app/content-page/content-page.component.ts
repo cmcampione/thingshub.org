@@ -37,7 +37,7 @@ export class ContentPageComponent implements OnInit, OnDestroy {
       this.subscriptionRealTimeConnector = this.realTimeConnector.connectionStatus.subscribe({
         next: (v) => this.connectionStatus = v
       });
-   }
+  }
 
   ngOnInit() {
     if (this.isLoggedIn) {

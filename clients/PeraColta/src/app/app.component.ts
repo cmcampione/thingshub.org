@@ -25,7 +25,7 @@ export class AppComponent implements OnDestroy {
   private readonly checkLogin = (accountUserData: AccountUserData) => {
     this.isLoggedIn = accountUserData != null;
   }
-  
+
   constructor(private accountService: AccountService, private menuService: MenuService) {
     this.subscriptionIsLoggedIn = this.accountService.isLoggedIn.subscribe(this.checkLogin);
     this.subscriptionMenuToggle = this.menuService.toggle.subscribe(() => this.splitter.nativeElement.side.open());
