@@ -23,7 +23,6 @@ export class ThingsComponent implements OnInit, OnDestroy {
     this.thingsService.init();
     await this.thingsService.thingsManager.getMoreThings(this.canceler);
   }
-
   ngOnDestroy() {
     this.thingsService.done();
   }

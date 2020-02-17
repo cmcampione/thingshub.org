@@ -16,15 +16,12 @@
 
 <div class="background"></div>
 <div class="content">
-
   <div *ngIf="!isLoggedIn">
     <app-login></app-login>
   </div>
-
   <div *ngIf="isLoggedIn">
     <app-map></app-map>
     <app-sensors></app-sensors>
     <app-things></app-things>
   </div>
-
 </div>

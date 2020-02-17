@@ -13,7 +13,7 @@ export class AccountService {
   private userId: string = null;
 
   public isLoggedIn: Subject<AccountUserData> = new Subject<AccountUserData>();
-  
+
   private actionControl: AccountActionControl = {
     getSecurityHeader : () => {
       return this.getSecurityHeader();
@@ -75,7 +75,7 @@ export class AccountService {
   public async logout() {
     try {
       await this.accountManager.logout();
-    } catch(e) {
+    } catch (e) {
       throw(e);
     } finally {
       this.userId = null;
