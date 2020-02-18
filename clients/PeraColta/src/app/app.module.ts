@@ -1,41 +1,27 @@
-import { BrowserModule } from '@angular/platform-browser';
-import { FormsModule } from '@angular/forms';
 import { NgModule } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
+import { RouteReuseStrategy } from '@angular/router';
+
+import { IonicModule, IonicRouteStrategy } from '@ionic/angular';
+import { SplashScreen } from '@ionic-native/splash-screen/ngx';
+import { StatusBar } from '@ionic-native/status-bar/ngx';
+
 import { AppComponent } from './app.component';
-
-import { OnsenModule } from 'ngx-onsenui';
-import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-
-import { AgmCoreModule } from '@agm/core';
-import { LoginComponent } from './login/login.component';
-import { MapComponent } from './map/map.component';
-import { ThingsComponent } from './things/things.component';
-import { SidePageComponent } from './side-page/side-page.component';
-import { ContentPageComponent } from './content-page/content-page.component';
-import { SensorsComponent } from './sensors/sensors.component';
+import { AppRoutingModule } from './app-routing.module';
 
 @NgModule({
-  declarations: [
-    AppComponent,
-    LoginComponent,
-    MapComponent,
-    SensorsComponent,
-    ThingsComponent,
-    SidePageComponent,
-    ContentPageComponent
-  ],
+  declarations: [AppComponent],
+  entryComponents: [],
   imports: [
     BrowserModule,
-    FormsModule,
-    OnsenModule,
-    AgmCoreModule.forRoot({
-      apiKey: 'AIzaSyD11pjYHyE0ekfygLBNJhvL1FgUp9-twkQ'
-    })
+    IonicModule.forRoot(),
+    AppRoutingModule
   ],
-  bootstrap: [AppComponent],
-  schemas: [
-    CUSTOM_ELEMENTS_SCHEMA,
+  providers: [
+    StatusBar,
+    SplashScreen,
+    { provide: RouteReuseStrategy, useClass: IonicRouteStrategy }
   ],
-  entryComponents: [SidePageComponent, ContentPageComponent],
+  bootstrap: [AppComponent]
 })
-export class AppModule { }
+export class AppModule {}
