@@ -1,38 +1,69 @@
-import { Component, ViewChild, OnDestroy } from '@angular/core';
-import { SidePageComponent } from './side-page/side-page.component';
-import { ContentPageComponent } from './content-page/content-page.component';
-import { MenuService } from './menu.service';
-import { AccountService } from './account.service';
-import { AccountUserData } from 'thingshub-js-sdk';
-import { Subscription } from 'rxjs';
+import { Component, OnInit } from '@angular/core';
+
+import { Platform } from '@ionic/angular';
+import { SplashScreen } from '@ionic-native/splash-screen/ngx';
+import { StatusBar } from '@ionic-native/status-bar/ngx';
 
 @Component({
   selector: 'app-root',
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css']
+  templateUrl: 'app.component.html',
+  styleUrls: ['app.component.scss']
 })
-export class AppComponent implements OnDestroy {
+export class AppComponent implements OnInit {
+  public selectedIndex = 0;
+  public appPages = [
+    {
+      title: 'Inbox',
+      url: '/folder/Inbox',
+      icon: 'mail'
+    },
+    {
+      title: 'Outbox',
+      url: '/folder/Outbox',
+      icon: 'paper-plane'
+    },
+    {
+      title: 'Favorites',
+      url: '/folder/Favorites',
+      icon: 'heart'
+    },
+    {
+      title: 'Archived',
+      url: '/folder/Archived',
+      icon: 'archive'
+    },
+    {
+      title: 'Trash',
+      url: '/folder/Trash',
+      icon: 'trash'
+    },
+    {
+      title: 'Spam',
+      url: '/folder/Spam',
+      icon: 'warning'
+    }
+  ];
+  public labels = ['Family', 'Friends', 'Notes', 'Work', 'Travel', 'Reminders'];
 
-  public sidePage    = SidePageComponent;
-  public contentPage = ContentPageComponent;
-
-  private readonly subscriptionIsLoggedIn: Subscription = null;
-  private readonly subscriptionMenuToggle: Subscription = null;
-
-  @ViewChild('splitter', {static: false}) splitter;
-
-  public isLoggedIn = false;
-  private readonly checkLogin = (accountUserData: AccountUserData) => {
-    this.isLoggedIn = accountUserData != null;
+  constructor(
+    private platform: Platform,
+    private splashScreen: SplashScreen,
+    private statusBar: StatusBar
+  ) {
+    this.initializeApp();
   }
 
-  constructor(private accountService: AccountService, private menuService: MenuService) {
-    this.subscriptionIsLoggedIn = this.accountService.isLoggedIn.subscribe(this.checkLogin);
-    this.subscriptionMenuToggle = this.menuService.toggle.subscribe(() => this.splitter.nativeElement.side.open());
+  initializeApp() {
+    this.platform.ready().then(() => {
+      this.statusBar.styleDefault();
+      this.splashScreen.hide();
+    });
   }
 
-  ngOnDestroy() {
-    this.subscriptionMenuToggle.unsubscribe();
-    this.subscriptionIsLoggedIn.unsubscribe();
+  ngOnInit() {
+    const path = window.location.pathname.split('folder/')[1];
+    if (path !== undefined) {
+      this.selectedIndex = this.appPages.findIndex(page => page.title.toLowerCase() === path.toLowerCase());
+    }
   }
 }
