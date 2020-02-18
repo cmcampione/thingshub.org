@@ -245,12 +245,12 @@ export declare class AccountManager {
 	private setLoginData;
 	private getLoginData;
 	constructor(appName: string, accountDataContext: AccountDataContext, apiKey?: string);
-	readonly apiKey: string;
-	readonly accessToken: string;
+	get apiKey(): string;
+	get accessToken(): string;
 	getSecurityHeader: () => object;
 	getSecurityToken: () => string;
-	readonly isLoggedIn: boolean;
-	readonly remember: boolean;
+	get isLoggedIn(): boolean;
+	get remember(): boolean;
 	login(username: string, password: string, remember: boolean): Promise<AccountUserData>;
 	logout(): Promise<any>;
 }
