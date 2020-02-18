@@ -31,7 +31,7 @@ export class LoginComponent implements OnInit {
       }
       const loginData = await this.accountService.login(this.username, this.password, this.remember);
     } catch (e) {
-      this.username = "";
+      this.username = '';
       const msg = (e instanceof Error) ? e.message : e.data.message;
       ons.notification.toast(msg, {
         timeout: 2000,
@@ -39,9 +39,7 @@ export class LoginComponent implements OnInit {
         animation: 'fall'
       });
     } finally {
-      this.password = "";
+      this.password = '';
     }
   }
 }
-
-
