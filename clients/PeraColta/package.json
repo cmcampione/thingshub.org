@@ -1,9 +1,8 @@
 {
-  "name": "PeraColta",
+  "name": "peracolta",
   "version": "0.0.1",
   "author": "Carmelo Campione",
   "homepage": "http://thingshub.org/",
-  "license": "MIT",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
@@ -40,9 +39,9 @@
     "@angular/compiler-cli": "~9.0.1",
     "@angular/language-service": "~9.0.1",
     "@ionic/angular-toolkit": "^2.1.2",
-    "@types/jasmine": "~3.5.4",
+    "@types/jasmine": "~3.5.5",
     "@types/jasminewd2": "~2.0.8",
-    "@types/node": "~13.7.1",
+    "@types/node": "~13.7.2",
     "codelyzer": "^5.2.1",
     "jasmine-core": "~3.5.0",
     "jasmine-spec-reporter": "~4.2.1",
