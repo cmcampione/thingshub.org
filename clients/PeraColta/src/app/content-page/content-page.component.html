@@ -1,27 +1,13 @@
-<ons-toolbar>
-  <!-- *ngIf does not works -->
-  <div [hidden]="!isLoggedIn" class="left">
-    <div class="center">{{connectionStatus}}</div>
-  </div>
-  <div class="center">{{title}}</div>
-  <div [hidden]="!isLoggedIn" class="right">
-    <ons-toolbar-button (click)="logout()">
-      Logout
-    </ons-toolbar-button>
-    <ons-toolbar-button (click)="openMenu()">
-      <ons-icon icon="ion-ios-menu, material:md-menu"></ons-icon>
-    </ons-toolbar-button>
-  </div>
-</ons-toolbar>
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title class="ion-text-center">
+      PeraColta - Hardworking bees are working here
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
 
-<div class="background"></div>
-<div class="content">
+<ion-content [fullscreen]="true">
   <div *ngIf="!isLoggedIn">
     <app-login></app-login>
   </div>
-  <div *ngIf="isLoggedIn">
-    <app-map></app-map>
-    <app-sensors></app-sensors>
-    <app-things></app-things>
-  </div>
-</div>
+</ion-content>
