@@ -7,9 +7,9 @@ import * as thingshub from 'thingshub-js-sdk';
 import { Subscription } from 'rxjs';
 
 @Component({
-  selector: 'ons-page',
+  selector: 'app-home',
   templateUrl: './content-page.component.html',
-  styleUrls: ['./content-page.component.css']
+  styleUrls: ['./content-page.component.scss']
 })
 export class ContentPageComponent implements OnInit, OnDestroy {
 
