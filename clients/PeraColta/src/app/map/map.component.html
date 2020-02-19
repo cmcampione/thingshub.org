@@ -1,22 +1,24 @@
-<ons-card>
-  <ons-card>
+<ion-card>
+  <ion-item>
     <label>
       DeviceId: {{ deviceId }}
-    </label>    
-    <br/>
+    </label>
+    <br />
     <label>
       Last valid GPS position date: {{ surveyDateTime }}
     </label>
-    <br/>
+    <br />
     <label>
       Last valid status date: {{ lastEventDateTime }}
     </label>
-    <br/>
+    <br />
     <label>
       Last status: {{ lastStatusMsg }}
     </label>
-  </ons-card>
-  <agm-map [latitude]="lat" [longitude]="lng" [zoom]=16>
-    <agm-marker [latitude]="lat" [longitude]="lng"></agm-marker>
-  </agm-map>
-</ons-card>
+  </ion-item>
+  <ion-card-content>
+    <agm-map [latitude]="lat" [longitude]="lng" [zoom]=16>
+      <agm-marker [latitude]="lat" [longitude]="lng"></agm-marker>
+    </agm-map>
+  </ion-card-content>
+</ion-card>
