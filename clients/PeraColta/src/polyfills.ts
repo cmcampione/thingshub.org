@@ -64,3 +64,6 @@ import 'zone.js/dist/zone';  // Included with Angular CLI.
 /***************************************************************************************************
  * APPLICATION IMPORTS
  */
+
+// Info: Uncaught ReferenceError: global is not defined at Object../node_modules/thingshub-js-sdk/node_modules/socket.io-parser/binary.js
+(window as any).global = window;
