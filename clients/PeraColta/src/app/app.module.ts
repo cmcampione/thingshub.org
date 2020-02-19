@@ -16,9 +16,11 @@ import { ThingsComponent } from './things/things.component';
 import { SidePageComponent } from './side-page/side-page.component';
 import { ContentPageComponent } from './content-page/content-page.component';
 import { SensorsComponent } from './sensors/sensors.component';
+import { FormsModule } from '@angular/forms';
 
 @NgModule({
-  declarations: [AppComponent,
+  declarations: [
+    AppComponent,
     LoginComponent,
     MapComponent,
     SensorsComponent,
@@ -26,7 +28,11 @@ import { SensorsComponent } from './sensors/sensors.component';
     SidePageComponent,
     ContentPageComponent],
   entryComponents: [],
-  imports: [BrowserModule, IonicModule.forRoot(), AppRoutingModule,
+  imports: [
+    BrowserModule,
+    IonicModule.forRoot(),
+    AppRoutingModule,
+    FormsModule,
     AgmCoreModule.forRoot({
       apiKey: 'AIzaSyD11pjYHyE0ekfygLBNJhvL1FgUp9-twkQ'
     })],

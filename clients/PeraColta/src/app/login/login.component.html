@@ -1,15 +1,13 @@
-<div class="login-form">
-    <ons-input modifier="underbar" [(value)]="username" type="email" required placeholder="username"></ons-input>
-    <ons-input modifier="underbar" [(value)]="password" type="password" required placeholder="password"></ons-input>
-    <br><br>
-    <ons-button modifier="material" class="login-button" (click)="login()">Login</ons-button>
-    <br><br>
-    <div style="display:flex; align-items:center; justify-content:space-between">
-        <label class="checkbox checkbox--material remember-checkbox">
-            <input type="checkbox" class="checkbox__input checkbox--material__input" [(ngModel)]="remember">
-            <div class="checkbox__checkmark checkbox--material__checkmark"></div>
-            Remember
-        </label>        
-        <ons-button modifier="quiet" class="forgot-password-button">Forgot password?</ons-button>
-    </div>
-</div>
+<ion-item lines="full">
+      <ion-label position="floating">Email</ion-label>
+      <ion-input [(ngModel)]="username" type="email" required></ion-input>
+</ion-item>
+<ion-item>
+      <ion-label position="floating">Password</ion-label>
+      <ion-input [(ngModel)]="password" type="password" required></ion-input>
+</ion-item>
+<ion-row>
+      <ion-col>
+            <ion-button (click)="login()" color="danger" expand="block">Sign In</ion-button>            
+      </ion-col>
+</ion-row>
