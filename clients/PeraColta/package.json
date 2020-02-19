@@ -13,6 +13,7 @@
   },
   "private": true,
   "dependencies": {
+    "@agm/core": "^1.1.0",
     "@angular/common": "~9.0.1",
     "@angular/core": "~9.0.1",
     "@angular/forms": "~9.0.1",
@@ -27,10 +28,10 @@
     "core-js": "^3.6.4",
     "moment": "^2.24.0",
     "rxjs": "~6.5.4",
-    "tslib": "^1.10.0",
-    "zone.js": "~0.10.2",
     "socket.io-client": "^2.3.0",
-    "thingshub-js-sdk": "^1.0.31"
+    "thingshub-js-sdk": "^1.0.31",
+    "tslib": "^1.10.0",
+    "zone.js": "~0.10.2"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "~0.900.2",
