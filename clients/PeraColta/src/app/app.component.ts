@@ -29,7 +29,8 @@ export class AppComponent implements OnDestroy {
     private platform: Platform,
     private splashScreen: SplashScreen,
     private statusBar: StatusBar,
-    private accountService: AccountService, private menuService: MenuService) {
+    private accountService: AccountService,
+    private menuService: MenuService) {
     this.initializeApp();
 
     this.subscriptionIsLoggedIn = this.accountService.isLoggedIn.subscribe(this.checkLogin);
