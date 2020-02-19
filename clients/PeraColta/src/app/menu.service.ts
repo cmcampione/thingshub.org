@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable ,  Subject } from 'rxjs';
+import { Subject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -7,7 +7,7 @@ import { Observable ,  Subject } from 'rxjs';
 export class MenuService {
 
   toggle = new Subject();
-  
+
   open() {
     this.toggle.next();
   }
