@@ -2,7 +2,7 @@
   <ion-toolbar>
     <ion-buttons *ngIf="isLoggedIn" slot="primary">
       <ion-icon [name]="connIconName" [color]="connIconColor"></ion-icon>
-      <ion-menu-button auto-hide="false"></ion-menu-button>
+      <ion-menu-button auto-hide="false" (click)="openMenu()"></ion-menu-button>
     </ion-buttons>
     <ion-title class="ion-text-center">
       PeraColta - Hardworking bees are working here
