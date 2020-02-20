@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { AccountService } from '../account.service';
 import { AccountUserData } from 'thingshub-js-sdk';
 import { Subscription } from 'rxjs';
+import { MenuController } from '@ionic/angular';
 
 @Component({
   selector: 'ons-page',
@@ -16,7 +17,7 @@ export class SidePageComponent implements OnInit, OnDestroy {
     this.isLoggedIn = accountUserData != null;
   }
 
-  constructor(private accountService: AccountService) {
+  constructor(private menu: MenuController, private accountService: AccountService) {
     this.subscriptionIsLoggedIn = this.accountService.isLoggedIn.subscribe(this.checkLogin);
   }
 
@@ -24,5 +25,10 @@ export class SidePageComponent implements OnInit, OnDestroy {
   }
   ngOnDestroy() {
     this.subscriptionIsLoggedIn.unsubscribe();
+  }
+
+  open() {
+    this.menu.enable(true, 'main-content');
+    this.menu.open('main-content');
   }
 }
