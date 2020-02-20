@@ -7,9 +7,9 @@ import * as thingshub from 'thingshub-js-sdk';
 import { Subscription } from 'rxjs';
 
 @Component({
-  selector: 'ons-page',
+  selector: 'app-home',
   templateUrl: './content-page.component.html',
-  styleUrls: ['./content-page.component.css']
+  styleUrls: ['./content-page.component.scss']
 })
 export class ContentPageComponent implements OnInit, OnDestroy {
 
@@ -18,6 +18,9 @@ export class ContentPageComponent implements OnInit, OnDestroy {
   public connectionStatus: thingshub.RealtimeConnectionStates = thingshub.RealtimeConnectionStates.Disconnected;
   private readonly subscriptionIsLoggedIn: Subscription = null;
   private readonly subscriptionRealTimeConnector: Subscription = null;
+
+  private connIconName = 'globe';
+  private connIconColor = 'danger';
 
   public isLoggedIn = false;
   private readonly checkLogin = (accountUserData: AccountUserData) => {
@@ -35,7 +38,27 @@ export class ContentPageComponent implements OnInit, OnDestroy {
     private realTimeConnector: RealTimeConnectorService) {
       this.subscriptionIsLoggedIn = this.accountService.isLoggedIn.subscribe(this.checkLogin);
       this.subscriptionRealTimeConnector = this.realTimeConnector.connectionStatus.subscribe({
-        next: (v) => this.connectionStatus = v
+        next: (v) => {
+          this.connectionStatus = v;
+          switch (this.connectionStatus){
+            case thingshub.RealtimeConnectionStates.Disconnected: {
+              this.connIconColor = 'danger';
+              break;
+            }
+            case thingshub.RealtimeConnectionStates.Connected: {
+              this.connIconColor = 'primary';
+              break;
+            }
+            case thingshub.RealtimeConnectionStates.Connecting: {
+              this.connIconColor = 'warning';
+              break;
+            }
+            case thingshub.RealtimeConnectionStates.Reconnecting: {
+              this.connIconColor = 'warning';
+              break;
+            }
+          }
+        }
       });
   }
 
