@@ -1,31 +1,29 @@
-<ons-card>
-  <ons-list>
-    <ons-list-header>sensors works!</ons-list-header>
-    <div *ngFor="let sensor of sensors">
-      <ons-list-item expandable>
+<ion-card>
+  <ion-card-header>
+    <ion-card-title>My home</ion-card-title>
+  </ion-card-header>
+  <ion-list>
+    <ion-item *ngFor="let sensor of sensors">
+      <div>
+        name: {{sensor.name}}
+      </div>
+      <div>
+        <button (click)="acknowledge(sensor)">Riconosci</button>
+      </div>
+      <div>
         <div>
-          name: {{sensor.name}}
+          Id: {{sensor.id}}
         </div>
         <div>
-          <button (click)="acknowledge(sensor)">Riconosci</button>
+          Millis: {{sensor.millis}}
         </div>
-        <div class="expandable-content">
-          <div>
-            Id: {{sensor.id}}
-          </div>
-          <div>
-            Millis: {{sensor.millis}}
-          </div>
-          <div>
-            Now: {{sensor.now}}
-          </div>
-          <div>
-            Value: {{sensor.value}}
+        <div>
+          Now: {{sensor.now}}
         </div>
+        <div>
+          Value: {{sensor.value}}
         </div>
-      </ons-list-item>       
-    </div>
-  </ons-list>
-
-  <button (click)="recall()">recall</button>
-</ons-card>
+      </div>
+    </ion-item>
+  </ion-list>
+</ion-card>
