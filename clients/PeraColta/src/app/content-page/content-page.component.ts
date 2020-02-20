@@ -19,7 +19,8 @@ export class ContentPageComponent implements OnInit, OnDestroy {
   private readonly subscriptionIsLoggedIn: Subscription = null;
   private readonly subscriptionRealTimeConnector: Subscription = null;
 
-  private connIconName = 'heart';
+  private connIconName = 'globe';
+  private connIconColor = 'danger';
 
   public isLoggedIn = false;
   private readonly checkLogin = (accountUserData: AccountUserData) => {
@@ -41,19 +42,19 @@ export class ContentPageComponent implements OnInit, OnDestroy {
           this.connectionStatus = v;
           switch (this.connectionStatus){
             case thingshub.RealtimeConnectionStates.Disconnected: {
-              this.connIconName = 'heart';
+              this.connIconColor = 'danger';
               break;
             }
             case thingshub.RealtimeConnectionStates.Connected: {
-              this.connIconName = 'alarm-outline';
+              this.connIconColor = 'primary';
               break;
             }
             case thingshub.RealtimeConnectionStates.Connecting: {
-              this.connIconName = 'albums-outline';
+              this.connIconColor = 'warning';
               break;
             }
             case thingshub.RealtimeConnectionStates.Reconnecting: {
-              this.connIconName = 'bar-chart-outline';
+              this.connIconColor = 'warning';
               break;
             }
           }

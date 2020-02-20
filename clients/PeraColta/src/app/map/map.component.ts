@@ -8,7 +8,7 @@ import { RealTimeConnectorService } from '../real-time-connector.service';
 @Component({
   selector: 'app-map',
   templateUrl: './map.component.html',
-  styleUrls: ['./map.component.css']
+  styleUrls: ['./map.component.scss']
 })
 export class MapComponent implements OnInit, OnDestroy  {
 
@@ -32,7 +32,6 @@ export class MapComponent implements OnInit, OnDestroy  {
   }
 
   private setValue(value: any) {
-    const now = Date.now();
 
     this.deviceId = value.deviceId;
     this.lastEventDateTime = moment(value.lastEventDateTime).format('L LTS');
