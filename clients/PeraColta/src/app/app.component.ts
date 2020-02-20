@@ -1,38 +1,47 @@
 import { Component, ViewChild, OnDestroy } from '@angular/core';
-import { SidePageComponent } from './side-page/side-page.component';
-import { ContentPageComponent } from './content-page/content-page.component';
 import { MenuService } from './menu.service';
 import { AccountService } from './account.service';
 import { AccountUserData } from 'thingshub-js-sdk';
 import { Subscription } from 'rxjs';
 
+import { Platform } from '@ionic/angular';
+import { SplashScreen } from '@ionic-native/splash-screen/ngx';
+import { StatusBar } from '@ionic-native/status-bar/ngx';
+
 @Component({
   selector: 'app-root',
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css']
+  templateUrl: 'app.component.html',
+  styleUrls: ['app.component.scss']
 })
 export class AppComponent implements OnDestroy {
-
-  public sidePage    = SidePageComponent;
-  public contentPage = ContentPageComponent;
-
   private readonly subscriptionIsLoggedIn: Subscription = null;
   private readonly subscriptionMenuToggle: Subscription = null;
-
-  @ViewChild('splitter', {static: false}) splitter;
-
   public isLoggedIn = false;
-  private readonly checkLogin = (accountUserData: AccountUserData) => {
-    this.isLoggedIn = accountUserData != null;
+
+  initializeApp() {
+    this.platform.ready().then(() => {
+      this.statusBar.styleDefault();
+      this.splashScreen.hide();
+    });
   }
 
-  constructor(private accountService: AccountService, private menuService: MenuService) {
+  constructor(
+    private platform: Platform,
+    private splashScreen: SplashScreen,
+    private statusBar: StatusBar,
+    private accountService: AccountService,
+    private menuService: MenuService) {
+    this.initializeApp();
+
     this.subscriptionIsLoggedIn = this.accountService.isLoggedIn.subscribe(this.checkLogin);
-    this.subscriptionMenuToggle = this.menuService.toggle.subscribe(() => this.splitter.nativeElement.side.open());
+    // this.subscriptionMenuToggle = this.menuService.toggle.subscribe(() => this.splitter.nativeElement.side.open());
   }
-
   ngOnDestroy() {
     this.subscriptionMenuToggle.unsubscribe();
     this.subscriptionIsLoggedIn.unsubscribe();
+  }
+
+  private readonly checkLogin = (accountUserData: AccountUserData) => {
+    this.isLoggedIn = accountUserData != null;
   }
 }
