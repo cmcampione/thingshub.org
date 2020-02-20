@@ -1,12 +1,14 @@
-<ons-card>
+<ion-card>
+  <ion-card-header>
+    <ion-card-title>My things</ion-card-title>
+  </ion-card-header>
   <ons-list>
-    <ons-list-header>things works!</ons-list-header>
     <div *ngFor="let thing of things">
       <ons-list-item expandable>
         <div>
           name:{{thing.name}}
         </div>
-        <div class="expandable-content">
+        <div>
           <div>
             Id: {{thing.id}}
           </div>
@@ -17,9 +19,8 @@
             Value: {{ thing.value | json }}
           </div>
         </div>
-      </ons-list-item>       
+      </ons-list-item>
     </div>
   </ons-list>
-
   <button (click)="recall()">recall</button>
-</ons-card>
+</ion-card>
