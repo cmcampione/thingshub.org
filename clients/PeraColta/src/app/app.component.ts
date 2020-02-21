@@ -1,5 +1,4 @@
-import { Component, ViewChild, OnDestroy } from '@angular/core';
-import { MenuService } from './menu.service';
+import { Component, OnDestroy } from '@angular/core';
 import { AccountService } from './account.service';
 import { AccountUserData } from 'thingshub-js-sdk';
 import { Subscription } from 'rxjs';
@@ -15,7 +14,6 @@ import { StatusBar } from '@ionic-native/status-bar/ngx';
 })
 export class AppComponent implements OnDestroy {
   private readonly subscriptionIsLoggedIn: Subscription = null;
-  private readonly subscriptionMenuToggle: Subscription = null;
   public isLoggedIn = false;
 
   initializeApp() {
@@ -24,24 +22,28 @@ export class AppComponent implements OnDestroy {
       this.splashScreen.hide();
     });
   }
-
   constructor(
     private platform: Platform,
     private splashScreen: SplashScreen,
     private statusBar: StatusBar,
-    private accountService: AccountService,
-    private menuService: MenuService) {
+    private accountService: AccountService) {
     this.initializeApp();
 
     this.subscriptionIsLoggedIn = this.accountService.isLoggedIn.subscribe(this.checkLogin);
-    // this.subscriptionMenuToggle = this.menuService.toggle.subscribe(() => this.splitter.nativeElement.side.open());
   }
   ngOnDestroy() {
-    this.subscriptionMenuToggle.unsubscribe();
     this.subscriptionIsLoggedIn.unsubscribe();
   }
 
   private readonly checkLogin = (accountUserData: AccountUserData) => {
     this.isLoggedIn = accountUserData != null;
+  }
+
+  async logout() {
+    try {
+      await this.accountService.logout();
+    } catch (e) {
+      console.log(e);
+    }
   }
 }

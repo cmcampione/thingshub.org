@@ -1,11 +1,9 @@
-import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { AccountUserData } from 'thingshub-js-sdk';
 import { AccountService } from '../account.service';
-import { MenuService } from '../menu.service';
 import { RealTimeConnectorService } from '../real-time-connector.service';
 import * as thingshub from 'thingshub-js-sdk';
 import { Subscription } from 'rxjs';
-import { SidePageComponent } from '../side-page/side-page.component'
 
 @Component({
   selector: 'app-home',
@@ -23,7 +21,6 @@ export class ContentPageComponent implements OnInit, OnDestroy {
   private connIconName = 'globe';
   private connIconColor = 'danger';
 
-  @ViewChild(Menu) menu: Menu;
 
   public isLoggedIn = false;
   private readonly checkLogin = (accountUserData: AccountUserData) => {
@@ -37,7 +34,6 @@ export class ContentPageComponent implements OnInit, OnDestroy {
   }
 
   constructor(private accountService: AccountService,
-    private menuService: MenuService,
     private realTimeConnector: RealTimeConnectorService) {
       this.subscriptionIsLoggedIn = this.accountService.isLoggedIn.subscribe(this.checkLogin);
       this.subscriptionRealTimeConnector = this.realTimeConnector.connectionStatus.subscribe({
@@ -78,9 +74,6 @@ export class ContentPageComponent implements OnInit, OnDestroy {
     this.subscriptionIsLoggedIn.unsubscribe();
   }
 
-  openMenu() {
-    this.menuService.open();
-  }
   async logout() {
     try {
       await this.accountService.logout();
