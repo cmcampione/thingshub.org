@@ -3,21 +3,24 @@
     <ion-card-title>My car</ion-card-title>
   </ion-card-header>
   <ion-item>
-    <label>
+    <ion-label>
       DeviceId: {{ deviceId }}
-    </label>
-    <br />
-    <label>
+    </ion-label>
+  </ion-item>
+  <ion-item>
+    <ion-label>
       Last valid GPS position date: {{ surveyDateTime }}
-    </label>
-    <br />
-    <label>
+    </ion-label>
+  </ion-item>
+  <ion-item>
+    <ion-label>
       Last valid status date: {{ lastEventDateTime }}
-    </label>
-    <br />
-    <label>
+    </ion-label>
+  </ion-item>
+  <ion-item>
+    <ion-textarea>
       Last status: {{ lastStatusMsg }}
-    </label>
+    </ion-textarea>
   </ion-item>
   <ion-card-content>
     <agm-map [latitude]="lat" [longitude]="lng" [zoom]=16>
