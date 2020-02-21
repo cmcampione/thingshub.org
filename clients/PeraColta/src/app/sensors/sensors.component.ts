@@ -37,7 +37,7 @@ export class SensorsComponent implements OnInit, OnDestroy {
       await this.sensorsService.setSensorValue(sensor, {
         id: sensor.id,
         now: false,
-        value: "false"
+        value: 'false'
       });
     } catch (e) {
       console.log(e);
