@@ -2,13 +2,12 @@ import { Injectable, OnDestroy } from '@angular/core';
 import { Sensor } from './sensor';
 import { ThingsService } from './things.service';
 import { Thing, HttpRequestCanceler } from 'thingshub-js-sdk';
-import { SummaryResolver } from '@angular/compiler';
 
-interface SensorRaw { 
+interface SensorRaw {
   id: number;
   now: any;
   millis: number;
-  value: any; 
+  value: any;
 }
 
 // it's no iniectable because keep things state
@@ -32,17 +31,17 @@ export class SensorsService implements OnDestroy {
       return sensor.id === id;
     })
   }
-  
+
   private readonly onUpdateThingValue = (thingId: string, value: any, asCmd: boolean): void => {
     if (asCmd)
       return;
-    let thing = this.searchThingById(thingId);
+    const thing = this.searchThingById(thingId);
     if (!thing)
       return;
     if (!value.sensors)
       return;
     value.sensors.forEach((sensorRaw: SensorRaw) => {
-      let sensor = this.searchSensorById(sensorRaw.id);
+      const sensor = this.searchSensorById(sensorRaw.id);
       if (sensor) {
         sensor.now = sensorRaw.now;
         sensor.millis = sensorRaw.millis;
@@ -77,10 +76,10 @@ export class SensorsService implements OnDestroy {
   }
 
   public async setSensorValue(sensor : Sensor, value: any): Promise<any> {
-    let thing: Thing = this.searchThingById(sensor.thingId);
+    const thing: Thing = this.searchThingById(sensor.thingId);
     if (!thing)
       return; // Sanity check
-    let sensorsRaw = {sensors: [value]}
+    const sensorsRaw = {sensors: [value]}
     // asCmd
     return await this.thingsService.putThingValue(thing.id, true, sensorsRaw);
   }

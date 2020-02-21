@@ -1,4 +1,4 @@
-import { Injectable, OnDestroy, Inject  } from '@angular/core';
+import { Injectable, OnDestroy, Inject, isDevMode  } from '@angular/core';
 import * as thingshub from 'thingshub-js-sdk';
 import { endPointAddress } from './utils';
 import { AccountService } from './account.service';
@@ -25,7 +25,13 @@ export class ThingsService implements OnDestroy {
 
   public readonly thingsManager: thingshub.ThingsManager;
 
-  private readonly onUpdateThingValue = (thingId, value, asCmd): void => {
+  private readonly onUpdateThingValue = (thingId: string, value: any, asCmd: boolean): void => {
+    if (!isDevMode())
+      return;
+
+    console.log('ThingId : ' + thingId);
+    console.log('Value   : ' + JSON.stringify(value));
+    console.log('asCmd   : ' + asCmd);
   }
 
   constructor(@Inject('thingKind') thingKind: string, private readonly accountService: AccountService,
@@ -49,6 +55,7 @@ export class ThingsService implements OnDestroy {
     this.done();
   }
 
+  // Only a simple wrapper to "thingsDatacontext"
   public async putThingValue(thingId: string, asCmd: boolean, value: any): Promise<any> {
     return await this.thingsDatacontext.putThingValue(thingId, asCmd, value);
   }
