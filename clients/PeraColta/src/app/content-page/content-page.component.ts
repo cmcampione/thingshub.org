@@ -32,32 +32,33 @@ export class ContentPageComponent implements OnInit, OnDestroy {
       this.realTimeConnector.realTimeConnectorRaw.unsubscribe();
     }
   }
+  private readonly setConnectionIcon = (v: thingshub.RealtimeConnectionStates): void => {
+    this.connectionStatus = v;
+    switch (this.connectionStatus) {
+      case thingshub.RealtimeConnectionStates.Disconnected: {
+        this.connIconColor = 'danger';
+        break;
+      }
+      case thingshub.RealtimeConnectionStates.Connected: {
+        this.connIconColor = 'primary';
+        break;
+      }
+      case thingshub.RealtimeConnectionStates.Connecting: {
+        this.connIconColor = 'warning';
+        break;
+      }
+      case thingshub.RealtimeConnectionStates.Reconnecting: {
+        this.connIconColor = 'warning';
+        break;
+      }
+    }
+  };
 
   constructor(private accountService: AccountService,
     private realTimeConnector: RealTimeConnectorService) {
       this.subscriptionIsLoggedIn = this.accountService.isLoggedIn.subscribe(this.checkLogin);
       this.subscriptionRealTimeConnector = this.realTimeConnector.connectionStatus.subscribe({
-        next: (v) => {
-          this.connectionStatus = v;
-          switch (this.connectionStatus){
-            case thingshub.RealtimeConnectionStates.Disconnected: {
-              this.connIconColor = 'danger';
-              break;
-            }
-            case thingshub.RealtimeConnectionStates.Connected: {
-              this.connIconColor = 'primary';
-              break;
-            }
-            case thingshub.RealtimeConnectionStates.Connecting: {
-              this.connIconColor = 'warning';
-              break;
-            }
-            case thingshub.RealtimeConnectionStates.Reconnecting: {
-              this.connIconColor = 'warning';
-              break;
-            }
-          }
-        }
+        next: this.setConnectionIcon
       });
   }
 
@@ -72,13 +73,5 @@ export class ContentPageComponent implements OnInit, OnDestroy {
     }
     this.subscriptionRealTimeConnector.unsubscribe();
     this.subscriptionIsLoggedIn.unsubscribe();
-  }
-
-  async logout() {
-    try {
-      await this.accountService.logout();
-    } catch (e) {
-      console.log(e);
-    }
   }
 }
