@@ -1,3 +1,15 @@
 <ion-app>
+  <ion-menu side="end" menuId="first" contentId="content">  
+    <ion-header>  
+      <ion-toolbar>  
+        <ion-title>Navigate</ion-title>  
+      </ion-toolbar>  
+    </ion-header>  
+    <ion-content id="content">
+      <ion-menu-toggle auto-hide="true">
+        <ion-button (click)="logout()">Sigh out</ion-button>
+      </ion-menu-toggle>
+    </ion-content>  
+  </ion-menu>  
   <ion-router-outlet></ion-router-outlet>
 </ion-app>

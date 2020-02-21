@@ -2,25 +2,21 @@
   <ion-card-header>
     <ion-card-title>My things</ion-card-title>
   </ion-card-header>
-  <ons-list>
-    <div *ngFor="let thing of things">
-      <ons-list-item expandable>
-        <div>
-          name:{{thing.name}}
-        </div>
-        <div>
-          <div>
-            Id: {{thing.id}}
-          </div>
-          <div>
-            Kind: {{thing.kind}}
-          </div>
-          <div>
-            Value: {{ thing.value | json }}
-          </div>
-        </div>
-      </ons-list-item>
+  <div *ngFor="let thing of things">
+    <div>
+      name:{{thing.name}}
     </div>
-  </ons-list>
+    <div>
+      <div>
+        Id: {{thing.id}}
+      </div>
+      <div>
+        Kind: {{thing.kind}}
+      </div>
+      <div>
+        Value: {{ thing.value | json }}
+      </div>
+    </div>
+  </div>
   <button (click)="recall()">recall</button>
 </ion-card>
