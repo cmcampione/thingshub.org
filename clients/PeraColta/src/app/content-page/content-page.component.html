@@ -14,9 +14,18 @@
   <div *ngIf="!isLoggedIn">
     <app-login></app-login>
   </div>
-  <div *ngIf="isLoggedIn">
-    <app-map></app-map>
-    <app-sensors></app-sensors>
-    <app-things></app-things>
-  </div>
+
+  <ion-grid *ngIf="isLoggedIn">
+    <ion-row>
+      <ion-col>
+        <app-map></app-map>
+      </ion-col>
+      <ion-col>
+        <app-sensors></app-sensors>
+      </ion-col>
+      <ion-col>
+        <app-things></app-things>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
 </ion-content>
