@@ -9,13 +9,19 @@
             "type": "node",
             "request": "launch",
             "name": "Launch Tracker Server ",
-            "program": "${workspaceFolder}\\client\\TrackerServer\\app.js"
+            "program": "${workspaceFolder}\\clients\\TrackerServer\\app.js"
         },
         {
             "type": "node",
             "request": "launch",
             "name": "Launch ThingsHub Server",            
             "program": "${workspaceFolder}\\server\\src\\server.js"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Launch ThingsMonitor",            
+            "program": "${workspaceFolder}\\clients\\ThingsMonitor\\app.js"
         },
         {
             "name": "Launch PeraColta App",
