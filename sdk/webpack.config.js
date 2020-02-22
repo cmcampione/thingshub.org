@@ -11,7 +11,8 @@ module.exports = {
 		path: path.resolve(__dirname, "dist"),  
 		filename: "thingshub.js",
 		library: libraryName,
-		libraryTarget: "umd"
+		libraryTarget: "umd",
+		globalObject: 'this' // Useful for node e DOM compatility
 	},
 	externals: {
 		"socket.io-client": { 

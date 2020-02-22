@@ -7,7 +7,7 @@
 		exports["thingshub"] = factory(require("axios"), require("socket.io-client"));
 	else
 		root["thingshub"] = factory(root["axios"], root["io"]);
-})(window, function(__WEBPACK_EXTERNAL_MODULE_axios__, __WEBPACK_EXTERNAL_MODULE_socket_io_client__) {
+})(this, function(__WEBPACK_EXTERNAL_MODULE_axios__, __WEBPACK_EXTERNAL_MODULE_socket_io_client__) {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
