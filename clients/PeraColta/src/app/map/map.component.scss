@@ -35,3 +35,9 @@ ion-content ion-toolbar {
 agm-map {
   height: 50vh ;
 }
+
+.multiline-ellipsis {
+  max-width: 350px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
