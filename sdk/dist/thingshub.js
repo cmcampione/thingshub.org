@@ -2608,6 +2608,9 @@ class AccountManager {
         this._accessToken = null;
         this._userId = null;
         this._userName = null;
+        // Useful for node app
+        if (typeof localStorage === 'undefined')
+            return;
         localStorage.removeItem(this._appName + "_Remember");
         localStorage.removeItem(this._appName + "_AccessToken");
         sessionStorage.removeItem(this._appName + "_AccessToken");
@@ -2624,6 +2627,9 @@ class AccountManager {
         this._userId = accountUserData.id;
         this._userName = accountUserData.name;
         this.deltaTime = 0;
+        // Useful for node app
+        if (typeof localStorage === 'undefined')
+            return;
         sessionStorage.setItem(this._appName + "_AccessToken", this._accessToken);
         sessionStorage.setItem(this._appName + "_UserId", this._userId);
         sessionStorage.setItem(this._appName + "_Username", this._userName);
@@ -2644,6 +2650,9 @@ class AccountManager {
             this._apiKey = apiKey;
             return;
         }
+        // Useful for node app
+        if (typeof localStorage === 'undefined')
+            return;
         this._apiKey = null;
         this._accessToken = sessionStorage.getItem(this._appName + "_AccessToken");
         this._userId = sessionStorage.getItem(this._appName + "_UserId");
@@ -2675,6 +2684,9 @@ class AccountManager {
         return true;
     }
     get remember() {
+        // Useful for node app
+        if (typeof localStorage === 'undefined')
+            return false;
         return localStorage.getItem(this._appName + "_Remember") == "true" ? true : false;
     }
     login(username, password, remember) {
