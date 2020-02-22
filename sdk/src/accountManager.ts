@@ -25,6 +25,10 @@ export class AccountManager {
         this._userId = null;
         this._userName = null;
 
+        // Useful for node app
+        if(typeof localStorage === 'undefined')
+            return;
+
         localStorage.removeItem(this._appName + "_Remember");
 
         localStorage.removeItem(this._appName + "_AccessToken");
@@ -48,6 +52,10 @@ export class AccountManager {
         this._userName = accountUserData.name;
 
         this.deltaTime = 0;
+
+        // Useful for node app
+        if(typeof localStorage === 'undefined')
+            return;
 
         sessionStorage.setItem(this._appName + "_AccessToken", this._accessToken);
 
@@ -77,6 +85,10 @@ export class AccountManager {
             this._apiKey = apiKey;
             return;
         }
+
+        // Useful for node app
+        if(typeof localStorage === 'undefined')
+            return;
 
         this._apiKey = null;
 
@@ -150,6 +162,9 @@ export class AccountManager {
     }
 
     public get remember() : boolean {
+        // Useful for node app
+        if(typeof localStorage === 'undefined')
+            return false;
         return localStorage.getItem(this._appName + "_Remember") == "true" ? true : false;
     }
     public async login(username: string, password: string, remember: boolean) : Promise<AccountUserData> {
