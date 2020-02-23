@@ -1,7 +1,7 @@
 {
   "name": "thingsmonitor",
   "version": "1.0.0",
-  "description": "",
+  "description": "ThingsHub - Monitoring for ThingsHub server status",
   "main": "app.js",
   "scripts": {
     "start": "node ./app.js",
@@ -10,8 +10,14 @@
   },
   "author": "",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cmcampione/thingshub.org.git"
+  },
   "dependencies": {
+    "ejs": "^3.0.1",
     "dotenv": "^8.2.0",
-    "thingshub-js-sdk": "^1.0.35"
+    "thingshub-js-sdk": "^1.0.35",
+    "nodemailer": "^6.4.2"
   }
 }
