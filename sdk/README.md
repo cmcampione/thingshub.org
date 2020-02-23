@@ -7,6 +7,7 @@ Hope
 cd ./sdk
 
 --> inc version number of ./package.json and ./dist/package.json
+--> check in ./package.json and ./dist/package.json for axio e socket-io version equality
 
 npm run build-prod 
 

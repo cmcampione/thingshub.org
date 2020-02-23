@@ -12,6 +12,6 @@
   "license": "MIT",
   "dependencies": {
     "dotenv": "^8.2.0",
-    "thingshub-js-sdk": "^1.0.33"
+    "thingshub-js-sdk": "^1.0.35"
   }
 }
