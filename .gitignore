@@ -63,6 +63,7 @@ typings/
 # application specific
 thingsHub.env
 trackerServer.env
+thingsMonitor.env
 
 # End of https://www.gitignore.io/api/node
 
