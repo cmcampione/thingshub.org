@@ -38,6 +38,7 @@ const globalConfig = {
 const globalConfigStatus = {
   lastConnection: Date.now(),
   timeoutForDisconnection: null,
+  disconnectionEmailSending: false,
   disconnectionEmailSent: false
 }
 
@@ -121,13 +122,19 @@ const onStateChanged = (change) => {
     case thingshub.RealtimeConnectionStates.Disconnected: {
       let interval1 = Date.now() - globalConfigStatus.lastConnection;
       if (interval1 > globalConfig.disconnectionTimeout) {
-        globalConfigStatus.timeoutForDisconnection = setTimeout(
+        globalConfigStatus.timeoutForDisconnection = setInterval(
           async () => {
             try {
+              if (globalConfigStatus.disconnectionEmailSending)
+                return;
+              globalConfigStatus.disconnectionEmailSending = true;
               await SendNotificationEmailForDisconnection(globalConfig.emails, interval1, globalConfig.interval2);
-              globalConfigStatus.disconnectionEmailSent = true;
+              clearTimeout(globalConfigStatus.timeoutForDisconnection);
               globalConfigStatus.timeoutForDisconnection = null;
+              globalConfigStatus.disconnectionEmailSending = false;
+              globalConfigStatus.disconnectionEmailSent = true;
             } catch(e) {
+              globalConfigStatus.disconnectionEmailSending = false;
               console.log(e);
           }
         }, 
@@ -145,6 +152,8 @@ const onStateChanged = (change) => {
         // SendNotificationEmailForReconnection(emails);
         globalConfigStatus.disconnectionEmailSent = false;
       }
+      globalConfigStatus.disconnectionEmailSending = false;
+      
       break;
     }
     case thingshub.RealtimeConnectionStates.Connecting: {
