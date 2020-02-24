@@ -18,6 +18,6 @@
     "ejs": "^3.0.1",
     "dotenv": "^8.2.0",
     "thingshub-js-sdk": "^1.0.35",
-    "nodemailer": "^6.4.2"
+    "nodemailer": "^6.4.3"
   }
 }
