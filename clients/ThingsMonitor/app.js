@@ -109,7 +109,7 @@ async function SendNotificationEmailForDisconnection(emails, interval1, interval
 		transporter.sendMail(mailOptions, (error, info) => {
 			if (error) {
 				reject(error);
-				throw error;
+				return error;
 			}
 			resolve(info);
 			return info;
@@ -155,7 +155,7 @@ async function SendNotificationEmailForReconnection(emails, culture) {
 		transporter.sendMail(mailOptions, (error, info) => {
 			if (error) {
 				reject(error);
-				throw error;
+				return error;
 			}
 			resolve(info);
 			return info; // ToDo: Do we need this?
@@ -163,7 +163,7 @@ async function SendNotificationEmailForReconnection(emails, culture) {
 	});
 }
 
-const onStateChanged = (change) => {
+const onStateChanged = async (change) => {
 	switch (change) {
 	case thingshub.RealtimeConnectionStates.Disconnected: {
 		let interval1 = Date.now() - globalConfigStatus.lastConnectionDate;
@@ -175,12 +175,20 @@ const onStateChanged = (change) => {
 							return;
 						globalConfigStatus.disconnectionEmailSending = true;
 						await SendNotificationEmailForDisconnection(globalConfig.emails, interval1, globalConfig.interval2);
-						clearInterval(globalConfigStatus.timeoutForDisconnection);
-						globalConfigStatus.timeoutForDisconnection = null;
 						globalConfigStatus.disconnectionEmailSending = false;
 						globalConfigStatus.disconnectionEmailSent = true;
+						if (!globalConfigStatus.timeoutForDisconnection) {
+							await SendNotificationEmailForReconnection(globalConfig.emails);
+							break;
+						}
+						clearInterval(globalConfigStatus.timeoutForDisconnection);
+						globalConfigStatus.timeoutForDisconnection = null;
 					} catch(e) {
 						globalConfigStatus.disconnectionEmailSending = false;
+						if (!globalConfigStatus.timeoutForDisconnection) {
+							globalConfigStatus.disconnectionEmailSent = false;
+							break;
+						}
 						console.log(e);
 					}
 				}, 
@@ -194,11 +202,14 @@ const onStateChanged = (change) => {
 			clearInterval(globalConfigStatus.timeoutForDisconnection);
 			globalConfigStatus.timeoutForDisconnection = null;
 		}
+		if (globalConfigStatus.disconnectionEmailSending) {			
+			break;
+		}
+		// globalConfigStatus.disconnectionEmailSending = false;
 		if (globalConfigStatus.disconnectionEmailSent) {
-			SendNotificationEmailForReconnection(globalConfig.emails);
+			await SendNotificationEmailForReconnection(globalConfig.emails);
 			globalConfigStatus.disconnectionEmailSent = false;
 		}
-		globalConfigStatus.disconnectionEmailSending = false;      
 		break;
 	}
 	case thingshub.RealtimeConnectionStates.Connecting: {
@@ -260,6 +271,7 @@ thingsManager.getMoreThings(httpRequestCanceler)
 		console.log(mainThingForConfig);
 	})
 	.catch(function(err) {
+		// Used default Config Thing
 		console.log(err);
 	});
 
