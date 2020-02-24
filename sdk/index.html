@@ -60,7 +60,7 @@
       }
 
       var realTimeConnector = new thingshub.SocketIORealtimeConnector(endPointAddress.server, accountManager.getSecurityToken, onError, onConnectError, onStateChanged);
-      realTimeConnector.subscribe();
+      realTimeConnector.subscribe(); // There is an automatic reconnection
       realTimeConnector.setHook("api", onAPI);
       realTimeConnector.setHook("onUpdateThing", onUpdateThing);
       realTimeConnector.setHook("onUpdateThingValue", onUpdateThingValue);
