@@ -149,7 +149,11 @@ export class ThingsManager {
         return this.mainThing.childrenTotalItems;
     }
 
-    // Only a wrapper
+    // Only wrappers
+    public async getThing(thingId: string): Promise<Thing> {
+        const thingDTO: ThingDTO = await this.thingsDataContext.getThing(thingId);
+        return new Thing(thingDTO);
+    }
     public async putThingValue(thingId: string, asCmd: boolean, value: any): Promise<any> {
         return await this.thingsDataContext.putThingValue(thingId, asCmd, value);
     }
