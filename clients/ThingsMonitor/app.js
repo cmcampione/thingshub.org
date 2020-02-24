@@ -109,7 +109,7 @@ async function SendNotificationEmailForDisconnection(emails, interval1, interval
 		transporter.sendMail(mailOptions, (error, info) => {
 			if (error) {
 				reject(error);
-				return error;
+				throw error;
 			}
 			resolve(info);
 			return info;
@@ -155,10 +155,10 @@ async function SendNotificationEmailForReconnection(emails, culture) {
 		transporter.sendMail(mailOptions, (error, info) => {
 			if (error) {
 				reject(error);
-				return error; // Do we need this?
+				throw error;
 			}
 			resolve(info);
-			return info; // Do we need this?
+			return info; // ToDo: Do we need this?
 		});
 	});
 }
@@ -240,7 +240,7 @@ realTimeConnector.api()
 
 // 
 const mainThingForConfig = new thingshub.Thing();
-let thingsManagerClaims = {
+const thingsManagerClaims = {
 
 	publicReadClaims : thingshub.ThingUserReadClaims.NoClaims,
 	publicChangeClaims: thingshub.ThingUserChangeClaims.NoClaims,
@@ -252,19 +252,16 @@ let thingsManagerClaims = {
 	creatorUserChangeClaims: thingshub.ThingUserChangeClaims.AllClaims
 };
 const thingsDatacontext = new thingshub.ThingsDataContext(endPoint, accountManager.getSecurityHeader);
-let thingsManager = new thingshub.ThingsManager(mainThingForConfig, configThingKind, thingsManagerClaims, thingsDatacontext, realTimeConnector );
+const thingsManager = new thingshub.ThingsManager(mainThingForConfig, process.env.CONFIG_THING_KIND, thingsManagerClaims, thingsDatacontext, realTimeConnector );
 let httpRequestCanceler = new thingshub.HttpRequestCanceler();
 
-async function GetConfigThing() {
-	return await thingsManager.getMoreThings(httpRequestCanceler);
-}
-
-// Get configuration Things
-try {
-	GetConfigThing();
-} catch (err) {
-	console.log(err);
-}
+thingsManager.getMoreThings(httpRequestCanceler)
+	.then(function(data) {
+		console.log(mainThingForConfig);
+	})
+	.catch(function(err) {
+		console.log(err);
+	});
 
 //
 readline.emitKeypressEvents(process.stdin);
