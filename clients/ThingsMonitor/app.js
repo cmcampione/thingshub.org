@@ -43,6 +43,12 @@ const globalConfigStatus = {
 	disconnectionEmailSent: false
 };
 
+const ThingsConfigs = [];
+ThingsConfigs["thingsId"] = {
+	relateThingId: "",
+	onUpThVaTimeout: 15*1000 // Milliseconds
+}
+
 // create reusable transporter object using the default SMTP transport
 const transporter = nodemailer.createTransport({
 	host: process.env.SMTP_HOST,
