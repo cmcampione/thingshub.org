@@ -36,9 +36,9 @@ const globalConfig = {
 	emails: ["cmcampione@gmail.com"]
 };
 const globalConfigStatus = {
-	lastConnectionDate: Date.now(),
 	timeoutForDisconnection: null,
-	disconnectionEmailSending: false,
+	sendingDisconnectionEmail: false,
+	sendingReconnectionEmail: false,
 	disconnectionEmailSent: false
 };
 
@@ -166,49 +166,45 @@ async function SendNotificationEmailForReconnection(emails, culture) {
 const onStateChanged = async (change) => {
 	switch (change) {
 	case thingshub.RealtimeConnectionStates.Disconnected: {
-		let interval1 = Date.now() - globalConfigStatus.lastConnectionDate;
-		if (interval1 > globalConfig.disconnectionTimeout) {
-			globalConfigStatus.timeoutForDisconnection = setInterval(
-				async () => {
-					try {
-						if (globalConfigStatus.disconnectionEmailSending)
-							return;
-						globalConfigStatus.disconnectionEmailSending = true;
-						await SendNotificationEmailForDisconnection(globalConfig.emails, interval1, globalConfig.interval2);
-						globalConfigStatus.disconnectionEmailSending = false;
+		globalConfigStatus.timeoutForDisconnection = setInterval(
+			async () => {
+				try {
+					if (globalConfigStatus.sendingDisconnectionEmail || globalConfigStatus.sendingReconnectionEmail)
+						return;
+					if (!globalConfigStatus.disconnectionEmailSent) {
+						globalConfigStatus.sendingDisconnectionEmail = true;
+						await SendNotificationEmailForDisconnection(globalConfig.emails, globalConfig.disconnectionTimeout, globalConfig.interval2);
+						globalConfigStatus.sendingDisconnectionEmail = false;
 						globalConfigStatus.disconnectionEmailSent = true;
-						if (!globalConfigStatus.timeoutForDisconnection) {
-							await SendNotificationEmailForReconnection(globalConfig.emails);
-							break;
-						}
-						clearInterval(globalConfigStatus.timeoutForDisconnection);
-						globalConfigStatus.timeoutForDisconnection = null;
-					} catch(e) {
-						globalConfigStatus.disconnectionEmailSending = false;
-						if (!globalConfigStatus.timeoutForDisconnection) {
-							globalConfigStatus.disconnectionEmailSent = false;
-							break;
-						}
-						console.log(e);
+						globalConfigStatus.sendingReconnectionEmail = true;
+						return;
+					}					
+					globalConfigStatus.sendingReconnectionEmail = true;
+					await SendNotificationEmailForReconnection(globalConfig.emails);
+					clearInterval(globalConfigStatus.timeoutForDisconnection);
+					globalConfigStatus.timeoutForDisconnection = null;
+					globalConfigStatus.sendingDisconnectionEmail = false;
+					globalConfigStatus.sendingReconnectionEmail = true;
+				} catch(e) {
+					if (globalConfigStatus.sendingDisconnectionEmail) {
+						globalConfigStatus.sendingDisconnectionEmail = false;
+						return;
 					}
-				}, 
-				globalConfig.disconnectionTimeout);
-		}
+					if (globalConfigStatus.sendingReconnectionEmail) {
+						globalConfigStatus.sendingReconnectionEmail = false;
+						return;
+					}
+				}
+			}, 
+			globalConfig.disconnectionTimeout);
 		break;
 	}
 	case thingshub.RealtimeConnectionStates.Connected: {
-		globalConfigStatus.lastConnectionDate = Date.now();
+		if (globalConfigStatus.sendingDisconnectionEmail || globalConfigStatus.sendingReconnectionEmail)
+			return;
 		if (globalConfigStatus.timeoutForDisconnection) {
 			clearInterval(globalConfigStatus.timeoutForDisconnection);
 			globalConfigStatus.timeoutForDisconnection = null;
-		}
-		if (globalConfigStatus.disconnectionEmailSending) {			
-			break;
-		}
-		// globalConfigStatus.disconnectionEmailSending = false;
-		if (globalConfigStatus.disconnectionEmailSent) {
-			await SendNotificationEmailForReconnection(globalConfig.emails);
-			globalConfigStatus.disconnectionEmailSent = false;
 		}
 		break;
 	}
