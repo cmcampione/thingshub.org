@@ -36,6 +36,7 @@ const globalConfig = {
 	emails: ["cmcampione@gmail.com"]
 };
 const globalConfigStatus = {
+	isConnected: false,
 	timeoutForDisconnection: null,
 	sendingDisconnectionEmail: false,
 	sendingReconnectionEmail: false,
@@ -47,7 +48,7 @@ const transporter = nodemailer.createTransport({
 	host: process.env.SMTP_HOST,
 	port: process.env.SMTP_PORT,
 	secure: (process.env.SMTP_SECURE === "true"), // secure:true for port 465, secure:false for port 587
-	requireTLS: true,
+	requireTLS: false,// ToDo: At home works with true
 	tls: {
 		rejectUnauthorized: false,
 	},
@@ -106,10 +107,10 @@ async function SendNotificationEmailForDisconnection(emails, interval1, interval
 	// Send email
 	return new Promise((resolve, reject) => {
 		// send mail with defined transport object
-		transporter.sendMail(mailOptions, (error, info) => {
-			if (error) {
-				reject(error);
-				return error;
+		transporter.sendMail(mailOptions, (err, info) => {
+			if (err) {
+				reject(err);
+				return err;
 			}
 			resolve(info);
 			return info;
@@ -166,26 +167,38 @@ async function SendNotificationEmailForReconnection(emails, culture) {
 const onStateChanged = async (change) => {
 	switch (change) {
 	case thingshub.RealtimeConnectionStates.Disconnected: {
+		console.log("Disconnected");
+		globalConfigStatus.isConnected = false;
 		globalConfigStatus.timeoutForDisconnection = setInterval(
 			async () => {
+				console.log("In timeout");
 				try {
-					if (globalConfigStatus.sendingDisconnectionEmail || globalConfigStatus.sendingReconnectionEmail)
-						return;
-					if (!globalConfigStatus.disconnectionEmailSent) {
+					if (globalConfigStatus.sendingDisconnectionEmail) {
+						return; // Timer is sending DisconnectionEmail
+					}
+					if (globalConfigStatus.disconnectionEmailSent === false) {
 						globalConfigStatus.sendingDisconnectionEmail = true;
 						await SendNotificationEmailForDisconnection(globalConfig.emails, globalConfig.disconnectionTimeout, globalConfig.interval2);
 						globalConfigStatus.sendingDisconnectionEmail = false;
 						globalConfigStatus.disconnectionEmailSent = true;
-						globalConfigStatus.sendingReconnectionEmail = true;
 						return;
-					}					
+					}
+					if (globalConfigStatus.sendingReconnectionEmail) {
+						return; // Timer is sending ReconnectionEmail
+					}
+					if (globalConfigStatus.isConnected === false) {
+						return;
+					}
 					globalConfigStatus.sendingReconnectionEmail = true;
 					await SendNotificationEmailForReconnection(globalConfig.emails);
+					globalConfigStatus.sendingReconnectionEmail = false;
+					globalConfigStatus.disconnectionEmailSent = false;
 					clearInterval(globalConfigStatus.timeoutForDisconnection);
-					globalConfigStatus.timeoutForDisconnection = null;
-					globalConfigStatus.sendingDisconnectionEmail = false;
-					globalConfigStatus.sendingReconnectionEmail = true;
-				} catch(e) {
+					globalConfigStatus.timeoutForDisconnection = null;					
+				} catch(err) {
+					console.log("Email error");
+					console.log(err);
+					console.log(globalConfigStatus);
 					if (globalConfigStatus.sendingDisconnectionEmail) {
 						globalConfigStatus.sendingDisconnectionEmail = false;
 						return;
@@ -200,12 +213,23 @@ const onStateChanged = async (change) => {
 		break;
 	}
 	case thingshub.RealtimeConnectionStates.Connected: {
-		if (globalConfigStatus.sendingDisconnectionEmail || globalConfigStatus.sendingReconnectionEmail)
-			return;
-		if (globalConfigStatus.timeoutForDisconnection) {
-			clearInterval(globalConfigStatus.timeoutForDisconnection);
-			globalConfigStatus.timeoutForDisconnection = null;
+		console.log("Connected");
+		globalConfigStatus.isConnected = true;
+		if (globalConfigStatus.timeoutForDisconnection === null) {
+			return; // Timer was not started. First connection is a case
 		}
+		if (globalConfigStatus.sendingDisconnectionEmail) {
+			return; // Timer try to send Disconnection Email
+		}
+		if (globalConfigStatus.sendingReconnectionEmail) {
+			return; // Timer try to send Reconnection Email
+		}
+		if (globalConfigStatus.disconnectionEmailSent) {
+			return; // Timer has sent Disconnection Email but not Reconnection Email
+		}
+		console.log("Timeout canceled");
+		clearInterval(globalConfigStatus.timeoutForDisconnection);
+		globalConfigStatus.timeoutForDisconnection = null;
 		break;
 	}
 	case thingshub.RealtimeConnectionStates.Connecting: {
@@ -218,14 +242,14 @@ const onStateChanged = async (change) => {
 };
 
 function onAPI(data) {
-	console.log(data);
+	// console.log(data);
 }
 
 function onUpdateThing(thingDTO) {
-	console.log(thingDTO);
+	// console.log(thingDTO);
 }
 function onUpdateThingValue(thingId, value, asCmd) {
-	console.log(value);
+	// console.log(value);
 }
 
 const realTimeConnector = new thingshub.SocketIORealtimeConnector(endPoint.server, 
