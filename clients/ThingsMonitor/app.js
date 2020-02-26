@@ -9,6 +9,21 @@ const thingshub = require("thingshub-js-sdk");
 const configPath = path.join(__dirname, "./", "thingsMonitor.env");
 dotenv.config({ path: configPath });
 
+// create reusable transporter object using the default SMTP transport
+const transporter = nodemailer.createTransport({
+	host: process.env.SMTP_HOST,
+	port: process.env.SMTP_PORT,
+	secure: (process.env.SMTP_SECURE === "true"), // secure:true for port 465, secure:false for port 587
+	requireTLS: false,// ToDo: At home works with true
+	tls: {
+		rejectUnauthorized: false,
+	},
+	auth: {
+		user: process.env.SMTP_USER,
+		pass: process.env.SMTP_USER_PASSWORD,
+	},
+});
+
 //
 var mainApiKey = process.env.MAIN_API_KEY;
 if (!mainApiKey) {
@@ -31,8 +46,8 @@ if (!configThingKind) {
 
 //
 const globalConfig = {
-	disconnectionTimeout: 10000, // milliseconds
-	interval2: 2*60*1000, // 2 minutes
+	disconnectionTimeout: 10000, // 10 seconds
+	interval2: 2 * 60 * 1000, // 2 minutes
 	emails: ["cmcampione@gmail.com"]
 };
 const globalConfigStatus = {
@@ -43,26 +58,51 @@ const globalConfigStatus = {
 	disconnectionEmailSent: false
 };
 
-const ThingsConfigs = [];
-ThingsConfigs["thingsId"] = {
-	relateThingId: "",
-	onUpThVaTimeout: 15*1000 // Milliseconds
+//
+let ThingsConfigs = null;
+
+function checkAlarmForDelay(thingId) {
+	if (ThingsConfigs.has(thingId) === false)
+		return;
+	const thingConfig = ThingsConfigs.get(thingId).config;
+	const thingStatus = ThingsConfigs.get(thingId).status;
+
+	// Check alarm for delay
+	if (thingStatus.lastOnUpdateThingValueEvent === null || Date.now() - thingStatus.lastOnUpdateThingValueEvent > thingConfig.onUpdateThingValueTimeoutEvent) {
+		if (thingStatus.inAlarm === false) {
+			console.log("SendAlarmEmailForDelay");
+		}
+		thingStatus.inAlarm = true;
+		return;
+	}
+	if (thingStatus.inAlarm === true) {
+		console.log("SendReenteredEmailForDelay");
+		thingStatus.inAlarm = false;
+	}
 }
 
-// create reusable transporter object using the default SMTP transport
-const transporter = nodemailer.createTransport({
-	host: process.env.SMTP_HOST,
-	port: process.env.SMTP_PORT,
-	secure: (process.env.SMTP_SECURE === "true"), // secure:true for port 465, secure:false for port 587
-	requireTLS: false,// ToDo: At home works with true
-	tls: {
-		rejectUnauthorized: false,
-	},
-	auth: {
-		user: process.env.SMTP_USER,
-		pass: process.env.SMTP_USER_PASSWORD,
-	},
-});
+ThingsConfigs = new Map([
+	["f4c3c80b-d561-4a7b-80a5-f4805fdab9bb", {
+		config: {
+			configThingId: "fb9071b5-133a-4716-86c6-4e14d798a2d1",
+			onUpdateThingValueTimeoutEvent: 10 * 1000, // 10 seconds - Bees pull every 5 seconds			
+			checkInterval: setInterval(() => {
+				checkAlarmForDelay("f4c3c80b-d561-4a7b-80a5-f4805fdab9bb");
+			}, this.onUpdateThingValueTimeoutEvent)
+		},
+		status: {
+			lastOnUpdateThingValueEvent: null,
+			lastValue: null,
+			inAlarm: false
+		},
+		// Specific for Home appliance
+		sensors: new Map([
+			["31669624", {// ToDo: sensorId long or string?
+				onUpdateThingValueAlarmValue: true
+			}]
+		])
+	}]
+]);
 
 //
 const accountDataContext = new thingshub.AccountDataContext(endPoint);
@@ -88,7 +128,7 @@ async function SendNotificationEmailForDisconnection(emails, interval1, interval
 		var ejsFile = path.join(__dirname, "./views/disconnectionEmail-" + culture + ".ejs");
 		ejs.renderFile(ejsFile, {
 			title: process.env.APPLICATION_NAME,
-			email : process.env.SUPPORT_EMAIL,
+			email: process.env.SUPPORT_EMAIL,
 			interval1: Math.round(interval1 / 1000),
 			interval2: interval2 / 1000 / 60,
 			urlportal: process.env.URL_PORTAL
@@ -136,7 +176,7 @@ async function SendNotificationEmailForReconnection(emails, culture) {
 		var ejsFile = path.join(__dirname, "./views/reconnectionEmail-" + culture + ".ejs");
 		ejs.renderFile(ejsFile, {
 			title: process.env.APPLICATION_NAME,
-			email : process.env.SUPPORT_EMAIL,
+			email: process.env.SUPPORT_EMAIL,
 			urlportal: process.env.URL_PORTAL
 		}, (err, renderedHtml) => {
 			if (err) {
@@ -169,7 +209,6 @@ async function SendNotificationEmailForReconnection(emails, culture) {
 		});
 	});
 }
-
 const onStateChanged = async (change) => {
 	switch (change) {
 	case thingshub.RealtimeConnectionStates.Disconnected: {
@@ -205,7 +244,7 @@ const onStateChanged = async (change) => {
 					clearInterval(globalConfigStatus.timeoutForDisconnection);
 					globalConfigStatus.timeoutForDisconnection = null;
 					console.log("Reconnection email sent and Timer interruped");
-				} catch(err) {
+				} catch (err) {
 					if (globalConfigStatus.sendingDisconnectionEmail) {
 						globalConfigStatus.sendingDisconnectionEmail = false;
 						return;
@@ -218,7 +257,7 @@ const onStateChanged = async (change) => {
 					console.log(err);
 					console.log(globalConfigStatus);
 				}
-			}, 
+			},
 			globalConfig.disconnectionTimeout);
 		break;
 	}
@@ -251,19 +290,22 @@ const onStateChanged = async (change) => {
 	}
 };
 
-function onAPI(data) {
+const onAPI = async (data) => {
 	// console.log(data);
-}
-
-function onUpdateThing(thingDTO) {
+};
+const onUpdateThing = async (thingDTO) => {
 	// console.log(thingDTO);
-}
-function onUpdateThingValue(thingId, value, asCmd) {
-	// console.log(value);
-}
+};
+const  onUpdateThingValue = async (thingId, value, asCmd) => {
+	if (ThingsConfigs.has(thingId) === false)
+		return;
+	const thingStatus = ThingsConfigs.get(thingId).status;
+	thingStatus.lastOnUpdateThingValueEvent = Date.now();
+	thingStatus.lastValue = value;
+};
 
-const realTimeConnector = new thingshub.SocketIORealtimeConnector(endPoint.server, 
-	accountManager.getSecurityToken, 
+const realTimeConnector = new thingshub.SocketIORealtimeConnector(endPoint.server,
+	accountManager.getSecurityToken,
 	onError, onConnectError, onStateChanged);
 realTimeConnector.subscribe();
 realTimeConnector.setHook("api", onAPI);
@@ -272,10 +314,10 @@ realTimeConnector.setHook("onUpdateThingValue", onUpdateThingValue);
 
 // Test realtime connection
 realTimeConnector.api()
-	.then(function(data) {
+	.then(function (data) {
 		console.log(data);
 	})
-	.catch(function(err) {
+	.catch(function (err) {
 		console.log(err);
 	});
 
@@ -283,7 +325,7 @@ realTimeConnector.api()
 const mainThingForConfig = new thingshub.Thing();
 const thingsManagerClaims = {
 
-	publicReadClaims : thingshub.ThingUserReadClaims.NoClaims,
+	publicReadClaims: thingshub.ThingUserReadClaims.NoClaims,
 	publicChangeClaims: thingshub.ThingUserChangeClaims.NoClaims,
 
 	everyoneReadClaims: thingshub.ThingUserReadClaims.NoClaims,
@@ -293,22 +335,21 @@ const thingsManagerClaims = {
 	creatorUserChangeClaims: thingshub.ThingUserChangeClaims.AllClaims
 };
 const thingsDatacontext = new thingshub.ThingsDataContext(endPoint, accountManager.getSecurityHeader);
-const thingsManager = new thingshub.ThingsManager(mainThingForConfig, process.env.CONFIG_THING_KIND, thingsManagerClaims, thingsDatacontext, realTimeConnector );
+const thingsManager = new thingshub.ThingsManager(mainThingForConfig, process.env.CONFIG_THING_KIND, thingsManagerClaims, thingsDatacontext, realTimeConnector);
 let httpRequestCanceler = new thingshub.HttpRequestCanceler();
 
 thingsManager.getMoreThings(httpRequestCanceler)
-	.then(function(data) {
+	.then(function (data) {
 		console.log(mainThingForConfig);
 	})
-	.catch(function(err) {
+	.catch(function (err) {
 		// Used default Config Thing
 		console.log(err);
 	});
 
 //
 readline.emitKeypressEvents(process.stdin);
-// ToDo: Why in debug not works?
-// process.stdin.setRawMode(true);
+// process.stdin.setRawMode(true); // ToDo: Why in debug does not works?
 process.stdin.on("keypress", (str, key) => {
 	if (key.ctrl && key.name === "c") {
 		console.log("bye");
