@@ -166,10 +166,10 @@ async function checkAlarmForDelay(thingId) {
 	// Check alarm for delay
 	if (thingStatus.lastOnUpdateThingValueEvent === null || Date.now() - thingStatus.lastOnUpdateThingValueEvent > thingConfig.onUpdateThingValueTimeoutEvent) {
 		if (thingStatus.inAlarm === false) {
+			thingStatus.inAlarm = true;
 			console.log("SendAlarmEmailForDelay");
-			await SendAlarmEmailForDelay(thingConfig.emails, thingConfig.thingName);
-		}
-		thingStatus.inAlarm = true;
+			await SendAlarmEmailForDelay(thingConfig.emails, thingConfig.thingName, thingConfig.onUpdateThingValueTimeoutEvent);
+		}		
 		return;
 	}
 	if (thingStatus.inAlarm === true) {
@@ -186,9 +186,7 @@ ThingsConfigs = new Map([
 			onUpdateThingValueTimeoutEvent: 10 * 1000, // 10 seconds - Bees pull every 5 seconds		
 			emails: ["cmcampione@gmail.com"],
 			thingName: "My Home",
-			checkInterval: setInterval(async () => {
-				await checkAlarmForDelay("f4c3c80b-d561-4a7b-80a5-f4805fdab9bb");
-			}, this.onUpdateThingValueTimeoutEvent)
+			checkInterval: null
 		},
 		status: {
 			lastOnUpdateThingValueEvent: null,
@@ -203,6 +201,11 @@ ThingsConfigs = new Map([
 		])
 	}]
 ]);
+
+let delay = ThingsConfigs.get("f4c3c80b-d561-4a7b-80a5-f4805fdab9bb").config.onUpdateThingValueTimeoutEvent;
+ThingsConfigs.get("f4c3c80b-d561-4a7b-80a5-f4805fdab9bb").config.checkInterval = setInterval(async function () {
+	await checkAlarmForDelay("f4c3c80b-d561-4a7b-80a5-f4805fdab9bb");
+}, delay);
 
 //
 const accountDataContext = new thingshub.AccountDataContext(endPoint);
@@ -397,6 +400,7 @@ const onUpdateThing = async (thingDTO) => {
 	// console.log(thingDTO);
 };
 const  onUpdateThingValue = async (thingId, value, asCmd) => {
+	console.log("onUpdateThingValue");
 	if (ThingsConfigs.has(thingId) === false)
 		return;
 	const thingStatus = ThingsConfigs.get(thingId).status;
