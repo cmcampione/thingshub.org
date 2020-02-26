@@ -61,7 +61,103 @@ const globalConfigStatus = {
 //
 let ThingsConfigs = null;
 
-function checkAlarmForDelay(thingId) {
+//
+async function SendAlarmEmailForDelay(emails, thingName, delay, culture) {
+	// ToDo: Fix correct culture
+	culture = "it-IT";
+	let subject = process.env[`NOTIFICATION_EMAIL_SUBJECT_${culture}`];
+	if (!subject) {
+		subject = process.env.NOTIFICATION_EMAIL_SUBJECT_DEFAULT;
+	}
+
+	// Render html
+	const html = await new Promise((resolve, reject) => {
+		var ejsFile = path.join(__dirname, "./views/alarmEmailForDelay-" + culture + ".ejs");
+		ejs.renderFile(ejsFile, {
+			title: process.env.APPLICATION_NAME,
+			supportemail: process.env.SUPPORT_EMAIL,
+			thingName: thingName,
+			delay: delay / 1000,
+			urlportal: process.env.URL_PORTAL
+		}, (err, renderedHtml) => {
+			if (err) {
+				reject(err);
+				return;
+			}
+			resolve(renderedHtml);
+		});
+	});
+
+	// setup email data with unicode symbols
+	const mailOptions = {
+		from: process.env.NOTIFICATION_EMAIL_FROM, // sender address
+		to: emails, // list of receivers
+		subject, // Subject line
+		text: "", // plain text body
+		html, // html body
+	};
+
+	// Send email
+	return new Promise((resolve, reject) => {
+		// send mail with defined transport object
+		transporter.sendMail(mailOptions, (err, info) => {
+			if (err) {
+				reject(err);
+				return err;
+			}
+			resolve(info);
+			return info;
+		});
+	});
+}
+async function SendReenteredEmailForDelay(emails, thingName, culture) {
+	// ToDo: Fix correct culture
+	culture = "it-IT";
+	let subject = process.env[`NOTIFICATION_EMAIL_SUBJECT_${culture}`];
+	if (!subject) {
+		subject = process.env.NOTIFICATION_EMAIL_SUBJECT_DEFAULT;
+	}
+
+	// Render html
+	const html = await new Promise((resolve, reject) => {
+		var ejsFile = path.join(__dirname, "./views/alarmEmailForDelay-" + culture + ".ejs");
+		ejs.renderFile(ejsFile, {
+			title: process.env.APPLICATION_NAME,
+			support_email: process.env.SUPPORT_EMAIL,
+			thingName: thingName,
+			urlportal: process.env.URL_PORTAL
+		}, (err, renderedHtml) => {
+			if (err) {
+				reject(err);
+				return;
+			}
+			resolve(renderedHtml);
+		});
+	});
+
+	// setup email data with unicode symbols
+	const mailOptions = {
+		from: process.env.NOTIFICATION_EMAIL_FROM, // sender address
+		to: emails, // list of receivers
+		subject, // Subject line
+		text: "", // plain text body
+		html, // html body
+	};
+
+	// Send email
+	return new Promise((resolve, reject) => {
+		// send mail with defined transport object
+		transporter.sendMail(mailOptions, (err, info) => {
+			if (err) {
+				reject(err);
+				return err;
+			}
+			resolve(info);
+			return info;
+		});
+	});
+}
+async function checkAlarmForDelay(thingId) {
 	if (ThingsConfigs.has(thingId) === false)
 		return;
 	const thingConfig = ThingsConfigs.get(thingId).config;
@@ -71,12 +167,14 @@ function checkAlarmForDelay(thingId) {
 	if (thingStatus.lastOnUpdateThingValueEvent === null || Date.now() - thingStatus.lastOnUpdateThingValueEvent > thingConfig.onUpdateThingValueTimeoutEvent) {
 		if (thingStatus.inAlarm === false) {
 			console.log("SendAlarmEmailForDelay");
+			await SendAlarmEmailForDelay(thingConfig.emails, thingConfig.thingName);
 		}
 		thingStatus.inAlarm = true;
 		return;
 	}
 	if (thingStatus.inAlarm === true) {
 		console.log("SendReenteredEmailForDelay");
+		await SendReenteredEmailForDelay(thingConfig.emails, thingConfig.thingName);
 		thingStatus.inAlarm = false;
 	}
 }
@@ -85,9 +183,11 @@ ThingsConfigs = new Map([
 	["f4c3c80b-d561-4a7b-80a5-f4805fdab9bb", {
 		config: {
 			configThingId: "fb9071b5-133a-4716-86c6-4e14d798a2d1",
-			onUpdateThingValueTimeoutEvent: 10 * 1000, // 10 seconds - Bees pull every 5 seconds			
-			checkInterval: setInterval(() => {
-				checkAlarmForDelay("f4c3c80b-d561-4a7b-80a5-f4805fdab9bb");
+			onUpdateThingValueTimeoutEvent: 10 * 1000, // 10 seconds - Bees pull every 5 seconds		
+			emails: ["cmcampione@gmail.com"],
+			thingName: "My Home",
+			checkInterval: setInterval(async () => {
+				await checkAlarmForDelay("f4c3c80b-d561-4a7b-80a5-f4805fdab9bb");
 			}, this.onUpdateThingValueTimeoutEvent)
 		},
 		status: {
@@ -128,7 +228,7 @@ async function SendNotificationEmailForDisconnection(emails, interval1, interval
 		var ejsFile = path.join(__dirname, "./views/disconnectionEmail-" + culture + ".ejs");
 		ejs.renderFile(ejsFile, {
 			title: process.env.APPLICATION_NAME,
-			email: process.env.SUPPORT_EMAIL,
+			supportemail: process.env.SUPPORT_EMAIL,
 			interval1: Math.round(interval1 / 1000),
 			interval2: interval2 / 1000 / 60,
 			urlportal: process.env.URL_PORTAL
@@ -176,7 +276,7 @@ async function SendNotificationEmailForReconnection(emails, culture) {
 		var ejsFile = path.join(__dirname, "./views/reconnectionEmail-" + culture + ".ejs");
 		ejs.renderFile(ejsFile, {
 			title: process.env.APPLICATION_NAME,
-			email: process.env.SUPPORT_EMAIL,
+			supportemail: process.env.SUPPORT_EMAIL,
 			urlportal: process.env.URL_PORTAL
 		}, (err, renderedHtml) => {
 			if (err) {
