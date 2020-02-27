@@ -190,19 +190,19 @@ ThingsConfigs = new Map([
 			onUpdateThingValueInterval: 10 * 1000, // 10 seconds - Bees pull every 5 seconds		
 			emails: ["cmcampione@gmail.com"],
 			thingName: "My Home",
-			checkInterval: null
+			checkInterval: null,
+			// Specific for Home appliance
+			sensors: new Map([
+				["31669624", {// ToDo: sensorId long or string?
+					onUpdateThingValueAlarmValue: true
+				}]
+			])
 		},
 		status: {
 			lastOnUpdateThingValueEvent: null,
 			lastValue: null,
 			inAlarmForDelay: false
-		},
-		// Specific for Home appliance
-		sensors: new Map([
-			["31669624", {// ToDo: sensorId long or string?
-				onUpdateThingValueAlarmValue: true
-			}]
-		])
+		}
 	}],
 	["3601b4c5-706d-4917-ac21-3c2ef1f01fd0", { // GPS
 		config: {
@@ -426,11 +426,54 @@ const onUpdateThing = async (thingDTO) => {
 };
 const  onUpdateThingValue = async (thingId, value, asCmd) => {
 	console.log("onUpdateThingValue");
-	if (ThingsConfigs.has(thingId) === false)
+	switch (thingId) {
+	case process.env.CONFIG_THING_KIND:
 		return;
+	case process.env.HOME_THING_KIND: {
+		if (ThingsConfigs.has(thingId) === false) {
+			break;
+		}
+		break;
+	}
+	case process.env.GPS_THING_KIND: {
+		if (ThingsConfigs.has(thingId) === false) {
+			break;
+		}
+		break;
+	}
+	
+	const thingConfig = ThingsConfigs.get(thingId).config;
 	const thingStatus = ThingsConfigs.get(thingId).status;
 	thingStatus.lastOnUpdateThingValueEvent = Date.now();
 	thingStatus.lastValue = value;
+	switch (thingId) {
+	case process.env.CONFIG_THING_KIND:
+		return;
+	case process.env.HOME_THING_KIND: {
+		if (ThingsConfigs.has(thingId) === false) {
+			break;
+		}
+		value.sensors.forEach((sensorRaw) => {
+			const 
+			if (sensorRaw === thingConfig.)
+			this.sensors.push({
+			  thingId: thing.id,
+			  name: thing.name,
+			  id: sensorRaw.id,
+			  now: sensorRaw.now,
+			  millis: sensorRaw.millis,
+			  value: sensorRaw.value});
+		  });
+		});
+		break;
+	}
+	case process.env.GPS_THING_KIND: {
+		if (ThingsConfigs.has(thingId) === false) {
+			break;
+		}
+		break;
+	}
+	}
 };
 
 const realTimeConnector = new thingshub.SocketIORealtimeConnector(endPoint.server,
