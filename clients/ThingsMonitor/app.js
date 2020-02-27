@@ -184,7 +184,7 @@ async function checkAlarmForDelay(thingId) {
 }
 
 ThingsConfigs = new Map([
-	["f4c3c80b-d561-4a7b-80a5-f4805fdab9bb", {
+	["f4c3c80b-d561-4a7b-80a5-f4805fdab9bb", { // Home appliance
 		config: {
 			configThingId: "fb9071b5-133a-4716-86c6-4e14d798a2d1",
 			onUpdateThingValueInterval: 10 * 1000, // 10 seconds - Bees pull every 5 seconds		
@@ -203,12 +203,33 @@ ThingsConfigs = new Map([
 				onUpdateThingValueAlarmValue: true
 			}]
 		])
+	}],
+	["3601b4c5-706d-4917-ac21-3c2ef1f01fd0", { // GPS
+		config: {
+			configThingId: "",
+			onUpdateThingValueInterval: 20 * 1000, // 10 seconds - GPS pull every 15 seconds		
+			emails: ["cmcampione@gmail.com"],
+			thingName: "My Car",
+			checkInterval: null
+		},
+		status: {
+			lastOnUpdateThingValueEvent: null,
+			lastValue: null,
+			inAlarmForDelay: false
+		}
+		// Specific for GPS
 	}]
 ]);
-
-const delay = ThingsConfigs.get("f4c3c80b-d561-4a7b-80a5-f4805fdab9bb").config.onUpdateThingValueInterval;
+// My Home
+let delay = null;
+delay = ThingsConfigs.get("f4c3c80b-d561-4a7b-80a5-f4805fdab9bb").config.onUpdateThingValueInterval;
 ThingsConfigs.get("f4c3c80b-d561-4a7b-80a5-f4805fdab9bb").config.checkInterval = setInterval(async function () {
 	await checkAlarmForDelay("f4c3c80b-d561-4a7b-80a5-f4805fdab9bb");
+}, delay);
+// My Car
+delay = ThingsConfigs.get("3601b4c5-706d-4917-ac21-3c2ef1f01fd0").config.onUpdateThingValueInterval;
+ThingsConfigs.get("3601b4c5-706d-4917-ac21-3c2ef1f01fd0").config.checkInterval = setInterval(async function () {
+	await checkAlarmForDelay("3601b4c5-706d-4917-ac21-3c2ef1f01fd0");
 }, delay);
 
 //
@@ -430,7 +451,8 @@ realTimeConnector.api()
 	});
 
 // 
-const mainThingForConfig = new thingshub.Thing();
+const thingsDatacontext = new thingshub.ThingsDataContext(endPoint, accountManager.getSecurityHeader);
+//
 const thingsManagerClaims = {
 
 	publicReadClaims: thingshub.ThingUserReadClaims.NoClaims,
@@ -442,13 +464,35 @@ const thingsManagerClaims = {
 	creatorUserReadClaims: thingshub.ThingUserReadClaims.AllClaims,
 	creatorUserChangeClaims: thingshub.ThingUserChangeClaims.AllClaims
 };
-const thingsDatacontext = new thingshub.ThingsDataContext(endPoint, accountManager.getSecurityHeader);
-const thingsMngConfig = new thingshub.thingsMngConfig(mainThingForConfig, process.env.CONFIG_THING_KIND, thingsManagerClaims, thingsDatacontext, realTimeConnector);
 let httpRequestCanceler = new thingshub.HttpRequestCanceler();
-
+// Config Things
+const mainThingForConfig = new thingshub.Thing();
+const thingsMngConfig = new thingshub.ThingsManager(mainThingForConfig, process.env.CONFIG_THING_KIND, thingsManagerClaims, thingsDatacontext, realTimeConnector);
 thingsMngConfig.getMoreThings(httpRequestCanceler)
 	.then(function (data) {
 		console.log(mainThingForConfig);
+	})
+	.catch(function (err) {
+		// Used default Config Thing
+		console.log(err);
+	});
+// Home appliance Things
+const mainThingForHome = new thingshub.Thing();
+const thingsMngForHome = new thingshub.ThingsManager(mainThingForHome, process.env.HOME_THING_KIND, thingsManagerClaims, thingsDatacontext, realTimeConnector);
+thingsMngForHome.getMoreThings(httpRequestCanceler)
+	.then(function (data) {
+		console.log(mainThingForHome);
+	})
+	.catch(function (err) {
+		// Used default Config Thing
+		console.log(err);
+	});
+// GPS
+const mainThingForGPS = new thingshub.Thing();
+const thingsMngForGPS = new thingshub.ThingsManager(mainThingForGPS, process.env.GPS_THING_KIND, thingsManagerClaims, thingsDatacontext, realTimeConnector);
+thingsMngForGPS.getMoreThings(httpRequestCanceler)
+	.then(function (data) {
+		console.log(mainThingForGPS);
 	})
 	.catch(function (err) {
 		// Used default Config Thing
