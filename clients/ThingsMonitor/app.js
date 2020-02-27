@@ -120,7 +120,7 @@ async function SendReenteredEmailForDelay(emails, thingName, culture) {
 
 	// Render html
 	const html = await new Promise((resolve, reject) => {
-		var ejsFile = path.join(__dirname, "./views/alarmEmailForDelay-" + culture + ".ejs");
+		var ejsFile = path.join(__dirname, "./views/reenteredEmailForDelay-" + culture + ".ejs");
 		ejs.renderFile(ejsFile, {
 			title: process.env.APPLICATION_NAME,
 			support_email: process.env.SUPPORT_EMAIL,
@@ -158,24 +158,28 @@ async function SendReenteredEmailForDelay(emails, thingName, culture) {
 	});
 }
 async function checkAlarmForDelay(thingId) {
-	if (ThingsConfigs.has(thingId) === false)
-		return;
-	const thingConfig = ThingsConfigs.get(thingId).config;
-	const thingStatus = ThingsConfigs.get(thingId).status;
+	try {
+		if (ThingsConfigs.has(thingId) === false)
+			return;
+		const thingConfig = ThingsConfigs.get(thingId).config;
+		const thingStatus = ThingsConfigs.get(thingId).status;
 
-	// Check alarm for delay
-	if (thingStatus.lastOnUpdateThingValueEvent === null || Date.now() - thingStatus.lastOnUpdateThingValueEvent > thingConfig.onUpdateThingValueTimeoutEvent) {
-		if (thingStatus.inAlarm === false) {
-			thingStatus.inAlarm = true;
-			console.log("SendAlarmEmailForDelay");
-			await SendAlarmEmailForDelay(thingConfig.emails, thingConfig.thingName, thingConfig.onUpdateThingValueTimeoutEvent);
-		}		
-		return;
-	}
-	if (thingStatus.inAlarm === true) {
-		console.log("SendReenteredEmailForDelay");
-		await SendReenteredEmailForDelay(thingConfig.emails, thingConfig.thingName);
-		thingStatus.inAlarm = false;
+		// Check alarm for delay
+		if (thingStatus.lastOnUpdateThingValueEvent === null || Date.now() - thingStatus.lastOnUpdateThingValueEvent > thingConfig.onUpdateThingValueInterval) {
+			if (thingStatus.inAlarmForDelay === false) {
+				thingStatus.inAlarmForDelay = true;
+				console.log("SendAlarmEmailForDelay");
+				await SendAlarmEmailForDelay(thingConfig.emails, thingConfig.thingName, thingConfig.onUpdateThingValueInterval);
+			}		
+			return;
+		}
+		if (thingStatus.inAlarmForDelay === true) {
+			thingStatus.inAlarmForDelay = false;
+			console.log("SendReenteredEmailForDelay");		
+			await SendReenteredEmailForDelay(thingConfig.emails, thingConfig.thingName);
+		}
+	} catch(err) {
+		console.log(err);
 	}
 }
 
@@ -183,7 +187,7 @@ ThingsConfigs = new Map([
 	["f4c3c80b-d561-4a7b-80a5-f4805fdab9bb", {
 		config: {
 			configThingId: "fb9071b5-133a-4716-86c6-4e14d798a2d1",
-			onUpdateThingValueTimeoutEvent: 10 * 1000, // 10 seconds - Bees pull every 5 seconds		
+			onUpdateThingValueInterval: 10 * 1000, // 10 seconds - Bees pull every 5 seconds		
 			emails: ["cmcampione@gmail.com"],
 			thingName: "My Home",
 			checkInterval: null
@@ -191,7 +195,7 @@ ThingsConfigs = new Map([
 		status: {
 			lastOnUpdateThingValueEvent: null,
 			lastValue: null,
-			inAlarm: false
+			inAlarmForDelay: false
 		},
 		// Specific for Home appliance
 		sensors: new Map([
@@ -202,7 +206,7 @@ ThingsConfigs = new Map([
 	}]
 ]);
 
-let delay = ThingsConfigs.get("f4c3c80b-d561-4a7b-80a5-f4805fdab9bb").config.onUpdateThingValueTimeoutEvent;
+const delay = ThingsConfigs.get("f4c3c80b-d561-4a7b-80a5-f4805fdab9bb").config.onUpdateThingValueInterval;
 ThingsConfigs.get("f4c3c80b-d561-4a7b-80a5-f4805fdab9bb").config.checkInterval = setInterval(async function () {
 	await checkAlarmForDelay("f4c3c80b-d561-4a7b-80a5-f4805fdab9bb");
 }, delay);
@@ -439,10 +443,10 @@ const thingsManagerClaims = {
 	creatorUserChangeClaims: thingshub.ThingUserChangeClaims.AllClaims
 };
 const thingsDatacontext = new thingshub.ThingsDataContext(endPoint, accountManager.getSecurityHeader);
-const thingsManager = new thingshub.ThingsManager(mainThingForConfig, process.env.CONFIG_THING_KIND, thingsManagerClaims, thingsDatacontext, realTimeConnector);
+const thingsMngConfig = new thingshub.thingsMngConfig(mainThingForConfig, process.env.CONFIG_THING_KIND, thingsManagerClaims, thingsDatacontext, realTimeConnector);
 let httpRequestCanceler = new thingshub.HttpRequestCanceler();
 
-thingsManager.getMoreThings(httpRequestCanceler)
+thingsMngConfig.getMoreThings(httpRequestCanceler)
 	.then(function (data) {
 		console.log(mainThingForConfig);
 	})
