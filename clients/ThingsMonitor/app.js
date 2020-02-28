@@ -528,7 +528,6 @@ async function SendReenteredEmailForAlarm(emails, sensorName, culture) {
 	});
 }
 const  onUpdateThingValue = async (thingId, value, asCmd) => {
-	console.log("onUpdateThingValue");
 	if (asCmd)
 		return;
 	if (ThingsConfigs.has(thingId) === false) {
