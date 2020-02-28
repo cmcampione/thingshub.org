@@ -1,14 +1,14 @@
 {
   "name": "thingsmonitor",
   "version": "1.0.0",
-  "description": "ThingsHub - Monitoring for ThingsHub server status",
+  "description": "ThingsMonitor - Monitoring for ThingsHub server status",
   "main": "app.js",
   "scripts": {
     "start": "node ./app.js",
     "dev": "nodemon ./app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
+  "author": "Carmelo Campione",
   "license": "MIT",
   "repository": {
     "type": "git",

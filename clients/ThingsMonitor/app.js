@@ -45,18 +45,51 @@ if (!configThingKind) {
 }
 
 //
-const globalConfig = {
-	disconnectionTimeout: 10000, // 10 seconds
-	interval2: 2 * 60 * 1000, // 2 minutes
-	emails: ["cmcampione@gmail.com"]
-};
-const globalConfigStatus = {
-	isConnected: false,
-	timeoutForDisconnection: null,
-	sendingDisconnectionEmail: false,
-	sendingReconnectionEmail: false,
-	disconnectionEmailSent: false
-};
+const ThingsConfigs = new Map([
+	["f4c3c80b-d561-4a7b-80a5-f4805fdab9bb", {
+		config: {
+			configThingId: "fb9071b5-133a-4716-86c6-4e14d798a2d1",
+			thingKind: "Home appliance", // Home appliance
+			onUpdateThingValueInterval: 10 * 1000, // 10 seconds - Bees pull every 5 seconds		
+			emails: ["cmcampione@gmail.com"],
+			thingName: "My Home",
+			checkInterval: null,
+			// Specific for Home appliance
+			sensors: new Map([
+				[31669624, {
+					onUpdateThingValueAlarmValue: "true"
+				}]
+			])
+		},
+		status: {
+			lastOnUpdateThingValueEvent: null,
+			lastValue: null,
+			inAlarmForDelay: false,
+			inAlarmForAlarm: false,
+			emailAlarmSending: false,
+			emailAlarmSent: false
+		}
+	}],
+	["3601b4c5-706d-4917-ac21-3c2ef1f01fd0", {
+		config: {
+			configThingId: "",
+			thingKind: "c3aa4d95-4cb4-415c-a251-7fe846e0fd17", // GPS
+			onUpdateThingValueInterval: 20 * 1000, // 20 seconds - GPS pull every 15 seconds		
+			emails: ["cmcampione@gmail.com"],
+			thingName: "My Car",
+			checkInterval: null
+		},
+		status: {
+			lastOnUpdateThingValueEvent: null,
+			lastValue: null,
+			inAlarmForDelay: false,
+			inAlarmForAlarm: false,
+			emailAlarmSending: false,
+			emailAlarmSent: false
+		}
+		// Specific for GPS
+	}]
+]);
 
 //
 async function SendAlarmEmailForDelay(emails, thingName, delay, culture) {
@@ -154,53 +187,6 @@ async function SendReenteredEmailForDelay(emails, thingName, culture) {
 		});
 	});
 }
-//
-const ThingsConfigs = new Map([
-	["f4c3c80b-d561-4a7b-80a5-f4805fdab9bb", {
-		config: {
-			configThingId: "fb9071b5-133a-4716-86c6-4e14d798a2d1",
-			thingKind: "Home appliance", // Home appliance
-			onUpdateThingValueInterval: 10 * 1000, // 10 seconds - Bees pull every 5 seconds		
-			emails: ["cmcampione@gmail.com"],
-			thingName: "My Home",
-			checkInterval: null,
-			// Specific for Home appliance
-			sensors: new Map([
-				[31669624, {
-					onUpdateThingValueAlarmValue: "true"
-				}]
-			])
-		},
-		status: {
-			lastOnUpdateThingValueEvent: null,
-			lastValue: null,
-			inAlarmForDelay: false,
-			inAlarmForAlarm: false,
-			emailAlarmSending: false,
-			emailAlarmSent: false
-		}
-	}],
-	["3601b4c5-706d-4917-ac21-3c2ef1f01fd0", {
-		config: {
-			configThingId: "",
-			thingKind: "c3aa4d95-4cb4-415c-a251-7fe846e0fd17", // GPS
-			onUpdateThingValueInterval: 20 * 1000, // 20 seconds - GPS pull every 15 seconds		
-			emails: ["cmcampione@gmail.com"],
-			thingName: "My Car",
-			checkInterval: null
-		},
-		status: {
-			lastOnUpdateThingValueEvent: null,
-			lastValue: null,
-			inAlarmForDelay: false,
-			inAlarmForAlarm: false,
-			emailAlarmSending: false,
-			emailAlarmSent: false
-		}
-		// Specific for GPS
-	}]
-]);
-
 async function checkAlarmForDelay(thingId) {
 	try {
 		if (ThingsConfigs.has(thingId) === false)
@@ -250,7 +236,21 @@ function onConnectError(error) {
 	// console.log(error);
 }
 
-async function SendNotificationEmailForDisconnection(emails, interval1, interval2, culture) {
+//
+const globalConfig = {
+	disconnectionTimeout: 10000, // 10 seconds
+	emails: ["cmcampione@gmail.com"]
+};
+const globalConfigStatus = {
+	isConnected: false,
+	timeoutForDisconnection: null,
+	sendingDisconnectionEmail: false,
+	sendingReconnectionEmail: false,
+	disconnectionEmailSent: false
+};
+
+//
+async function SendNotificationEmailForDisconnection(emails, interval1, culture) {
 	// ToDo: Fix correct culture
 	culture = "it-IT";
 	let subject = process.env[`NOTIFICATION_EMAIL_SUBJECT_${culture}`];
@@ -265,7 +265,6 @@ async function SendNotificationEmailForDisconnection(emails, interval1, interval
 			title: process.env.APPLICATION_NAME,
 			supportemail: process.env.SUPPORT_EMAIL,
 			interval1: Math.round(interval1 / 1000),
-			interval2: interval2 / 1000 / 60,
 			urlportal: process.env.URL_PORTAL
 		}, (err, renderedHtml) => {
 			if (err) {
@@ -359,7 +358,7 @@ const onStateChanged = async (change) => {
 					if (globalConfigStatus.disconnectionEmailSent === false) {
 						console.log("Trying to send Disconnection email");
 						globalConfigStatus.sendingDisconnectionEmail = true;
-						await SendNotificationEmailForDisconnection(globalConfig.emails, globalConfig.disconnectionTimeout, globalConfig.interval2);
+						await SendNotificationEmailForDisconnection(globalConfig.emails, globalConfig.disconnectionTimeout);
 						globalConfigStatus.sendingDisconnectionEmail = false;
 						globalConfigStatus.disconnectionEmailSent = true;
 						console.log("Disconnection email sent");
