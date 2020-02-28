@@ -425,6 +425,102 @@ const onAPI = async (data) => {
 const onUpdateThing = async (thingDTO) => {
 	// console.log(thingDTO);
 };
+
+//
+async function SendAlarmEmailForAlarm(emails, sensorName, culture) {
+	// ToDo: Fix correct culture
+	culture = "it-IT";
+	let subject = process.env[`NOTIFICATION_EMAIL_SUBJECT_${culture}`];
+	if (!subject) {
+		subject = process.env.NOTIFICATION_EMAIL_SUBJECT_DEFAULT;
+	}
+
+	// Render html
+	const html = await new Promise((resolve, reject) => {
+		var ejsFile = path.join(__dirname, "./views/alarmEmailForAlarm-" + culture + ".ejs");
+		ejs.renderFile(ejsFile, {
+			title: process.env.APPLICATION_NAME,
+			supportemail: process.env.SUPPORT_EMAIL,
+			sensorName: sensorName,
+			urlportal: process.env.URL_PORTAL
+		}, (err, renderedHtml) => {
+			if (err) {
+				reject(err);
+				return;
+			}
+			resolve(renderedHtml);
+		});
+	});
+
+	// setup email data with unicode symbols
+	const mailOptions = {
+		from: process.env.NOTIFICATION_EMAIL_FROM, // sender address
+		to: emails, // list of receivers
+		subject, // Subject line
+		text: "", // plain text body
+		html, // html body
+	};
+
+	// Send email
+	return new Promise((resolve, reject) => {
+		// send mail with defined transport object
+		transporter.sendMail(mailOptions, (err, info) => {
+			if (err) {
+				reject(err);
+				return err;
+			}
+			resolve(info);
+			return info;
+		});
+	});
+}
+async function SendReenteredEmailForAlarm(emails, sensorName, culture) {
+	// ToDo: Fix correct culture
+	culture = "it-IT";
+	let subject = process.env[`NOTIFICATION_EMAIL_SUBJECT_${culture}`];
+	if (!subject) {
+		subject = process.env.NOTIFICATION_EMAIL_SUBJECT_DEFAULT;
+	}
+
+	// Render html
+	const html = await new Promise((resolve, reject) => {
+		var ejsFile = path.join(__dirname, "./views/reenteredEmailForAlarm-" + culture + ".ejs");
+		ejs.renderFile(ejsFile, {
+			title: process.env.APPLICATION_NAME,
+			supportemail: process.env.SUPPORT_EMAIL,
+			sensorName: sensorName,
+			urlportal: process.env.URL_PORTAL
+		}, (err, renderedHtml) => {
+			if (err) {
+				reject(err);
+				return;
+			}
+			resolve(renderedHtml);
+		});
+	});
+
+	// setup email data with unicode symbols
+	const mailOptions = {
+		from: process.env.NOTIFICATION_EMAIL_FROM, // sender address
+		to: emails, // list of receivers
+		subject, // Subject line
+		text: "", // plain text body
+		html, // html body
+	};
+
+	// Send email
+	return new Promise((resolve, reject) => {
+		// send mail with defined transport object
+		transporter.sendMail(mailOptions, (err, info) => {
+			if (err) {
+				reject(err);
+				return err;
+			}
+			resolve(info);
+			return info;
+		});
+	});
+}
 const  onUpdateThingValue = async (thingId, value, asCmd) => {
 	console.log("onUpdateThingValue");
 	if (asCmd)
@@ -457,22 +553,28 @@ const  onUpdateThingValue = async (thingId, value, asCmd) => {
 		if (thingConfig.has(thingId) === false) {
 			break;
 		}
-		value.sensors.forEach((sensorRaw) => {
+		value.sensors.forEach(async (sensorRaw) => {
 			const sensor = thingConfig.sensors.get(sensorRaw.id);
 			if (!sensor)
 				return;
-			if (sensorRaw.value === sensor.onUpdateThingValueAlarmValue) {
-				if (thingStatus.inAlarmForAlarm === false) {
+			if (thingStatus.inAlarmForAlarm === false) {
+				if (sensorRaw.value === sensor.onUpdateThingValueAlarmValue) {
 					thingStatus.inAlarmForAlarm = true;
-					console.log("Alarm");
-					// Send.....
+					try {
+						await SendAlarmEmailForAlarm(thingConfig.emails, sensorRaw.id);
+					} catch(err) {
+						thingStatus.inAlarmForAlarm = false;
+					}
 				}
 				return;
 			}
 			if (thingStatus.inAlarmForAlarm === true) {
 				thingStatus.inAlarmForAlarm = false;
-				console.log("Reentered Alarm");
-				// Send.....
+				try {
+					await SendReenteredEmailForAlarm(thingConfig.emails, sensorRaw.id);
+				} catch(err) {
+					thingStatus.inAlarmForAlarm = true;
+				}
 			}
 		});
 		break;
