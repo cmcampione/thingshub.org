@@ -59,9 +59,6 @@ const globalConfigStatus = {
 };
 
 //
-let ThingsConfigs = null;
-
-//
 async function SendAlarmEmailForDelay(emails, thingName, delay, culture) {
 	// ToDo: Fix correct culture
 	culture = "it-IT";
@@ -123,7 +120,7 @@ async function SendReenteredEmailForDelay(emails, thingName, culture) {
 		var ejsFile = path.join(__dirname, "./views/reenteredEmailForDelay-" + culture + ".ejs");
 		ejs.renderFile(ejsFile, {
 			title: process.env.APPLICATION_NAME,
-			support_email: process.env.SUPPORT_EMAIL,
+			supportemail: process.env.SUPPORT_EMAIL,
 			thingName: thingName,
 			urlportal: process.env.URL_PORTAL
 		}, (err, renderedHtml) => {
@@ -157,6 +154,53 @@ async function SendReenteredEmailForDelay(emails, thingName, culture) {
 		});
 	});
 }
+//
+const ThingsConfigs = new Map([
+	["f4c3c80b-d561-4a7b-80a5-f4805fdab9bb", {
+		config: {
+			configThingId: "fb9071b5-133a-4716-86c6-4e14d798a2d1",
+			thingKind: "Home appliance", // Home appliance
+			onUpdateThingValueInterval: 10 * 1000, // 10 seconds - Bees pull every 5 seconds		
+			emails: ["cmcampione@gmail.com"],
+			thingName: "My Home",
+			checkInterval: null,
+			// Specific for Home appliance
+			sensors: new Map([
+				[31669624, {
+					onUpdateThingValueAlarmValue: "true"
+				}]
+			])
+		},
+		status: {
+			lastOnUpdateThingValueEvent: null,
+			lastValue: null,
+			inAlarmForDelay: false,
+			inAlarmForAlarm: false,
+			emailAlarmSending: false,
+			emailAlarmSent: false
+		}
+	}],
+	["3601b4c5-706d-4917-ac21-3c2ef1f01fd0", {
+		config: {
+			configThingId: "",
+			thingKind: "c3aa4d95-4cb4-415c-a251-7fe846e0fd17", // GPS
+			onUpdateThingValueInterval: 20 * 1000, // 20 seconds - GPS pull every 15 seconds		
+			emails: ["cmcampione@gmail.com"],
+			thingName: "My Car",
+			checkInterval: null
+		},
+		status: {
+			lastOnUpdateThingValueEvent: null,
+			lastValue: null,
+			inAlarmForDelay: false,
+			inAlarmForAlarm: false,
+			emailAlarmSending: false,
+			emailAlarmSent: false
+		}
+		// Specific for GPS
+	}]
+]);
+
 async function checkAlarmForDelay(thingId) {
 	try {
 		if (ThingsConfigs.has(thingId) === false)
@@ -183,44 +227,6 @@ async function checkAlarmForDelay(thingId) {
 	}
 }
 
-ThingsConfigs = new Map([
-	["f4c3c80b-d561-4a7b-80a5-f4805fdab9bb", { // Home appliance
-		config: {
-			configThingId: "fb9071b5-133a-4716-86c6-4e14d798a2d1",
-			onUpdateThingValueInterval: 10 * 1000, // 10 seconds - Bees pull every 5 seconds		
-			emails: ["cmcampione@gmail.com"],
-			thingName: "My Home",
-			checkInterval: null,
-			// Specific for Home appliance
-			sensors: new Map([
-				["31669624", {// ToDo: sensorId long or string?
-					onUpdateThingValueAlarmValue: true
-				}]
-			])
-		},
-		status: {
-			lastOnUpdateThingValueEvent: null,
-			lastValue: null,
-			inAlarmForDelay: false,
-			inAlarmForAlarm: false
-		}
-	}],
-	["3601b4c5-706d-4917-ac21-3c2ef1f01fd0", { // GPS
-		config: {
-			configThingId: "",
-			onUpdateThingValueInterval: 20 * 1000, // 10 seconds - GPS pull every 15 seconds		
-			emails: ["cmcampione@gmail.com"],
-			thingName: "My Car",
-			checkInterval: null
-		},
-		status: {
-			lastOnUpdateThingValueEvent: null,
-			lastValue: null,
-			inAlarmForDelay: false
-		}
-		// Specific for GPS
-	}]
-]);
 // My Home
 let delay = null;
 delay = ThingsConfigs.get("f4c3c80b-d561-4a7b-80a5-f4805fdab9bb").config.onUpdateThingValueInterval;
@@ -525,45 +531,44 @@ const  onUpdateThingValue = async (thingId, value, asCmd) => {
 	console.log("onUpdateThingValue");
 	if (asCmd)
 		return;
-	switch (thingId) {
+	if (ThingsConfigs.has(thingId) === false) {
+		return;
+	}
+	const thingConfig = ThingsConfigs.get(thingId).config;
+	switch (thingConfig.thingKind) {
 	case process.env.CONFIG_THING_KIND:
 		return;
 	case process.env.HOME_THING_KIND: {
-		if (ThingsConfigs.has(thingId) === false) {
-			break;
-		}
 		break;
 	}
 	case process.env.GPS_THING_KIND: {
-		if (ThingsConfigs.has(thingId) === false) {
-			break;
-		}
 		break;
 	}
 	}
 	
-	const thingConfig = ThingsConfigs.get(thingId).config;
 	const thingStatus = ThingsConfigs.get(thingId).status;
 	thingStatus.lastOnUpdateThingValueEvent = Date.now();
 	thingStatus.lastValue = value;
-	switch (thingId) {
+	switch (thingConfig.thingKind) {
 	case process.env.CONFIG_THING_KIND:
 		return;
 	case process.env.HOME_THING_KIND: {
-		if (thingConfig.has(thingId) === false) {
-			break;
-		}
 		value.sensors.forEach(async (sensorRaw) => {
 			const sensor = thingConfig.sensors.get(sensorRaw.id);
 			if (!sensor)
 				return;
-			if (thingStatus.inAlarmForAlarm === false) {
-				if (sensorRaw.value === sensor.onUpdateThingValueAlarmValue) {
+			if (thingStatus.emailAlarmSending === true) {
+				return;
+			}
+			if (sensorRaw.value === sensor.onUpdateThingValueAlarmValue) {
+				if (thingStatus.inAlarmForAlarm === false) {
 					thingStatus.inAlarmForAlarm = true;
 					try {
+						thingStatus.emailAlarmSending = true;
 						await SendAlarmEmailForAlarm(thingConfig.emails, sensorRaw.id);
+						thingStatus.emailAlarmSending = false;
 					} catch(err) {
-						thingStatus.inAlarmForAlarm = false;
+						console.log(err);
 					}
 				}
 				return;
@@ -571,18 +576,17 @@ const  onUpdateThingValue = async (thingId, value, asCmd) => {
 			if (thingStatus.inAlarmForAlarm === true) {
 				thingStatus.inAlarmForAlarm = false;
 				try {
+					thingStatus.emailAlarmSending = true;
 					await SendReenteredEmailForAlarm(thingConfig.emails, sensorRaw.id);
+					thingStatus.emailAlarmSending = false;
 				} catch(err) {
-					thingStatus.inAlarmForAlarm = true;
+					console.log(err);
 				}
 			}
 		});
 		break;
 	}
 	case process.env.GPS_THING_KIND: {
-		if (ThingsConfigs.has(thingId) === false) {
-			break;
-		}
 		break;
 	}
 	}
@@ -660,6 +664,7 @@ readline.emitKeypressEvents(process.stdin);
 process.stdin.on("keypress", (str, key) => {
 	if (key.ctrl && key.name === "c") {
 		console.log("bye");
+		// ToDo: cleaning resource?
 		process.exit();
 	} else {
 		console.log(`You pressed the "${str}" key`);
