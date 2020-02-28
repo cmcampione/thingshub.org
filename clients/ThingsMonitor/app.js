@@ -201,7 +201,8 @@ ThingsConfigs = new Map([
 		status: {
 			lastOnUpdateThingValueEvent: null,
 			lastValue: null,
-			inAlarmForDelay: false
+			inAlarmForDelay: false,
+			inAlarmForAlarm: false
 		}
 	}],
 	["3601b4c5-706d-4917-ac21-3c2ef1f01fd0", { // GPS
@@ -426,6 +427,8 @@ const onUpdateThing = async (thingDTO) => {
 };
 const  onUpdateThingValue = async (thingId, value, asCmd) => {
 	console.log("onUpdateThingValue");
+	if (asCmd)
+		return;
 	switch (thingId) {
 	case process.env.CONFIG_THING_KIND:
 		return;
@@ -441,6 +444,7 @@ const  onUpdateThingValue = async (thingId, value, asCmd) => {
 		}
 		break;
 	}
+	}
 	
 	const thingConfig = ThingsConfigs.get(thingId).config;
 	const thingStatus = ThingsConfigs.get(thingId).status;
@@ -450,20 +454,26 @@ const  onUpdateThingValue = async (thingId, value, asCmd) => {
 	case process.env.CONFIG_THING_KIND:
 		return;
 	case process.env.HOME_THING_KIND: {
-		if (ThingsConfigs.has(thingId) === false) {
+		if (thingConfig.has(thingId) === false) {
 			break;
 		}
 		value.sensors.forEach((sensorRaw) => {
-			const 
-			if (sensorRaw === thingConfig.)
-			this.sensors.push({
-			  thingId: thing.id,
-			  name: thing.name,
-			  id: sensorRaw.id,
-			  now: sensorRaw.now,
-			  millis: sensorRaw.millis,
-			  value: sensorRaw.value});
-		  });
+			const sensor = thingConfig.sensors.get(sensorRaw.id);
+			if (!sensor)
+				return;
+			if (sensorRaw.value === sensor.onUpdateThingValueAlarmValue) {
+				if (thingStatus.inAlarmForAlarm === false) {
+					thingStatus.inAlarmForAlarm = true;
+					console.log("Alarm");
+					// Send.....
+				}
+				return;
+			}
+			if (thingStatus.inAlarmForAlarm === true) {
+				thingStatus.inAlarmForAlarm = false;
+				console.log("Reentered Alarm");
+				// Send.....
+			}
 		});
 		break;
 	}
