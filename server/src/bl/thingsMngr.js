@@ -258,6 +258,7 @@ async function getThings(user, parentThingId, thingFilter, valueFilter, orderBy,
 
 	let order = orderBy ? orderBy : { "parentsThingsIds.pos": 1 };
 
+	let dummy = JSON.stringify(mainThingsQuery);
 	let things = await findThings(mainThingsQuery, order, skip, top);
 
 	let thingsDTO = [];
