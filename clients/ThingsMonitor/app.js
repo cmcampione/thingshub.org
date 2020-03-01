@@ -57,6 +57,7 @@ const ThingsConfigs = new Map([
 			// Specific for Home appliance
 			sensors: new Map([
 				[31669624, {
+					sensorName: "Salone",
 					onUpdateThingValueAlarmValue: "true"
 				}]
 			])
@@ -77,7 +78,8 @@ const ThingsConfigs = new Map([
 			onUpdateThingValueInterval: 20 * 1000, // 20 seconds - GPS pull every 15 seconds		
 			emails: ["cmcampione@gmail.com"],
 			thingName: "My Car",
-			checkInterval: null
+			checkInterval: null,
+			// Specific for GPS
 		},
 		status: {
 			lastOnUpdateThingValueEvent: null,
@@ -86,8 +88,7 @@ const ThingsConfigs = new Map([
 			inAlarmForAlarm: false,
 			emailAlarmSending: false,
 			emailAlarmSent: false
-		}
-		// Specific for GPS
+		}		
 	}]
 ]);
 
@@ -99,6 +100,7 @@ async function SendAlarmEmailForDelay(emails, thingName, delay, culture) {
 	if (!subject) {
 		subject = process.env.NOTIFICATION_EMAIL_SUBJECT_DEFAULT;
 	}
+	subject += ": " + thingName;
 
 	// Render html
 	const html = await new Promise((resolve, reject) => {
@@ -147,6 +149,7 @@ async function SendReenteredEmailForDelay(emails, thingName, culture) {
 	if (!subject) {
 		subject = process.env.NOTIFICATION_EMAIL_SUBJECT_DEFAULT;
 	}
+	subject += ": " + thingName;
 
 	// Render html
 	const html = await new Promise((resolve, reject) => {
@@ -257,6 +260,7 @@ async function SendNotificationEmailForDisconnection(emails, interval1, culture)
 	if (!subject) {
 		subject = process.env.NOTIFICATION_EMAIL_SUBJECT_DEFAULT;
 	}
+	subject += ": Disconnection";
 
 	// Render html
 	const html = await new Promise((resolve, reject) => {
@@ -304,6 +308,7 @@ async function SendNotificationEmailForReconnection(emails, culture) {
 	if (!subject) {
 		subject = process.env.NOTIFICATION_EMAIL_SUBJECT_DEFAULT;
 	}
+	subject += ": Reconnection";
 
 	// Render html
 	const html = await new Promise((resolve, reject) => {
@@ -402,10 +407,10 @@ const onStateChanged = async (change) => {
 			return; // Timer was not started. First connection is a case
 		}
 		if (globalConfigStatus.sendingDisconnectionEmail) {
-			return; // Timer try to send Disconnection Email
+			return; // Timer tries to send Disconnection Email
 		}
 		if (globalConfigStatus.sendingReconnectionEmail) {
-			return; // Timer try to send Reconnection Email
+			return; // Timer tries to send Reconnection Email
 		}
 		if (globalConfigStatus.disconnectionEmailSent) {
 			return; // Timer has sent Disconnection Email but not Reconnection Email
@@ -439,6 +444,7 @@ async function SendAlarmEmailForAlarm(emails, sensorName, culture) {
 	if (!subject) {
 		subject = process.env.NOTIFICATION_EMAIL_SUBJECT_DEFAULT;
 	}
+	subject += ": " + sensorName;
 
 	// Render html
 	const html = await new Promise((resolve, reject) => {
@@ -486,6 +492,7 @@ async function SendReenteredEmailForAlarm(emails, sensorName, culture) {
 	if (!subject) {
 		subject = process.env.NOTIFICATION_EMAIL_SUBJECT_DEFAULT;
 	}
+	subject += ": " + sensorName;
 
 	// Render html
 	const html = await new Promise((resolve, reject) => {
@@ -526,7 +533,7 @@ async function SendReenteredEmailForAlarm(emails, sensorName, culture) {
 		});
 	});
 }
-const  onUpdateThingValue = async (thingId, value, asCmd) => {
+const onUpdateThingValue = async (thingId, value, asCmd) => {
 	if (asCmd)
 		return;
 	if (ThingsConfigs.has(thingId) === false) {
@@ -563,7 +570,7 @@ const  onUpdateThingValue = async (thingId, value, asCmd) => {
 					thingStatus.inAlarmForAlarm = true;
 					try {
 						thingStatus.emailAlarmSending = true;
-						await SendAlarmEmailForAlarm(thingConfig.emails, sensorRaw.id);
+						await SendAlarmEmailForAlarm(thingConfig.emails, sensor.sensorName);
 						thingStatus.emailAlarmSending = false;
 					} catch(err) {
 						console.log(err);
@@ -575,7 +582,7 @@ const  onUpdateThingValue = async (thingId, value, asCmd) => {
 				thingStatus.inAlarmForAlarm = false;
 				try {
 					thingStatus.emailAlarmSending = true;
-					await SendReenteredEmailForAlarm(thingConfig.emails, sensorRaw.id);
+					await SendReenteredEmailForAlarm(thingConfig.emails, sensor.sensorName);
 					thingStatus.emailAlarmSending = false;
 				} catch(err) {
 					console.log(err);
