@@ -1,30 +1,44 @@
 <ion-card>
   <ion-card-header>
-    <ion-card-title>My car</ion-card-title>
+    <ion-card-title >My car</ion-card-title>
   </ion-card-header>
-  <ion-item>
-    <ion-label>
-      DeviceId: {{ deviceId }}
-    </ion-label>
-  </ion-item>
-  <ion-item>
-    <ion-label>
-      Last valid GPS position date: {{ surveyDateTime }}
-    </ion-label>
-  </ion-item>
-  <ion-item>
-    <ion-label>
-      Last valid status date: {{ lastEventDateTime }}
-    </ion-label>
-  </ion-item>
-  <ion-item>
-    <ion-textarea class="multiline-ellipsis">
-      Last status: {{ lastStatusMsg }}
-    </ion-textarea>
-  </ion-item>
   <ion-card-content>
     <agm-map [latitude]="lat" [longitude]="lng" [zoom]=16>
       <agm-marker [latitude]="lat" [longitude]="lng"></agm-marker>
     </agm-map>
+    <ion-grid>
+      <ion-row>
+        <ion-col>
+            DeviceId:
+        </ion-col>
+        <ion-col>
+            {{ deviceId }}
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col>
+          Last valid GPS position date:
+        </ion-col>
+        <ion-col>
+          {{ surveyDateTime }}
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col>
+          Last valid status date:
+        </ion-col>
+        <ion-col>
+          {{ lastEventDateTime }}
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col>
+          Last status:
+        </ion-col>
+        <ion-col>
+          {{ lastStatusMsg }}
+        </ion-col>
+      </ion-row>
+    </ion-grid>
   </ion-card-content>
 </ion-card>
