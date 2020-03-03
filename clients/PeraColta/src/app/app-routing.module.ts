@@ -3,9 +3,10 @@ import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
 import { ContentPageComponent} from '../app/content-page/content-page.component';
 
 const routes: Routes = [
-  { path: '', redirectTo: 'home', pathMatch: 'full' },
+  // { path: '', redirectTo: 'home', pathMatch: 'full' },
   // { path: 'home', loadChildren: () => import('./home/home.module').then( m => m.HomePageModule)},
-  { path: 'home', component: ContentPageComponent},
+  // { path: 'home', component: ContentPageComponent},
+  { path: '', component: ContentPageComponent}
 ];
 
 @NgModule({

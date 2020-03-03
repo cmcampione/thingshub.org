@@ -18,8 +18,8 @@ export class ContentPageComponent implements OnInit, OnDestroy {
   private readonly subscriptionIsLoggedIn: Subscription = null;
   private readonly subscriptionRealTimeConnector: Subscription = null;
 
-  private connIconName = 'globe';
-  private connIconColor = 'danger';
+  public connIconName = 'globe';
+  public connIconColor = 'danger';
 
 
   public isLoggedIn = false;
