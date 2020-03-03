@@ -347,6 +347,7 @@ export declare class ThingsManager {
 	getMoreThingChildren(parentThing: Thing, parameter: ThingsGetParams, canceler: HttpRequestCanceler): Promise<ThingsDataSet>;
 	getMoreThings(canceler: HttpRequestCanceler): Promise<void>;
 	getThingsTotalItems(): Number;
+	getThing(thingId: string): Promise<Thing>;
 	putThingValue(thingId: string, asCmd: boolean, value: any): Promise<any>;
 }
 
