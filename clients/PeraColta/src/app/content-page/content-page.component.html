@@ -9,23 +9,23 @@
     </ion-title>
   </ion-toolbar>
 </ion-header>
-
 <ion-content [fullscreen]="true">
-  <div *ngIf="!isLoggedIn">
-    <app-login></app-login>
+  <div id="container">
+    <div *ngIf="!isLoggedIn">
+      <app-login></app-login>
+    </div>
+    <ion-grid *ngIf="isLoggedIn">
+      <ion-row>
+        <ion-col>
+          <app-map></app-map>
+        </ion-col>
+        <ion-col>
+          <app-sensors></app-sensors>
+        </ion-col>
+        <ion-col>
+          <app-things></app-things>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
   </div>
-
-  <ion-grid *ngIf="isLoggedIn">
-    <ion-row>
-      <ion-col>
-        <app-map></app-map>
-      </ion-col>
-      <ion-col>
-        <app-sensors></app-sensors>
-      </ion-col>
-      <ion-col>
-        <app-things></app-things>
-      </ion-col>
-    </ion-row>
-  </ion-grid>
 </ion-content>

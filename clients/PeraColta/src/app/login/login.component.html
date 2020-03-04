@@ -1,19 +1,11 @@
 <ion-grid>
       <ion-row>
-            <ion-col size="12" size-sm="4" offset-sm="4">
-                  <ion-item>
-                        <ion-input [(ngModel)]="username" type="email" placeholder="Email" required></ion-input>
-                  </ion-item>
-            </ion-col>
-            <ion-col size="12" size-sm="4" offset-sm="4">
-                  <ion-item>
-                        <ion-input [(ngModel)]="password" type="password" placeholder="Password" required></ion-input>
-                  </ion-item>
-            </ion-col>
-            <ion-col size="12" size-sm="4" offset-sm="4">
-                  <ion-item>
-                        <ion-button (click)="login()" color="danger">Sign In</ion-button>
-                  </ion-item>
+            <ion-col size-sm="4" offset-sm="4">
+                  <ion-input [(ngModel)]="username" type="email" placeholder="Email" required></ion-input>
+                  <ion-input [(ngModel)]="password" type="password" placeholder="Password" required></ion-input>
+                  <ion-button (click)="login()">
+                        Sign In
+                  </ion-button>
             </ion-col>
       </ion-row>
 </ion-grid>
