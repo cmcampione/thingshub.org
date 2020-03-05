@@ -56,6 +56,10 @@ class ClientsConnectorSocketIO extends IClientsConnector {
 			}
 			userSockets.push(socket);
 
+			console.log("SocketIO Connection: username = " + user.username);
+			console.log("SocketIO Connection: size = " + self.connections.size);
+			console.log("SocketIO Connection userSocket: length = " + userSockets.length);
+
 			return next();
 		});
 		
@@ -76,8 +80,12 @@ class ClientsConnectorSocketIO extends IClientsConnector {
 					userSockets.splice(i, 1);
 					if (userSockets.length == 0)
 						self.connections.delete(userId);
+						
+					console.log("SocketIO Disonnection userSocket: length = " + userSockets.length);
 					break;
 				}
+
+				console.log("SocketIO Disconnection: length = " + self.connections.size);
 			});
 
 		});
