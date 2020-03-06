@@ -81,7 +81,7 @@ class ClientsConnectorSocketIO extends IClientsConnector {
 					if (userSockets.length == 0)
 						self.connections.delete(userId);
 						
-					console.log("SocketIO Disonnection userSocket: length = " + userSockets.length);
+					console.log("SocketIO Disconnection userSocket: length = " + userSockets.length);
 					break;
 				}
 
