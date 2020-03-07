@@ -1,7 +1,9 @@
 "use strict";
 
+const moment 			= require('moment');
 const httpStatusCodes 	= require("http-status-codes");
 
+const logger			= require("./logger");
 const utils				= require("./utils");
 const usersManager		= require("./bl/usersMngr");
 
@@ -56,9 +58,9 @@ class ClientsConnectorSocketIO extends IClientsConnector {
 			}
 			userSockets.push(socket);
 
-			console.log("SocketIO Connection: username = " + user.username);
-			console.log("SocketIO Connection: size = " + self.connections.size);
-			console.log("SocketIO Connection userSocket: length = " + userSockets.length);
+			logger.info("ClientsConnectorSocketIO.Connection.username = " + user.username,{ code: 117 });
+			logger.info("ClientsConnectorSocketIO.Connection.connections.size = " + self.connections.size, { code: 118 });
+			logger.info("ClientsConnectorSocketIO.Connection.userSockets.length = " + userSockets.length, { code: 119 });
 
 			return next();
 		});
@@ -80,12 +82,10 @@ class ClientsConnectorSocketIO extends IClientsConnector {
 					userSockets.splice(i, 1);
 					if (userSockets.length == 0)
 						self.connections.delete(userId);
-						
-					console.log("SocketIO Disonnection userSocket: length = " + userSockets.length);
+					logger.info("ClientsConnectorSocketIO.disconnect.userSockets.length = " + userSockets.length, { code: 120 });
 					break;
 				}
-
-				console.log("SocketIO Disconnection: length = " + self.connections.size);
+				logger.info("ClientsConnectorSocketIO.disconnect.connections.size = " + self.connections.size, { code: 121 });
 			});
 
 		});
