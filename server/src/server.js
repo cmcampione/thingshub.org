@@ -3,6 +3,7 @@
 const fs      			= require("fs");
 const path    			= require("path");
 const dotenv  			= require("dotenv");
+const moment 			= require('moment');
 const httpStatusCodes 	= require("http-status-codes");
 const https   			= require("https");
 const express 			= require("express");
@@ -17,6 +18,7 @@ const BasicStrategy		= require("passport-http").BasicStrategy;
 const mongoose  		= require("mongoose");
 const cors 				= require("cors");
 
+const logger			= require("./logger");
 const utils				= require("./utils");
 const usersManager		= require("./bl/usersMngr");
 const RealtimeNotifier 	= require("./realtimeNotifier");
@@ -179,15 +181,19 @@ app.use(function(req, res, next) {
 // You define error-handling middleware last, after other app.use() and routes calls
 app.use((err, req, res, next) => {
 	if (err) {
+		let errMsg;
 		if (err.statusCode == null) {
 			res.status(httpStatusCodes.INTERNAL_SERVER_ERROR);
-			res.json(utils.ErrorCustom.formatMessage(9, err));
+			errMsg = utils.ErrorCustom.formatMessage(9, err);
+			res.json(errMsg);
 		} else {
 			res.status(err.statusCode);
 			res.json(err.message);
+			errMsg = err.message;
 		}
+		console.log(moment().format() + ";error;" + errMsg.internalCode + ";" + JSON.stringify(errMsg.message));
 	} else {
-		next();
+		next();		
 	}
 });
 
@@ -210,7 +216,7 @@ httpsServer.listen(port, (err) => {
 		process.exit();
 		return;  
 	}
-	console.log("ThingsHub - Server started on port " + port);
+	logger.info("Server started on port " + port,{ code: 122 })
 });
 
 // Realtime communication support
