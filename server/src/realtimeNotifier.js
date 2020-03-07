@@ -104,7 +104,6 @@ class ClientsConnectorSocketIO extends IClientsConnector {
 	}
 	
 	onCreateThing(usersIds, thingDTO) {
-		// Dummy
 		for(let userId of usersIds) {
 			let connections = this.connections.get(userId.toString());
 			if (!connections)
