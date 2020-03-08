@@ -191,7 +191,7 @@ app.use((err, req, res, next) => {
 			res.json(err.message);
 			errMsg = err.message;
 		}
-		console.log(moment().format() + ";error;" + errMsg.internalCode + ";" + JSON.stringify(errMsg.message));
+		logger.error(errMsg.message,{ code: errMsg.internalCode })
 	} else {
 		next();		
 	}
@@ -212,7 +212,7 @@ const httpsServer = https.createServer(options, app);
 const port = process.env.SERVER_PORT || 3000;
 httpsServer.listen(port, (err) => {
 	if (err) {
-		console.log(err);
+		logger.info(err,{ code: 123 })
 		process.exit();
 		return;  
 	}
