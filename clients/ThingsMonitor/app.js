@@ -50,7 +50,7 @@ const ThingsConfigs = new Map([
 		config: {
 			configThingId: "fb9071b5-133a-4716-86c6-4e14d798a2d1",
 			thingKind: "Home appliance", // Home appliance
-			onUpdateThingValueInterval: 10 * 1000, // 10 seconds - Bees pull every 5 seconds		
+			onUpdateThingValueInterval: 20 * 1000, // 10 seconds - Bees pull every 5 seconds		
 			emails: ["cmcampione@gmail.com"],
 			thingName: "My Home",
 			checkInterval: null,
@@ -75,7 +75,7 @@ const ThingsConfigs = new Map([
 		config: {
 			configThingId: "",
 			thingKind: "c3aa4d95-4cb4-415c-a251-7fe846e0fd17", // GPS
-			onUpdateThingValueInterval: 20 * 1000, // 20 seconds - GPS pull every 15 seconds		
+			onUpdateThingValueInterval: 30 * 1000, // 20 seconds - GPS pull every 15 seconds		
 			emails: ["cmcampione@gmail.com"],
 			thingName: "My Car",
 			checkInterval: null,
