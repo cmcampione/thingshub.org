@@ -158,7 +158,6 @@ router.put("/:id", async function (req, res, next){
 
 // Update Thing Value
 router.put("/:id/value", async function (req, res, next) {
-	// console.log("Update Thing Value: req = " + JSON.stringify(req.body));
 	await passport.authenticate(["localapikey", "bearer"], { session: false }, async function(err, user, info) {
 		try {
 			if (err)
@@ -196,7 +195,6 @@ router.put("/:id/value", async function (req, res, next) {
 
 // Send Thing Command
 router.put("/:id/cmd", async function (req, res, next) {
-	// console.log("Send Thing Command: req = " + JSON.stringify(req.body));
 	await passport.authenticate(["localapikey", "bearer"], { session: false }, async function(err, user, info) {
 		try {
 			if (err)
