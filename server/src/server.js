@@ -39,7 +39,7 @@ mongoose.connect(process.env.MONGODB_URI,
 		user: process.env.MONGODB_USER,
 		pass: process.env.MONGODB_PASSWORD
 	}).catch(err => {
-	console.log(err);
+	logger.error(err,{ code: 124 });
 	process.exit();
 });
 
@@ -191,7 +191,7 @@ app.use((err, req, res, next) => {
 			res.json(err.message);
 			errMsg = err.message;
 		}
-		logger.error(errMsg.message,{ code: errMsg.internalCode })
+		logger.error(errMsg.message,{ code: errMsg.internalCode });
 	} else {
 		next();		
 	}
@@ -212,11 +212,10 @@ const httpsServer = https.createServer(options, app);
 const port = process.env.SERVER_PORT || 3000;
 httpsServer.listen(port, (err) => {
 	if (err) {
-		logger.info(err,{ code: 123 })
+		logger.info(err,{ code: 123 });
 		process.exit();
-		return;  
 	}
-	logger.info("Server started on port " + port,{ code: 122 })
+	logger.info("Server started on port " + port,{ code: 122 });
 });
 
 // Realtime communication support
