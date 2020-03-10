@@ -536,10 +536,15 @@ async function SendReenteredEmailForAlarm(emails, sensorName, culture) {
 const onUpdateThingValue = async (thingId, value, asCmd) => {
 	if (asCmd)
 		return;
-	if (ThingsConfigs.has(thingId) === false) {
+	if (ThingsConfigs.has(thingId) === false)
 		return;
-	}
 	const thingConfig = ThingsConfigs.get(thingId).config;
+	if (!thingConfig)
+		return;
+	const thingStatus = ThingsConfigs.get(thingId).status;
+	if (!thingStatus)
+		return;
+
 	switch (thingConfig.thingKind) {
 	case process.env.CONFIG_THING_KIND:
 		return;
@@ -550,8 +555,7 @@ const onUpdateThingValue = async (thingId, value, asCmd) => {
 		break;
 	}
 	}
-	
-	const thingStatus = ThingsConfigs.get(thingId).status;
+		
 	thingStatus.lastOnUpdateThingValueEvent = Date.now();
 	thingStatus.lastValue = value;
 	switch (thingConfig.thingKind) {
@@ -562,9 +566,8 @@ const onUpdateThingValue = async (thingId, value, asCmd) => {
 			const sensor = thingConfig.sensors.get(sensorRaw.id);
 			if (!sensor)
 				return;
-			if (thingStatus.emailAlarmSending === true) {
+			if (thingStatus.emailAlarmSending === true)
 				return;
-			}
 			if (sensorRaw.value === sensor.onUpdateThingValueAlarmValue) {
 				if (thingStatus.inAlarmForAlarm === false) {
 					thingStatus.inAlarmForAlarm = true;
