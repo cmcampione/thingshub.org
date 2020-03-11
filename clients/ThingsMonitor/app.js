@@ -46,9 +46,9 @@ if (!configThingKind) {
 
 //
 const ThingsConfigs = new Map([
-	["f4c3c80b-d561-4a7b-80a5-f4805fdab9bb", {
+	["f4c3c80b-d561-4a7b-80a5-f4805fdab9bb", {// My home
 		config: {
-			configThingId: "fb9071b5-133a-4716-86c6-4e14d798a2d1",
+			configThingId: "fb9071b5-133a-4716-86c6-4e14d798a2d1", // My Home - Config
 			thingKind: "Home appliance", // Home appliance
 			onUpdateThingValueInterval: 20 * 1000, // 10 seconds - Bees pull every 5 seconds		
 			emails: ["cmcampione@gmail.com"],

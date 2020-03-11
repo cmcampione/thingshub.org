@@ -1,8 +1,9 @@
 "use strict";
 
-const { createLogger, format, transports } = require("winston");
+const moment = require("moment");
 const fs = require("fs");
 const path = require("path");
+const { createLogger, format, transports } = require("winston");
 
 const env = process.env.NODE_ENV || "development";
 const logDir = "log";
@@ -14,19 +15,23 @@ if (!fs.existsSync(logDir)) {
 
 const filename = path.join(logDir, "results.log");
 
+const timezoned = () => {
+	return moment().utc().format("YYYY-MM-DD hh:mm:ss");
+};
+
 const logger = createLogger({
 	// change level if in dev environment versus production
 	level: env === "production" ? "info" : "debug",
 	format: format.combine(
-		format.timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),
+		//format.timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),
+		format.timestamp({ format: timezoned })
 	),
 	transports: [
 		new transports.Console({
 			format: format.combine(
 				format.colorize(),
 				format.printf(
-					info =>
-						`${info.timestamp}; ${info.level}; ${info.code}; ${info.message}`
+					info => `${info.timestamp}; ${info.level}; ${info.code}; ${info.message}`
 				)
 			)
 		})/* ,

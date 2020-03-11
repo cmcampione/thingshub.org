@@ -3,7 +3,6 @@
 const fs      			= require("fs");
 const path    			= require("path");
 const dotenv  			= require("dotenv");
-const moment 			= require('moment');
 const httpStatusCodes 	= require("http-status-codes");
 const https   			= require("https");
 const express 			= require("express");
