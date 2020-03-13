@@ -29,7 +29,7 @@ export class AppComponent implements OnDestroy {
     private accountService: AccountService) {
     this.initializeApp();
 
-    this.subscriptionIsLoggedIn = this.accountService.isLoggedIn.subscribe(this.checkLogin);
+    this.subscriptionIsLoggedIn = this.accountService.isLoggedIn$.subscribe(this.checkLogin);
   }
   ngOnDestroy() {
     this.subscriptionIsLoggedIn.unsubscribe();
