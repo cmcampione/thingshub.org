@@ -56,7 +56,7 @@ export class ContentPageComponent implements OnInit, OnDestroy {
 
   constructor(private accountService: AccountService,
     private realTimeConnector: RealTimeConnectorService) {
-      this.subscriptionIsLoggedIn = this.accountService.isLoggedIn.subscribe(this.checkLogin);
+      this.subscriptionIsLoggedIn = this.accountService.isLoggedIn$.subscribe(this.checkLogin);
       this.subscriptionRealTimeConnector = this.realTimeConnector.connectionStatus.subscribe({
         next: this.setConnectionIcon
       });
