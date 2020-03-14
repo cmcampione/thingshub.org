@@ -4,6 +4,7 @@ const nodemailer = require("nodemailer");
 const ejs = require("ejs");
 const dotenv = require("dotenv");
 const thingshub = require("thingshub-js-sdk");
+const logger = require("./logger");
 
 // Env configuration
 const configPath = path.join(__dirname, "./", "thingsMonitor.env");
@@ -71,7 +72,7 @@ const ThingsConfigs = new Map([
 			emailAlarmSent: false
 		}
 	}],
-	["3601b4c5-706d-4917-ac21-3c2ef1f01fd0", {
+	["3601b4c5-706d-4917-ac21-3c2ef1f01fd0", {// My car
 		config: {
 			configThingId: "",
 			thingKind: "c3aa4d95-4cb4-415c-a251-7fe846e0fd17", // GPS
@@ -94,6 +95,9 @@ const ThingsConfigs = new Map([
 
 //
 async function SendAlarmEmailForDelay(emails, thingName, delay, culture) {
+
+	logger.info(`SendAlarmEmailForDelay: ${thingName}`, { code: 1 });
+
 	// ToDo: Fix correct culture
 	culture = "it-IT";
 	let subject = process.env[`NOTIFICATION_EMAIL_SUBJECT_${culture}`];
@@ -143,6 +147,9 @@ async function SendAlarmEmailForDelay(emails, thingName, delay, culture) {
 	});
 }
 async function SendReenteredEmailForDelay(emails, thingName, culture) {
+
+	logger.info(`SendReenteredEmailForDelay: ${thingName}`, { code: 2 });
+
 	// ToDo: Fix correct culture
 	culture = "it-IT";
 	let subject = process.env[`NOTIFICATION_EMAIL_SUBJECT_${culture}`];
@@ -254,6 +261,9 @@ const globalConfigStatus = {
 
 //
 async function SendNotificationEmailForDisconnection(emails, interval1, culture) {
+
+	logger.info("SendNotificationEmailForDisconnection", { code: 3 });
+
 	// ToDo: Fix correct culture
 	culture = "it-IT";
 	let subject = process.env[`NOTIFICATION_EMAIL_SUBJECT_${culture}`];
@@ -302,6 +312,9 @@ async function SendNotificationEmailForDisconnection(emails, interval1, culture)
 	});
 }
 async function SendNotificationEmailForReconnection(emails, culture) {
+
+	logger.info("SendNotificationEmailForReconnection", { code: 4 });
+
 	// ToDo: Fix correct culture
 	culture = "it-IT";
 	let subject = process.env[`NOTIFICATION_EMAIL_SUBJECT_${culture}`];
@@ -438,6 +451,8 @@ const onUpdateThing = async (thingDTO) => {
 
 //
 async function SendAlarmEmailForAlarm(emails, sensorName, culture) {
+	logger.info(`SendAlarmEmailForAlarm: ${sensorName}`, { code: 5 });
+
 	// ToDo: Fix correct culture
 	culture = "it-IT";
 	let subject = process.env[`NOTIFICATION_EMAIL_SUBJECT_${culture}`];
@@ -486,6 +501,7 @@ async function SendAlarmEmailForAlarm(emails, sensorName, culture) {
 	});
 }
 async function SendReenteredEmailForAlarm(emails, sensorName, culture) {
+	logger.info(`SendReenteredEmailForAlarm: ${sensorName}`, { code: 6 });
 	// ToDo: Fix correct culture
 	culture = "it-IT";
 	let subject = process.env[`NOTIFICATION_EMAIL_SUBJECT_${culture}`];
