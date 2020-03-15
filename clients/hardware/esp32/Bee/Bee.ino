@@ -46,9 +46,9 @@ void onSensorPin2OnOff(const char* value) {
   digitalWrite(ledPin, ledStatus);
 }
 
-const int sensorsCount      = 3;
+const int sensorsCount      = 4;
 const int sensorsFieldCount = 4;
-const int sensorsCapacity   = JSON_OBJECT_SIZE(1) + JSON_ARRAY_SIZE(sensorsCount) + sensorsCount*JSON_OBJECT_SIZE(sensorsFieldCount) + 91;
+const int sensorsCapacity   = JSON_OBJECT_SIZE(1) + JSON_ARRAY_SIZE(sensorsCount) + sensorsCount*JSON_OBJECT_SIZE(sensorsFieldCount) + 175;// To Change
 class BeeStatus {
   public:
     static const char* thing;
@@ -59,6 +59,7 @@ class BeeStatus {
       sensors[8171288].sensorHandler = onSensorPin2On;
       sensors[8171284].sensorHandler = onSensorPin2Off;
       sensors[31669624].sensorHandler = onSensorPin2OnOff;
+      sensors[7271203].sensorHandler = onSensorPin2OnOff;
     }
     static void setSensorValue(long idSensor, bool now, const char* value) {
       if (BeeStatus::sensors.find(idSensor) != BeeStatus::sensors.end()) {
@@ -104,7 +105,7 @@ class BeeStatus {
     */
   #ifdef DEBUG_BEESTATUS
       // Declare a buffer to hold the result
-      char output[512];// To check
+      char output[1024];// To check
       int count = 0;    
   #endif
       doc.clear();
