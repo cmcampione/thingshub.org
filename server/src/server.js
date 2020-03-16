@@ -89,23 +89,21 @@ var localApiStrategyOptions = {
 	apiKeyField: process.env.APIKEY_NAME,
 	apiKeyHeader: process.env.APIKEY_NAME
 };
-passport.use(new LocalApiStrategy(localApiStrategyOptions,
-	function(apikey, done) {
-		// asynchronous verification, for effect...
-		process.nextTick(async function () {
+passport.use(new LocalApiStrategy(localApiStrategyOptions, function(apikey, done) {
+	// asynchronous verification, for effect...
+	process.nextTick(async function () {
 		
-			// Find the user by username.  If there is no user with the given
-			// username, or the password is not correct, set the user to `false` to
-			// indicate failure and set a flash message.  Otherwise, return the
-			// authenticated `user`.
-			const user = await usersManager.findUserByMasterApiKey(apikey);
-			if (!user) { 
-				return done(null, false, { message: "Unknown apikey : " + apikey }); 
-			}
-			return done(null, user);
-		});
-	}
-));
+		// Find the user by username.  If there is no user with the given
+		// username, or the password is not correct, set the user to `false` to
+		// indicate failure and set a flash message.  Otherwise, return the
+		// authenticated `user`.
+		const user = await usersManager.findUserByMasterApiKey(apikey);
+		if (!user) { 
+			return done(null, false, { message: "Unknown apikey : " + apikey }); 
+		}
+		return done(null, user);
+	});
+}));
 
 passport.use(new BearerStrategy(async function(token, done) {
 	try {
@@ -167,6 +165,9 @@ app.use("/api/account", AccountController);
 
 const ThingsController = require(__dirname + "/controllers/thingsController");
 app.use("/api/things", ThingsController);
+
+const LogController = require(__dirname + "/controllers/logController");
+app.use("/api/log", LogController);
 
 // Errors support
 

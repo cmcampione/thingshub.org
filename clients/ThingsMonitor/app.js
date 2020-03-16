@@ -60,6 +60,18 @@ const ThingsConfigs = new Map([
 				[31669624, {
 					sensorName: "Salone",
 					onUpdateThingValueAlarmValue: "true"
+				}],
+				[7271203, {
+					sensorName: "Contatto filare",
+					onUpdateThingValueAlarmValue: "true"
+				}],
+				[8171288, {
+					sensorName: "Telecomando 1 chiudi",
+					onUpdateThingValueAlarmValue: "true"
+				}],
+				[8171284, {
+					sensorName: "Telecomando 1 apri",
+					onUpdateThingValueAlarmValue: "true"
 				}]
 			])
 		},
