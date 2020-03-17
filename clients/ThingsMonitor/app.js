@@ -28,7 +28,7 @@ const transporter = nodemailer.createTransport({
 //
 var mainApiKey = process.env.MAIN_API_KEY;
 if (!mainApiKey) {
-	console.log("Main ApiKey not found in .env file");
+	logger.error("Main ApiKey not found in .env file", { code: 11 });
 	process.exit();
 }
 const endPoint = {
@@ -36,12 +36,12 @@ const endPoint = {
 	api: process.env.ENDPOINT_API
 };
 if (!endPoint.server || !endPoint.api) {
-	console.log("EndPoint data not found in .env file");
+	logger.error("EndPoint data not found in .env file", { code: 12 });
 	process.exit();
 }
 const configThingKind = process.env.CONFIG_THING_KIND;
 if (!configThingKind) {
-	console.log("Config Thing Kind not found in .env file");
+	logger.error("Config Thing Kind not found in .env file", { code: 13 });
 	process.exit();
 }
 
@@ -77,11 +77,29 @@ const ThingsConfigs = new Map([
 		},
 		status: {
 			lastOnUpdateThingValueEvent: null,
-			lastValue: null,
 			inAlarmForDelay: false,
-			inAlarmForAlarm: false,
-			emailAlarmSending: false,
-			emailAlarmSent: false
+			sensors: new Map([
+				[31669624, {
+					inAlarmForAlarm: false,
+					emailAlarmSending: false,
+					emailAlarmSent: false
+				}],
+				[7271203, {
+					inAlarmForAlarm: false,
+					emailAlarmSending: false,
+					emailAlarmSent: false
+				}],
+				[8171288, {
+					inAlarmForAlarm: false,
+					emailAlarmSending: false,
+					emailAlarmSent: false
+				}],
+				[8171284, {
+					inAlarmForAlarm: false,
+					emailAlarmSending: false,
+					emailAlarmSent: false
+				}]
+			])
 		}
 	}],
 	["3601b4c5-706d-4917-ac21-3c2ef1f01fd0", {// My car
@@ -96,7 +114,6 @@ const ThingsConfigs = new Map([
 		},
 		status: {
 			lastOnUpdateThingValueEvent: null,
-			lastValue: null,
 			inAlarmForDelay: false,
 			inAlarmForAlarm: false,
 			emailAlarmSending: false,
@@ -220,42 +237,35 @@ async function checkAlarmForDelay(thingId) {
 		if (thingStatus.lastOnUpdateThingValueEvent === null || Date.now() - thingStatus.lastOnUpdateThingValueEvent > thingConfig.onUpdateThingValueInterval) {
 			if (thingStatus.inAlarmForDelay === false) {
 				thingStatus.inAlarmForDelay = true;
-				console.log("SendAlarmEmailForDelay");
 				await SendAlarmEmailForDelay(thingConfig.emails, thingConfig.thingName, thingConfig.onUpdateThingValueInterval);
 			}		
 			return;
 		}
 		if (thingStatus.inAlarmForDelay === true) {
 			thingStatus.inAlarmForDelay = false;
-			console.log("SendReenteredEmailForDelay");		
 			await SendReenteredEmailForDelay(thingConfig.emails, thingConfig.thingName);
 		}
 	} catch(err) {
-		console.log(err);
+		logger.error(err, { code: 7 });
 	}
 }
 
-// My Home
-let delay = null;
-delay = ThingsConfigs.get("f4c3c80b-d561-4a7b-80a5-f4805fdab9bb").config.onUpdateThingValueInterval;
-ThingsConfigs.get("f4c3c80b-d561-4a7b-80a5-f4805fdab9bb").config.checkInterval = setInterval(async function () {
-	await checkAlarmForDelay("f4c3c80b-d561-4a7b-80a5-f4805fdab9bb");
-}, delay);
-// My Car
-delay = ThingsConfigs.get("3601b4c5-706d-4917-ac21-3c2ef1f01fd0").config.onUpdateThingValueInterval;
-ThingsConfigs.get("3601b4c5-706d-4917-ac21-3c2ef1f01fd0").config.checkInterval = setInterval(async function () {
-	await checkAlarmForDelay("3601b4c5-706d-4917-ac21-3c2ef1f01fd0");
-}, delay);
+ThingsConfigs.forEach((value, key, map) => {
+	let delay = value.config.onUpdateThingValueInterval;
+	value.config.checkInterval = setInterval(async function () {
+		await checkAlarmForDelay(key);
+	}, delay);
+});
 
 //
 const accountDataContext = new thingshub.AccountDataContext(endPoint);
 const accountManager = new thingshub.AccountManager("thingshub", accountDataContext, mainApiKey);
 
 function onError(error) {
-	// console.log(error);
+	logger.error(error, { code: 16});
 }
 function onConnectError(error) {
-	// console.log(error);
+	logger.error(error, { code: 17});
 }
 
 //
@@ -380,18 +390,15 @@ const onStateChanged = async (change) => {
 		globalConfigStatus.isConnected = false;
 		globalConfigStatus.timeoutForDisconnection = setInterval(
 			async () => {
-				console.log("In timeout");
 				try {
 					if (globalConfigStatus.sendingDisconnectionEmail) {
 						return; // Timer is sending DisconnectionEmail
 					}
 					if (globalConfigStatus.disconnectionEmailSent === false) {
-						console.log("Trying to send Disconnection email");
 						globalConfigStatus.sendingDisconnectionEmail = true;
 						await SendNotificationEmailForDisconnection(globalConfig.emails, globalConfig.disconnectionTimeout);
 						globalConfigStatus.sendingDisconnectionEmail = false;
 						globalConfigStatus.disconnectionEmailSent = true;
-						console.log("Disconnection email sent");
 						return;
 					}
 					if (globalConfigStatus.sendingReconnectionEmail) {
@@ -400,14 +407,12 @@ const onStateChanged = async (change) => {
 					if (globalConfigStatus.isConnected === false) {
 						return;
 					}
-					console.log("Trying to send Reconnection email");
 					globalConfigStatus.sendingReconnectionEmail = true;
 					await SendNotificationEmailForReconnection(globalConfig.emails);
 					globalConfigStatus.sendingReconnectionEmail = false;
 					globalConfigStatus.disconnectionEmailSent = false;
 					clearInterval(globalConfigStatus.timeoutForDisconnection);
 					globalConfigStatus.timeoutForDisconnection = null;
-					console.log("Reconnection email sent and Timer interruped");
 				} catch (err) {
 					if (globalConfigStatus.sendingDisconnectionEmail) {
 						globalConfigStatus.sendingDisconnectionEmail = false;
@@ -417,16 +422,14 @@ const onStateChanged = async (change) => {
 						globalConfigStatus.sendingReconnectionEmail = false;
 						return;
 					}
-					console.log("Email error");
-					console.log(err);
-					console.log(globalConfigStatus);
+					logger.error(err, {code: 17});
+					console.log(`globalConfigStatus : ${globalConfigStatus}`, {code: 18 });
 				}
 			},
 			globalConfig.disconnectionTimeout);
 		break;
 	}
 	case thingshub.RealtimeConnectionStates.Connected: {
-		console.log("Connected");
 		globalConfigStatus.isConnected = true;
 		if (globalConfigStatus.timeoutForDisconnection === null) {
 			return; // Timer was not started. First connection is a case
@@ -442,7 +445,6 @@ const onStateChanged = async (change) => {
 		}
 		clearInterval(globalConfigStatus.timeoutForDisconnection);
 		globalConfigStatus.timeoutForDisconnection = null;
-		console.log("Timeout canceled");
 		break;
 	}
 	case thingshub.RealtimeConnectionStates.Connecting: {
@@ -585,38 +587,40 @@ const onUpdateThingValue = async (thingId, value, asCmd) => {
 	}
 		
 	thingStatus.lastOnUpdateThingValueEvent = Date.now();
-	thingStatus.lastValue = value;
 	switch (thingConfig.thingKind) {
 	case process.env.CONFIG_THING_KIND:
 		return;
 	case process.env.HOME_THING_KIND: {
 		value.sensors.forEach(async (sensorRaw) => {
-			const sensor = thingConfig.sensors.get(sensorRaw.id);
-			if (!sensor)
+			const sensorConfig = thingConfig.sensors.get(sensorRaw.id);
+			if (!sensorConfig)
 				return;
-			if (thingStatus.emailAlarmSending === true)
+			const sensorStatus = thingStatus.sensors.get(sensorRaw.id);
+			if (!sensorStatus)
 				return;
-			if (sensorRaw.value === sensor.onUpdateThingValueAlarmValue) {
-				if (thingStatus.inAlarmForAlarm === false) {
-					thingStatus.inAlarmForAlarm = true;
+			if (sensorStatus.emailAlarmSending === true)
+				return;
+			if (sensorRaw.value === sensorConfig.onUpdateThingValueAlarmValue) {
+				if (sensorStatus.inAlarmForAlarm === false) {
+					sensorStatus.inAlarmForAlarm = true;
 					try {
-						thingStatus.emailAlarmSending = true;
-						await SendAlarmEmailForAlarm(thingConfig.emails, sensor.sensorName);
-						thingStatus.emailAlarmSending = false;
+						sensorStatus.emailAlarmSending = true;
+						await SendAlarmEmailForAlarm(thingConfig.emails, sensorConfig.sensorName);
+						sensorStatus.emailAlarmSending = false;
 					} catch(err) {
-						console.log(err);
+						logger.error(err, { code: 8 });
 					}
 				}
 				return;
 			}
-			if (thingStatus.inAlarmForAlarm === true) {
-				thingStatus.inAlarmForAlarm = false;
+			if (sensorStatus.inAlarmForAlarm === true) {
+				sensorStatus.inAlarmForAlarm = false;
 				try {
-					thingStatus.emailAlarmSending = true;
-					await SendReenteredEmailForAlarm(thingConfig.emails, sensor.sensorName);
-					thingStatus.emailAlarmSending = false;
+					sensorStatus.emailAlarmSending = true;
+					await SendReenteredEmailForAlarm(thingConfig.emails, sensorConfig.sensorName);
+					sensorStatus.emailAlarmSending = false;
 				} catch(err) {
-					console.log(err);
+					logger.error(err, { code: 9 });
 				}
 			}
 		});
@@ -642,7 +646,7 @@ realTimeConnector.api()
 		console.log(data);
 	})
 	.catch(function (err) {
-		console.log(err);
+		logger.error(err, { code: 14 });
 	});
 
 // 
@@ -669,7 +673,7 @@ thingsMngConfig.getMoreThings(httpRequestCanceler)
 	})
 	.catch(function (err) {
 		// Used default Config Thing
-		console.log(err);
+		logger.error(err, { code: 15 });
 	});
 // Home appliance Things
 const mainThingForHome = new thingshub.Thing();
@@ -680,7 +684,7 @@ thingsMngForHome.getMoreThings(httpRequestCanceler)
 	})
 	.catch(function (err) {
 		// Used default Config Thing
-		console.log(err);
+		logger.error(err, { code: 16 });
 	});
 // GPS
 const mainThingForGPS = new thingshub.Thing();
@@ -691,7 +695,7 @@ thingsMngForGPS.getMoreThings(httpRequestCanceler)
 	})
 	.catch(function (err) {
 		// Used default Config Thing
-		console.log(err);
+		logger.error(err, {code: 10 });
 	});
 
 //
