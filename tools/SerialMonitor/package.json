@@ -1,0 +1,24 @@
+{
+  "name": "serialmonitor",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "start": "node ./app.js",
+    "dev": "nodemon ./app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Carmelo Campione",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cmcampione/thingshub.org.git"
+  },
+  "dependencies": {
+    "dotenv": "^8.2.0",
+    "ejs": "^3.0.1",
+    "winston": "^3.2.1",
+    "moment": "^2.24.0",
+    "serialport": "^8.0.7"
+  }
+}

@@ -13,7 +13,8 @@
 const int sensorsCount = 4;
 const int sensorsFieldCount = 4;
 /* 
-[ "onUpdateThingValue",
+[
+  "onUpdateThingValue",
   "f4c3c80b-d561-4a7b-80a5-f4805fdab9bb",
   {
     sensors : [
@@ -27,11 +28,11 @@ const int sensorsFieldCount = 4;
 ]
 */
 // ESP32/ESP8266	384+167 = 551
-// const int msgCapacity = JSON_ARRAY_SIZE(4) + JSON_ARRAY_SIZE(sensorsCount) + JSON_OBJECT_SIZE(1) + sensorsCount*JSON_OBJECT_SIZE(sensorsFieldCount) + 167;
-
+// const int msgCapacity = JSON_ARRAY_SIZE(4) + JSON_ARRAY_SIZE(sensorsCount) + JSON_OBJECT_SIZE(1) + sensorsCount*JSON_OBJECT_SIZE(sensorsFieldCount) + 167; // To Check. Do not move from here, some compilation error or compiler bug
 
 /*
-[ "onUpdateThingValue",
+[
+  "onUpdateThingValue",
   "3601b4c5-706d-4917-ac21-3c2ef1f01fd0",
   {
     lastStatus: {result: 1, message: "Tue, 17 Mar 2020 17:10:15 GMT - All is Ok"},
@@ -49,9 +50,7 @@ const int sensorsFieldCount = 4;
 ]
 */
 // ESP32/ESP8266	256+306 = 562
-const int msgCapacity = JSON_ARRAY_SIZE(4) + JSON_OBJECT_SIZE(2) + JSON_OBJECT_SIZE(10) + 306;
-//
-// const int msgCapacity = 2 * JSON_ARRAY_SIZE(3) + JSON_OBJECT_SIZE(1) + 3 * JSON_OBJECT_SIZE(4) + 180; // To Check. Do not move from here, some compilation error or compiler bug
+const int msgCapacity = JSON_ARRAY_SIZE(4) + JSON_OBJECT_SIZE(2) + JSON_OBJECT_SIZE(10) + 306; // To Check. Do not move from here, some compilation error or compiler bug
 
 //
 int ledPin = 2;
