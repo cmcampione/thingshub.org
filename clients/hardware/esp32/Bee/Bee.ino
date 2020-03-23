@@ -12,8 +12,8 @@
 // Max capacity for actual msg
 const int sensorsCount = 4;
 const int sensorsFieldCount = 4;
-/* 
-[
+/*
+  [
   "onUpdateThingValue",
   "f4c3c80b-d561-4a7b-80a5-f4805fdab9bb",
   {
@@ -25,13 +25,13 @@ const int sensorsFieldCount = 4;
     ]
   },
   false
-]
+  ]
 */
 // ESP32/ESP8266	384+167 = 551
 // const int msgCapacity = JSON_ARRAY_SIZE(4) + JSON_ARRAY_SIZE(sensorsCount) + JSON_OBJECT_SIZE(1) + sensorsCount*JSON_OBJECT_SIZE(sensorsFieldCount) + 167; // To Check. Do not move from here, some compilation error or compiler bug
 
 /*
-[
+  [
   "onUpdateThingValue",
   "3601b4c5-706d-4917-ac21-3c2ef1f01fd0",
   {
@@ -47,7 +47,7 @@ const int sensorsFieldCount = 4;
     angle: 0
   },
   false
-]
+  ]
 */
 // ESP32/ESP8266	256+306 = 562
 const int msgCapacity = JSON_ARRAY_SIZE(4) + JSON_OBJECT_SIZE(2) + JSON_OBJECT_SIZE(10) + 306; // To Check. Do not move from here, some compilation error or compiler bug
@@ -137,23 +137,23 @@ public:
   {
     // Sensor model sample
     /*
-      {
-        "sensors": [
-          {
-            "id": "123456",
-            "now": "true",
-            "millis": 123456,
-            "value": "dummyVal"
-          },
-          {
-            "id": "123456",
-            "now": "false",
-            "millis": 123456,
-            "value": "dummyVal"
-          }
-        ]
-      }
-    */
+        {
+          "sensors": [
+            {
+              "id": "123456",
+              "now": "true",
+              "millis": 123456,
+              "value": "dummyVal"
+            },
+            {
+              "id": "123456",
+              "now": "false",
+              "millis": 123456,
+              "value": "dummyVal"
+            }
+          ]
+        }
+      */
 #ifdef DEBUG_BEESTATUS
     // Declare a buffer to hold the result
     char output[1024]; // To check
@@ -304,9 +304,6 @@ private:
     auto e = events.find(event);
     if (e != events.end())
     {
-#ifdef DEBUG_SOCKETIOMANAGER
-      DPRINTF("trigger event %s\n", event);
-#endif
       e->second(jMsg);
     }
     else
@@ -319,10 +316,6 @@ private:
   static void handleEvent(socketIOmessageType_t type, uint8_t *payload, size_t length)
   {
     StaticJsonDocument<msgCapacity> jMsg;
-#ifdef DEBUG_SOCKETIOMANAGER
-    DPRINTF("socketIOmessageType_t = %c\n", type);
-    DPRINTF("payload = %s\n", length == 0 ? (uint8_t *)"" : payload);
-#endif
     switch (type)
     {
     case sIOtype_EVENT:
@@ -330,7 +323,9 @@ private:
       if (error)
       {
 #ifdef DEBUG_SOCKETIOMANAGER
-        DPRINT(F("deserializeJson() failed: "));
+        DPRINTF("deserializeJson() failed: socketIOmessageType_t = %c\n", type);
+        DPRINTF("payload = %s\n", length == 0 ? (uint8_t *)"" : payload);
+        DPRINTF("deserializeJson() error: ");
         DPRINTLN(error.c_str());
 #endif
         return;
@@ -403,30 +398,69 @@ unsigned long restCallInterval = 0;
 
 void onUpdateThingValue(const StaticJsonDocument<msgCapacity> &jMsg)
 {
-  DPRINTLN("-------------------------");
-
+#ifdef DEBUG_SOCKETIOMANAGER
+  DPRINTLN("onUpdateThingValue: begin");
+#endif
   if (jMsg.isNull())
+  {
+#ifdef DEBUG_SOCKETIOMANAGER
+    DPRINTLN("onUpdateThingValue: jMsg.isNull()");
+    DPRINTLN("onUpdateThingValue: end");
+#endif
     return;
+  }
   if (!jMsg.is<JsonArray>())
+  {
+#ifdef DEBUG_SOCKETIOMANAGER
+    DPRINTLN("onUpdateThingValue: !jMsg.is<JsonArray>()");
+    DPRINTLN("onUpdateThingValue: end");
+#endif
     return;
+  }
   if (jMsg.size() != 4)
+  {
+#ifdef DEBUG_SOCKETIOMANAGER
+    DPRINTLN("onUpdateThingValue: jMsg.size() != 4");
+    DPRINTLN("onUpdateThingValue: end");
+#endif
     return;
+  }
 
   // Only Command for this bee
   bool asCmd = jMsg[3];
-  DPRINTF("asCmd = %d\n", asCmd);
   if (!asCmd)
+  {
+#ifdef DEBUG_SOCKETIOMANAGER
+    DPRINTLN("onUpdateThingValue: !asCmd");
+    DPRINTLN("onUpdateThingValue: end");
+#endif
     return;
+  }
+  
+#ifdef DEBUG_SOCKETIOMANAGER
+  DPRINTLN("onUpdateThingValue: Command begin");
+#endif
 
   const char *thingId = jMsg[1];
-  DPRINTF("ThingId = %s\n", thingId);
   // Only one thing for this bee
   if (strcmp(thingId, BeeStatus::thing) != 0)
+  {
+#ifdef DEBUG_SOCKETIOMANAGER
+    DPRINTLN("onUpdateThingValue: strcmp(thingId, BeeStatus::thing) != 0");
+    DPRINTLN("onUpdateThingValue: Command end");
+#endif
     return;
+  }
 
   auto beeObj = jMsg[2].as<JsonObject>();
   if (!beeObj.containsKey("sensors"))
+  {
+#ifdef DEBUG_SOCKETIOMANAGER
+    DPRINTLN("onUpdateThingValue: !beeObj.containsKey('sensors')");
+    DPRINTLN("onUpdateThingValue: Command end");
+#endif
     return;
+  }
 
   auto sensors = beeObj["sensors"].as<JsonArray>();
   for (auto sensor : sensors)
@@ -434,22 +468,23 @@ void onUpdateThingValue(const StaticJsonDocument<msgCapacity> &jMsg)
     if (!sensor.containsKey("id"))
       continue;
     long sensorId = sensor["id"];
-    DPRINTF("SensorId = %d\n", sensorId);
 
     const char *value = ""; // Seems possible
     bool now = true;
     if (sensor.containsKey("value"))
     {
       value = sensor["value"];
-      DPRINTF("Value = %s\n", value);
     }
     if (sensor.containsKey("now"))
     {
       now = sensor["now"];
-      DPRINTF("Now = %d\n", now);
     }
     BeeStatus::setSensorValue(sensorId, now, value);
   }
+
+#ifdef DEBUG_SOCKETIOMANAGER
+  DPRINTLN("onUpdateThingValue: Command end");
+#endif
 }
 
 void setup()
@@ -500,11 +535,17 @@ void loop()
     serializeJson(doc, jsonDoc);
 
     int httpCode = http.PUT(jsonDoc);
-    DPRINTLN(httpCode);
+#ifdef DEBUG_RESTCALL
+    DPRINTF("RestCall Http return code : %d\n", httpCode);
+#endif
     if (httpCode > 0)
-    { //Check for the returning code
+    {
+      //Check for the returning code
       String payload = http.getString();
-      DPRINTLN(payload);
+#ifdef DEBUG_RESTCALL
+    DPRINT("RestCall return payload : ");
+    DPRINTLN(payload);
+#endif      
     }
 
     http.end(); //Free resources
