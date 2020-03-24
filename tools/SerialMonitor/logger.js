@@ -16,7 +16,7 @@ if (!fs.existsSync(logDir)) {
 const filename = path.join(logDir, "results.log");
 
 const timezoneUTC = () => {
-	return moment().utc().format("YYYY-MM-DD hh:mm:ss");
+	return moment().utc().format("YYYY-MM-DD HH:mm:ss");
 };
 
 const logger = createLogger({

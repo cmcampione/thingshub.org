@@ -112,7 +112,7 @@ public:
   {
     if (BeeStatus::sensors.find(idSensor) != BeeStatus::sensors.end())
     {
-      Sensor &sensorValue = BeeStatus::sensors[idSensor];
+      Sensor& sensorValue = BeeStatus::sensors[idSensor];
       sensorValue.now = now;
       sensorValue.millis = millis();
       sensorValue.value = value;
@@ -127,7 +127,7 @@ public:
   {
     for (std::map<long, Sensor>::const_iterator it = BeeStatus::sensors.begin(); it != BeeStatus::sensors.end(); it++)
     {
-      const Sensor &sensorValue = it->second;
+      const Sensor& sensorValue = it->second;
       if (sensorValue.now)
         return true;
     }
@@ -163,7 +163,7 @@ public:
     JsonArray sensors = doc.createNestedArray("sensors");
     for (std::map<long, Sensor>::iterator it = BeeStatus::sensors.begin(); it != BeeStatus::sensors.end(); it++)
     {
-      Sensor &sensorValue = it->second;
+      Sensor& sensorValue = it->second;
 
       JsonObject sensor = sensors.createNestedObject();
       sensor["id"] = it->first;
@@ -436,7 +436,7 @@ void onUpdateThingValue(const StaticJsonDocument<msgCapacity> &jMsg)
 #endif
     return;
   }
-  
+
 #ifdef DEBUG_SOCKETIOMANAGER
   DPRINTLN("onUpdateThingValue: Command begin");
 #endif
@@ -543,11 +543,14 @@ void loop()
       //Check for the returning code
       String payload = http.getString();
 #ifdef DEBUG_RESTCALL
-    DPRINT("RestCall return payload : ");
-    DPRINTLN(payload);
-#endif      
+      DPRINT("RestCall return payload : ");
+      DPRINTLN(payload);
+#endif
     }
 
     http.end(); //Free resources
+
+    DPRINT("getFreeHeap : ");
+    DPRINTLN(ESP.getFreeHeap());
   }
 }

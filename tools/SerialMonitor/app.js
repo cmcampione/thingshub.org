@@ -20,14 +20,28 @@ if (!baudRate) {
 	process.exit();
 }
 
-const port = new SerialPort(serial_port, { baudRate:  parseInt(baudRate) });
+let port = null; 
 
-const parser = new Readline();
-port.pipe(parser);
+function openSerialPort() {
+	logger.info("Serial port opening", { code: 5 });
+	port = new SerialPort(serial_port, { baudRate:  parseInt(baudRate) });
+	port.on("error",() => {
+		logger.error("Serial port opening error", { code: 7 });
+		setTimeout(openSerialPort, 10000);
+	});
+	port.on("close", () => {
+		logger.error("Serial port closed", { code: 4 });
+		setTimeout(openSerialPort, 10000);
+	});
+	const parser = new Readline();
+	port.pipe(parser);
+	parser.on("data", line => {
+		logger.info(line, { code: 3 });
+	});
+}
 
-parser.on("data", line => {
-	logger.info(line, { code: 3 });
-});
+openSerialPort();
+
 //
 readline.emitKeypressEvents(process.stdin);
 // process.stdin.setRawMode(true); // ToDo: Why in debug does not works?
