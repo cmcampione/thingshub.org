@@ -13,7 +13,7 @@
 const int sensorsCount = 4;
 const int sensorsFieldCount = 4;
 /*
-  [
+  [ 
   "onUpdateThingValue",
   "f4c3c80b-d561-4a7b-80a5-f4805fdab9bb",
   {
@@ -57,6 +57,13 @@ int ledPin = 2;
 int ledStatus = LOW;
 
 //
+const byte buzzerPin = 15;
+const int freq = 2000;
+const int channel = 0;
+const int resolution = 8;
+const int dutyCycle = 128;
+
+//
 typedef std::function<void(const char *value)> SensorHandler;
 struct Sensor
 {
@@ -77,12 +84,14 @@ void onSensorPin2On(const char *value)
 {
   ledStatus = HIGH;
   digitalWrite(ledPin, ledStatus);
+  ledcWrite(channel, dutyCycle);
 }
 
 void onSensorPin2Off(const char *value)
 {
   ledStatus = LOW;
   digitalWrite(ledPin, ledStatus);
+  ledcWrite(channel, 0);
 }
 
 void onSensorPin2OnOff(const char *value)
@@ -493,6 +502,10 @@ void setup()
   Serial.begin(115200);
   //
   pinMode(ledPin, OUTPUT);
+  //
+  ledcSetup(channel, freq, resolution);
+  ledcAttachPin(buzzerPin, channel);
+  
   // BeeStatus setup
   BeeStatus::init();
   // RFSensor setup
@@ -501,7 +514,7 @@ void setup()
   WiFiManager::connect();
   // SocketIO setup
   SocketIOManager::on("onUpdateThingValue", onUpdateThingValue);
-  SocketIOManager::beginSocketSSLWithCA("api.thingshub.org", 3000, "/socket.io/?EIO=3&token=491e94d9-9041-4e5e-b6cb-9dad91bbf63d", root_ca, "");
+  SocketIOManager::beginSocketSSLWithCA("api.thingshub.org", 3000, "/socket.io/?EIO=3&token=491e94d9-9041-4e5e-b6cb-9dad91bbf63d", root_ca, "");  
 }
 
 void loop()
