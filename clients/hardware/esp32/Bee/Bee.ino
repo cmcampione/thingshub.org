@@ -505,7 +505,6 @@ void setup()
   //
   ledcSetup(channel, freq, resolution);
   ledcAttachPin(buzzerPin, channel);
-  
   // BeeStatus setup
   BeeStatus::init();
   // RFSensor setup

@@ -68,3 +68,6 @@ thingsMonitor.env
 # End of https://www.gitignore.io/api/node
 
 
+c_cpp_properties.json
+arduino.json
+settings.json

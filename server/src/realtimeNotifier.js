@@ -60,7 +60,6 @@ class ClientsConnectorSocketIO extends IClientsConnector {
 			userSockets.push(socket);
 
 			logger.info("ClientsConnectorSocketIO.Connection.username = " + user.username, { code: 117 });
-			logger.info("ClientsConnectorSocketIO.Connection.connections.size = " + self.connections.size, { code: 118 });
 			logger.info("ClientsConnectorSocketIO.Connection.userSockets.length = " + userSockets.length, { code: 119 });
 
 			return next();
@@ -86,7 +85,6 @@ class ClientsConnectorSocketIO extends IClientsConnector {
 					logger.info("ClientsConnectorSocketIO.disconnect.userSockets.length = " + userSockets.length, { code: 120 });
 					break;
 				}
-				logger.info("ClientsConnectorSocketIO.disconnect.connections.size = " + self.connections.size, { code: 121 });
 			});
 
 		});
