@@ -1,6 +1,5 @@
 // Per la gestione dello overflow di millis () ho utilizzato la soluzione proposta da https://www.leonardomiliani.com/2012/come-gestire-loverflow-di-millis/
 // Useful link https://lastminuteengineers.com/esp32-arduino-ide-tutorial/
-// Dummy
 #include <map>
 #include <vector>
 #include "WiFi.h"
