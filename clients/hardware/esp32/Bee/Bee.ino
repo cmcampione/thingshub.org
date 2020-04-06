@@ -1,5 +1,5 @@
 // Per la gestione dello overflow di millis () ho utilizzato la soluzione proposta da https://www.leonardomiliani.com/2012/come-gestire-loverflow-di-millis/
-
+// Useful link https://lastminuteengineers.com/esp32-arduino-ide-tutorial/
 #include <map>
 #include <vector>
 #include "WiFi.h"
@@ -26,9 +26,9 @@ const int sensorsFieldCount = 4;
   },
   false
   ]
-*/
 // ESP32/ESP8266	384+167 = 551
 // const int msgCapacity = JSON_ARRAY_SIZE(4) + JSON_ARRAY_SIZE(sensorsCount) + JSON_OBJECT_SIZE(1) + sensorsCount*JSON_OBJECT_SIZE(sensorsFieldCount) + 167; // To Check. Do not move from here, some compilation error or compiler bug
+*/
 
 /*
   [
@@ -104,7 +104,7 @@ const int sensorsCapacity = JSON_OBJECT_SIZE(1) + JSON_ARRAY_SIZE(sensorsCount) 
 class BeeStatus
 {
 public:
-  static const char *thing;
+  static const char* thing;
 
 private:
   static std::map<long, Sensor> sensors;
@@ -130,7 +130,11 @@ public:
 #ifdef DEBUG_BEESTATUS
       DPRINTLN("Sensor id found");
 #endif
+      return;
     }
+#ifdef DEBUG_BEESTATUS
+      DPRINTF("Sensor id: %d not found\n", idSensor );
+#endif    
   }
   static bool checkChanges()
   {
@@ -233,7 +237,7 @@ public:
     }
   }
 };
-RCSwitch RCSensorsManager::mySwitch = RCSwitch();
+RCSwitch RCSensorsManager::mySwitch = RCSwitch(); // ToDo: Do a copy?
 const int RCSensorsManager::pin = 4;
 
 // WiFi
@@ -496,19 +500,24 @@ void onUpdateThingValue(const StaticJsonDocument<msgCapacity> &jMsg)
 #endif
 }
 
+int pinLed = 5;
+int luce;
+int soglia = 280;
+
 void setup()
 {
-  //
   Serial.begin(115200);
-  //
+  // Integrate pin 2
   pinMode(ledPin, OUTPUT);
-  //
+  // Buzzer pin 15
   ledcSetup(channel, freq, resolution);
   ledcAttachPin(buzzerPin, channel);
+  // Photoresistor pin 5
+  pinMode(pinLed, OUTPUT); // 
+   // RFSensor setup pin 4
+  RCSensorsManager::init();
   // BeeStatus setup
   BeeStatus::init();
-  // RFSensor setup
-  RCSensorsManager::init();
   // WiFi setup
   WiFiManager::connect();
   // SocketIO setup
@@ -518,7 +527,13 @@ void setup()
 
 void loop()
 {
-  // Check RC Sensor State change
+  // Photoresistor
+  luce = analogRead(34);
+	if (luce < soglia)
+		digitalWrite(pinLed, HIGH);
+	else
+		digitalWrite(pinLed, LOW);
+  // Check RC Sensor State changes
   RCSensorsManager::updateSensorsStatus();
   // Check if wifi is ok, eventually try reconnecting every "WiFiManager::check_wifi_interval" milliseconds
   WiFiManager::checkConnection();
@@ -534,8 +549,6 @@ void loop()
     //
     StaticJsonDocument<sensorsCapacity> doc;
     BeeStatus::toJson(doc);
-
-    restCallInterval = millis();
 
     HTTPClient http;
     String url = String("/api/things/") + String(BeeStatus::thing) + String("/value");
@@ -561,6 +574,8 @@ void loop()
     }
 
     http.end(); //Free resources
+
+    restCallInterval = millis();
 
     DPRINT("getFreeHeap : ");
     DPRINTLN(ESP.getFreeHeap());
