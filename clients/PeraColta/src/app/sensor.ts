@@ -1,8 +1,8 @@
 export interface Sensor {
   thingId: string;
-  id: number;
+  id: string;
   name: string;
   now: boolean;
   millis: number;
-  value: string;
+  value: number;
 }

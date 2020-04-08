@@ -359,7 +359,6 @@ public:
       setPointLedOff.pins.push_back(setPointPin2LedOff);
 
       sensors["7271203"].setPoints.push_back(setPointLedOff);
-
     }
 
     { // Luminosità 01

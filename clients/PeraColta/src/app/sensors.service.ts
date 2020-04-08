@@ -4,10 +4,10 @@ import { ThingsService } from './things.service';
 import { Thing, HttpRequestCanceler } from 'thingshub-js-sdk';
 
 interface SensorRaw {
-  id: number;
-  now: any;
+  id: string;
+  now: boolean;
   millis: number;
-  value: any;
+  value: number;
 }
 
 // it's no iniectable because keep things state
@@ -26,7 +26,7 @@ export class SensorsService implements OnDestroy {
         return thing.id === id;
     })
   }
-  private searchSensorById(id: number): Sensor {
+  private searchSensorById(id: string): Sensor {
     return this.sensors.find((sensor) => {
       return sensor.id === id;
     })
