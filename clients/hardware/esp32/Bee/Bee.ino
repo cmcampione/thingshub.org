@@ -51,102 +51,493 @@ const int sensorsFieldCount = 4;
 */
 // ESP32/ESP8266	256+306 = 562
 const int msgCapacity = JSON_ARRAY_SIZE(4) + JSON_OBJECT_SIZE(2) + JSON_OBJECT_SIZE(10) + 306; // To Check. Do not move from here, some compilation error or compiler bug
+const int sensorsCapacity = JSON_OBJECT_SIZE(1) + JSON_ARRAY_SIZE(sensorsCount) + sensorsCount * JSON_OBJECT_SIZE(sensorsFieldCount) + 175; // To Change
 
 //
-int ledPin = 2;
-int ledStatus = LOW;
+class RCSensorsManager
+{
+private:
+  static RCSwitch mySwitch;
+  static int      pin; // To Check: Interrupt or pin? In my dev board i use D4 gpio and it works
+public:
+  static void init(int pinN)
+  {
+    pin = pinN;
+    mySwitch.enableReceive(pin);
+  }
+public:
+  static bool available()
+  {
+    return mySwitch.available();
+  }
+  static long getReceivedValue()
+  {
+#ifdef DEBUG_RCSENSORSMANAGER
+    DPRINT("RCSENSORSMANAGER - Received ");
+    DPRINT(mySwitch.getReceivedValue());
+    DPRINT(" / ");
+    DPRINT(mySwitch.getReceivedBitlength());
+    DPRINT("bit ");
+    DPRINT("Protocol: ");
+    DPRINT(mySwitch.getReceivedProtocol());
+    DPRINTLN();
+#endif
+    long value = mySwitch.getReceivedValue();
+    mySwitch.resetAvailable();
+    return value;
+  }
+};
+RCSwitch RCSensorsManager::mySwitch = RCSwitch(); // ToDo: Do a copy? As example
+int RCSensorsManager::pin           = 4;
+
+struct PWM
+{
+    int freq;
+    int channel;
+    int res;
+};
+struct Pin
+{
+  String  kind;  
+  int     min;
+  int     max;
+  PWM     pwm;
+
+  int     value;
+};
+typedef std::map<int,Pin>              pin_collection;
+typedef pin_collection::const_iterator pin_const_iterator;
+
+struct SetPointPin 
+{
+  int   n;
+  bool  force;
+  int   forceValue;
+  bool  toggle;
+};
+typedef std::vector<SetPointPin>                setPointPin_collection;
+typedef setPointPin_collection::const_iterator  setPointPin_const_iterator;
+
+struct SetPoint
+{
+  int min;
+  int max;
+
+  setPointPin_collection pins;
+};
+typedef std::vector<SetPoint>                setPoint_collection;
+typedef setPoint_collection::const_iterator  setPoint_const_iterator;
 
 //
-const byte buzzerPin = 15;
-const int freq = 2000;
-const int channel = 0;
-const int resolution = 8;
-const int dutyCycle = 128;
-
-//
-typedef std::function<void(const char *value)> SensorHandler;
 struct Sensor
 {
-  Sensor() : millis(0), now(false), value("false") {}
-  bool now;
-  unsigned long millis;
-  String value;
-  SensorHandler sensorHandler;
+  Sensor() : millis(0), now(false), value(0), pin(0), prior(false) {}
+
+  String              name;
+  int                 pin;
+  bool                prior;
+  setPoint_collection setPoints;
+  
+  bool                now;
+  unsigned long       millis;
+  int                 value;
 };
+typedef std::map<String, Sensor>            sensor_collection;
+typedef sensor_collection::iterator         sensor_iterator;
+typedef sensor_collection::const_iterator   sensor_const_iterator;
 
-void onSensorPin2Toggle(const char *value)
-{
-  ledStatus = ledStatus == HIGH ? LOW : HIGH;
-  digitalWrite(ledPin, ledStatus);
-}
-
-void onSensorPin2On(const char *value)
-{
-  ledStatus = HIGH;
-  digitalWrite(ledPin, ledStatus);
-  ledcWrite(channel, dutyCycle);
-}
-
-void onSensorPin2Off(const char *value)
-{
-  ledStatus = LOW;
-  digitalWrite(ledPin, ledStatus);
-  ledcWrite(channel, 0);
-}
-
-void onSensorPin2OnOff(const char *value)
-{
-  ledStatus = strcmp(value, "true") == 0 ? HIGH : LOW;
-  digitalWrite(ledPin, ledStatus);
-}
-
-const int sensorsCapacity = JSON_OBJECT_SIZE(1) + JSON_ARRAY_SIZE(sensorsCount) + sensorsCount * JSON_OBJECT_SIZE(sensorsFieldCount) + 175; // To Change
+//
 class BeeStatus
 {
 public:
-  static const char* thing;
-
+  static const char* thingCnfg;
+  static const char* thingValue;
 private:
-  static std::map<long, Sensor> sensors;
-
+  static  pin_collection    pins;
+  static  sensor_collection sensors;
 public:
   static void init()
   {
-    sensors[8171288].sensorHandler = onSensorPin2On;
-    sensors[8171284].sensorHandler = onSensorPin2Off;
-    sensors[31669624].sensorHandler = onSensorPin2OnOff;
-    sensors[7271203].sensorHandler = onSensorPin2OnOff;
-  }
-  static void setSensorValue(long idSensor, bool now, const char *value)
-  {
-    if (BeeStatus::sensors.find(idSensor) != BeeStatus::sensors.end())
+    { // Pin 2 - On board led
+      pins[2].kind = "DO";
+      pins[2].min = 0;
+      pins[2].max = 1;
+      pins[2].value = 0; //initial
+      pins[2].pwm.freq = 0;
+      pins[2].pwm.channel = 0;
+      pins[2].pwm.res = 0;
+    }
+
+    { // Pin 4 - RC sensor
+      pins[4].kind = "RC";
+      pins[4].min = 0;
+      pins[4].max = 1;
+      pins[4].value = 0; //initial
+      pins[4].pwm.freq = 0;
+      pins[4].pwm.channel = 0;
+      pins[4].pwm.res = 0;
+    }
+
+    { // Pin 5 - PhotoResistor Led
+      pins[5].kind = "DO";
+      pins[5].min = 0;
+      pins[5].max = 1;
+      pins[5].value = 0; //initial
+      pins[5].pwm.freq = 0;
+      pins[5].pwm.channel = 0;
+      pins[5].pwm.res = 0;
+    }
+
+    { // Pin 15 - Buzzer
+      pins[15].kind = "PWM";
+      pins[15].min = 0;
+      pins[15].max = 128;
+      pins[15].value = 0; //initial
+      pins[15].pwm.freq = 2000;
+      pins[15].pwm.channel = 0;
+      pins[15].pwm.res = 8;
+    }
+
+    { // Pin 34 - PhotoResistor
+      pins[34].kind = "AI";
+      pins[34].min = 0;
+      pins[34].max = 4095;
+      pins[34].value = 0; //initial
+      pins[34].pwm.freq = 0;
+      pins[34].pwm.channel = 0;
+      pins[34].pwm.res = 0;
+    }
+
+    for(pin_const_iterator it = pins.begin(); it != pins.end(); it++)
     {
-      Sensor& sensorValue = BeeStatus::sensors[idSensor];
-      sensorValue.now = now;
-      sensorValue.millis = millis();
-      sensorValue.value = value;
-      if (sensorValue.sensorHandler)
-        sensorValue.sensorHandler(value);
+      int pinN        = it->first;
+      const Pin& pin  = it->second;
+      if (pin.kind == "DO")
+      {
+        pinMode(pinN, OUTPUT);
+        continue;
+      }
+      if (pin.kind == "RC")
+      {
+        RCSensorsManager::init(pinN);
+        continue;
+      }
+      if (pin.kind == "PWM")
+      {
+        ledcSetup(pin.pwm.channel, pin.pwm.freq, pin.pwm.res);
+        ledcAttachPin(pinN, pin.pwm.channel);
+        continue;
+      }
+      if (pin.kind == "AI")
+      {
+        continue;
+      }
+    }
+
+    { // Telecomando 1 Apri
+      sensors["8171288"].name = "Telecomando 1 Apri";
+      sensors["8171288"].pin = 4;
+
+      SetPoint setPoint;
+      setPoint.min = 1;
+      setPoint.max = 1;
+
+      SetPointPin setPointPin2;
+      setPointPin2.n = 2;
+      setPointPin2.force = false;
+      setPointPin2.forceValue = 0;
+      setPointPin2.toggle = false;
+      setPoint.pins.push_back(setPointPin2);
+
+      SetPointPin setPointPin15;
+      setPointPin15.n = 15;
+      setPointPin15.force = true;
+      setPointPin15.forceValue = 5;//128
+      setPointPin15.toggle = false;
+      setPoint.pins.push_back(setPointPin15);
+
+      sensors["8171288"].setPoints.push_back(setPoint);
+    }    
+
+    { // Telecomando 1 Chiudi
+      sensors["8171284"].name = "Telecomando 1 Chiudi";
+      sensors["8171284"].pin = 4;
+
+      SetPoint setPoint;
+      setPoint.min = 1;
+      setPoint.max = 1;
+
+      SetPointPin setPointPin2;
+      setPointPin2.n = 2;
+      setPointPin2.force = true;
+      setPointPin2.forceValue = LOW;
+      setPointPin2.toggle = false;
+      setPoint.pins.push_back(setPointPin2);
+
+      SetPointPin setPointPin15;
+      setPointPin15.n = 15;
+      setPointPin15.force = true;
+      setPointPin15.forceValue = 0;
+      setPointPin15.toggle = false;
+      setPoint.pins.push_back(setPointPin15);
+
+      sensors["8171284"].setPoints.push_back(setPoint);
+    }
+/*
+    sensors["31669624"].name = "Pir Salone";
+    sensors["31669624"].pin = 4;
+
+    sensors["7271203"].name = "Contatto Filare";
+    sensors["7271203"].pin = 4;
+*/
+    {
+      sensors["PhotoResistor-01"].name = "Luminosità 01";
+      sensors["PhotoResistor-01"].pin = 34;
+
+      SetPoint setPointLedOn;
+      setPointLedOn.min = 0;
+      setPointLedOn.max = 250;
+
+      SetPointPin setPointPin5LedOn;
+      setPointPin5LedOn.n = 5;
+      setPointPin5LedOn.force = true;
+      setPointPin5LedOn.forceValue = 1;
+      setPointPin5LedOn.toggle = false;
+
+      setPointLedOn.pins.push_back(setPointPin5LedOn);
+      
+      sensors["PhotoResistor-01"].setPoints.push_back(setPointLedOn);
+
+      SetPoint setPointLedOff;
+      setPointLedOff.min = 251;
+      setPointLedOff.max = 4095;
+
+      SetPointPin setPointPin5LedOff;
+      setPointPin5LedOff.n = 5;
+      setPointPin5LedOff.force = true;
+      setPointPin5LedOff.forceValue = 0;
+      setPointPin5LedOff.toggle = false;
+
+      setPointLedOff.pins.push_back(setPointPin5LedOff);
+      
+      sensors["PhotoResistor-01"].setPoints.push_back(setPointLedOff);
+    }
+  }
+
+  static void setPinValue(int pinN, int value) 
+  {
+    if (pins.find(pinN) == pins.end())
+    {
 #ifdef DEBUG_BEESTATUS
-      DPRINTLN("Sensor id found");
+      DPRINTF("BEESTATUS - Pin n: %d not found\n", pinN);
+#endif 
+      return;
+    }
+      
+    Pin& pin = pins[pinN];
+#ifdef DEBUG_BEESTATUS
+    DPRINTF("BEESTATUS - Write Pin n: %d kind: %s value: %d\n", pinN, pin.kind, value);
+#endif
+    if (pin.kind == "RC" || pin.kind == "DI" || pin.kind == "AI")
+    {
+#ifdef DEBUG_BEESTATUS
+      DPRINTF("BEESTATUS - Pin n: %d kind: %s is not set for write\n", pinN, pin.kind.c_str());
 #endif
       return;
     }
+    if (value < pin.min || value > pin.max)
+    {
 #ifdef DEBUG_BEESTATUS
-      DPRINTF("Sensor id: %d not found\n", idSensor );
-#endif    
+      DPRINTF("BEESTATUS - Pin n: %d value: %d is out of range\n", pinN, value);
+#endif
+      return;
+    }
+    if (pin.value == value)
+    {
+      return;
+    }
+    if (pin.kind == "DO")
+    {
+      digitalWrite(pinN, value);
+      pin.value = value;
+      return;
+    }
+    if (pin.kind == "PWM")
+    {
+      ledcWrite(pin.pwm.channel, value);
+      pin.value = value;
+      return;
+    }
+#ifdef DEBUG_BEESTATUS
+    DPRINTF("BEESTATUS - Pin n: %d kind: %s not recognized\n", pinN, pin.kind.c_str());
+#endif
   }
+
+  static void togglePinValue(int pinN) 
+  {
+    if (pins.find(pinN) == pins.end())
+    {
+#ifdef DEBUG_BEESTATUS
+      DPRINTF("BEESTATUS - Pin n: %d not found\n", pinN);
+#endif 
+      return;
+    }
+    
+    Pin& pin = pins[pinN];
+    if (pin.kind == "RC" || pin.kind == "DI" || pin.kind == "AI")
+    {
+#ifdef DEBUG_BEESTATUS
+      DPRINTF("BEESTATUS - Pin n: %d kind: %s is not set for write\n", pinN, pin.kind.c_str());
+#endif
+      return;
+    }
+
+    int value = pin.min;
+    if (pin.value == pin.min)
+      value = pin.max;
+    if (pin.value == pin.max)
+      value = pin.min;
+
+    if (pin.kind == "DO")
+    {
+      digitalWrite(pinN, value);
+      pin.value = value;
+      return;
+    }
+    if (pin.kind == "PWM")
+    {
+      ledcWrite(pin.pwm.channel, value);
+      pin.value = value;
+      return;
+    }
+#ifdef DEBUG_BEESTATUS
+    DPRINTF("BEESTATUS - Pin n: %d kind: %s not recognized\n", pinN, pin.kind);
+#endif
+  }
+
+  static void checkSetPoints(const setPoint_collection& setPoints, int value)
+  {
+    for (setPoint_const_iterator it = setPoints.begin(); it != setPoints.end(); it++)
+    {
+      const SetPoint& setPoint = *it;
+      if (value >= setPoint.min && value <= setPoint.max) 
+      {
+        for (setPointPin_const_iterator n = setPoint.pins.begin(); n != setPoint.pins.end(); n++)
+        {
+          const SetPointPin& setPointPin = *n;
+          if (setPointPin.force == true)
+          {
+#ifdef DEBUG_BEESTATUS
+            DPRINTF("BEESTATUS - SetPointPin n: %d value: %d forced\n", setPointPin.n, setPointPin.forceValue);
+#endif
+            setPinValue(setPointPin.n, setPointPin.forceValue);
+            continue;
+          }
+          if (setPointPin.toggle == true)
+          {
+            togglePinValue(setPointPin.n);
+            continue;
+          }
+          setPinValue(setPointPin.n, value);
+        }
+      }
+    }
+  }
+
+  static void setSensorsValueFromPin(int pin, int value)
+  {
+    for (sensor_iterator it = sensors.begin(); it != sensors.end(); it++)
+    {
+      Sensor& sensor = it->second;
+      if (sensor.pin != pin)
+        continue;
+
+      if (sensor.value == value)
+        continue;
+
+      sensor.now = true;
+      sensor.millis = millis();
+      sensor.value = value;
+
+      checkSetPoints(sensor.setPoints, value);
+    }
+  }
+
+  static void setSensorValue(const char* sensorId, int value) 
+  {
+    if (sensors.find(sensorId) == sensors.end())
+    {
+#ifdef DEBUG_BEESTATUS
+        DPRINTF("BEESTATUS - Sensor id: %s not found\n", sensorId);
+#endif
+      return;
+    }
+
+    Sensor& sensor = sensors[sensorId];
+
+    sensor.now = true;
+    sensor.millis = millis();
+    sensor.value = value;
+
+    checkSetPoints(sensor.setPoints, value);
+  }
+
+  static void loop() {
+    for (pin_const_iterator it = pins.begin(); it != pins.end(); it++)
+    {
+      int pinN        = it->first;
+      const Pin& pin  = it->second;
+#ifdef DEBUG_BEESTATUS
+      DPRINTF("BEESTATUS - Elaborating Pin n: %d kind: %s\n", pinN, pin.kind.c_str());
+#endif
+      if (pin.kind == "DO")
+      {
+        continue;
+      }
+      if (pin.kind == "PWM")
+      {
+        continue;
+      }
+      if (pin.kind == "AI") 
+      {
+        int value = analogRead(pinN);
+#ifdef DEBUG_BEESTATUS
+      DPRINTF("BEESTATUS - Read Pin n: %d kind: %s analogic value: %d\n", pinN, pin.kind.c_str(),value);
+#endif
+        setSensorsValueFromPin(pinN, value);
+        continue;
+      }
+      if (pin.kind == "RC") 
+      {
+        if (RCSensorsManager::available() == false)
+          continue;
+        
+        long sensorId = RCSensorsManager::getReceivedValue();
+        String sensorIdStr(sensorId);
+#ifdef DEBUG_BEESTATUS
+        DPRINTF("BEESTATUS - Read Pin n: %d kind: %s sensor id: %s\n", pinN, pin.kind.c_str(), sensorIdStr.c_str());
+#endif        
+        setSensorValue(sensorIdStr.c_str(), HIGH);
+        continue;
+      }
+#ifdef DEBUG_BEESTATUS
+      DPRINTF("BEESTATUS - Pin n: %d kind %s not found\n", pinN, pin.kind.c_str());
+#endif
+    }  
+  }
+  
   static bool checkChanges()
   {
-    for (std::map<long, Sensor>::const_iterator it = BeeStatus::sensors.begin(); it != BeeStatus::sensors.end(); it++)
+    for (sensor_const_iterator it = sensors.begin(); it != sensors.end(); it++)
     {
-      const Sensor& sensorValue = it->second;
-      if (sensorValue.now)
+      const Sensor& sensor = it->second;
+      if (sensor.now && sensor.prior)
         return true;
     }
     return false;
   }
-  static void toJson(StaticJsonDocument<sensorsCapacity> &doc)
+
+  static void toJson(StaticJsonDocument<sensorsCapacity>& doc)
   {
     // Sensor model sample
     /*
@@ -173,12 +564,12 @@ public:
     int count = 0;
 #endif
     doc.clear();
-    JsonArray sensors = doc.createNestedArray("sensors");
-    for (std::map<long, Sensor>::iterator it = BeeStatus::sensors.begin(); it != BeeStatus::sensors.end(); it++)
+    JsonArray sensorsNode = doc.createNestedArray("sensors");
+    for (sensor_iterator it = sensors.begin(); it != sensors.end(); it++)
     {
       Sensor& sensorValue = it->second;
 
-      JsonObject sensor = sensors.createNestedObject();
+      JsonObject sensor = sensorsNode.createNestedObject();
       sensor["id"] = it->first;
       sensor["now"] = sensorValue.now;
       sensor["millis"] = sensorValue.millis;
@@ -188,6 +579,7 @@ public:
 
 #ifdef DEBUG_BEESTATUS
       serializeJson(sensor, output);
+      DPRINT("BEESTATUS - ");
       DPRINT(count++);
       DPRINT(": ");
       DPRINTLN(output);
@@ -200,45 +592,12 @@ public:
 #endif
   }
 };
-const char *BeeStatus::thing = "f4c3c80b-d561-4a7b-80a5-f4805fdab9bb";
-std::map<long, Sensor> BeeStatus::sensors;
 
-//
-class RCSensorsManager
-{
-private:
-  static RCSwitch mySwitch;
-  static const int pin; // To Check: Interrupt or pin? In my dev board i use D4 gpio and it works
-public:
-  static void init()
-  {
-    RCSensorsManager::mySwitch.enableReceive(RCSensorsManager::pin); // Pin 4 or interrupt?
-  }
+const char* BeeStatus::thingCnfg  = "";
+const char* BeeStatus::thingValue = "f4c3c80b-d561-4a7b-80a5-f4805fdab9bb";
 
-public:
-  static void updateSensorsStatus()
-  {
-    if (mySwitch.available())
-    {
-#ifdef DEBUG_RCSENSORSMANAGER
-      DPRINT("Received ");
-      DPRINT(mySwitch.getReceivedValue());
-      DPRINT(" / ");
-      DPRINT(mySwitch.getReceivedBitlength());
-      DPRINT("bit ");
-      DPRINT("Protocol: ");
-      DPRINT(mySwitch.getReceivedProtocol());
-      DPRINTLN();
-#endif
-      long sensorId = mySwitch.getReceivedValue();
-      BeeStatus::setSensorValue(sensorId, true, "true");
-
-      mySwitch.resetAvailable();
-    }
-  }
-};
-RCSwitch RCSensorsManager::mySwitch = RCSwitch(); // ToDo: Do a copy?
-const int RCSensorsManager::pin = 4;
+pin_collection    BeeStatus::pins;
+sensor_collection BeeStatus::sensors;
 
 // WiFi
 class WiFiManager
@@ -266,7 +625,7 @@ public:
     } while (WiFi.status() != WL_CONNECTED);
     DPRINTLN("Connected to the WiFi");
   }
-  static void checkConnection()
+  static void loop()
   {
     // if wifi is down, try reconnecting every 15 seconds
     if (WiFi.status() != WL_CONNECTED)
@@ -309,7 +668,6 @@ class SocketIOManager
 private:
   static SocketIOclient webSocket;
   static std::map<String, std::function<void(const StaticJsonDocument<msgCapacity> &)>> events;
-
 private:
   static void trigger(const StaticJsonDocument<msgCapacity> &jMsg)
   {
@@ -377,7 +735,6 @@ public:
     SocketIOManager::webSocket.loop();
   }
 };
-
 SocketIOclient SocketIOManager::webSocket;
 std::map<String, std::function<void(const StaticJsonDocument<msgCapacity> &)>> SocketIOManager::events;
 
@@ -456,7 +813,7 @@ void onUpdateThingValue(const StaticJsonDocument<msgCapacity> &jMsg)
 
   const char *thingId = jMsg[1];
   // Only one thing for this bee
-  if (strcmp(thingId, BeeStatus::thing) != 0)
+  if (strcmp(thingId, BeeStatus::thingValue) != 0)
   {
 #ifdef DEBUG_SOCKETIOMANAGER
     DPRINTLN("onUpdateThingValue: strcmp(thingId, BeeStatus::thing) != 0");
@@ -480,19 +837,25 @@ void onUpdateThingValue(const StaticJsonDocument<msgCapacity> &jMsg)
   {
     if (!sensor.containsKey("id"))
       continue;
-    long sensorId = sensor["id"];
 
-    const char *value = ""; // Seems possible
-    bool now = true;
+    String sensorId = sensor["id"];
+
+    int value = 0;
     if (sensor.containsKey("value"))
     {
       value = sensor["value"];
     }
+/*  No matter "now"    
+    bool now = true;
     if (sensor.containsKey("now"))
     {
       now = sensor["now"];
     }
-    BeeStatus::setSensorValue(sensorId, now, value);
+*/
+#ifdef DEBUG_SOCKETIOMANAGER
+    DPRINTF("onUpdateThingValue: Sensor ID: %s Value: %d\n", sensorId.c_str(), value);
+#endif
+    BeeStatus::setSensorValue(sensorId.c_str(), value);
   }
 
 #ifdef DEBUG_SOCKETIOMANAGER
@@ -500,22 +863,9 @@ void onUpdateThingValue(const StaticJsonDocument<msgCapacity> &jMsg)
 #endif
 }
 
-int pinLed = 5;
-int luce;
-int soglia = 280;
-
 void setup()
 {
   Serial.begin(115200);
-  // Integrate pin 2
-  pinMode(ledPin, OUTPUT);
-  // Buzzer pin 15
-  ledcSetup(channel, freq, resolution);
-  ledcAttachPin(buzzerPin, channel);
-  // Photoresistor pin 5
-  pinMode(pinLed, OUTPUT); // 
-   // RFSensor setup pin 4
-  RCSensorsManager::init();
   // BeeStatus setup
   BeeStatus::init();
   // WiFi setup
@@ -527,22 +877,17 @@ void setup()
 
 void loop()
 {
-  // Photoresistor
-  luce = analogRead(34);
-	if (luce < soglia)
-		digitalWrite(pinLed, HIGH);
-	else
-		digitalWrite(pinLed, LOW);
-  // Check RC Sensor State changes
-  RCSensorsManager::updateSensorsStatus();
+  //
+  BeeStatus::loop();
   // Check if wifi is ok, eventually try reconnecting every "WiFiManager::check_wifi_interval" milliseconds
-  WiFiManager::checkConnection();
+  WiFiManager::loop();
   if (WiFi.status() != WL_CONNECTED)
     return;
   //
   SocketIOManager::loop();
   //
-  bool immediately = BeeStatus::checkChanges();
+  //bool immediately = BeeStatus::checkChanges();
+  bool immediately = false;
   //
   if ((immediately == true) || (millis() - restCallInterval >= 5000))
   {
@@ -551,7 +896,7 @@ void loop()
     BeeStatus::toJson(doc);
 
     HTTPClient http;
-    String url = String("/api/things/") + String(BeeStatus::thing) + String("/value");
+    String url = String("/api/things/") + String(BeeStatus::thingValue) + String("/value");
     http.begin("api.thingshub.org", 3000, url, root_ca); //Specify the URL and certificate
     http.addHeader("thapikey", "491e94d9-9041-4e5e-b6cb-9dad91bbf63d");
     http.addHeader("Content-Type", "application/json");
@@ -577,7 +922,7 @@ void loop()
 
     restCallInterval = millis();
 
-    DPRINT("getFreeHeap : ");
-    DPRINTLN(ESP.getFreeHeap());
+    //DPRINT("getFreeHeap : ");
+    //DPRINTLN(ESP.getFreeHeap());
   }
 }
