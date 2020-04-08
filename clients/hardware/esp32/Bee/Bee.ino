@@ -155,14 +155,14 @@ public:
 private:
   static  pin_collection    pins;
   static  sensor_collection sensors;
-public:
-  static void init()
+private:
+  static void setupPins()
   {
     { // Pin 2 - On board led
       pins[2].kind = "DO";
       pins[2].min = 0;
       pins[2].max = 1;
-      pins[2].value = 0; //initial
+      pins[2].value = LOW; //initial
       pins[2].pwm.freq = 0;
       pins[2].pwm.channel = 0;
       pins[2].pwm.res = 0;
@@ -182,7 +182,7 @@ public:
       pins[5].kind = "DO";
       pins[5].min = 0;
       pins[5].max = 1;
-      pins[5].value = 0; //initial
+      pins[5].value = LOW; //initial
       pins[5].pwm.freq = 0;
       pins[5].pwm.channel = 0;
       pins[5].pwm.res = 0;
@@ -208,7 +208,7 @@ public:
       pins[34].pwm.res = 0;
     }
 
-    for(pin_const_iterator it = pins.begin(); it != pins.end(); it++)
+    for (pin_const_iterator it = pins.begin(); it != pins.end(); it++)
     {
       int pinN        = it->first;
       const Pin& pin  = it->second;
@@ -233,7 +233,15 @@ public:
         // Doesn't initial setup
         continue;
       }
+#ifdef DEBUG_BEESTATUS
+      DPRINTF("BEESTATUS - Pin n: %d kind: %s - Kind not found\n", pinN, pin.kind);
+#endif
     }
+  }
+public:
+  static void init()
+  {
+    setupPins();
 
     { // Telecomando 1 Apri
       sensors["8171288"].name = "Telecomando 1 Apri";
@@ -285,7 +293,7 @@ public:
       sensors["8171284"].setPoints.push_back(setPoint);
     }
 
-    {
+    { // Pir Salone
       sensors["31669624"].name = "Pir Salone";
       sensors["31669624"].pin = 4;
       sensors["31669624"].prior = true;
@@ -319,7 +327,7 @@ public:
       sensors["31669624"].setPoints.push_back(setPointLedOff);
     }
 
-    {
+    { // Contatto Filare
       sensors["7271203"].name = "Contatto Filare";
       sensors["7271203"].pin = 4;
       sensors["7271203"].prior = true;
@@ -354,7 +362,7 @@ public:
 
     }
 
-    {
+    { // Luminosità 01
       sensors["PhotoResistor-01"].name = "Luminosità 01";
       sensors["PhotoResistor-01"].pin = 34;
 
@@ -405,14 +413,14 @@ public:
     if (pin.kind == "RC" || pin.kind == "DI" || pin.kind == "AI")
     {
 #ifdef DEBUG_BEESTATUS
-      DPRINTF("BEESTATUS - Pin n: %d kind: %s is not set for write\n", pinN, pin.kind.c_str());
+      DPRINTF("BEESTATUS - Pin n: %d kind: %s - Pin is not set for write\n", pinN, pin.kind.c_str());
 #endif
       return;
     }
     if (value < pin.min || value > pin.max)
     {
 #ifdef DEBUG_BEESTATUS
-      DPRINTF("BEESTATUS - Pin n: %d value: %d is out of range\n", pinN, value);
+      DPRINTF("BEESTATUS - Pin n: %d value: %d - Value is out of range\n", pinN, value);
 #endif
       return;
     }
@@ -451,7 +459,7 @@ public:
     if (pin.kind == "RC" || pin.kind == "DI" || pin.kind == "AI")
     {
 #ifdef DEBUG_BEESTATUS
-      DPRINTF("BEESTATUS - Pin n: %d kind: %s is not set for write\n", pinN, pin.kind.c_str());
+      DPRINTF("BEESTATUS - Pin n: %d kind: %s - Pin is not set for write\n", pinN, pin.kind.c_str());
 #endif
       return;
     }
@@ -475,7 +483,7 @@ public:
       return;
     }
 #ifdef DEBUG_BEESTATUS
-    DPRINTF("BEESTATUS - Pin n: %d kind: %s not recognized\n", pinN, pin.kind);
+    DPRINTF("BEESTATUS - Pin n: %d kind: %s - Kind not recognized\n", pinN, pin.kind);
 #endif
   }
 
