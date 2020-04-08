@@ -57,21 +57,21 @@ const ThingsConfigs = new Map([
 			checkInterval: null,
 			// Specific for Home appliance
 			sensors: new Map([
-				[31669624, {
+				["31669624", {
 					sensorName: "Salone",
-					onUpdateThingValueAlarmValue: "true"
+					onUpdateThingValueAlarmValue: 1
 				}],
-				[7271203, {
+				["7271203", {
 					sensorName: "Contatto filare",
-					onUpdateThingValueAlarmValue: "true"
+					onUpdateThingValueAlarmValue: 1
 				}],
-				[8171288, {
+				["8171288", {
 					sensorName: "Telecomando 1 chiudi",
-					onUpdateThingValueAlarmValue: "true"
+					onUpdateThingValueAlarmValue: 1
 				}],
-				[8171284, {
+				["8171284", {
 					sensorName: "Telecomando 1 apri",
-					onUpdateThingValueAlarmValue: "true"
+					onUpdateThingValueAlarmValue: 1
 				}]
 			])
 		},
@@ -79,22 +79,22 @@ const ThingsConfigs = new Map([
 			lastOnUpdateThingValueEvent: null,
 			inAlarmForDelay: false,
 			sensors: new Map([
-				[31669624, {
+				["31669624", {
 					inAlarmForAlarm: false,
 					emailAlarmSending: false,
 					emailAlarmSent: false
 				}],
-				[7271203, {
+				["7271203", {
 					inAlarmForAlarm: false,
 					emailAlarmSending: false,
 					emailAlarmSent: false
 				}],
-				[8171288, {
+				["8171288", {
 					inAlarmForAlarm: false,
 					emailAlarmSending: false,
 					emailAlarmSent: false
 				}],
-				[8171284, {
+				["8171284", {
 					inAlarmForAlarm: false,
 					emailAlarmSending: false,
 					emailAlarmSent: false
