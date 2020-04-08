@@ -10,7 +10,7 @@
 #include "BuildDefine.h"
 
 // Max capacity for actual msg
-const int sensorsCount = 4;
+const int sensorsCount = 5;
 const int sensorsFieldCount = 4;
 /*
   [ 
@@ -230,6 +230,7 @@ public:
       }
       if (pin.kind == "AI")
       {
+        // Doesn't initial setup
         continue;
       }
     }
@@ -283,13 +284,76 @@ public:
 
       sensors["8171284"].setPoints.push_back(setPoint);
     }
-/*
-    sensors["31669624"].name = "Pir Salone";
-    sensors["31669624"].pin = 4;
 
-    sensors["7271203"].name = "Contatto Filare";
-    sensors["7271203"].pin = 4;
-*/
+    {
+      sensors["31669624"].name = "Pir Salone";
+      sensors["31669624"].pin = 4;
+      sensors["31669624"].prior = true;
+
+      SetPoint setPointLedOn;
+      setPointLedOn.min = 1;
+      setPointLedOn.max = 1;
+
+      SetPointPin setPointPin2LedOn;
+      setPointPin2LedOn.n = 2;
+      setPointPin2LedOn.force = false;
+      setPointPin2LedOn.forceValue = HIGH;
+      setPointPin2LedOn.toggle = false;
+
+      setPointLedOn.pins.push_back(setPointPin2LedOn);
+      
+      sensors["31669624"].setPoints.push_back(setPointLedOn);
+
+      SetPoint setPointLedOff;
+      setPointLedOff.min = 0;
+      setPointLedOff.max = 0;
+
+      SetPointPin setPointPin2LedOff;
+      setPointPin2LedOff.n = 2;
+      setPointPin2LedOff.force = true;
+      setPointPin2LedOff.forceValue = LOW;
+      setPointPin2LedOff.toggle = false;
+
+      setPointLedOff.pins.push_back(setPointPin2LedOff);
+      
+      sensors["31669624"].setPoints.push_back(setPointLedOff);
+    }
+
+    {
+      sensors["7271203"].name = "Contatto Filare";
+      sensors["7271203"].pin = 4;
+      sensors["7271203"].prior = true;
+
+      SetPoint setPointLedOn;
+      setPointLedOn.min = 1;
+      setPointLedOn.max = 1;
+
+      SetPointPin setPointPin2LedOn;
+      setPointPin2LedOn.n = 2;
+      setPointPin2LedOn.force = false;
+      setPointPin2LedOn.forceValue = HIGH;
+      setPointPin2LedOn.toggle = false;
+
+      setPointLedOn.pins.push_back(setPointPin2LedOn);
+      
+      sensors["7271203"].setPoints.push_back(setPointLedOn);
+
+      SetPoint setPointLedOff;
+      setPointLedOff.min = 0;
+      setPointLedOff.max = 0;
+
+      SetPointPin setPointPin2LedOff;
+      setPointPin2LedOff.n = 2;
+      setPointPin2LedOff.force = true;
+      setPointPin2LedOff.forceValue = LOW;
+      setPointPin2LedOff.toggle = false;
+
+      setPointLedOff.pins.push_back(setPointPin2LedOff);
+
+      sensors["7271203"].setPoints.push_back(setPointLedOff);
+
+    }
+
     {
       sensors["PhotoResistor-01"].name = "Luminosità 01";
       sensors["PhotoResistor-01"].pin = 34;
@@ -444,16 +508,17 @@ public:
     }
   }
 
-  static void setSensorsValueFromPin(int pin, int value)
+  static bool setSensorsValueFromPin(int pin, int value)
   {
+    bool immediately = false;
     for (sensor_iterator it = sensors.begin(); it != sensors.end(); it++)
     {
       Sensor& sensor = it->second;
       if (sensor.pin != pin)
         continue;
 
-      if (sensor.value == value)
-        continue;
+      if (immediately == false)
+        immediately = sensor.prior;
 
       sensor.now = true;
       sensor.millis = millis();
@@ -461,16 +526,17 @@ public:
 
       checkSetPoints(sensor.setPoints, value);
     }
+    return immediately;
   }
 
-  static void setSensorValue(const char* sensorId, int value) 
+  static bool setSensorValue(const char* sensorId, int value) 
   {
     if (sensors.find(sensorId) == sensors.end())
     {
 #ifdef DEBUG_BEESTATUS
         DPRINTF("BEESTATUS - Sensor id: %s not found\n", sensorId);
 #endif
-      return;
+      return false;
     }
 
     Sensor& sensor = sensors[sensorId];
@@ -480,9 +546,12 @@ public:
     sensor.value = value;
 
     checkSetPoints(sensor.setPoints, value);
+
+    return sensor.prior;
   }
 
-  static void loop() {
+  static bool loop() {
+    bool immediately = false;
     for (pin_const_iterator it = pins.begin(); it != pins.end(); it++)
     {
       int pinN        = it->first;
@@ -502,9 +571,11 @@ public:
       {
         int value = analogRead(pinN);
 #ifdef DEBUG_BEESTATUS
-      DPRINTF("BEESTATUS - Read Pin n: %d kind: %s analogic value: %d\n", pinN, pin.kind.c_str(),value);
+        DPRINTF("BEESTATUS - Read Pin n: %d kind: %s analogic value: %d\n", pinN, pin.kind.c_str(),value);
 #endif
-        setSensorsValueFromPin(pinN, value);
+        int prior = setSensorsValueFromPin(pinN, value);
+        if (immediately == false)
+          immediately = prior;
         continue;
       }
       if (pin.kind == "RC") 
@@ -517,26 +588,18 @@ public:
 #ifdef DEBUG_BEESTATUS
         DPRINTF("BEESTATUS - Read Pin n: %d kind: %s sensor id: %s\n", pinN, pin.kind.c_str(), sensorIdStr.c_str());
 #endif        
-        setSensorValue(sensorIdStr.c_str(), HIGH);
+        int prior = setSensorValue(sensorIdStr.c_str(), HIGH);
+        if (immediately == false)
+          immediately = prior;
         continue;
       }
 #ifdef DEBUG_BEESTATUS
       DPRINTF("BEESTATUS - Pin n: %d kind %s not found\n", pinN, pin.kind.c_str());
 #endif
-    }  
+    }
+    return immediately;
   }
   
-  static bool checkChanges()
-  {
-    for (sensor_const_iterator it = sensors.begin(); it != sensors.end(); it++)
-    {
-      const Sensor& sensor = it->second;
-      if (sensor.now && sensor.prior)
-        return true;
-    }
-    return false;
-  }
-
   static void toJson(StaticJsonDocument<sensorsCapacity>& doc)
   {
     // Sensor model sample
@@ -878,17 +941,12 @@ void setup()
 void loop()
 {
   //
-  BeeStatus::loop();
+  bool immediately = BeeStatus::loop();
   // Check if wifi is ok, eventually try reconnecting every "WiFiManager::check_wifi_interval" milliseconds
   WiFiManager::loop();
   if (WiFi.status() != WL_CONNECTED)
-    return;
-  //
-  SocketIOManager::loop();
-  //
-  //bool immediately = BeeStatus::checkChanges();
-  bool immediately = false;
-  //
+    return;  
+  //  
   if ((immediately == true) || (millis() - restCallInterval >= 5000))
   {
     //
@@ -925,4 +983,6 @@ void loop()
     //DPRINT("getFreeHeap : ");
     //DPRINTLN(ESP.getFreeHeap());
   }
+  //
+  SocketIOManager::loop();
 }
