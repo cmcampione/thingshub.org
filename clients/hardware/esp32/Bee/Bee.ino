@@ -18,10 +18,10 @@ const int sensorsFieldCount = 4;
   "f4c3c80b-d561-4a7b-80a5-f4805fdab9bb",
   {
     sensors : [
-      {id : 7271203, now : false, millis : 130538923, value : "false"},
-      {id : 8171284, now : false, millis : 130541105, value : "false"},
-      {id : 8171288, now : false, millis : 130541116, value : "false"},
-      {id : 31669624, now : false, millis : 136470772, value : "true"}
+      {"id" : "7271203", "value" : 123456},
+      {"id" : "8171284", "value" : 123456},
+      {"id" : "8171288", "value" : 123456},
+      {"id" : "31669624", "value" : 123456}
     ]
   },
   false
@@ -50,7 +50,7 @@ const int sensorsFieldCount = 4;
   ]
 */
 // ESP32/ESP8266	256+306 = 562
-const int msgCapacity = JSON_ARRAY_SIZE(4) + JSON_OBJECT_SIZE(2) + JSON_OBJECT_SIZE(10) + 306; // To Check. Do not move from here, some compilation error or compiler bug
+const int msgCapacity = JSON_ARRAY_SIZE(4) + JSON_OBJECT_SIZE(2) + JSON_OBJECT_SIZE(10) + 306;                                              // To Check. Do not move from here, some compilation error or compiler bug
 const int sensorsCapacity = JSON_OBJECT_SIZE(1) + JSON_ARRAY_SIZE(sensorsCount) + sensorsCount * JSON_OBJECT_SIZE(sensorsFieldCount) + 175; // To Change
 
 //
@@ -58,13 +58,14 @@ class RCSensorsManager
 {
 private:
   static RCSwitch mySwitch;
-  static int      pin; // To Check: Interrupt or pin? In my dev board i use D4 gpio and it works
+  static int pin; // To Check: Interrupt or pin? In my dev board i use D4 gpio and it works
 public:
   static void init(int pinN)
   {
     pin = pinN;
     mySwitch.enableReceive(pin);
   }
+
 public:
   static bool available()
   {
@@ -88,35 +89,38 @@ public:
   }
 };
 RCSwitch RCSensorsManager::mySwitch = RCSwitch(); // ToDo: Do a copy? As example
-int RCSensorsManager::pin           = 4;
+int RCSensorsManager::pin = 4;
 
+//
 struct PWM
 {
-    int freq;
-    int channel;
-    int res;
+  int freq;
+  int channel;
+  int res;
 };
 struct Pin
 {
-  String  kind;  
-  int     min;
-  int     max;
-  PWM     pwm;
+  String kind;
+  int min;
+  int max;
+  PWM pwm;
 
-  int     value;
+  int value;
 };
-typedef std::map<int,Pin>              pin_collection;
+typedef std::map<int, Pin> pin_collection;
 typedef pin_collection::const_iterator pin_const_iterator;
 
-struct SetPointPin 
+struct SetPointPin
 {
-  int   n;
-  bool  force;
-  int   forceValue;
-  bool  toggle;
+  SetPointPin() : n(0), force(false), toggle(false) 
+  {}
+  int n;
+  bool force;
+  int forceValue;
+  bool toggle;
 };
-typedef std::vector<SetPointPin>                setPointPin_collection;
-typedef setPointPin_collection::const_iterator  setPointPin_const_iterator;
+typedef std::vector<SetPointPin> setPointPin_collection;
+typedef setPointPin_collection::const_iterator setPointPin_const_iterator;
 
 struct SetPoint
 {
@@ -125,37 +129,39 @@ struct SetPoint
 
   setPointPin_collection pins;
 };
-typedef std::vector<SetPoint>                setPoint_collection;
-typedef setPoint_collection::const_iterator  setPoint_const_iterator;
+typedef std::vector<SetPoint> setPoint_collection;
+typedef setPoint_collection::const_iterator setPoint_const_iterator;
 
 //
 struct Sensor
 {
   Sensor() : millis(0), now(false), value(0), pin(0), prior(false) {}
 
-  String              name;
-  int                 pin;
-  bool                prior;
+  String name;
+  int pin;
+  bool prior;
   setPoint_collection setPoints;
-  
-  bool                now;
-  unsigned long       millis;
-  int                 value;
+
+  bool now;
+  unsigned long millis;
+  int value;
 };
-typedef std::map<String, Sensor>            sensor_collection;
-typedef sensor_collection::iterator         sensor_iterator;
-typedef sensor_collection::const_iterator   sensor_const_iterator;
+typedef std::map<String, Sensor> sensor_collection;
+typedef sensor_collection::iterator sensor_iterator;
+typedef sensor_collection::const_iterator sensor_const_iterator;
 
 //
 class BeeStatus
 {
 public:
-  static const char* thingCnfg;
-  static const char* thingValue;
+  static const char *thingCnfg;
+  static const char *thingValue;
+
 private:
-  static  pin_collection    pins;
-  static  sensor_collection sensors;
-private:
+  static pin_collection pins;
+  static sensor_collection sensors;
+
+public:
   static void setupPins()
   {
     { // Pin 2 - On board led
@@ -163,19 +169,13 @@ private:
       pins[2].min = 0;
       pins[2].max = 1;
       pins[2].value = LOW; //initial
-      pins[2].pwm.freq = 0;
-      pins[2].pwm.channel = 0;
-      pins[2].pwm.res = 0;
     }
 
     { // Pin 4 - RC sensor
       pins[4].kind = "RC";
-      pins[4].min = 0;
-      pins[4].max = 1;
+      pins[4].min = 0;   // No matter
+      pins[4].max = 0;   // No matter
       pins[4].value = 0; //initial
-      pins[4].pwm.freq = 0;
-      pins[4].pwm.channel = 0;
-      pins[4].pwm.res = 0;
     }
 
     { // Pin 5 - PhotoResistor Led
@@ -183,9 +183,6 @@ private:
       pins[5].min = 0;
       pins[5].max = 1;
       pins[5].value = LOW; //initial
-      pins[5].pwm.freq = 0;
-      pins[5].pwm.channel = 0;
-      pins[5].pwm.res = 0;
     }
 
     { // Pin 15 - Buzzer
@@ -203,15 +200,12 @@ private:
       pins[34].min = 0;
       pins[34].max = 4095;
       pins[34].value = 0; //initial
-      pins[34].pwm.freq = 0;
-      pins[34].pwm.channel = 0;
-      pins[34].pwm.res = 0;
     }
 
     for (pin_const_iterator it = pins.begin(); it != pins.end(); it++)
     {
-      int pinN        = it->first;
-      const Pin& pin  = it->second;
+      int pinN = it->first;
+      const Pin &pin = it->second;
       if (pin.kind == "DO")
       {
         pinMode(pinN, OUTPUT);
@@ -230,7 +224,7 @@ private:
       }
       if (pin.kind == "AI")
       {
-        // Doesn't initial setup
+        // Doesn't need initial setup
         continue;
       }
 #ifdef DEBUG_BEESTATUS
@@ -238,11 +232,8 @@ private:
 #endif
     }
   }
-public:
-  static void init()
+  static void setupSensors()
   {
-    setupPins();
-
     { // Telecomando 1 Apri
       sensors["8171288"].name = "Telecomando 1 Apri";
       sensors["8171288"].pin = 4;
@@ -251,22 +242,22 @@ public:
       setPoint.min = 1;
       setPoint.max = 1;
 
-      SetPointPin setPointPin2;
-      setPointPin2.n = 2;
-      setPointPin2.force = false;
-      setPointPin2.forceValue = 0;
-      setPointPin2.toggle = false;
-      setPoint.pins.push_back(setPointPin2);
+      SetPointPin setPointOnBoardLed;
+      setPointOnBoardLed.n = 2;
+      setPointOnBoardLed.force = false; // Set value equal to 1
+      setPointOnBoardLed.forceValue = LOW;
+      setPointOnBoardLed.toggle = false;
+      setPoint.pins.push_back(setPointOnBoardLed);
 
-      SetPointPin setPointPin15;
-      setPointPin15.n = 15;
-      setPointPin15.force = true;
-      setPointPin15.forceValue = 5;//128
-      setPointPin15.toggle = false;
-      setPoint.pins.push_back(setPointPin15);
+      SetPointPin setPointBuzzer;
+      setPointBuzzer.n = 15;
+      setPointBuzzer.force = true;
+      setPointBuzzer.forceValue = 5; //128
+      setPointBuzzer.toggle = false;
+      setPoint.pins.push_back(setPointBuzzer);
 
       sensors["8171288"].setPoints.push_back(setPoint);
-    }    
+    }
 
     { // Telecomando 1 Chiudi
       sensors["8171284"].name = "Telecomando 1 Chiudi";
@@ -276,19 +267,19 @@ public:
       setPoint.min = 1;
       setPoint.max = 1;
 
-      SetPointPin setPointPin2;
-      setPointPin2.n = 2;
-      setPointPin2.force = true;
-      setPointPin2.forceValue = LOW;
-      setPointPin2.toggle = false;
-      setPoint.pins.push_back(setPointPin2);
+      SetPointPin setPointOnBoardLed;
+      setPointOnBoardLed.n = 2;
+      setPointOnBoardLed.force = true;
+      setPointOnBoardLed.forceValue = LOW;
+      setPointOnBoardLed.toggle = false;
+      setPoint.pins.push_back(setPointOnBoardLed);
 
-      SetPointPin setPointPin15;
-      setPointPin15.n = 15;
-      setPointPin15.force = true;
-      setPointPin15.forceValue = 0;
-      setPointPin15.toggle = false;
-      setPoint.pins.push_back(setPointPin15);
+      SetPointPin setPointBuzzer;
+      setPointBuzzer.n = 15;
+      setPointBuzzer.force = true;
+      setPointBuzzer.forceValue = 0;
+      setPointBuzzer.toggle = false;
+      setPoint.pins.push_back(setPointBuzzer);
 
       sensors["8171284"].setPoints.push_back(setPoint);
     }
@@ -309,7 +300,7 @@ public:
       setPointPin2LedOn.toggle = false;
 
       setPointLedOn.pins.push_back(setPointPin2LedOn);
-      
+
       sensors["31669624"].setPoints.push_back(setPointLedOn);
 
       SetPoint setPointLedOff;
@@ -323,7 +314,7 @@ public:
       setPointPin2LedOff.toggle = false;
 
       setPointLedOff.pins.push_back(setPointPin2LedOff);
-      
+
       sensors["31669624"].setPoints.push_back(setPointLedOff);
     }
 
@@ -343,7 +334,7 @@ public:
       setPointPin2LedOn.toggle = false;
 
       setPointLedOn.pins.push_back(setPointPin2LedOn);
-      
+
       sensors["7271203"].setPoints.push_back(setPointLedOn);
 
       SetPoint setPointLedOff;
@@ -376,7 +367,7 @@ public:
       setPointPin5LedOn.toggle = false;
 
       setPointLedOn.pins.push_back(setPointPin5LedOn);
-      
+
       sensors["PhotoResistor-01"].setPoints.push_back(setPointLedOn);
 
       SetPoint setPointLedOff;
@@ -390,22 +381,29 @@ public:
       setPointPin5LedOff.toggle = false;
 
       setPointLedOff.pins.push_back(setPointPin5LedOff);
-      
+
       sensors["PhotoResistor-01"].setPoints.push_back(setPointLedOff);
     }
   }
 
-  static void setPinValue(int pinN, int value) 
+public:
+  static void setup()
+  {
+    setupPins();
+    setupSensors();
+  }
+
+  static void setPinValue(int pinN, int value)
   {
     if (pins.find(pinN) == pins.end())
     {
 #ifdef DEBUG_BEESTATUS
       DPRINTF("BEESTATUS - Pin n: %d not found\n", pinN);
-#endif 
+#endif
       return;
     }
-      
-    Pin& pin = pins[pinN];
+
+    Pin &pin = pins[pinN];
 #ifdef DEBUG_BEESTATUS
     DPRINTF("BEESTATUS - Write Pin n: %d kind: %s value: %d\n", pinN, pin.kind, value);
 #endif
@@ -444,17 +442,17 @@ public:
 #endif
   }
 
-  static void togglePinValue(int pinN) 
+  static void togglePinValue(int pinN)
   {
     if (pins.find(pinN) == pins.end())
     {
 #ifdef DEBUG_BEESTATUS
       DPRINTF("BEESTATUS - Pin n: %d not found\n", pinN);
-#endif 
+#endif
       return;
     }
-    
-    Pin& pin = pins[pinN];
+
+    Pin &pin = pins[pinN];
     if (pin.kind == "RC" || pin.kind == "DI" || pin.kind == "AI")
     {
 #ifdef DEBUG_BEESTATUS
@@ -486,16 +484,16 @@ public:
 #endif
   }
 
-  static void checkSetPoints(const setPoint_collection& setPoints, int value)
+  static void checkSetPoints(const setPoint_collection &setPoints, int value)
   {
     for (setPoint_const_iterator it = setPoints.begin(); it != setPoints.end(); it++)
     {
-      const SetPoint& setPoint = *it;
-      if (value >= setPoint.min && value <= setPoint.max) 
+      const SetPoint &setPoint = *it;
+      if (value >= setPoint.min && value <= setPoint.max)
       {
         for (setPointPin_const_iterator n = setPoint.pins.begin(); n != setPoint.pins.end(); n++)
         {
-          const SetPointPin& setPointPin = *n;
+          const SetPointPin &setPointPin = *n;
           if (setPointPin.force == true)
           {
 #ifdef DEBUG_BEESTATUS
@@ -520,7 +518,7 @@ public:
     bool immediately = false;
     for (sensor_iterator it = sensors.begin(); it != sensors.end(); it++)
     {
-      Sensor& sensor = it->second;
+      Sensor &sensor = it->second;
       if (sensor.pin != pin)
         continue;
 
@@ -536,17 +534,17 @@ public:
     return immediately;
   }
 
-  static bool setSensorValue(const char* sensorId, int value) 
+  static bool setSensorValue(const char *sensorId, int value)
   {
     if (sensors.find(sensorId) == sensors.end())
     {
 #ifdef DEBUG_BEESTATUS
-        DPRINTF("BEESTATUS - Sensor id: %s not found\n", sensorId);
+      DPRINTF("BEESTATUS - Sensor id: %s not found\n", sensorId);
 #endif
       return false;
     }
 
-    Sensor& sensor = sensors[sensorId];
+    Sensor &sensor = sensors[sensorId];
 
     sensor.now = true;
     sensor.millis = millis();
@@ -557,12 +555,13 @@ public:
     return sensor.prior;
   }
 
-  static bool loop() {
+  static bool loop()
+  {
     bool immediately = false;
     for (pin_const_iterator it = pins.begin(); it != pins.end(); it++)
     {
-      int pinN        = it->first;
-      const Pin& pin  = it->second;
+      int pinN = it->first;
+      const Pin &pin = it->second;
 #ifdef DEBUG_BEESTATUS
       DPRINTF("BEESTATUS - Elaborating Pin n: %d kind: %s\n", pinN, pin.kind.c_str());
 #endif
@@ -574,40 +573,40 @@ public:
       {
         continue;
       }
-      if (pin.kind == "AI") 
+      if (pin.kind == "AI")
       {
         int value = analogRead(pinN);
 #ifdef DEBUG_BEESTATUS
-        DPRINTF("BEESTATUS - Read Pin n: %d kind: %s analogic value: %d\n", pinN, pin.kind.c_str(),value);
+        DPRINTF("BEESTATUS - Read Pin n: %d kind: %s analogic value: %d\n", pinN, pin.kind.c_str(), value);
 #endif
         int prior = setSensorsValueFromPin(pinN, value);
         if (immediately == false)
           immediately = prior;
         continue;
       }
-      if (pin.kind == "RC") 
+      if (pin.kind == "RC")
       {
         if (RCSensorsManager::available() == false)
           continue;
-        
+
         long sensorId = RCSensorsManager::getReceivedValue();
         String sensorIdStr(sensorId);
 #ifdef DEBUG_BEESTATUS
         DPRINTF("BEESTATUS - Read Pin n: %d kind: %s sensor id: %s\n", pinN, pin.kind.c_str(), sensorIdStr.c_str());
-#endif        
+#endif
         int prior = setSensorValue(sensorIdStr.c_str(), HIGH);
         if (immediately == false)
           immediately = prior;
         continue;
       }
 #ifdef DEBUG_BEESTATUS
-      DPRINTF("BEESTATUS - Pin n: %d kind %s not found\n", pinN, pin.kind.c_str());
+      DPRINTF("BEESTATUS - Pin n: %d kind: %s not found\n", pinN, pin.kind.c_str());
 #endif
     }
     return immediately;
   }
-  
-  static void toJson(StaticJsonDocument<sensorsCapacity>& doc)
+
+  static void toJson(StaticJsonDocument<sensorsCapacity> &doc)
   {
     // Sensor model sample
     /*
@@ -617,14 +616,15 @@ public:
               "id": "123456",
               "now": "true",
               "millis": 123456,
-              "value": "dummyVal"
+              "value": 123456
             },
             {
               "id": "123456",
               "now": "false",
               "millis": 123456,
-              "value": "dummyVal"
-            }
+              "value": 123456
+            },
+            ....
           ]
         }
       */
@@ -637,7 +637,7 @@ public:
     JsonArray sensorsNode = doc.createNestedArray("sensors");
     for (sensor_iterator it = sensors.begin(); it != sensors.end(); it++)
     {
-      Sensor& sensorValue = it->second;
+      Sensor &sensorValue = it->second;
 
       JsonObject sensor = sensorsNode.createNestedObject();
       sensor["id"] = it->first;
@@ -663,10 +663,10 @@ public:
   }
 };
 
-const char* BeeStatus::thingCnfg  = "";
-const char* BeeStatus::thingValue = "f4c3c80b-d561-4a7b-80a5-f4805fdab9bb";
+const char *BeeStatus::thingCnfg = "";
+const char *BeeStatus::thingValue = "f4c3c80b-d561-4a7b-80a5-f4805fdab9bb";
 
-pin_collection    BeeStatus::pins;
+pin_collection BeeStatus::pins;
 sensor_collection BeeStatus::sensors;
 
 // WiFi
@@ -738,6 +738,7 @@ class SocketIOManager
 private:
   static SocketIOclient webSocket;
   static std::map<String, std::function<void(const StaticJsonDocument<msgCapacity> &)>> events;
+
 private:
   static void trigger(const StaticJsonDocument<msgCapacity> &jMsg)
   {
@@ -750,7 +751,7 @@ private:
     else
     {
 #ifdef DEBUG_SOCKETIOMANAGER
-      DPRINTF("event %s not found. %d events available\n", event, events.size());
+      DPRINTF("DEBUG_SOCKETIOMANAGER - event %s not found. %d events available\n", event, events.size());
 #endif
     }
   }
@@ -764,9 +765,9 @@ private:
       if (error)
       {
 #ifdef DEBUG_SOCKETIOMANAGER
-        DPRINTF("deserializeJson() failed: socketIOmessageType_t = %c\n", type);
-        DPRINTF("payload = %s\n", length == 0 ? (uint8_t *)"" : payload);
-        DPRINTF("deserializeJson() error: ");
+        DPRINTF("DEBUG_SOCKETIOMANAGER - deserializeJson() failed: socketIOmessageType_t = %c\n", type);
+        DPRINTF("DEBUG_SOCKETIOMANAGER - payload = %s\n", length == 0 ? (uint8_t *)"" : payload);
+        DPRINTF("DEBUG_SOCKETIOMANAGER - deserializeJson() error: ");
         DPRINTLN(error.c_str());
 #endif
         return;
@@ -791,7 +792,7 @@ public:
     else
     {
 #ifdef DEBUG_SOCKETIOMANAGER
-      DPRINTF("[SIoC] event %s not found, can not be removed\n", event);
+      DPRINTF("DEBUG_SOCKETIOMANAGER - event %s not found, can not be removed\n", event);
 #endif
     }
   }
@@ -839,29 +840,29 @@ unsigned long restCallInterval = 0;
 void onUpdateThingValue(const StaticJsonDocument<msgCapacity> &jMsg)
 {
 #ifdef DEBUG_SOCKETIOMANAGER
-  DPRINTLN("onUpdateThingValue: begin");
+  DPRINTLN("DEBUG_SOCKETIOMANAGER - onUpdateThingValue: begin");
 #endif
   if (jMsg.isNull())
   {
 #ifdef DEBUG_SOCKETIOMANAGER
-    DPRINTLN("onUpdateThingValue: jMsg.isNull()");
-    DPRINTLN("onUpdateThingValue: end");
+    DPRINTLN("DEBUG_SOCKETIOMANAGER - onUpdateThingValue: jMsg.isNull()");
+    DPRINTLN("DEBUG_SOCKETIOMANAGER - onUpdateThingValue: end");
 #endif
     return;
   }
   if (!jMsg.is<JsonArray>())
   {
 #ifdef DEBUG_SOCKETIOMANAGER
-    DPRINTLN("onUpdateThingValue: !jMsg.is<JsonArray>()");
-    DPRINTLN("onUpdateThingValue: end");
+    DPRINTLN("DEBUG_SOCKETIOMANAGER - onUpdateThingValue: !jMsg.is<JsonArray>()");
+    DPRINTLN("DEBUG_SOCKETIOMANAGER - onUpdateThingValue: end");
 #endif
     return;
   }
   if (jMsg.size() != 4)
   {
 #ifdef DEBUG_SOCKETIOMANAGER
-    DPRINTLN("onUpdateThingValue: jMsg.size() != 4");
-    DPRINTLN("onUpdateThingValue: end");
+    DPRINTLN("DEBUG_SOCKETIOMANAGER - onUpdateThingValue: jMsg.size() != 4");
+    DPRINTLN("DEBUG_SOCKETIOMANAGER - onUpdateThingValue: end");
 #endif
     return;
   }
@@ -871,14 +872,14 @@ void onUpdateThingValue(const StaticJsonDocument<msgCapacity> &jMsg)
   if (!asCmd)
   {
 #ifdef DEBUG_SOCKETIOMANAGER
-    DPRINTLN("onUpdateThingValue: !asCmd");
-    DPRINTLN("onUpdateThingValue: end");
+    DPRINTLN("DEBUG_SOCKETIOMANAGER - onUpdateThingValue: !asCmd");
+    DPRINTLN("DEBUG_SOCKETIOMANAGER - onUpdateThingValue: end");
 #endif
     return;
   }
 
 #ifdef DEBUG_SOCKETIOMANAGER
-  DPRINTLN("onUpdateThingValue: Command begin");
+  DPRINTLN("DEBUG_SOCKETIOMANAGER - onUpdateThingValue: Command begin");
 #endif
 
   const char *thingId = jMsg[1];
@@ -886,8 +887,8 @@ void onUpdateThingValue(const StaticJsonDocument<msgCapacity> &jMsg)
   if (strcmp(thingId, BeeStatus::thingValue) != 0)
   {
 #ifdef DEBUG_SOCKETIOMANAGER
-    DPRINTLN("onUpdateThingValue: strcmp(thingId, BeeStatus::thing) != 0");
-    DPRINTLN("onUpdateThingValue: Command end");
+    DPRINTLN("DEBUG_SOCKETIOMANAGER - onUpdateThingValue: strcmp(thingId, BeeStatus::thing) != 0");
+    DPRINTLN("DEBUG_SOCKETIOMANAGER - onUpdateThingValue: Command end");
 #endif
     return;
   }
@@ -896,8 +897,8 @@ void onUpdateThingValue(const StaticJsonDocument<msgCapacity> &jMsg)
   if (!beeObj.containsKey("sensors"))
   {
 #ifdef DEBUG_SOCKETIOMANAGER
-    DPRINTLN("onUpdateThingValue: !beeObj.containsKey('sensors')");
-    DPRINTLN("onUpdateThingValue: Command end");
+    DPRINTLN("DEBUG_SOCKETIOMANAGER - onUpdateThingValue: !beeObj.containsKey('sensors')");
+    DPRINTLN("DEBUG_SOCKETIOMANAGER - onUpdateThingValue: Command end");
 #endif
     return;
   }
@@ -915,21 +916,14 @@ void onUpdateThingValue(const StaticJsonDocument<msgCapacity> &jMsg)
     {
       value = sensor["value"];
     }
-/*  No matter "now"    
-    bool now = true;
-    if (sensor.containsKey("now"))
-    {
-      now = sensor["now"];
-    }
-*/
 #ifdef DEBUG_SOCKETIOMANAGER
-    DPRINTF("onUpdateThingValue: Sensor ID: %s Value: %d\n", sensorId.c_str(), value);
+    DPRINTF("DEBUG_SOCKETIOMANAGER - onUpdateThingValue: Sensor ID: %s Value: %d\n", sensorId.c_str(), value);
 #endif
     BeeStatus::setSensorValue(sensorId.c_str(), value);
   }
 
 #ifdef DEBUG_SOCKETIOMANAGER
-  DPRINTLN("onUpdateThingValue: Command end");
+  DPRINTLN("DEBUG_SOCKETIOMANAGER - onUpdateThingValue: Command end");
 #endif
 }
 
@@ -937,12 +931,12 @@ void setup()
 {
   Serial.begin(115200);
   // BeeStatus setup
-  BeeStatus::init();
+  BeeStatus::setup();
   // WiFi setup
   WiFiManager::connect();
   // SocketIO setup
   SocketIOManager::on("onUpdateThingValue", onUpdateThingValue);
-  SocketIOManager::beginSocketSSLWithCA("api.thingshub.org", 3000, "/socket.io/?EIO=3&token=491e94d9-9041-4e5e-b6cb-9dad91bbf63d", root_ca, "");  
+  SocketIOManager::beginSocketSSLWithCA("api.thingshub.org", 3000, "/socket.io/?EIO=3&token=491e94d9-9041-4e5e-b6cb-9dad91bbf63d", root_ca, "");
 }
 
 void loop()
@@ -952,17 +946,16 @@ void loop()
   // Check if wifi is ok, eventually try reconnecting every "WiFiManager::check_wifi_interval" milliseconds
   WiFiManager::loop();
   if (WiFi.status() != WL_CONNECTED)
-    return;  
-  //  
+    return;
+  //
   if ((immediately == true) || (millis() - restCallInterval >= 5000))
   {
-    //
     StaticJsonDocument<sensorsCapacity> doc;
     BeeStatus::toJson(doc);
 
     HTTPClient http;
     String url = String("/api/things/") + String(BeeStatus::thingValue) + String("/value");
-    http.begin("api.thingshub.org", 3000, url, root_ca); //Specify the URL and certificate
+    http.begin("api.thingshub.org", 3000, url, root_ca); // Specify the URL and certificate
     http.addHeader("thapikey", "491e94d9-9041-4e5e-b6cb-9dad91bbf63d");
     http.addHeader("Content-Type", "application/json");
 
@@ -975,7 +968,7 @@ void loop()
 #endif
     if (httpCode > 0)
     {
-      //Check for the returning code
+      // Check for the returning code
       String payload = http.getString();
 #ifdef DEBUG_RESTCALL
       DPRINT("RestCall return payload : ");
