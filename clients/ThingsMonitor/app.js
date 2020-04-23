@@ -72,6 +72,10 @@ const ThingsConfigs = new Map([
 				["8171284", {
 					sensorName: "Telecomando 1 apri",
 					onUpdateThingValueAlarmValue: 1
+				}],
+				["7830832", {
+					sensorName: "Sensore fumi",
+					onUpdateThingValueAlarmValue: 1
 				}]
 			])
 		},
@@ -95,6 +99,11 @@ const ThingsConfigs = new Map([
 					emailAlarmSent: false
 				}],
 				["8171284", {
+					inAlarmForAlarm: false,
+					emailAlarmSending: false,
+					emailAlarmSent: false
+				}],
+				["7830832", {
 					inAlarmForAlarm: false,
 					emailAlarmSending: false,
 					emailAlarmSent: false

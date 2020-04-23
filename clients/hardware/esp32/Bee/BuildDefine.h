@@ -12,7 +12,8 @@
   #define DPRINTLN(...)   //now defines a blank line
 #endif
 
-//#define DEBUG_BEESTATUS
+#define DEBUG_BEESTATUS
+//#define DEBUG_BEESTATUS_VERBOSE
 #define DEBUG_RCSENSORSMANAGER
 //#define DEBUG_SOCKETIOMANAGER
 //#define DEBUG_RESTCALL

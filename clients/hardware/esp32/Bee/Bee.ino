@@ -10,7 +10,7 @@
 #include "BuildDefine.h"
 
 // Max capacity for actual msg
-const int sensorsCount = 5;
+const int sensorsCount = 6;
 const int sensorsFieldCount = 4;
 /*
   [ 
@@ -73,9 +73,10 @@ public:
   }
   static long getReceivedValue()
   {
+    long value = mySwitch.getReceivedValue();
 #ifdef DEBUG_RCSENSORSMANAGER
     DPRINT("RCSENSORSMANAGER - Received ");
-    DPRINT(mySwitch.getReceivedValue());
+    DPRINT(value);
     DPRINT(" / ");
     DPRINT(mySwitch.getReceivedBitlength());
     DPRINT("bit ");
@@ -83,7 +84,6 @@ public:
     DPRINT(mySwitch.getReceivedProtocol());
     DPRINTLN();
 #endif
-    long value = mySwitch.getReceivedValue();
     mySwitch.resetAvailable();
     return value;
   }
@@ -154,8 +154,8 @@ typedef sensor_collection::const_iterator sensor_const_iterator;
 class BeeStatus
 {
 public:
-  static const char *thingCnfg;
-  static const char *thingValue;
+  static const char* thingCnfg;
+  static const char* thingValue;
 
 private:
   static pin_collection pins;
@@ -185,14 +185,14 @@ public:
       pins[5].value = LOW; //initial
     }
 
-    { // Pin 15 - Buzzer
-      pins[15].kind = "PWM";
-      pins[15].min = 0;
-      pins[15].max = 128;
-      pins[15].value = 0; //initial
-      pins[15].pwm.freq = 2000;
-      pins[15].pwm.channel = 0;
-      pins[15].pwm.res = 8;
+    { // Pin 23 - Buzzer
+      pins[23].kind = "PWM";
+      pins[23].min = 0;
+      pins[23].max = 128;
+      pins[23].value = 0; //initial
+      pins[23].pwm.freq = 2000;
+      pins[23].pwm.channel = 1;
+      pins[23].pwm.res = 8;
     }
 
     { // Pin 34 - PhotoResistor
@@ -250,7 +250,7 @@ public:
       setPoint.pins.push_back(setPointOnBoardLed);
 
       SetPointPin setPointBuzzer;
-      setPointBuzzer.n = 15;
+      setPointBuzzer.n = 23;
       setPointBuzzer.force = true;
       setPointBuzzer.forceValue = 5; //128
       setPointBuzzer.toggle = false;
@@ -275,7 +275,7 @@ public:
       setPoint.pins.push_back(setPointOnBoardLed);
 
       SetPointPin setPointBuzzer;
-      setPointBuzzer.n = 15;
+      setPointBuzzer.n = 23;
       setPointBuzzer.force = true;
       setPointBuzzer.forceValue = 0;
       setPointBuzzer.toggle = false;
@@ -352,6 +352,40 @@ public:
       sensors["7271203"].setPoints.push_back(setPointLedOff);
     }
 
+    { // Sensore fumi
+      sensors["7830832"].name = "Sensore Fumi";
+      sensors["7830832"].pin = 4;
+      sensors["7830832"].prior = true;
+
+      SetPoint setPointLedOn;
+      setPointLedOn.min = 1;
+      setPointLedOn.max = 1;
+
+      SetPointPin setPointPin2LedOn;
+      setPointPin2LedOn.n = 2;
+      setPointPin2LedOn.force = false;
+      setPointPin2LedOn.forceValue = HIGH;
+      setPointPin2LedOn.toggle = false;
+
+      setPointLedOn.pins.push_back(setPointPin2LedOn);
+
+      sensors["7830832"].setPoints.push_back(setPointLedOn);
+
+      SetPoint setPointLedOff;
+      setPointLedOff.min = 0;
+      setPointLedOff.max = 0;
+
+      SetPointPin setPointPin2LedOff;
+      setPointPin2LedOff.n = 2;
+      setPointPin2LedOff.force = true;
+      setPointPin2LedOff.forceValue = LOW;
+      setPointPin2LedOff.toggle = false;
+
+      setPointLedOff.pins.push_back(setPointPin2LedOff);
+
+      sensors["7830832"].setPoints.push_back(setPointLedOff);
+    }
+
     { // Luminosità 01
       sensors["PhotoResistor-01"].name = "Luminosità 01";
       sensors["PhotoResistor-01"].pin = 34;
@@ -403,10 +437,8 @@ public:
       return;
     }
 
-    Pin &pin = pins[pinN];
-#ifdef DEBUG_BEESTATUS
-    DPRINTF("BEESTATUS - Write Pin n: %d kind: %s value: %d\n", pinN, pin.kind, value);
-#endif
+    Pin& pin = pins[pinN];
+    
     if (pin.kind == "RC" || pin.kind == "DI" || pin.kind == "AI")
     {
 #ifdef DEBUG_BEESTATUS
@@ -435,6 +467,9 @@ public:
     {
       ledcWrite(pin.pwm.channel, value);
       pin.value = value;
+#ifdef DEBUG_BEESTATUS
+      DPRINTF("BEESTATUS - Pin n: %d kind: %s - PWM value: %d\n", pinN, pin.kind, value);
+#endif      
       return;
     }
 #ifdef DEBUG_BEESTATUS
@@ -496,7 +531,7 @@ public:
           const SetPointPin &setPointPin = *n;
           if (setPointPin.force == true)
           {
-#ifdef DEBUG_BEESTATUS
+#ifdef DEBUG_BEESTATUS_VERBOSE
             DPRINTF("BEESTATUS - SetPointPin n: %d value: %d forced\n", setPointPin.n, setPointPin.forceValue);
 #endif
             setPinValue(setPointPin.n, setPointPin.forceValue);
@@ -544,7 +579,7 @@ public:
       return false;
     }
 
-    Sensor &sensor = sensors[sensorId];
+    Sensor& sensor = sensors[sensorId];
 
     sensor.now = true;
     sensor.millis = millis();
@@ -561,8 +596,8 @@ public:
     for (pin_const_iterator it = pins.begin(); it != pins.end(); it++)
     {
       int pinN = it->first;
-      const Pin &pin = it->second;
-#ifdef DEBUG_BEESTATUS
+      const Pin& pin = it->second;
+#ifdef DEBUG_BEESTATUS_VERBOSE
       DPRINTF("BEESTATUS - Elaborating Pin n: %d kind: %s\n", pinN, pin.kind.c_str());
 #endif
       if (pin.kind == "DO")
@@ -576,7 +611,7 @@ public:
       if (pin.kind == "AI")
       {
         int value = analogRead(pinN);
-#ifdef DEBUG_BEESTATUS
+#ifdef DEBUG_BEESTATUS_VERBOSE
         DPRINTF("BEESTATUS - Read Pin n: %d kind: %s analogic value: %d\n", pinN, pin.kind.c_str(), value);
 #endif
         int prior = setSensorsValueFromPin(pinN, value);
@@ -628,7 +663,7 @@ public:
           ]
         }
       */
-#ifdef DEBUG_BEESTATUS
+#ifdef DEBUG_BEESTATUS_VERBOSE
     // Declare a buffer to hold the result
     char output[1024]; // To check
     int count = 0;
@@ -647,7 +682,7 @@ public:
 
       sensorValue.now = false;
 
-#ifdef DEBUG_BEESTATUS
+#ifdef DEBUG_BEESTATUS_VERBOSE
       serializeJson(sensor, output);
       DPRINT("BEESTATUS - ");
       DPRINT(count++);
@@ -655,7 +690,7 @@ public:
       DPRINTLN(output);
 #endif
     }
-#ifdef DEBUG_BEESTATUS
+#ifdef DEBUG_BEESTATUS_VERBOSE
     // Produce a minified JSON document
     serializeJson(doc, output);
     DPRINTLN(output);
@@ -742,7 +777,7 @@ private:
 private:
   static void trigger(const StaticJsonDocument<msgCapacity> &jMsg)
   {
-    const char *event = jMsg[0];
+    const char* event = jMsg[0];
     auto e = events.find(event);
     if (e != events.end())
     {
