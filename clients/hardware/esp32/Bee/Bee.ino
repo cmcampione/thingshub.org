@@ -10,7 +10,7 @@
 #include "BuildDefine.h"
 
 // Max capacity for actual msg
-const int sensorsCount = 6;
+const int sensorsCount = 7;
 const int sensorsFieldCount = 4;
 /*
   [ 
@@ -138,6 +138,7 @@ struct Sensor
   Sensor() : millis(0), now(false), value(0), pin(0), prior(false) {}
 
   String name;
+
   int pin;
   bool prior;
   setPoint_collection setPoints;
@@ -200,6 +201,13 @@ public:
       pins[34].min = 0;
       pins[34].max = 4095;
       pins[34].value = 0; //initial
+    }
+
+    { // Pin 15 - Thermistor
+      pins[35].kind = "AI";
+      pins[35].min = 0;
+      pins[35].max = 4095;
+      pins[35].value = 0; //initial
     }
 
     for (pin_const_iterator it = pins.begin(); it != pins.end(); it++)
@@ -418,6 +426,11 @@ public:
 
       sensors["PhotoResistor-01"].setPoints.push_back(setPointLedOff);
     }
+
+    { // Temperatura 01
+      sensors["Temperatura-01"].name = "Temperatura 01";
+      sensors["Temperatura-01"].pin = 35;
+    }
   }
 
 public:
@@ -519,11 +532,11 @@ public:
 #endif
   }
 
-  static void checkSetPoints(const setPoint_collection &setPoints, int value)
+  static void checkSetPoints(const setPoint_collection& setPoints, int value)
   {
     for (setPoint_const_iterator it = setPoints.begin(); it != setPoints.end(); it++)
     {
-      const SetPoint &setPoint = *it;
+      const SetPoint& setPoint = *it;
       if (value >= setPoint.min && value <= setPoint.max)
       {
         for (setPointPin_const_iterator n = setPoint.pins.begin(); n != setPoint.pins.end(); n++)
@@ -553,7 +566,7 @@ public:
     bool immediately = false;
     for (sensor_iterator it = sensors.begin(); it != sensors.end(); it++)
     {
-      Sensor &sensor = it->second;
+      Sensor& sensor = it->second;
       if (sensor.pin != pin)
         continue;
 
@@ -569,7 +582,7 @@ public:
     return immediately;
   }
 
-  static bool setSensorValue(const char *sensorId, int value)
+  static bool setSensorValue(const char* sensorId, int value)
   {
     if (sensors.find(sensorId) == sensors.end())
     {
@@ -641,7 +654,7 @@ public:
     return immediately;
   }
 
-  static void toJson(StaticJsonDocument<sensorsCapacity> &doc)
+  static void toJson(StaticJsonDocument<sensorsCapacity>& doc)
   {
     // Sensor model sample
     /*
@@ -672,7 +685,7 @@ public:
     JsonArray sensorsNode = doc.createNestedArray("sensors");
     for (sensor_iterator it = sensors.begin(); it != sensors.end(); it++)
     {
-      Sensor &sensorValue = it->second;
+      Sensor& sensorValue = it->second;
 
       JsonObject sensor = sensorsNode.createNestedObject();
       sensor["id"] = it->first;
@@ -698,8 +711,8 @@ public:
   }
 };
 
-const char *BeeStatus::thingCnfg = "";
-const char *BeeStatus::thingValue = "f4c3c80b-d561-4a7b-80a5-f4805fdab9bb";
+const char* BeeStatus::thingCnfg = "";
+const char* BeeStatus::thingValue = "f4c3c80b-d561-4a7b-80a5-f4805fdab9bb";
 
 pin_collection BeeStatus::pins;
 sensor_collection BeeStatus::sensors;
@@ -845,7 +858,7 @@ SocketIOclient SocketIOManager::webSocket;
 std::map<String, std::function<void(const StaticJsonDocument<msgCapacity> &)>> SocketIOManager::events;
 
 //
-const char *root_ca =
+const char* root_ca =
     "-----BEGIN CERTIFICATE-----\n"
     "MIIDSjCCAjKgAwIBAgIQRK+wgNajJ7qJMDmGLvhAazANBgkqhkiG9w0BAQUFADA/\n"
     "MSQwIgYDVQQKExtEaWdpdGFsIFNpZ25hdHVyZSBUcnVzdCBDby4xFzAVBgNVBAMT\n"
@@ -872,7 +885,7 @@ unsigned long restCallInterval = 0;
 
 /////////////////////////////
 
-void onUpdateThingValue(const StaticJsonDocument<msgCapacity> &jMsg)
+void onUpdateThingValue(const StaticJsonDocument<msgCapacity>& jMsg)
 {
 #ifdef DEBUG_SOCKETIOMANAGER
   DPRINTLN("DEBUG_SOCKETIOMANAGER - onUpdateThingValue: begin");
