@@ -62,7 +62,16 @@ export class SensorsService implements OnDestroy {
           id: sensorRaw.id,
           now: sensorRaw.now,
           millis: sensorRaw.millis,
-          value: sensorRaw.value});
+          value: sensorRaw.value,
+          props: {
+            name: thing.name
+          },
+          status: {
+            now: sensorRaw.now,
+            millis: sensorRaw.millis,
+            value: sensorRaw.value
+          }
+        });
       });
     });
   }
@@ -81,6 +90,6 @@ export class SensorsService implements OnDestroy {
       return; // Sanity check
     const sensorsRaw = {sensors: [value]}
     // asCmd
-    return await this.thingsService.putThingValue(thing.id, true, sensorsRaw);
+    return await this.thingsService.putThingValue({ thingId: thing.id, asCmd: true, value: sensorsRaw });
   }
 }

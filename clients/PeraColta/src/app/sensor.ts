@@ -5,4 +5,13 @@ export interface Sensor {
   now: boolean;
   millis: number;
   value: number;
+  //
+  props: {
+    name: string;
+  };
+  status: {
+    now: boolean;
+    millis: number;
+    value: number;
+  }
 }

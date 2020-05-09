@@ -15,7 +15,10 @@ import { MapComponent } from './map/map.component';
 import { ThingsComponent } from './things/things.component';
 import { ContentPageComponent } from './content-page/content-page.component';
 import { SensorsComponent } from './sensors/sensors.component';
+import { Sensors1Component } from './sensors1/sensors1.component';
 import { FormsModule } from '@angular/forms';
+import { StoreModule } from '@ngrx/store';
+import { reducers, metaReducers } from './reducers';
 
 @NgModule({
   declarations: [
@@ -23,6 +26,7 @@ import { FormsModule } from '@angular/forms';
     LoginComponent,
     MapComponent,
     SensorsComponent,
+    Sensors1Component,
     ThingsComponent,
     ContentPageComponent],
   entryComponents: [],
@@ -33,6 +37,9 @@ import { FormsModule } from '@angular/forms';
     FormsModule,
     AgmCoreModule.forRoot({
       apiKey: 'AIzaSyD11pjYHyE0ekfygLBNJhvL1FgUp9-twkQ'
+    }),
+    StoreModule.forRoot(reducers, {
+      metaReducers
     })],
   providers: [
     StatusBar,

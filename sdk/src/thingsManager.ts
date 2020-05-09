@@ -83,7 +83,7 @@ export class ThingsManager {
         thing.value = value;
     }
 
-    // INFO: Does not change mainThing
+    // INFO: Does not change mainThing state
     private async getThings(parameter: ThingsGetParams , canceler: HttpRequestCanceler) : Promise<ThingsDataSet> {
 
         let thingsDTOsDataSet : ThingsDTOsDataSet = null;
@@ -111,6 +111,7 @@ export class ThingsManager {
     // INFO: Fills parentThing
     // INFO: Does not change mainThing, but parentThing is changed    
     // INFO: "parameter" is changed
+    // INFO: Change mainThing state
     public async getMoreThingChildren(parentThing : Thing, parameter: ThingsGetParams, canceler: HttpRequestCanceler) : Promise<ThingsDataSet> {
 
         parameter.skip = parentThing.childrenSkip;
