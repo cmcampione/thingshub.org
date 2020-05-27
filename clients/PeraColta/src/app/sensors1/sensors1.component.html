@@ -3,7 +3,7 @@
     <ion-card-title>My home1</ion-card-title>
   </ion-card-header>
   <ion-list>
-    <ion-item *ngFor="let sensor of sensors">
+    <ion-item *ngFor="let sensor of sensors$ | async">
       <div>
         name: {{sensor.name}}
       </div>

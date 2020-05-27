@@ -14,7 +14,7 @@ interface SensorRaw {
 @Injectable()
 export class SensorsService implements OnDestroy {
 
-  private things: Thing[];// It's only a ref to this.thingsService.mainThing.children
+  private things: Thing[] = [];// It's only a ref to this.thingsService.mainThing.children
   public sensors: Sensor[] = [];
 
   constructor(public readonly thingsService: ThingsService) {
@@ -54,9 +54,10 @@ export class SensorsService implements OnDestroy {
     this.thingsService.init();
     this.thingsService.realTimeConnector.realTimeConnectorRaw.setHook('onUpdateThingValue', this.onUpdateThingValue);
     await this.thingsService.thingsManager.getMoreThings(canceler);
-    this.things.forEach(thing => {
+
+    this.things.forEach(thing =>
       thing.value.sensors.forEach((sensorRaw: SensorRaw) => {
-        this.sensors.push({
+        const sensor: Sensor = {
           thingId: thing.id,
           name: thing.name,
           id: sensorRaw.id,
@@ -71,9 +72,10 @@ export class SensorsService implements OnDestroy {
             millis: sensorRaw.millis,
             value: sensorRaw.value
           }
-        });
-      });
-    });
+        }
+        this.sensors.push(sensor);
+      })
+    )
   }
   done() {
     this.thingsService.realTimeConnector.realTimeConnectorRaw.remHook('onUpdateThingValue', this.onUpdateThingValue);
@@ -91,5 +93,35 @@ export class SensorsService implements OnDestroy {
     const sensorsRaw = {sensors: [value]}
     // asCmd
     return await this.thingsService.putThingValue({ thingId: thing.id, asCmd: true, value: sensorsRaw });
+  }
+
+  //
+  public async getAllSensors(): Promise<Sensor[]> {
+    this.thingsService.init();
+    this.thingsService.realTimeConnector.realTimeConnectorRaw.setHook('onUpdateThingValue', this.onUpdateThingValue);
+    await this.thingsService.thingsManager.getMoreThings(null);
+    const sensors: Sensor[] = [];
+    this.things.forEach(thing =>
+      thing.value.sensors.forEach((sensorRaw: SensorRaw) => {
+        const sensor: Sensor = {
+          thingId: thing.id,
+          name: thing.name,
+          id: sensorRaw.id,
+          now: sensorRaw.now,
+          millis: sensorRaw.millis,
+          value: sensorRaw.value,
+          props: {
+            name: thing.name
+          },
+          status: {
+            now: sensorRaw.now,
+            millis: sensorRaw.millis,
+            value: sensorRaw.value
+          }
+        }
+        sensors.push(sensor);
+      })
+    )
+    return sensors;
   }
 }

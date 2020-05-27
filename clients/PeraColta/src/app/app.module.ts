@@ -18,7 +18,10 @@ import { SensorsComponent } from './sensors/sensors.component';
 import { Sensors1Component } from './sensors1/sensors1.component';
 import { FormsModule } from '@angular/forms';
 import { StoreModule } from '@ngrx/store';
-import { reducers, metaReducers } from './reducers';
+import { reducers, metaReducers, SensorEffects } from './reducers';
+import { EffectsModule } from '@ngrx/effects';
+import { SensorsService } from './sensors.service';
+import { ThingsService } from './things.service';
 
 @NgModule({
   declarations: [
@@ -38,14 +41,22 @@ import { reducers, metaReducers } from './reducers';
     AgmCoreModule.forRoot({
       apiKey: 'AIzaSyD11pjYHyE0ekfygLBNJhvL1FgUp9-twkQ'
     }),
-    StoreModule.forRoot(reducers, {
-      metaReducers
-    })],
+    StoreModule.forRoot(reducers, {metaReducers}),
+    EffectsModule.forRoot([SensorEffects])
+  ],
   providers: [
     StatusBar,
     SplashScreen,
+    { provide: 'thingKind', useValue: 'Home appliance' },
+    ThingsService,
+    {
+      provide: SensorsService,
+      deps: [ThingsService]
+    },
+    SensorsService,
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy }
   ],
   bootstrap: [AppComponent]
 })
+
 export class AppModule {}

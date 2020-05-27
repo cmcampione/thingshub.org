@@ -3,6 +3,10 @@ import { HttpRequestCanceler } from 'thingshub-js-sdk';
 import { ThingsService } from '../things.service';
 import { Sensor } from '../sensor';
 import { SensorsService } from '../sensors.service';
+import { Observable } from 'rxjs';
+import { Store } from '@ngrx/store';
+import { SensorState } from '../reducers';
+import * as fromReducer from '../reducers';
 
 @Component({
   selector: 'app-sensors1',
@@ -20,34 +24,34 @@ import { SensorsService } from '../sensors.service';
 export class Sensors1Component implements OnInit, OnDestroy {
 
   private canceler = new HttpRequestCanceler();
-  public readonly sensors: Sensor[];
+  public  sensors$: Observable<Sensor[]> = this.store.select(fromReducer.getSensors);
 
-  constructor(private readonly sensorsService: SensorsService) {
-    this.sensors = sensorsService.sensors;
+  constructor(private readonly store: Store<SensorState>) {
   }
-  async ngOnInit() {
-    await this.sensorsService.init(this.canceler);
+
+  ngOnInit() {
+    this.store.dispatch(new fromReducer.GetAllAction());
   }
   ngOnDestroy() {
-    this.sensorsService.done();
+    this.canceler.cancel();
   }
 
   public async acknowledge(sensor: Sensor) {
-    try {
+   /*  try {
       await this.sensorsService.setSensorValue(sensor, {
         id: sensor.id,
         value: 0
       });
     } catch (e) {
       console.log(e);
-    }
+    } */
   }
 
   public async recall() {
-    try {
+    /* try {
       await this.sensorsService.thingsService.thingsManager.getMoreThings(this.canceler);
     } catch (e) {
       console.log(e);
-    }
+    } */
   }
 }
