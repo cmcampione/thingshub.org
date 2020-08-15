@@ -1,9 +1,8 @@
 "use strict";
 
 const httpStatusCodes = require("http-status-codes");
-const uuidv4 = require("uuid/v4");
-
 const utils = require("../utils");
+const { v4: uuid } = require("uuid");
 const thConstants = require("../../../common/src/thConstants");
 const UserInfoDTO = require("../../../common/src/dtos").UserInfoDTO;
 const ThingDTO = require("../../../common/src/dtos").ThingDTO;
@@ -532,7 +531,7 @@ exports.createThing = async (user, thingDTO) => {
 		throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Thing UserChangeClaims is incorrect", 87);
         
 	// Generate Thing's Id if not provided
-	let thingId = !thingDTO.id ? uuidv4() : thingDTO.id;
+	let thingId = !thingDTO.id ? uuid() : thingDTO.id;
 	
 	let letterNumber = /^[0-9a-zA-Z-]+$/;  
 	if (!thingId.match(letterNumber))

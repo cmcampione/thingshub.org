@@ -1,6 +1,6 @@
 "use strict";
 
-const uuid = require("uuid/v4");
+const { v4: uuid } = require("uuid");
 const mongoose = require("mongoose");
 const userPendingModel = require("../models/UserPending.js");
 
