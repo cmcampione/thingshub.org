@@ -1,7 +1,6 @@
 "use strict";
 
 const path  			= require("path");
-const httpStatus 		= require("http-status-codes");
 const nodemailer 		= require("nodemailer");
 const httpStatusCodes 	= require("http-status-codes");
 const express 			= require("express");
@@ -98,7 +97,7 @@ async (req, res, next) => {
 		try {
 			validationResult(req).throw();
 		} catch (e) {
-			throw (new utils.ErrorCustom(httpStatus.BAD_REQUEST, e.mapped(), 2));
+			throw (new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, e.mapped(), 2));
 		}
 
 		const email = req.params.email;
@@ -151,7 +150,7 @@ async (req, res, next) => {
 			next(e);
 			return;
 		}
-		next(new utils.ErrorCustom(httpStatus.INTERNAL_SERVER_ERROR, e.message, 3));
+		next(new utils.ErrorCustom(httpStatusCodes.INTERNAL_SERVER_ERROR, e.message, 3));
 	}
 });
 
@@ -172,7 +171,7 @@ async (req, res, next) => {
 		try {
 			validationResult(req).throw();
 		} catch (e) {
-			throw (new utils.ErrorCustom(httpStatus.BAD_REQUEST, e.mapped(), 4));
+			throw (new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, e.mapped(), 4));
 		}
 
 		const email = req.body.email;
@@ -182,13 +181,13 @@ async (req, res, next) => {
 
 		let user = await usersMngr.findUserByUsername(email);
 		if (user) {
-			throw new utils.ErrorCustom(httpStatus.UNAUTHORIZED, "User registration already exists", 5);
+			throw new utils.ErrorCustom(httpStatusCodes.UNAUTHORIZED, "User registration already exists", 5);
 		}
 
 		const userPending = await usersPendingMngr.findUserByEmailAndConfirmToken(email,
 			confirmationToken);
 		if (!userPending) {
-			throw new utils.ErrorCustom(httpStatus.NOT_FOUND, "User pending registration does not exist", 6);
+			throw new utils.ErrorCustom(httpStatusCodes.NOT_FOUND, "User pending registration does not exist", 6);
 		}
 
 		user = await usersMngr.createUser(email, name, password, userPending.registrationDate, true,
@@ -203,7 +202,7 @@ async (req, res, next) => {
 			next(e);
 			return;
 		}
-		next(new utils.ErrorCustom(httpStatus.INTERNAL_SERVER_ERROR, e.message, 7));
+		next(new utils.ErrorCustom(httpStatusCodes.INTERNAL_SERVER_ERROR, e.message, 7));
 	}
 });
 

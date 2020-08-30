@@ -12,7 +12,7 @@ export class AccountService {
 
   private userId: string = null;
 
-  public isLoggedIn: Subject<AccountUserData> = new Subject<AccountUserData>();
+  public isLoggedIn$: Subject<AccountUserData> = new Subject<AccountUserData>();
 
   private actionControl: AccountActionControl = {
     getSecurityHeader : () => {
@@ -21,9 +21,9 @@ export class AccountService {
     refreshToken: (): Promise<any> => {
 
       // Shows login Component
-      this.isLoggedIn.next(null);
+      this.isLoggedIn$.next(null);
       return new Promise((resolve, reject) => {
-        const subscription = this.isLoggedIn.subscribe((accountUserData: AccountUserData) => {
+        const subscription = this.isLoggedIn$.subscribe((accountUserData: AccountUserData) => {
           subscription.unsubscribe();
           if (accountUserData != null) {
             resolve(accountUserData);
@@ -66,10 +66,10 @@ export class AccountService {
     if (this.userId !== loginData.id) {
       this.userId = null;
       this.accountManager.resetLoginData();
-      this.isLoggedIn.next(null);
+      this.isLoggedIn$.next(null);
       throw new Error('User is changed without appropriate logout action');
     }
-    this.isLoggedIn.next(loginData);
+    this.isLoggedIn$.next(loginData);
     return loginData;
   }
   public async logout() {
@@ -80,7 +80,7 @@ export class AccountService {
     } finally {
       this.userId = null;
       this.accountManager.resetLoginData();
-      this.isLoggedIn.next(null);
+      this.isLoggedIn$.next(null);
     }
   }
 }

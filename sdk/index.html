@@ -19,18 +19,16 @@
     <script src="https://cdn.jsdelivr.net/npm/vue"></script>
 
     <script>
-
+      /*
       var endPointAddress = {
           server: "https://api.thingshub.org:3000",
           api: "https://api.thingshub.org:3000/api"
       }
-
-      /*
+      */
       var endPointAddress = {
           server: "https://localhost:3000",
           api: "https://localhost:3000/api"
       }
-  */
       var accountDataContext = new thingshub.AccountDataContext(endPointAddress);
       var accountManager = new thingshub.AccountManager("thingshub", accountDataContext, "491e94d9-9041-4e5e-b6cb-9dad91bbf63d");
 
@@ -59,11 +57,16 @@
         console.log(value);
       }
 
+      function onLog(log) {
+        console.log(log);
+      }
+
       var realTimeConnector = new thingshub.SocketIORealtimeConnector(endPointAddress.server, accountManager.getSecurityToken, onError, onConnectError, onStateChanged);
       realTimeConnector.subscribe(); // There is an automatic reconnection
       realTimeConnector.setHook("api", onAPI);
       realTimeConnector.setHook("onUpdateThing", onUpdateThing);
       realTimeConnector.setHook("onUpdateThingValue", onUpdateThingValue);
+      realTimeConnector.setHook("onLog", onLog);
       
       realTimeConnector.api()
       .then(function(res) {

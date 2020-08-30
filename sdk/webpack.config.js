@@ -12,7 +12,7 @@ module.exports = {
 		filename: "thingshub.js",
 		library: libraryName,
 		libraryTarget: "umd",
-		globalObject: 'this' // Useful for node e DOM compatility
+		globalObject: "this" // Useful for node e DOM compatility
 	},
 	externals: {
 		"socket.io-client": { 
