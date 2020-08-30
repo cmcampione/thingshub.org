@@ -3,7 +3,7 @@
 const httpStatusCodes 	= require("http-status-codes");
 const fs   				= require("fs");
 const path 				= require("path");
-const uuid 				= require("uuid/v4");
+const { v4: uuid } = require("uuid");
 const jwt  				= require("jsonwebtoken");
 
 const UserDTO 			= require("../../common/src/dtos").UserDTO;

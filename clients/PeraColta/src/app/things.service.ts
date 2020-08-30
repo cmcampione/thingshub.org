@@ -1,5 +1,6 @@
 import { Injectable, OnDestroy, Inject, isDevMode  } from '@angular/core';
 import * as thingshub from 'thingshub-js-sdk';
+import { ThingsGetParams, HttpRequestCanceler, ThingsDTOsDataSet } from 'thingshub-js-sdk';
 import { endPointAddress } from './utils';
 import { AccountService } from './account.service';
 import { RealTimeConnectorService } from './real-time-connector.service';
@@ -55,8 +56,10 @@ export class ThingsService implements OnDestroy {
     this.done();
   }
 
-  // Only a simple wrapper to "thingsDatacontext"
-  public async putThingValue(thingId: string, asCmd: boolean, value: any): Promise<any> {
-    return await this.thingsDatacontext.putThingValue(thingId, asCmd, value);
+  // Only simple wrappers to "thingsDatacontext"
+
+  public async putThingValue({ thingId, asCmd, value }: { thingId: string; asCmd: boolean; value: any; })
+    : Promise<any> {
+    return await this.thingsManager.putThingValue(thingId, asCmd, value);
   }
 }

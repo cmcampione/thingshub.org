@@ -37,6 +37,12 @@
             "request": "launch",
             "program": "${workspaceRoot}\\sdk\\node_modules\\webpack-dev-server\\bin\\webpack-dev-server.js",
             "cwd": "${workspaceRoot}\\sdk"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Launch SerialMonitor",            
+            "program": "${workspaceFolder}\\tools\\SerialMonitor\\app.js"
         }
     ]
 }

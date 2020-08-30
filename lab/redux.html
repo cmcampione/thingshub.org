@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+
+<html lang="it">
+
+<head>
+
+    <meta charset="utf-8" />
+
+    <title>redux</title>
+
+    <style>
+    </style>
+
+    <script src="https://unpkg.com/redux@latest/dist/redux.js"></script>
+
+    <script>
+        // State
+        const initialState = {
+            user: {},
+            todoList: [
+                { id: 1, task: "Definire le azioni" },
+                { id: 2, task: "Definire i reducer" },
+                { id: 3, task: "Creare lo store" },
+                { id: 4, task: "Inviare le azioni allo store" }
+            ]
+        };
+
+        // Action creator
+        const ADD = "ADD";
+        const REMOVE = "REMOVE";
+        function addAction(text) {
+            return {
+                type: ADD,
+                payload: { task: text }
+            };
+        }
+        function removeAction(id) {
+            return {
+                type: REMOVE,
+                payload: { taskId: id }
+            };
+        }
+
+        // Reducer
+        function todo(state = initialState, action) {
+            switch (action.type) {
+                case ADD:
+                    state = Object.assign({}, state, {
+                        todoList: [...state.todoList,
+                        { id: state.todoList.length + 1, task: action.payload.task }
+                        ]
+                    });
+                    break;
+                case REMOVE:
+                    state = Object.assign({}, state, {
+                        todoList: state.todoList.filter((x) => x.id != action.payload.taskId)
+                    });
+                    break;
+            }
+            return state;
+        }
+
+    </script>
+</head>
+
+<body>
+    <div>
+        <h1>TODO List</h1>
+        <div>
+            <button id="btnAggiungi">Aggiungi</button>
+        </div>
+        <div id="divTaskName">
+            <input type="text" id="txtTaskname">
+            <button id="btnOK">OK</button>
+        </div>
+        <div>
+            <ul id="ulTodoList">
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // Store
+        var store = Redux.createStore(todo, initialState);
+        showTasks(store.getState()); // Is't correct?
+        // 
+        var btnAggiungi = document.getElementById("btnAggiungi");
+        var divTaskName = document.getElementById("divTaskName");
+        divTaskName.style.visibility = "hidden";
+        btnAggiungi.addEventListener("click", mostraInput);
+        function mostraInput() {
+            divTaskName.style.visibility = "visible";
+        }
+
+        // 
+        var btnOK = document.getElementById("btnOK");
+        btnOK.addEventListener("click", aggiungi);
+        function aggiungi() {
+            let taskName = txtTaskname.value;
+            if (taskName) {
+                store.dispatch(addAction(taskName));
+            }
+            txtTaskname.value = "";
+            divTaskName.style.visibility = "hidden";
+        }
+
+        //
+        store.subscribe(() => showTasks(store.getState()));
+        function showTasks(state) {
+            var ulTodoList = document.getElementById("ulTodoList");
+            ulTodoList.innerHTML = "";
+            state.todoList.forEach((task) => {
+                let liNode = document.createElement("li");
+                liNode.setAttribute("id", task.id);
+                let textNode = document.createTextNode(task.task);
+                liNode.appendChild(textNode);
+                let btnNode = document.createElement("button");
+                btnNode.innerText = "Rimuovi";
+                btnNode.addEventListener("click", () => store.dispatch(removeAction(task.id)));
+                liNode.appendChild(btnNode);
+                ulTodoList.appendChild(liNode)
+            });
+        }
+    </script>
+</body>
+
+</html>

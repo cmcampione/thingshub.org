@@ -7,7 +7,7 @@ import { ThingsService } from '../things.service';
   templateUrl: './things.component.html',
   styleUrls: ['./things.component.css'],
   providers: [ThingsService,
-    { provide: 'thingKind', useValue: 'Home appliance' }
+    { provide: 'thingKind', useValue: 'first thing' }
   ]
 })
 export class ThingsComponent implements OnInit, OnDestroy {

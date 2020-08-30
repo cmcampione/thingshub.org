@@ -4,17 +4,17 @@ import { ThingsService } from './things.service';
 import { Thing, HttpRequestCanceler } from 'thingshub-js-sdk';
 
 interface SensorRaw {
-  id: number;
-  now: any;
+  id: string;
+  now: boolean;
   millis: number;
-  value: any;
+  value: number;
 }
 
 // it's no iniectable because keep things state
 @Injectable()
 export class SensorsService implements OnDestroy {
 
-  private things: Thing[];// It's only a ref to this.thingsService.mainThing.children
+  private things: Thing[] = [];// It's only a ref to this.thingsService.mainThing.children
   public sensors: Sensor[] = [];
 
   constructor(public readonly thingsService: ThingsService) {
@@ -26,7 +26,7 @@ export class SensorsService implements OnDestroy {
         return thing.id === id;
     })
   }
-  private searchSensorById(id: number): Sensor {
+  private searchSensorById(id: string): Sensor {
     return this.sensors.find((sensor) => {
       return sensor.id === id;
     })
@@ -54,17 +54,28 @@ export class SensorsService implements OnDestroy {
     this.thingsService.init();
     this.thingsService.realTimeConnector.realTimeConnectorRaw.setHook('onUpdateThingValue', this.onUpdateThingValue);
     await this.thingsService.thingsManager.getMoreThings(canceler);
-    this.things.forEach(thing => {
+
+    this.things.forEach(thing =>
       thing.value.sensors.forEach((sensorRaw: SensorRaw) => {
-        this.sensors.push({
+        const sensor: Sensor = {
           thingId: thing.id,
           name: thing.name,
           id: sensorRaw.id,
           now: sensorRaw.now,
           millis: sensorRaw.millis,
-          value: sensorRaw.value});
-      });
-    });
+          value: sensorRaw.value,
+          props: {
+            name: thing.name
+          },
+          status: {
+            now: sensorRaw.now,
+            millis: sensorRaw.millis,
+            value: sensorRaw.value
+          }
+        }
+        this.sensors.push(sensor);
+      })
+    )
   }
   done() {
     this.thingsService.realTimeConnector.realTimeConnectorRaw.remHook('onUpdateThingValue', this.onUpdateThingValue);
@@ -81,6 +92,36 @@ export class SensorsService implements OnDestroy {
       return; // Sanity check
     const sensorsRaw = {sensors: [value]}
     // asCmd
-    return await this.thingsService.putThingValue(thing.id, true, sensorsRaw);
+    return await this.thingsService.putThingValue({ thingId: thing.id, asCmd: true, value: sensorsRaw });
+  }
+
+  //
+  public async getAllSensors(): Promise<Sensor[]> {
+    this.thingsService.init();
+    this.thingsService.realTimeConnector.realTimeConnectorRaw.setHook('onUpdateThingValue', this.onUpdateThingValue);
+    await this.thingsService.thingsManager.getMoreThings(null);
+    const sensors: Sensor[] = [];
+    this.things.forEach(thing =>
+      thing.value.sensors.forEach((sensorRaw: SensorRaw) => {
+        const sensor: Sensor = {
+          thingId: thing.id,
+          name: thing.name,
+          id: sensorRaw.id,
+          now: sensorRaw.now,
+          millis: sensorRaw.millis,
+          value: sensorRaw.value,
+          props: {
+            name: thing.name
+          },
+          status: {
+            now: sensorRaw.now,
+            millis: sensorRaw.millis,
+            value: sensorRaw.value
+          }
+        }
+        sensors.push(sensor);
+      })
+    )
+    return sensors;
   }
 }
