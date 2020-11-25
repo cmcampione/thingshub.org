@@ -1,6 +1,6 @@
 import * as qs from "qs"
 import axios from "axios";
-import * as jwtDecode from "jwt-decode";
+import jwtDecode from "jwt-decode";
 import {EndPointAddress} from "./endPointAddress";
 
 export interface AccountUserData {

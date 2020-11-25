@@ -1,5 +1,5 @@
 const path = require("path");
-const WebpackShellPlugin = require("webpack-shell-plugin");
+const WebpackShellPluginNext = require("webpack-shell-plugin-next");
 const FileManagerPlugin = require("filemanager-webpack-plugin");
 
 const libraryName = "thingshub";
@@ -35,7 +35,7 @@ module.exports = {
 		]
 	},
 	plugins: [		
-		new WebpackShellPlugin({
+		new WebpackShellPluginNext({
 			onBuildEnd: [".\\node_modules\\.bin\\dts-bundle-generator -o ./dist/thingshub.d.ts ./src/index.ts  --umd-module-name thingshub"]
 		}),
 		// TODO: Not executed in correct order
