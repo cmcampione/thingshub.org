@@ -1,4 +1,4 @@
-import * as jwtDecode from "jwt-decode";
+import jwtDecode from "jwt-decode";
 import {AccountDataContext, AccountUserData} from "./accountDataContext";
 
 export class AccountManager {
