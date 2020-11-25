@@ -40,9 +40,9 @@ import { ThingsService } from './things.service';
     FormsModule,
     AgmCoreModule.forRoot({
       apiKey: 'AIzaSyD11pjYHyE0ekfygLBNJhvL1FgUp9-twkQ'
-    }),
-    StoreModule.forRoot(reducers, {metaReducers}),
-    EffectsModule.forRoot([SensorEffects])
+    })
+    // ,StoreModule.forRoot(reducers, {metaReducers}),
+    // EffectsModule.forRoot([SensorEffects])
   ],
   providers: [
     StatusBar,

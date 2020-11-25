@@ -1,5 +1,5 @@
 import axios, { AxiosRequestConfig, AxiosPromise } from "axios";
-import * as socketIo from "socket.io-client";
+import * as io from 'socket.io-client';
 
 export const enum RealtimeConnectionStates {
     Connecting = 0,
@@ -90,7 +90,7 @@ export class SocketIORealtimeConnector extends RealtimeConnector {
             return;
 
         let fullUrl = this.url + "?" + this.authHook();
-        this.socket = socketIo(fullUrl);
+        this.socket = io(fullUrl);
 
         this.socket.on("error", error => this.on_error(error));
 

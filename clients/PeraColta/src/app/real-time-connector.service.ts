@@ -14,7 +14,7 @@ export class RealTimeConnectorService {
 
   public readonly connectionStatus = new Subject<thingshub.RealtimeConnectionStates>();
 
-   private readonly onError = (error: any) => {
+  private readonly onError = (error: any) => {
     console.log(error);
   }
   private readonly onConnectError = (error: any) => {
