@@ -1,6 +1,5 @@
 import { Injectable, OnDestroy, Inject, isDevMode  } from '@angular/core';
-import * as thingshub from 'thingshub-js-sdk';
-import { ThingsGetParams, HttpRequestCanceler, ThingsDTOsDataSet } from 'thingshub-js-sdk';
+import { Thing, ThingUserReadClaims, ThingUserChangeClaims, ThingsDataContext, ThingsManager } from 'thingshub-js-sdk';
 import { endPointAddress } from './utils';
 import { AccountService } from './account.service';
 import { RealTimeConnectorService } from './real-time-connector.service';
@@ -9,22 +8,22 @@ import { RealTimeConnectorService } from './real-time-connector.service';
 @Injectable()
 export class ThingsService implements OnDestroy {
 
-  public readonly mainThing = new thingshub.Thing();
+  public readonly mainThing = new Thing();
   private readonly thingsManagerClaims = {
 
-    publicReadClaims : thingshub.ThingUserReadClaims.NoClaims,
-    publicChangeClaims: thingshub.ThingUserChangeClaims.NoClaims,
+    publicReadClaims : ThingUserReadClaims.NoClaims,
+    publicChangeClaims: ThingUserChangeClaims.NoClaims,
 
-    everyoneReadClaims: thingshub.ThingUserReadClaims.NoClaims,
-    everyoneChangeClaims: thingshub.ThingUserChangeClaims.NoClaims,
+    everyoneReadClaims: ThingUserReadClaims.NoClaims,
+    everyoneChangeClaims: ThingUserChangeClaims.NoClaims,
 
-    creatorUserReadClaims: thingshub.ThingUserReadClaims.AllClaims,
-    creatorUserChangeClaims: thingshub.ThingUserChangeClaims.AllClaims
+    creatorUserReadClaims: ThingUserReadClaims.AllClaims,
+    creatorUserChangeClaims: ThingUserChangeClaims.AllClaims
   };
   // ToDo: Could be a singleton. Need to create a ThingsDataContextService
-  private readonly thingsDatacontext = new thingshub.ThingsDataContext(endPointAddress, this.accountService.getSecurityHeader);
+  private readonly thingsDatacontext = new ThingsDataContext(endPointAddress, this.accountService.getSecurityHeader);
 
-  public readonly thingsManager: thingshub.ThingsManager;
+  public readonly thingsManager: ThingsManager;
 
   private readonly onUpdateThingValue = (thingId: string, value: any, asCmd: boolean): void => {
     if (!isDevMode())
@@ -38,7 +37,7 @@ export class ThingsService implements OnDestroy {
   constructor(@Inject('thingKind') thingKind: string, private readonly accountService: AccountService,
     public readonly realTimeConnector: RealTimeConnectorService) {
 
-    this.thingsManager = new thingshub.ThingsManager(this.mainThing,
+    this.thingsManager = new ThingsManager(this.mainThing,
         thingKind,
         this.thingsManagerClaims,
         this.thingsDatacontext,

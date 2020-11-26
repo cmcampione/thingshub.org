@@ -11,7 +11,7 @@ const thConstants 		= require("../../../common/src/thConstants");
 const thingsMngr		= require("../bl/thingsMngr");
 const RealtimeNotifier 	= require("../realtimeNotifier");
 
-const router = express.Router();
+const router 			= express.Router();
 
 router.get("/:id", function(req, res, next) {
 	passport.authenticate(["localapikey", "bearer"], { session: false }, async function(err, user, info) {
@@ -133,7 +133,6 @@ router.put("/:id", async function (req, res, next){
 				throw new utils.ErrorCustom(httpStatusCodes.INTERNAL_SERVER_ERROR, "Result not valid", 95);
 
 			if (blResult.usersIdsToNotify) {
-
 				if (!blResult.thingDTOs)
 					throw new utils.ErrorCustom(httpStatusCodes.INTERNAL_SERVER_ERROR, "Result not valid", 96);
 				

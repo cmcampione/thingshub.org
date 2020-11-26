@@ -811,6 +811,5 @@ exports.updateThingValue = async (user, thingId, value, asCmd) => {
 	}
 
 	return null;
-
 };
 
