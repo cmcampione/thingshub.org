@@ -29,7 +29,12 @@ class ClientsConnectorSocketIO extends IClientsConnector {
 		let self = this;
 		this.connections = new Map();
 
-		this.io = require("socket.io")(server);
+		this.io = require("socket.io")(server, {
+			cors: {
+				origin: "*",
+				methods: ["GET", "POST"]
+			}
+		});
 
 		this.io.use(async (socket, next) => {
 			let token = socket.handshake.query.token;
