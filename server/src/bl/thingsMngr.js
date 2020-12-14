@@ -137,6 +137,10 @@ async function getThing(user, thingId, deletedStatus, userRole, userStatus, user
 		throw new utils.ErrorCustom(httpStatusCodes.NOT_FOUND, "Thing not found", 39);
 	}
 
+	// If User is Super Administrator returns Thing whatever filters(userRole) are passed as parameters
+	if (user && user.isSuperAdministrator)
+		return thing;
+
 	if (deletedStatus != thConstants.ThingDeletedStates.NoMatter && thing.deletedStatus != deletedStatus)
 		throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Thing's Deletedstatus not valid", 40);
 
@@ -151,11 +155,7 @@ async function getThing(user, thingId, deletedStatus, userRole, userStatus, user
 	}
 
 	if (!user)
-		throw new utils.ErrorCustom(httpStatusCodes.UNAUTHORIZED, "Unauthorized user", 41);
-
-	// If User is Super Administrator returns Thing whatever filters(userRole) are passed as parameters
-	if (user.isSuperAdministrator)
-		return thing;
+		throw new utils.ErrorCustom(httpStatusCodes.UNAUTHORIZED, "Unauthorized user", 41);	
 
 	if ((thing.everyoneReadClaims & thConstants.ThingUserReadClaims.AllClaims) != 0 
 		|| (thing.everyoneChangeClaims & thConstants.ThingUserChangeClaims.AllClaims) != 0)

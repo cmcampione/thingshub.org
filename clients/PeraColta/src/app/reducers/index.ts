@@ -16,6 +16,7 @@ import { EMPTY, from } from 'rxjs';
 import { NumericValueAccessor } from '@ionic/angular';
 
 // Actions
+
 export const GET_ALL = '[SENSOR] Get All';
 export const GET_ALL_SUCCESS = '[SENSOR] GET All Success';
 
@@ -36,7 +37,7 @@ export type ALL_REDUCER_ACTIONS = GetAllAction | GetAllSuccessAction;
 @Injectable()
 export class SensorEffects {
 
-  /* loadAllSensors$ = createEffect(() => {
+  loadAllSensors$ = createEffect(() => {
     return this.actions$.pipe(ofType(GET_ALL), mergeMap(() => {
       return from(this.sensorsService.getAllSensors()).pipe(map(sensors => {
         return new GetAllSuccessAction(sensors);
@@ -44,15 +45,7 @@ export class SensorEffects {
         return EMPTY;
       }));
     }));
-  }); */
-
-  loadAllSensors$ = createEffect(() => {
-    const a1 = from(this.sensorsService.getAllSensors());
-    const a2 = a1.pipe(map(sensors => new GetAllSuccessAction(sensors)));
-    const a3 = mergeMap(() => a2);
-    const a4 = this.actions$.pipe(ofType(GET_ALL), a3);
-    return a4;
-  })
+  });
 
   constructor(private actions$: Actions, private sensorsService: SensorsService)
   {
@@ -60,6 +53,7 @@ export class SensorEffects {
 }
 
 // States
+
 export interface SensorState {
 	sensors: Sensor[];
 }
@@ -94,6 +88,7 @@ export const getSensors = createSelector(
 );
 
 // Reducers
+
 export const reducers: ActionReducerMap<AppState> = {
   sensorState: reducer
 };
