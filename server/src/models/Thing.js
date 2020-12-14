@@ -16,7 +16,7 @@ const thingSchema = mongoose.Schema({
 	deletedStatus         : { type: Number, default : thConstants.ThingDeletedStates.NoMatter },
 	deletedDate       	  : Date,
 
-	publicReadClaims      : { type: Number, default : thConstants.ThingUserReadClaims.NoClaimss },
+	publicReadClaims      : { type: Number, default : thConstants.ThingUserReadClaims.NoClaims },
 	publicChangeClaims    : { type: Number, default : thConstants.ThingUserChangeClaims.NoClaims },
 
 	everyoneReadClaims    : { type: Number, default : thConstants.ThingUserReadClaims.NoClaims },
