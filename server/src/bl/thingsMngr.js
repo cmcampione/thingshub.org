@@ -123,7 +123,7 @@ function checkThingAccess(user, thing, deletedStatus, userRole, userStatus, user
 
 // Not optimized using the CheckThingAccess function.
 // It does not get optimized because staying so you have a capillary control of where it eventually snaps the error
-async function getThing(user, thingId, deletedStatus) {
+async function getThing(user, thingId, deletedStatus, userRole, userStatus, userVisibility) {
 
 	if (!thingId)
 		throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Thing's Id not valid", 37);
@@ -137,54 +137,49 @@ async function getThing(user, thingId, deletedStatus) {
 		throw new utils.ErrorCustom(httpStatusCodes.NOT_FOUND, "Thing not found", 39);
 	}
 
-	if (user)
-	{
-		// If the User is Super Administrator or an Administrator (relate to the Thing) the always returns Thing
-		if (user.isSuperAdministrator)
-			return thing;
-		var thingUserRights = getThingUserRights(user._id, user.username, thing);
-		if (thingUserRights)
-		{
-			if ((thingUserRights.userRole & thConstants.ThingUserRoles.Administrator) != 0)
-				return thing;
-		}
-
-		if (deletedStatus != thConstants.ThingDeletedStates.NoMatter && thing.deletedStatus != deletedStatus)
-			throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Thing's Deleted status not valid", 40);
-
-		if ((thing.publicReadClaims & thConstants.ThingUserReadClaims.AllClaims) != 0 
-			|| (thing.publicChangeClaims & thConstants.ThingUserChangeClaims.AllClaims) != 0)
-			return thing;				
-
-		if ((thing.everyoneReadClaims & thConstants.ThingUserReadClaims.AllClaims) != 0 
-			|| (thing.everyoneChangeClaims & thConstants.ThingUserChangeClaims.AllClaims) != 0)
-			return thing;
-
-		if (thingUserRights)
-		{			
-			var userStatusPass = thConstants.ThingUserStates.Ok | thConstants.ThingUserStates.WaitForAuth;
-			if (thingUserRights.userStatus & userStatusPass == 0)
-				throw new utils.ErrorCustom(httpStatusCodes.FORBIDDEN, "Unauthorized user", 42);
-	
-			// If the Thing is not visible for the User, he/she has not access
-			var userVisibilityPass = thConstants.ThingUserVisibility.Visible; 
-			if (thingUserRights.userVisibility & userVisibilityPass == 0)
-				throw new utils.ErrorCustom(httpStatusCodes.FORBIDDEN, "Unauthorized user", 48);
-
-			return thing;
-		}
-
-		throw new utils.ErrorCustom(httpStatusCodes.FORBIDDEN, "Unauthorized user", 44);
-	}
-
 	if (deletedStatus != thConstants.ThingDeletedStates.NoMatter && thing.deletedStatus != deletedStatus)
-		throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Thing's Deletedstatus not valid", 129);
+		throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Thing's Deletedstatus not valid", 40);
 
 	if ((thing.publicReadClaims & thConstants.ThingUserReadClaims.AllClaims) != 0 
 		|| (thing.publicChangeClaims & thConstants.ThingUserChangeClaims.AllClaims) != 0)
+	{
+		// This is a condition I do not remember why it was put on. I consider it important.
+		// At this time it is commented why when I try to assign a pos to Thing
+		// for an unnamed user who does not have a relationship with Thing the condition does not let me pass.
+		// if (user == null && userRole == ThingUserRoles.NoMatter && userStatus == ThingUserStates.NoMatter && userVisibility == thConstants.ThingUserVisibility.NoMatter)
+		return thing;
+	}
+
+	if (!user)
+		throw new utils.ErrorCustom(httpStatusCodes.UNAUTHORIZED, "Unauthorized user", 41);
+
+	// If User is Super Administrator returns Thing whatever filters(userRole) are passed as parameters
+	/*
+	// ToDo: Manage when User is a SuperAdministrator
+	if (user.isSuperAdministrator)
+		return thing;
+	*/
+
+	if ((thing.everyoneReadClaims & thConstants.ThingUserReadClaims.AllClaims) != 0 
+		|| (thing.everyoneChangeClaims & thConstants.ThingUserChangeClaims.AllClaims) != 0)
 		return thing;
 
-	throw new utils.ErrorCustom(httpStatusCodes.FORBIDDEN, "Unauthorized user", 128);
+	var thingUserRights = getThingUserRights(user._id, user.username, thing);
+	if (thingUserRights)
+	{
+		if (userStatus != thConstants.ThingUserStates.NoMatter && ((thingUserRights.userStatus & userStatus) == 0))
+			throw new utils.ErrorCustom(httpStatusCodes.FORBIDDEN, "Unauthorized user", 42);
+
+		if (userRole != thConstants.ThingUserRoles.NoMatter && ((thingUserRights.userRole & userRole) == 0))
+			throw new utils.ErrorCustom(httpStatusCodes.FORBIDDEN, "Unauthorized user", 43);
+
+		if (userVisibility != thConstants.ThingUserVisibility.NoMatter && ((thingUserRights.userVisibility & userVisibility) == 0))
+			throw new utils.ErrorCustom(httpStatusCodes.FORBIDDEN, "Unauthorized user", 48);
+
+		return thing;
+	}
+
+	throw new utils.ErrorCustom(httpStatusCodes.FORBIDDEN, "Unauthorized user", 44);
 }
 
 async function getThings(user, parentThingId, thingFilter, valueFilter, orderBy, skip, top) {
@@ -243,7 +238,8 @@ async function getThings(user, parentThingId, thingFilter, valueFilter, orderBy,
 	let parentThing = null;
 	if (parentThingId) {
 		
-		parentThing = await getThing(user, parentThingId, thConstants.ThingDeletedStates.Ok);
+		parentThing = await getThing(user, parentThingId, thConstants.ThingDeletedStates.Ok, 
+			thConstants.ThingUserRoles.NoMatter, thConstants.ThingUserStates.Ok, thConstants.ThingUserVisibility.Visible);
 		mainThingsQuery["$and"].push({parentsThingsIds: { $elemMatch: {userId: user ? user._id : null, parentThingId }}} );
 	}
 
@@ -487,6 +483,7 @@ exports.getThing = async (user, thingId, deletedStatus) => {
 	if (!thingId)
 		throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Thing's Id can't be null", 47);
 
+	// ToDo: Check why is used thConstants.ThingUserStates.WaitForAuth
 	var thing = await getThing(user, thingId, deletedStatus, thConstants.ThingUserRoles.NoMatter,
 		user ? thConstants.ThingUserStates.Ok | thConstants.ThingUserStates.WaitForAuth : thConstants.ThingUserStates.NoMatter,
 		thConstants.ThingUserVisibility.NoMatter);
