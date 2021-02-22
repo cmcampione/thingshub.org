@@ -66,6 +66,12 @@ void loop() {
   switch (state)
   {
     case stateUnarmed:
+        if (antiTamperAlarmState == LOW) {
+            alarmSpan = millis();
+            alarmState = HIGH;
+            state = stateAlarm;
+            break;
+        }
         alarmState = LOW;
         if (armedUnarmedState == HIGH) {
             armedDelaySpan = 0;
@@ -93,14 +99,19 @@ void loop() {
         }
         if (delayedAlarmState == LOW && armedDelaySpan == 0) {
             armedDelaySpan = millis();
-            break;
+            break; // I have opened the delayed contact at least once
         }
         if (armedDelaySpan == 0) {
-            break;
+            break; // I'm still inside the environment
         }
         int duration = millis() - armedDelaySpan;
         if (duration <= 10000) {
-            break;
+          if (delayedAlarmState == HIGH) {
+            armedDelaySpan = 0;
+            state = stateArmed;            
+            break; // I have closed the delayed contact at least once during the delay period so I can arm the system
+          }
+          break;
         }
         // Here delayedAlarmState can be HIGH or LOW
         if (delayedAlarmState == LOW) {
