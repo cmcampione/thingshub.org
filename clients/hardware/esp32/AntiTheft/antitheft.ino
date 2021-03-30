@@ -1,5 +1,47 @@
 #include <ezButton.h>
 
+struct AntiTheftConfig {
+
+  int ArmedUnarmedLedPin;
+  int ArmedUnarmedContactPin;
+  int ArmedUnarmedContactOpenValue; // HIGH
+
+  int InstantAlarmLedPin;
+  int InstantAlarmContactPin;
+  int InstantAlarmContactOpenValue; // 
+
+  int DelayedAlarmLedPin;
+  int DelayedAlarmContactPin;
+  int DelayedAlarmContactOpenValue;
+
+  int AntiTamperAlarmLedPin;
+  int AntiTamperAlarmContactPin;
+  int AntiTamperAlarmContactOpenValue;
+
+  int AlarmOnOffLedAndContactPin;
+
+  int ExitTime;
+  int EntryTime;
+};
+
+class AntiTheft {
+  private:
+    enum class states {
+      unarmed,
+      armed,
+      alarm,
+      armedLeavingEnviroment
+    };
+  private:
+    AntiTheftConfig _config;
+  public:
+    AntiTheft(const AntiTheftConfig& cnfg) : _config(cnfg) {
+    }
+  public:
+    void setup() {}
+    void loop() {}
+};
+
 /// constants won't change
 const int LED_ARMED_UNARMED      = 15; // the number of the LED pin
 const int BUTTON_ARMED_UNARMED   = 2; // the number of the pushbutton pin
@@ -16,9 +58,9 @@ const int BUTTON_ANTITAMPER_ALARM = 19; // the number of the pushbutton pin
 const int LED_ALARM_ON_OFF         = 21; // the number of the LED pin
 
 ezButton buttonArmedUnarmed(BUTTON_ARMED_UNARMED);
-ezButton buttonInstantAlarm(BUTTON_INSTANT_ALARM);
-ezButton buttonDelayedAlarm(BUTTON_DELAYED_ALARM);
-ezButton buttonAntiTamperAlarm(BUTTON_ANTITAMPER_ALARM);
+// ezButton buttonInstantAlarm(BUTTON_INSTANT_ALARM);
+// ezButton buttonDelayedAlarm(BUTTON_DELAYED_ALARM);
+// ezButton buttonAntiTamperAlarm(BUTTON_ANTITAMPER_ALARM);
 
 const int stateUnarmed  = 0;
 const int stateArmed    = 1;
@@ -44,12 +86,16 @@ void setup() {
   
   pinMode(LED_ARMED_UNARMED, OUTPUT);   // set arduino pin to output mode
   buttonArmedUnarmed.setDebounceTime(50); // set debounce time to 50 milliseconds
+  
   pinMode(LED_INSTANT_ALARM, OUTPUT);   // set arduino pin to output mode
-  buttonInstantAlarm.setDebounceTime(50); // set debounce time to 50 milliseconds
+  // buttonInstantAlarm.setDebounceTime(50); // set debounce time to 50 milliseconds
+  
   pinMode(LED_DELAYED_ALARM, OUTPUT);   // set arduino pin to output mode
-  buttonDelayedAlarm.setDebounceTime(50); // set debounce time to 50 milliseconds
+  pinMode(BUTTON_DELAYED_ALARM, INPUT);
+  // buttonDelayedAlarm.setDebounceTime(50); // set debounce time to 50 milliseconds
+  
   pinMode(LED_ANTITAMPER_ALARM, OUTPUT);   // set arduino pin to output mode
-  buttonAntiTamperAlarm.setDebounceTime(50); // set debounce time to 50 milliseconds
+  // buttonAntiTamperAlarm.setDebounceTime(50); // set debounce time to 50 milliseconds
 
   pinMode(LED_ALARM_ON_OFF, OUTPUT);   // set arduino pin to output mode
 }
@@ -179,16 +225,28 @@ void loop() {
     }
 
     buttonArmedUnarmed.loop(); // MUST call the loop() function first
-    buttonInstantAlarm.loop(); // MUST call the loop() function first
-    buttonDelayedAlarm.loop(); // MUST call the loop() function first
-    buttonAntiTamperAlarm.loop(); // MUST call the loop() function first
+    // buttonInstantAlarm.loop(); // MUST call the loop() function first
+    // buttonDelayedAlarm.loop(); // MUST call the loop() function first
+    // buttonAntiTamperAlarm.loop(); // MUST call the loop() function first
   
     if (buttonArmedUnarmed.isPressed())
       armedUnarmedState = !armedUnarmedState;
+      
+    /*
     if (buttonInstantAlarm.isPressed())
       instanAlarmState = !instanAlarmState;
+    */
+    instanAlarmState = digitalRead(BUTTON_INSTANT_ALARM);
+    
+    /*
     if (buttonDelayedAlarm.isPressed())
       delayedAlarmState = !delayedAlarmState;
+    */
+    delayedAlarmState = digitalRead(BUTTON_DELAYED_ALARM);
+      
+    /*
     if (buttonAntiTamperAlarm.isPressed())
       antiTamperAlarmState = !antiTamperAlarmState;
+    */
+    antiTamperAlarmState = digitalRead(BUTTON_ANTITAMPER_ALARM);
 }
