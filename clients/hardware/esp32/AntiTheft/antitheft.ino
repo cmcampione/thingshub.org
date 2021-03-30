@@ -4,11 +4,11 @@ struct AntiTheftConfig {
 
   int ArmedUnarmedLedPin;
   int ArmedUnarmedContactPin;
-  int ArmedUnarmedContactOpenValue; // HIGH
+  int ArmedUnarmedContactOpenValue;
 
   int InstantAlarmLedPin;
   int InstantAlarmContactPin;
-  int InstantAlarmContactOpenValue; // 
+  int InstantAlarmContactOpenValue;
 
   int DelayedAlarmLedPin;
   int DelayedAlarmContactPin;
@@ -22,6 +22,8 @@ struct AntiTheftConfig {
 
   int ExitTime;
   int EntryTime;
+
+  int AlarmDutation;
 };
 
 class AntiTheft {
@@ -34,219 +36,209 @@ class AntiTheft {
     };
   private:
     AntiTheftConfig _config;
+  private:
+    states _state;
+  private:
+    int _armedDelaySpan;    
+    int _alarmSpan;
+  private:
+    int _armedUnarmedState;     // HIGH == Armed, LOW == Unarmed
+    int _instanAlarmState;      // HIGH == Open,  LOW == Close
+    int _delayedAlarmState;     // HIGH == Open,  LOW == Close
+    int _antiTamperAlarmState;  // HIGH == Open,  LOW == Close
+  private:    
+    int _alarmState;            // HIGH == In alarm,  LOW == Not in alarm
+  private:
+    ezButton _buttonArmedUnarmed; // ToDo: To remove
   public:
-    AntiTheft(const AntiTheftConfig& cnfg) : _config(cnfg) {
+    AntiTheft(const AntiTheftConfig& cnfg) : _config(cnfg),
+    _state(states::unarmed),
+    _armedDelaySpan(0),
+    _alarmSpan(0),
+    _alarmState(LOW),
+    _armedUnarmedState(LOW),
+    _buttonArmedUnarmed(cnfg.ArmedUnarmedContactPin) // Info: I use cnfg because i don't know if _config is already initialized
+    {
     }
   public:
-    void setup() {}
-    void loop() {}
+    void setup() {
+      pinMode(_config.AlarmOnOffLedAndContactPin, OUTPUT);
+      
+      pinMode(_config.ArmedUnarmedContactPin, INPUT);
+      _buttonArmedUnarmed.setDebounceTime(50); // ToDo: To remove
+      pinMode(_config.ArmedUnarmedLedPin, OUTPUT);      
+      
+      pinMode(_config.InstantAlarmContactPin, INPUT);      
+      pinMode(_config.InstantAlarmLedPin, OUTPUT);
+
+      pinMode(_config.DelayedAlarmContactPin, INPUT);      
+      pinMode(_config.DelayedAlarmLedPin, OUTPUT);
+
+      pinMode(_config.AntiTamperAlarmContactPin, INPUT);      
+      pinMode(_config.AntiTamperAlarmLedPin, OUTPUT);
+    }
+    void loop() {
+      digitalWrite(_config.AlarmOnOffLedAndContactPin, _alarmState);
+
+      _buttonArmedUnarmed.loop();
+      if (_buttonArmedUnarmed.isPressed())
+        _armedUnarmedState = !_armedUnarmedState;
+
+      /*
+      int armedUnarmedState = digitalRead(_config.ArmedUnarmedContactPin);
+      _armedUnarmedState = armedUnarmedState == _config.ArmedUnarmedContactOpenValue ? HIGH : LOW;
+      */
+      
+      digitalWrite(_config.ArmedUnarmedLedPin, _armedUnarmedState);
+
+      int instanAlarmState = digitalRead(_config.InstantAlarmContactPin);
+      _instanAlarmState = instanAlarmState == _config.InstantAlarmContactOpenValue ? HIGH : LOW;
+      digitalWrite(_config.InstantAlarmLedPin, _instanAlarmState);
+
+      int delayedAlarmState = digitalRead(_config.DelayedAlarmContactPin);
+      _delayedAlarmState = delayedAlarmState == _config.DelayedAlarmContactOpenValue ? HIGH : LOW;
+      digitalWrite(_config.DelayedAlarmLedPin, _delayedAlarmState);
+
+      int antiTamperAlarmState = digitalRead(_config.AntiTamperAlarmContactPin);
+      _antiTamperAlarmState = antiTamperAlarmState == _config.AntiTamperAlarmContactOpenValue ? HIGH : LOW;
+      digitalWrite(_config.AntiTamperAlarmLedPin, _antiTamperAlarmState);
+
+      switch (_state)
+      {
+        case states::unarmed:
+            if (_antiTamperAlarmState == HIGH) {
+                _alarmSpan = millis();
+                _alarmState = HIGH;
+                _state = states::alarm;
+                break;
+            }
+            _alarmState = LOW;
+            if (_armedUnarmedState == HIGH) {
+                _armedDelaySpan = 0;
+                _state = states::armedLeavingEnviroment;
+                break;
+            }
+            break;
+        case states::armedLeavingEnviroment:
+        {
+            if (_armedUnarmedState == LOW) {
+                _state = states::unarmed;
+                break;
+            }
+            if (_instanAlarmState == HIGH) {
+                _alarmSpan = millis();
+                _alarmState = HIGH;
+                _state = states::alarm;            
+                break;
+            }
+            if (_antiTamperAlarmState == HIGH) {
+                _alarmSpan = millis();
+                _alarmState = HIGH;
+                _state = states::alarm;
+                break;
+            }
+            if (_delayedAlarmState == HIGH && _armedDelaySpan == 0) {
+                _armedDelaySpan = millis();
+                break; // I have opened the delayed contact at least once
+            }
+            if (_armedDelaySpan == 0) {
+                break; // I'm still inside the environment
+            }
+            int duration = millis() - _armedDelaySpan;
+            if (duration <= _config.ExitTime) {
+              if (_delayedAlarmState == LOW) {
+                _armedDelaySpan = 0;
+                _state = states::armed;
+                break; // I have closed the delayed contact at least once during the delay period so I can arm the system
+              }
+              break;
+            }
+            // Here delayedAlarmState can be HIGH or LOW
+            if (_delayedAlarmState == HIGH) {
+                _alarmSpan = millis();
+                _alarmState = HIGH;
+                _state = states::alarm;
+                break;
+            }
+              
+            _armedDelaySpan = 0;
+            _state = states::armed;
+            break;
+        }
+        case states::armed:
+        {
+            if (_armedUnarmedState == LOW) {
+                _state = states::unarmed;
+                break;
+            }
+            if (_instanAlarmState == HIGH) {
+                _alarmSpan = millis();
+                _alarmState = HIGH;
+                _state = states::alarm;            
+                break;
+            }
+            if (_antiTamperAlarmState == HIGH) {
+                _alarmSpan = millis();
+                _alarmState = HIGH;
+                _state = states::alarm;
+                break;
+            }
+            if (_delayedAlarmState == HIGH && _armedDelaySpan == 0) {
+                _armedDelaySpan = millis();
+                break;
+            }
+            if (_armedDelaySpan == 0) {
+                break;
+            }
+            int duration = millis() - _armedDelaySpan;
+            if (duration <= _config.EntryTime) {
+                break;
+            }
+            
+            _alarmSpan = millis();
+            _alarmState = HIGH;
+            _state = states::alarm;
+            break;
+        }
+        case states::alarm:
+        {
+            if (_armedUnarmedState == LOW) {
+                _state = states::unarmed;
+                break;
+            }
+            int duration = millis() - _alarmSpan;
+            if (duration > _config.AlarmDutation) {
+                _alarmSpan = millis();
+                _alarmState = !_alarmState;
+                break;
+            }
+            break;
+        }
+        default:
+            break;
+        }
+    }
 };
 
-/// constants won't change
-const int LED_ARMED_UNARMED      = 15; // the number of the LED pin
-const int BUTTON_ARMED_UNARMED   = 2; // the number of the pushbutton pin
-
-const int LED_INSTANT_ALARM       = 4; // the number of the LED pin
-const int BUTTON_INSTANT_ALARM    = 16; // the number of the pushbutton pin
-
-const int LED_DELAYED_ALARM       = 17; // the number of the LED pin
-const int BUTTON_DELAYED_ALARM    = 5; // the number of the pushbutton pin
-
-const int LED_ANTITAMPER_ALARM    = 18; // the number of the LED pin
-const int BUTTON_ANTITAMPER_ALARM = 19; // the number of the pushbutton pin
-
-const int LED_ALARM_ON_OFF         = 21; // the number of the LED pin
-
-ezButton buttonArmedUnarmed(BUTTON_ARMED_UNARMED);
-// ezButton buttonInstantAlarm(BUTTON_INSTANT_ALARM);
-// ezButton buttonDelayedAlarm(BUTTON_DELAYED_ALARM);
-// ezButton buttonAntiTamperAlarm(BUTTON_ANTITAMPER_ALARM);
-
-const int stateUnarmed  = 0;
-const int stateArmed    = 1;
-const int stateAlarm    = 2;
-const int stateArmedLeavingEnviroment  = 3;
-
-int state = stateUnarmed;
-
-// variables will change:
-int armedUnarmedState    = LOW;   // the current state of LED
-int instanAlarmState     = LOW;   // the current state of LED
-int delayedAlarmState    = LOW;   // the current state of LED
-int antiTamperAlarmState = LOW;   // the current state of LED
-
-int alarmState      = LOW;
-
-int armedDelaySpan  = 0;
-
-int alarmSpan       = 0;
+AntiTheftConfig mainAntiTheftCnfg {
+  15,  2, HIGH,
+   4, 16, HIGH,
+  17,  5, HIGH,   // don't run
+  //17, 23, HIGH, // run
+  18, 19, HIGH,   
+  21,
+  10000,
+  10000,
+  5000
+};
+AntiTheft mainAntiTheft(mainAntiTheftCnfg);
 
 void setup() {
   Serial.begin(115200);         // initialize serial
-  
-  pinMode(LED_ARMED_UNARMED, OUTPUT);   // set arduino pin to output mode
-  buttonArmedUnarmed.setDebounceTime(50); // set debounce time to 50 milliseconds
-  
-  pinMode(LED_INSTANT_ALARM, OUTPUT);   // set arduino pin to output mode
-  // buttonInstantAlarm.setDebounceTime(50); // set debounce time to 50 milliseconds
-  
-  pinMode(LED_DELAYED_ALARM, OUTPUT);   // set arduino pin to output mode
-  pinMode(BUTTON_DELAYED_ALARM, INPUT);
-  // buttonDelayedAlarm.setDebounceTime(50); // set debounce time to 50 milliseconds
-  
-  pinMode(LED_ANTITAMPER_ALARM, OUTPUT);   // set arduino pin to output mode
-  // buttonAntiTamperAlarm.setDebounceTime(50); // set debounce time to 50 milliseconds
 
-  pinMode(LED_ALARM_ON_OFF, OUTPUT);   // set arduino pin to output mode
+  mainAntiTheft.setup();    
 }
 
 void loop() {
-  
-  digitalWrite(LED_ARMED_UNARMED, armedUnarmedState);
-  digitalWrite(LED_INSTANT_ALARM, instanAlarmState); 
-  digitalWrite(LED_DELAYED_ALARM, delayedAlarmState); 
-  digitalWrite(LED_ANTITAMPER_ALARM, antiTamperAlarmState);
-  
-  digitalWrite(LED_ALARM_ON_OFF, alarmState); 
-  
-  switch (state)
-  {
-    case stateUnarmed:
-        if (antiTamperAlarmState == LOW) {
-            alarmSpan = millis();
-            alarmState = HIGH;
-            state = stateAlarm;
-            break;
-        }
-        alarmState = LOW;
-        if (armedUnarmedState == HIGH) {
-            armedDelaySpan = 0;
-            state = stateArmedLeavingEnviroment;
-            break;
-        }
-        break;
-    case stateArmedLeavingEnviroment:
-    {
-        if (armedUnarmedState == LOW) {
-            state = stateUnarmed;
-            break;
-        }
-        if (instanAlarmState == LOW) {
-            alarmSpan = millis();
-            alarmState = HIGH;
-            state = stateAlarm;            
-            break;
-        }
-        if (antiTamperAlarmState == LOW) {
-            alarmSpan = millis();
-            alarmState = HIGH;
-            state = stateAlarm;
-            break;
-        }
-        if (delayedAlarmState == LOW && armedDelaySpan == 0) {
-            armedDelaySpan = millis();
-            break; // I have opened the delayed contact at least once
-        }
-        if (armedDelaySpan == 0) {
-            break; // I'm still inside the environment
-        }
-        int duration = millis() - armedDelaySpan;
-        if (duration <= 10000) {
-          if (delayedAlarmState == HIGH) {
-            armedDelaySpan = 0;
-            state = stateArmed;            
-            break; // I have closed the delayed contact at least once during the delay period so I can arm the system
-          }
-          break;
-        }
-        // Here delayedAlarmState can be HIGH or LOW
-        if (delayedAlarmState == LOW) {
-            alarmSpan = millis();
-            alarmState = HIGH;
-            state = stateAlarm;            
-            break;
-        }
-          
-        armedDelaySpan = 0;
-        state = stateArmed;
-        break;
-    }
-    case stateArmed:
-    {
-        if (armedUnarmedState == LOW) {
-            state = stateUnarmed;
-            break;
-        }
-        if (instanAlarmState == LOW) {
-            alarmSpan = millis();
-            alarmState = HIGH;
-            state = stateAlarm;            
-            break;
-        }
-        if (antiTamperAlarmState == LOW) {
-            alarmSpan = millis();
-            alarmState = HIGH;
-            state = stateAlarm;
-            break;
-        }
-        if (delayedAlarmState == LOW && armedDelaySpan == 0) {
-            armedDelaySpan = millis();
-            break;
-        }
-        if (armedDelaySpan == 0) {
-            break;
-        }
-        int duration = millis() - armedDelaySpan;
-        if (duration <= 10000) {
-            break;
-        }
-        
-        alarmSpan = millis();
-        alarmState = HIGH;
-        state = stateAlarm;
-        break;
-    }
-    case stateAlarm:
-    {
-        if (armedUnarmedState == LOW) {
-            state = stateUnarmed;
-            break;
-        }
-        int duration = millis() - alarmSpan;
-        if (duration > 10000) {
-            alarmSpan = millis();
-            alarmState = !alarmState;
-            break;
-        }
-        break;
-    }
-    default:
-        break;
-    }
-
-    buttonArmedUnarmed.loop(); // MUST call the loop() function first
-    // buttonInstantAlarm.loop(); // MUST call the loop() function first
-    // buttonDelayedAlarm.loop(); // MUST call the loop() function first
-    // buttonAntiTamperAlarm.loop(); // MUST call the loop() function first
-  
-    if (buttonArmedUnarmed.isPressed())
-      armedUnarmedState = !armedUnarmedState;
-      
-    /*
-    if (buttonInstantAlarm.isPressed())
-      instanAlarmState = !instanAlarmState;
-    */
-    instanAlarmState = digitalRead(BUTTON_INSTANT_ALARM);
-    
-    /*
-    if (buttonDelayedAlarm.isPressed())
-      delayedAlarmState = !delayedAlarmState;
-    */
-    delayedAlarmState = digitalRead(BUTTON_DELAYED_ALARM);
-      
-    /*
-    if (buttonAntiTamperAlarm.isPressed())
-      antiTamperAlarmState = !antiTamperAlarmState;
-    */
-    antiTamperAlarmState = digitalRead(BUTTON_ANTITAMPER_ALARM);
+  mainAntiTheft.loop();
 }
