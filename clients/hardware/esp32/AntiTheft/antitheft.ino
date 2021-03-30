@@ -223,8 +223,9 @@ class AntiTheft {
 AntiTheftConfig mainAntiTheftCnfg {
   15,  2, HIGH,
    4, 16, HIGH,
-  17,  5, HIGH,   // don't run
-  //17, 23, HIGH, // run
+  //17,  5, HIGH,   // don't run
+  17, 23, HIGH, // run
+  //17,  3, HIGH, // don't run
   18, 19, HIGH,   
   21,
   10000,
