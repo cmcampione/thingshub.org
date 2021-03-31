@@ -10,7 +10,7 @@ const parser        = require("./parsers.js");
 const elaboratorsMod = require("./elaborators.js");
 
 // Env configuration
-
+// ToDo: Cercare di capire meglio
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
 const configPath = path.join(__dirname, "./", "trackerServer.env");
