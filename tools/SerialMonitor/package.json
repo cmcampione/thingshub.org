@@ -16,9 +16,9 @@
   },
   "dependencies": {
     "dotenv": "^8.2.0",
-    "ejs": "^3.1.5",
-    "winston": "^3.3.3",
+    "ejs": "^3.1.6",
     "moment": "^2.29.1",
-    "serialport": "^9.0.2"
+    "serialport": "^9.0.7",
+    "winston": "^3.3.3"
   }
 }

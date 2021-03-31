@@ -90,6 +90,8 @@ export class SocketIORealtimeConnector extends RealtimeConnector {
             return;
 
         let fullUrl = this.url + "?" + this.authHook();
+
+        // ToDo: Add support for options of socketio
         this.socket = io(fullUrl);
 
         this.socket.on("error", error => this.on_error(error));
