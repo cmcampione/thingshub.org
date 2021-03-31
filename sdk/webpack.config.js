@@ -41,20 +41,22 @@ module.exports = {
 		// TODO: Not executed in correct order
 		// Useful to avoid publish in npm repo
 		new FileManagerPlugin({
-			onEnd: {
-				copy: [
-					{ source: "./dist/package.json", destination: "../clients/PeraColta/node_modules/thingshub-js-sdk/" },
-					{ source: "./dist/README.md", destination: "../clients/PeraColta/node_modules/thingshub-js-sdk/" },
-					{ source: "./dist/thingshub.js", destination: "../clients/PeraColta/node_modules/thingshub-js-sdk/" },
-					{ source: "./dist/thingshub.js.map", destination: "../clients/PeraColta/node_modules/thingshub-js-sdk/" },
-					{ source: "./dist/thingshub.d.ts", destination: "../clients/PeraColta/node_modules/thingshub-js-sdk/" },
+			events: {
+				onEnd: {
+					copy: [
+						{ source: "./dist/package.json", destination: "../clients/PeraColta/node_modules/thingshub-js-sdk/" },
+						{ source: "./dist/README.md", destination: "../clients/PeraColta/node_modules/thingshub-js-sdk/" },
+						{ source: "./dist/thingshub.js", destination: "../clients/PeraColta/node_modules/thingshub-js-sdk/" },
+						{ source: "./dist/thingshub.js.map", destination: "../clients/PeraColta/node_modules/thingshub-js-sdk/" },
+						{ source: "./dist/thingshub.d.ts", destination: "../clients/PeraColta/node_modules/thingshub-js-sdk/" },
 
-					{ source: "./dist/package.json", destination: "../clients/ThingsMonitor/node_modules/thingshub-js-sdk/" },
-					{ source: "./dist/README.md", destination: "../clients/ThingsMonitor/node_modules/thingshub-js-sdk/" },
-					{ source: "./dist/thingshub.js", destination: "../clients/ThingsMonitor/node_modules/thingshub-js-sdk/" },
-					{ source: "./dist/thingshub.js.map", destination: "../clients/ThingsMonitor/node_modules/thingshub-js-sdk/" },
-					{ source: "./dist/thingshub.d.ts", destination: "../clients/ThingsMonitor/node_modules/thingshub-js-sdk/" }
-				]
+						{ source: "./dist/package.json", destination: "../clients/ThingsMonitor/node_modules/thingshub-js-sdk/" },
+						{ source: "./dist/README.md", destination: "../clients/ThingsMonitor/node_modules/thingshub-js-sdk/" },
+						{ source: "./dist/thingshub.js", destination: "../clients/ThingsMonitor/node_modules/thingshub-js-sdk/" },
+						{ source: "./dist/thingshub.js.map", destination: "../clients/ThingsMonitor/node_modules/thingshub-js-sdk/" },
+						{ source: "./dist/thingshub.d.ts", destination: "../clients/ThingsMonitor/node_modules/thingshub-js-sdk/" }
+					]
+				}
 			}
 		}),
 	]
