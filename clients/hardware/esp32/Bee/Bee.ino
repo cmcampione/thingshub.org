@@ -4,10 +4,17 @@
 #include <vector>
 #include "WiFi.h"
 #include "HTTPClient.h"
+#include "WebSocketsClient.h"
 #include "SocketIOclient.h"
 #include "RCSwitch.h"
 #include "ArduinoJson.h"
 #include "BuildDefine.h"
+
+#if defined(ESP32)
+#if defined(SSL_AXTLS)
+// Useful to check defines
+#endif
+#endif
 
 // Max capacity for actual msg
 const int sensorsCount = 7;
@@ -846,8 +853,8 @@ public:
   }
   static void beginSocketSSLWithCA(const char *host, uint16_t port, const char *url = "/socket.io/?EIO=3", const char *CA_cert = NULL, const char *protocol = "arduino")
   {
-    SocketIOManager::webSocket.onEvent(handleEvent);
-    SocketIOManager::webSocket.beginSocketIOSSLWithCA(host, port, url, CA_cert, protocol);
+    SocketIOManager::webSocket.onEvent(handleEvent);                     
+    SocketIOManager::webSocket.beginSocketIOSSLWithCA(host, port, url, CA_cert, protocol); 
   }
   static void loop()
   {
