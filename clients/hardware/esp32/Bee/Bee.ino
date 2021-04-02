@@ -9,12 +9,7 @@
 #include "RCSwitch.h"
 #include "ArduinoJson.h"
 #include "BuildDefine.h"
-
-#if defined(ESP32)
-#if defined(SSL_AXTLS)
-// Useful to check defines
-#endif
-#endif
+#include "antitheft.h"
 
 // Max capacity for actual msg
 const int sensorsCount = 7;
@@ -72,7 +67,6 @@ public:
     pin = pinN;
     mySwitch.enableReceive(pin);
   }
-
 public:
   static bool available()
   {
@@ -96,7 +90,7 @@ public:
   }
 };
 RCSwitch RCSensorsManager::mySwitch = RCSwitch(); // ToDo: Do a copy? As example
-int RCSensorsManager::pin = 4;
+int RCSensorsManager::pin = 4; // It's only a default value, can be changed during "init" call
 
 //
 struct PWM
@@ -107,10 +101,19 @@ struct PWM
 };
 struct Pin
 {
+  Pin() : pAntiTheft(NULL) {
+  }
+  ~Pin() {
+    if (pAntiTheft != NULL)
+      delete pAntiTheft;
+  }
   String kind;
+
   int min;
   int max;
-  PWM pwm;
+  
+  PWM         pwm;        // Valid only for kind == "PWM"
+  AntiTheft*  pAntiTheft; // Valid only for kind == "AT"
 
   int value;
 };
@@ -139,20 +142,21 @@ struct SetPoint
 typedef std::vector<SetPoint> setPoint_collection;
 typedef setPoint_collection::const_iterator setPoint_const_iterator;
 
-//
 struct Sensor
 {
   Sensor() : millis(0), now(false), value(0), pin(0), prior(false) {}
 
   String name;
 
-  int pin;
+  int pin;  // Can be an real or virtual pin
+
   bool prior;
+
   setPoint_collection setPoints;
 
-  bool now;
+  bool          now;
   unsigned long millis;
-  int value;
+  int           value;
 };
 typedef std::map<String, Sensor> sensor_collection;
 typedef sensor_collection::iterator sensor_iterator;
@@ -164,40 +168,39 @@ class BeeStatus
 public:
   static const char* thingCnfg;
   static const char* thingValue;
-
 private:
   static pin_collection pins;
   static sensor_collection sensors;
-
-public:
+private:
   static void setupPins()
   {
+    /*
     { // Pin 2 - On board led
       pins[2].kind = "DO";
       pins[2].min = 0;
       pins[2].max = 1;
-      pins[2].value = LOW; //initial
+      pins[2].value = LOW; // Initial
     }
 
     { // Pin 4 - RC sensor
       pins[4].kind = "RC";
       pins[4].min = 0;   // No matter
       pins[4].max = 0;   // No matter
-      pins[4].value = 0; //initial
+      pins[4].value = 0; // Initial
     }
 
     { // Pin 5 - PhotoResistor Led
       pins[5].kind = "DO";
       pins[5].min = 0;
       pins[5].max = 1;
-      pins[5].value = LOW; //initial
+      pins[5].value = LOW; // Initial
     }
 
     { // Pin 23 - Buzzer
       pins[23].kind = "PWM";
       pins[23].min = 0;
       pins[23].max = 128;
-      pins[23].value = 0; //initial
+      pins[23].value = 0; // Initial
       pins[23].pwm.freq = 2000;
       pins[23].pwm.channel = 1;
       pins[23].pwm.res = 8;
@@ -207,14 +210,32 @@ public:
       pins[34].kind = "AI";
       pins[34].min = 0;
       pins[34].max = 4095;
-      pins[34].value = 0; //initial
+      pins[34].value = 0; // Initial
     }
 
     { // Pin 15 - Thermistor
       pins[35].kind = "AI";
       pins[35].min = 0;
       pins[35].max = 4095;
-      pins[35].value = 0; //initial
+      pins[35].value = 0; // Initial
+    }
+    */
+    { // Pin 1000 - Main AntiTheaf
+      pins[1000].kind = "AT";
+
+      AntiTheftConfig mainAntiTheftCnfg {
+        "MAT-ALSTATE", 21,
+        "MAT-AUSTATE", 15,  2, HIGH,
+        "MAT-IASTATE", 4, 16, HIGH,
+        //"MAT-DASTATE", 17,  5, HIGH,   // don't run
+        "MAT-DASTATE", 17, 23, HIGH, // run
+        //"MAT-DASTATE", 17,  3, HIGH, // don't run
+        "MAT-AASTATE", 18, 19, HIGH,
+        10000,
+        10000,
+        5000
+      };
+      pins[1000].pAntiTheft = new AntiTheft(mainAntiTheftCnfg);
     }
 
     for (pin_const_iterator it = pins.begin(); it != pins.end(); it++)
@@ -242,6 +263,11 @@ public:
         // Doesn't need initial setup
         continue;
       }
+      if (pin.kind == "AT")
+      {
+        pin.pAntiTheft->setup();
+        continue;
+      }
 #ifdef DEBUG_BEESTATUS
       DPRINTF("BEESTATUS - Pin n: %d kind: %s - Kind not found\n", pinN, pin.kind);
 #endif
@@ -249,6 +275,7 @@ public:
   }
   static void setupSensors()
   {
+    /*
     { // Telecomando 1 Apri
       sensors["8171288"].name = "Telecomando 1 Apri";
       sensors["8171288"].pin = 4;
@@ -438,15 +465,25 @@ public:
       sensors["Temperatura-01"].name = "Temperatura 01";
       sensors["Temperatura-01"].pin = 35;
     }
+    */
+    { // AntiTheaf - ArmedUnarmed
+      sensors["MAT-AUSTATE"].name = "Antifurto Principale - ArmatoDisarmato";
+      sensors["MAT-AUSTATE"].pin = 1000;
+      sensors["MAT-AUSTATE"].prior = true;
+    }
+    { // AntiTheaf - AlarmState
+      sensors["MAT-ALSTATE"].name = "Antifurto Principale - Allarme on-off";
+      sensors["MAT-ALSTATE"].pin = 1000;
+      sensors["MAT-ALSTATE"].prior = true;
+    }
   }
-
 public:
   static void setup()
   {
     setupPins();
     setupSensors();
   }
-
+private:
   static void setPinValue(int pinN, int value)
   {
     if (pins.find(pinN) == pins.end())
@@ -496,7 +533,6 @@ public:
     DPRINTF("BEESTATUS - Pin n: %d kind: %s not recognized\n", pinN, pin.kind.c_str());
 #endif
   }
-
   static void togglePinValue(int pinN)
   {
     if (pins.find(pinN) == pins.end())
@@ -538,7 +574,7 @@ public:
     DPRINTF("BEESTATUS - Pin n: %d kind: %s - Kind not recognized\n", pinN, pin.kind);
 #endif
   }
-
+private:
   static void checkSetPoints(const setPoint_collection& setPoints, int value)
   {
     for (setPoint_const_iterator it = setPoints.begin(); it != setPoints.end(); it++)
@@ -548,7 +584,7 @@ public:
       {
         for (setPointPin_const_iterator n = setPoint.pins.begin(); n != setPoint.pins.end(); n++)
         {
-          const SetPointPin &setPointPin = *n;
+          const SetPointPin& setPointPin = *n;
           if (setPointPin.force == true)
           {
 #ifdef DEBUG_BEESTATUS_VERBOSE
@@ -567,7 +603,7 @@ public:
       }
     }
   }
-
+private:
   static bool setSensorsValueFromPin(int pin, int value)
   {
     bool immediately = false;
@@ -588,7 +624,7 @@ public:
     }
     return immediately;
   }
-
+public:
   static bool setSensorValue(const char* sensorId, int value)
   {
     if (sensors.find(sensorId) == sensors.end())
@@ -609,14 +645,14 @@ public:
 
     return sensor.prior;
   }
-
+public:
   static bool loop()
   {
     bool immediately = false;
     for (pin_const_iterator it = pins.begin(); it != pins.end(); it++)
     {
-      int pinN = it->first;
-      const Pin& pin = it->second;
+      int pinN        = it->first;
+      const Pin& pin  = it->second;
 #ifdef DEBUG_BEESTATUS_VERBOSE
       DPRINTF("BEESTATUS - Elaborating Pin n: %d kind: %s\n", pinN, pin.kind.c_str());
 #endif
@@ -654,13 +690,24 @@ public:
           immediately = prior;
         continue;
       }
+      if (pin.kind == "AT") {
+        pin.pAntiTheft->loop();
+        for (AntiTheft::const_iterator it = pin.pAntiTheft->begin(); it != pin.pAntiTheft->end(); it++) {
+          String      stateId     = it->first;
+          const int*  stateValue  = it->second;
+          int prior = setSensorValue(stateId.c_str(), *stateValue);
+          if (immediately == false)
+            immediately = prior;
+        }
+        continue;
+      }
 #ifdef DEBUG_BEESTATUS
       DPRINTF("BEESTATUS - Pin n: %d kind: %s not found\n", pinN, pin.kind.c_str());
 #endif
     }
     return immediately;
   }
-
+public:
   static void toJson(StaticJsonDocument<sensorsCapacity>& doc)
   {
     // Sensor model sample
