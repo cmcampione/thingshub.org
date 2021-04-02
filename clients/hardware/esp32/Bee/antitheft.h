@@ -251,27 +251,3 @@ class AntiTheft {
     }
   */
 };
-
-AntiTheftConfig mainAntiTheftCnfg {
-  "MAT-ALSTATE", 21,
-  "MAT-AUSTATE", 15,  2, HIGH,
-  "MAT-IASTATE", 4, 16, HIGH,
-  //"MAT-DASTATE", 17,  5, HIGH,   // don't run
-  "MAT-DASTATE", 17, 23, HIGH, // run
-  //"MAT-DASTATE", 17,  3, HIGH, // don't run
-  "MAT-AASTATE", 18, 19, HIGH,
-  10000,
-  10000,
-  5000
-};
-AntiTheft mainAntiTheft(mainAntiTheftCnfg);
-
-void setup() {
-  Serial.begin(115200);         // initialize serial
-
-  mainAntiTheft.setup();    
-}
-
-void loop() {
-  mainAntiTheft.loop();
-}
