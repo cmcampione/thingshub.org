@@ -125,6 +125,7 @@ class AntiTheft {
       switch (_state)
       {
         case states::unarmed:
+        {
             if (_antiTamperAlarmState == HIGH) {
                 _alarmSpan = millis();
                 _alarmState = HIGH;
@@ -138,6 +139,7 @@ class AntiTheft {
                 break;
             }
             break;
+        }
         case states::armedLeavingEnviroment:
         {
             if (_armedUnarmedState == LOW) {
@@ -219,11 +221,11 @@ class AntiTheft {
             _state = states::alarm;
             break;
         }
-        case states::alarm:
+        case states::alarm:// 2
         {
-            if (_armedUnarmedState == LOW) {
-                _state = states::unarmed;
-                break;
+            if (_antiTamperAlarmState == LOW && _armedUnarmedState == LOW) {
+              _state = states::unarmed;
+              break;
             }
             int duration = millis() - _alarmSpan;
             if (duration > _config.AlarmDutation) {
@@ -234,8 +236,19 @@ class AntiTheft {
             break;
         }
         default:
+        {
             break;
         }
+      }
+      /*
+      Serial.printf("-----------------------------------\n", _state);
+      Serial.printf("State global:                 %d\n", _state);
+      Serial.printf("State _armedUnarmedState:     %d\n", _armedUnarmedState);
+      Serial.printf("State _instantAlarmState:     %d\n", _instantAlarmState);
+      Serial.printf("State _delayedAlarmState:     %d\n", _delayedAlarmState);
+      Serial.printf("State _antiTamperAlarmState:  %d\n", _antiTamperAlarmState);
+      Serial.printf("State _alarmState:            %d\n", _alarmState);
+      */
     }
   /*
   public:  
