@@ -13,47 +13,11 @@
 #include "antitheft.h"
 
 // Max capacity for actual msg
-const int sensorsCount = 7;
+const int sensorsCount = 10;
 const int sensorsFieldCount = 4;
-/*
-  [ 
-  "onUpdateThingValue",
-  "f4c3c80b-d561-4a7b-80a5-f4805fdab9bb",
-  {
-    sensors : [
-      {"id" : "7271203", "value" : 123456},
-      {"id" : "8171284", "value" : 123456},
-      {"id" : "8171288", "value" : 123456},
-      {"id" : "31669624", "value" : 123456}
-    ]
-  },
-  false
-  ]
-// ESP32/ESP8266	384+167 = 551
-// const int msgCapacity = JSON_ARRAY_SIZE(4) + JSON_ARRAY_SIZE(sensorsCount) + JSON_OBJECT_SIZE(1) + sensorsCount*JSON_OBJECT_SIZE(sensorsFieldCount) + 167; // To Check. Do not move from here, some compilation error or compiler bug
-*/
 
-/*
-  [
-  "onUpdateThingValue",
-  "3601b4c5-706d-4917-ac21-3c2ef1f01fd0",
-  {
-    lastStatus: {result: 1, message: "Tue, 17 Mar 2020 17:10:15 GMT - All is Ok"},
-    result: 1,
-    message: "Tue, 17 Mar 2020 17:10:15 GMT - All is Ok",
-    deviceId: "087073117560",
-    lastEventDateTime: "2020-03-17T17:10:15.967Z",
-    surveyDateTime: "2020-03-17T17:06:56.000Z",
-    lat: 37.609141666666666,
-    lng: 15.155531666666667,
-    speed: 2,
-    angle: 0
-  },
-  false
-  ]
-*/
-// ESP32/ESP8266	256+306 = 562
-const int msgCapacity = JSON_ARRAY_SIZE(4) + JSON_OBJECT_SIZE(2) + JSON_OBJECT_SIZE(10) + 306;                                              // To Check. Do not move from here, some compilation error or compiler bug
+// ESP32
+const int msgCapacity = 1024; // To Check. Do not move from here, some compilation error or compiler bug
 const int sensorsCapacity = JSON_OBJECT_SIZE(1) + JSON_ARRAY_SIZE(sensorsCount) + sensorsCount * JSON_OBJECT_SIZE(sensorsFieldCount) + 175; // To Change
 
 //
@@ -107,11 +71,13 @@ struct Pin
   }
   
   String kind; // ToDo: Could be a enum
+  String _id;
 
   int min;
   int max;
   
   PWM         pwm;        // Valid only for kind == "PWM"
+
   AntiTheft*  pAntiTheft; // Valid only for kind == "AT"
 
   int value;
@@ -123,7 +89,9 @@ struct SetPointPin
 {
   SetPointPin() : n(0), force(false), toggle(false) 
   {}
-  int   n;
+  int     n;
+  String  id;
+
   bool  force;
   int   forceValue;
   bool  toggle;
@@ -225,6 +193,7 @@ private:
       AntiTheftConfig mainAntiTheftCnfg {
         "MAT-ALSTATE", 21,
         "MAT-AUSTATE", 15,  2, HIGH,
+        "MAT-AULSTATE", "MAT-AURSTATE",
         "MAT-IASTATE", 4, 16, HIGH,
         //"MAT-DASTATE", 17,  5, HIGH,   // don't run
         "MAT-DASTATE", 17, 23, HIGH, // run
@@ -465,10 +434,35 @@ private:
       sensors["Temperatura-01"].pin = 35;
     }
     */
+
     { // AntiTheaf - ArmedUnarmed
       sensors["MAT-AUSTATE"].name = "Antifurto Principale - ArmatoDisarmato";
       sensors["MAT-AUSTATE"].pin = 1000;
       // sensors["MAT-AUSTATE"].prior = true;
+    }
+    { // AntiTheaf - ArmedUnarmedLocal
+      sensors["MAT-AULSTATE"].name = "Antifurto Principale - ArmatoDisarmato Local";
+      sensors["MAT-AULSTATE"].pin = 1000;
+      // sensors["MAT-AUSTATE"].prior = true;
+    }
+    { // AntiTheaf - ArmedUnarmedRemote
+      sensors["MAT-AURSTATE"].name = "Antifurto Principale - ArmatoDisarmato Remote";
+      sensors["MAT-AURSTATE"].pin = 1000;
+      // sensors["MAT-AUSTATE"].prior = true;
+
+      SetPoint setPoint;
+      setPoint.min = 0;
+      setPoint.max = 1;
+
+      SetPointPin setPointRemoteSwitch;
+      setPointRemoteSwitch.n = 1000;
+      setPointRemoteSwitch.id = "MAT-AURSTATE";
+      setPointRemoteSwitch.force = false; // Set value equal to 1
+      setPointRemoteSwitch.forceValue = LOW;
+      setPointRemoteSwitch.toggle = true;
+      setPoint.pins.push_back(setPointRemoteSwitch);
+
+      sensors["MAT-AURSTATE"].setPoints.push_back(setPoint);
     }
     { // AntiTheaf - AlarmState
       sensors["MAT-ALSTATE"].name = "Antifurto Principale - Allarme on-off";
@@ -547,7 +541,7 @@ private:
     DPRINTF("BEESTATUS - Pin n: %d kind: %s not recognized\n", pinN, pin.kind.c_str());
 #endif
   }
-  static void togglePinValue(int pinN)
+  static void togglePinValue(int pinN, const char* id)
   {
     if (pins.find(pinN) == pins.end())
     {
@@ -557,7 +551,7 @@ private:
       return;
     }
 
-    Pin &pin = pins[pinN];
+    Pin& pin = pins[pinN];
     if (pin.kind == "RC" || pin.kind == "DI" || pin.kind == "AI")
     {
 #ifdef DEBUG_BEESTATUS
@@ -582,6 +576,10 @@ private:
     {
       ledcWrite(pin.pwm.channel, value);
       pin.value = value;
+      return;
+    }
+    if (pin.kind == "AT") {
+      pin.pAntiTheft->toggleStateValue(id);
       return;
     }
 #ifdef DEBUG_BEESTATUS
@@ -609,7 +607,7 @@ private:
           }
           if (setPointPin.toggle == true)
           {
-            togglePinValue(setPointPin.n);
+            togglePinValue(setPointPin.n, setPointPin.id.c_str());
             continue;
           }
           setPinValue(setPointPin.n, value);
@@ -670,7 +668,7 @@ public:
       int pinN        = it->first;
       const Pin& pin  = it->second;
 #ifdef DEBUG_BEESTATUS_VERBOSE
-      DPRINTF("BEESTATUS - Elaborating Pin n: %d kind: %s\n", pinN, pin.kind.c_str());
+      // DPRINTF("BEESTATUS - Elaborating Pin n: %d kind: %s\n", pinN, pin.kind.c_str());
 #endif
       if (pin.kind == "DO")
       {
@@ -1130,8 +1128,8 @@ void loop()
 
     restCallInterval = millis();
 
-    //DPRINT("getFreeHeap : ");
-    //DPRINTLN(ESP.getFreeHeap());
+    DPRINT("getFreeHeap : ");
+    DPRINTLN(ESP.getFreeHeap());
   }
 
   //
