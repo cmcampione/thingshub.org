@@ -1,5 +1,6 @@
 // Per la gestione dello overflow di millis () ho utilizzato la soluzione proposta da https://www.leonardomiliani.com/2012/come-gestire-loverflow-di-millis/
 // Useful link https://lastminuteengineers.com/esp32-arduino-ide-tutorial/
+
 #include <map>
 #include <vector>
 #include "WiFi.h"
@@ -59,13 +60,11 @@ const int sensorsCapacity = JSON_OBJECT_SIZE(1) + JSON_ARRAY_SIZE(sensorsCount) 
 class RCSensorsManager
 {
 private:
-  static RCSwitch mySwitch;
-  static int pin; // To Check: Interrupt or pin? In my dev board i use D4 gpio and it works
+  static RCSwitch mySwitch;  
 public:
   static void init(int pinN)
   {
-    pin = pinN;
-    mySwitch.enableReceive(pin);
+    mySwitch.enableReceive(pinN);
   }
 public:
   static bool available()
@@ -90,7 +89,6 @@ public:
   }
 };
 RCSwitch RCSensorsManager::mySwitch = RCSwitch(); // ToDo: Do a copy? As example
-int RCSensorsManager::pin = 4; // It's only a default value, can be changed during "init" call
 
 //
 struct PWM
@@ -107,7 +105,8 @@ struct Pin
     if (pAntiTheft != NULL)
       delete pAntiTheft;
   }
-  String kind;
+  
+  String kind; // ToDo: Could be a enum
 
   int min;
   int max;
@@ -124,10 +123,10 @@ struct SetPointPin
 {
   SetPointPin() : n(0), force(false), toggle(false) 
   {}
-  int n;
-  bool force;
-  int forceValue;
-  bool toggle;
+  int   n;
+  bool  force;
+  int   forceValue;
+  bool  toggle;
 };
 typedef std::vector<SetPointPin> setPointPin_collection;
 typedef setPointPin_collection::const_iterator setPointPin_const_iterator;
@@ -146,7 +145,7 @@ struct Sensor
 {
   Sensor() : millis(0), now(false), value(0), pin(0), prior(false) {}
 
-  String name;
+  String name; // ToDo: To Remove
 
   int pin;  // Can be an real or virtual pin
 
@@ -240,8 +239,8 @@ private:
 
     for (pin_const_iterator it = pins.begin(); it != pins.end(); it++)
     {
-      int pinN = it->first;
-      const Pin &pin = it->second;
+      int pinN        = it->first;
+      const Pin &pin  = it->second;
       if (pin.kind == "DO")
       {
         pinMode(pinN, OUTPUT);
@@ -469,12 +468,27 @@ private:
     { // AntiTheaf - ArmedUnarmed
       sensors["MAT-AUSTATE"].name = "Antifurto Principale - ArmatoDisarmato";
       sensors["MAT-AUSTATE"].pin = 1000;
-      sensors["MAT-AUSTATE"].prior = true;
+      // sensors["MAT-AUSTATE"].prior = true;
     }
     { // AntiTheaf - AlarmState
       sensors["MAT-ALSTATE"].name = "Antifurto Principale - Allarme on-off";
       sensors["MAT-ALSTATE"].pin = 1000;
       sensors["MAT-ALSTATE"].prior = true;
+    }
+    { // AntiTheaf - Porte balcone
+      sensors["MAT-IASTATE"].name = "Antifurto Principale - Porte balcone aperte-chiuse";
+      sensors["MAT-IASTATE"].pin = 1000;
+      // sensors["MAT-IASTATE"].prior = true;
+    }
+    { // AntiTheaf - Porta ingresso
+      sensors["MAT-DASTATE"].name = "Antifurto Principale - Porta ingresso aperta-chiusa";
+      sensors["MAT-DASTATE"].pin = 1000;
+      // sensors["MAT-DASTATE"].prior = true;
+    }
+    { // AntiTheaf - Anti Tamper
+      sensors["MAT-AASTATE"].name = "Antifurto Principale - Anti Tamper aperto-chiuso";
+      sensors["MAT-AASTATE"].pin = 1000;
+      // sensors["MAT-AASTATE"].prior = true;
     }
   }
 public:
@@ -627,16 +641,18 @@ private:
 public:
   static bool setSensorValue(const char* sensorId, int value)
   {
-    if (sensors.find(sensorId) == sensors.end())
+    if (sensors.find(sensorId) == sensors.end()) 
     {
 #ifdef DEBUG_BEESTATUS
       DPRINTF("BEESTATUS - Sensor id: %s not found\n", sensorId);
 #endif
       return false;
     }
-
     Sensor& sensor = sensors[sensorId];
 
+    if (sensor.value == value)
+      return false;
+      
     sensor.now = true;
     sensor.millis = millis();
     sensor.value = value;
@@ -742,10 +758,10 @@ public:
       Sensor& sensorValue = it->second;
 
       JsonObject sensor = sensorsNode.createNestedObject();
-      sensor["id"] = it->first;
-      sensor["now"] = sensorValue.now;
-      sensor["millis"] = sensorValue.millis;
-      sensor["value"] = sensorValue.value;
+      sensor["id"]      = it->first;
+      sensor["now"]     = sensorValue.now;
+      sensor["millis"]  = sensorValue.millis;
+      sensor["value"]   = sensorValue.value;
 
       sensorValue.now = false;
 
@@ -839,7 +855,7 @@ class SocketIOManager
 {
 private:
   static SocketIOclient webSocket;
-  static std::map<String, std::function<void(const StaticJsonDocument<msgCapacity> &)>> events;
+  static std::map<String, std::function<void(const StaticJsonDocument<msgCapacity>&)>> events;
 
 private:
   static void trigger(const StaticJsonDocument<msgCapacity> &jMsg)
@@ -862,20 +878,40 @@ private:
     StaticJsonDocument<msgCapacity> jMsg;
     switch (type)
     {
-    case sIOtype_EVENT:
-      DeserializationError error = deserializeJson(jMsg, payload);
-      if (error)
-      {
-#ifdef DEBUG_SOCKETIOMANAGER
-        DPRINTF("DEBUG_SOCKETIOMANAGER - deserializeJson() failed: socketIOmessageType_t = %c\n", type);
-        DPRINTF("DEBUG_SOCKETIOMANAGER - payload = %s\n", length == 0 ? (uint8_t *)"" : payload);
-        DPRINTF("DEBUG_SOCKETIOMANAGER - deserializeJson() error: ");
-        DPRINTLN(error.c_str());
-#endif
-        return;
-      }
-      trigger(jMsg);
-      break;
+      case sIOtype_DISCONNECT:
+            DPRINTF("[IOc] Disconnected!\n");
+            break;
+      case sIOtype_CONNECT:
+          DPRINTF("[IOc] Connected to url: %s\n", payload);
+          // join default namespace (no auto join in Socket.IO V3)
+          webSocket.send(sIOtype_CONNECT, "/");
+          break;
+      case sIOtype_ACK:
+          DPRINTF("[IOc] get ack: %u\n", length);
+          break;
+      case sIOtype_ERROR:
+          DPRINTF("[IOc] get error: %u\n", length);
+          break;
+      case sIOtype_BINARY_EVENT:
+          DPRINTF("[IOc] get binary: %u\n", length);
+          break;
+      case sIOtype_BINARY_ACK:
+          DPRINTF("[IOc] get binary ack: %u\n", length);
+          break;
+      case sIOtype_EVENT:
+        DeserializationError error = deserializeJson(jMsg, payload);
+        if (error)
+        {
+  #ifdef DEBUG_SOCKETIOMANAGER
+          DPRINTF("DEBUG_SOCKETIOMANAGER - deserializeJson() failed: socketIOmessageType_t = %c\n", type);
+          DPRINTF("DEBUG_SOCKETIOMANAGER - payload = %s\n", length == 0 ? (uint8_t *)"" : payload);
+          DPRINTF("DEBUG_SOCKETIOMANAGER - deserializeJson() error: ");
+          DPRINTLN(error.c_str());
+  #endif
+          return;
+        }
+        trigger(jMsg);
+        break;
     }
   }
 
@@ -898,8 +934,9 @@ public:
 #endif
     }
   }
-  static void beginSocketSSLWithCA(const char *host, uint16_t port, const char *url = "/socket.io/?EIO=3", const char *CA_cert = NULL, const char *protocol = "arduino")
+  static void beginSocketSSLWithCA(const char *host, uint16_t port, const char *url = "/socket.io/?EIO=4", const char *CA_cert = NULL, const char *protocol = "arduino")
   {
+    SocketIOManager::webSocket.configureEIOping(true);
     SocketIOManager::webSocket.onEvent(handleEvent);                     
     SocketIOManager::webSocket.beginSocketIOSSLWithCA(host, port, url, CA_cert, protocol); 
   }
@@ -984,7 +1021,7 @@ void onUpdateThingValue(const StaticJsonDocument<msgCapacity>& jMsg)
   DPRINTLN("DEBUG_SOCKETIOMANAGER - onUpdateThingValue: Command begin");
 #endif
 
-  const char *thingId = jMsg[1];
+  const char* thingId = jMsg[1];
   // Only one thing for this bee
   if (strcmp(thingId, BeeStatus::thingValue) != 0)
   {
@@ -1038,8 +1075,12 @@ void setup()
   WiFiManager::connect();
   // SocketIO setup
   SocketIOManager::on("onUpdateThingValue", onUpdateThingValue);
-  SocketIOManager::beginSocketSSLWithCA("api.thingshub.org", 3000, "/socket.io/?EIO=3&token=491e94d9-9041-4e5e-b6cb-9dad91bbf63d", root_ca, "");
+  SocketIOManager::beginSocketSSLWithCA("api.thingshub.org", 3000, "/socket.io/?EIO=4&token=491e94d9-9041-4e5e-b6cb-9dad91bbf63d", root_ca, "arduino");
 }
+
+HTTPClient http;
+String url = String("/api/things/") + String(BeeStatus::thingValue) + String("/value");
+char jsonDoc[512];
 
 void loop()
 {
@@ -1050,18 +1091,25 @@ void loop()
   if (WiFi.status() != WL_CONNECTED)
     return;
   //
+
   if ((immediately == true) || (millis() - restCallInterval >= 5000))
   {
     StaticJsonDocument<sensorsCapacity> doc;
     BeeStatus::toJson(doc);
 
+/*
     HTTPClient http;
     String url = String("/api/things/") + String(BeeStatus::thingValue) + String("/value");
     http.begin("api.thingshub.org", 3000, url, root_ca); // Specify the URL and certificate
     http.addHeader("thapikey", "491e94d9-9041-4e5e-b6cb-9dad91bbf63d");
     http.addHeader("Content-Type", "application/json");
-
     char jsonDoc[512];
+*/
+
+    http.begin("api.thingshub.org", 3000, url, root_ca); // Specify the URL and certificate
+    http.addHeader("thapikey", "491e94d9-9041-4e5e-b6cb-9dad91bbf63d");
+    http.addHeader("Content-Type", "application/json");
+    
     serializeJson(doc, jsonDoc);
 
     int httpCode = http.PUT(jsonDoc);
@@ -1085,6 +1133,7 @@ void loop()
     //DPRINT("getFreeHeap : ");
     //DPRINTLN(ESP.getFreeHeap());
   }
+
   //
   SocketIOManager::loop();
 }
