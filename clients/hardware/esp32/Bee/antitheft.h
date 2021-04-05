@@ -11,6 +11,9 @@ struct AntiTheftConfig {
   int ArmedUnarmedContactPin;
   int ArmedUnarmedContactOpenValue;
 
+  String ArmedUnarmedStateLocalId;
+  String ArmedUnarmedStateRemoteId;
+  
   String InstantAlarmStateId;
   int InstantAlarmLedPin;
   int InstantAlarmContactPin;
@@ -34,7 +37,7 @@ struct AntiTheftConfig {
 
 class AntiTheft {
   private:
-    typedef std::map<String,const int*> stateIds_collection;
+    typedef std::map<String,int*> stateIds_collection;
   private:
     enum class states {
       unarmed,
@@ -57,6 +60,9 @@ class AntiTheft {
     int _alarmSpan;
   private:
     int _armedUnarmedState;     // HIGH == Armed, LOW == Unarmed
+    int _armedUnarmedStateLocal;
+    int _armedUnarmedStateRemote;
+  private:
     int _instantAlarmState;     // HIGH == Open,  LOW == Close
     int _delayedAlarmState;     // HIGH == Open,  LOW == Close
     int _antiTamperAlarmState;  // HIGH == Open,  LOW == Close
@@ -71,13 +77,28 @@ class AntiTheft {
     _alarmSpan(0),
     _alarmState(LOW),
     _armedUnarmedState(LOW),
+    _armedUnarmedStateLocal(LOW),
+    _armedUnarmedStateRemote(LOW),
     _buttonArmedUnarmed(cnfg.ArmedUnarmedContactPin) // ToDo: To remove
     {
-      _statesIds[_config.AlarmStateId]            = &_alarmState;
-      _statesIds[_config.ArmedUnarmedStateId]     = &_armedUnarmedState;
-      _statesIds[_config.InstantAlarmStateId]     = &_instantAlarmState;
-      _statesIds[_config.DelayedAlarmStateId]     = &_delayedAlarmState;
-      _statesIds[_config.AntiTamperAlarmStateId]  = &_antiTamperAlarmState;      
+      _statesIds[_config.AlarmStateId]              = &_alarmState;
+      _statesIds[_config.ArmedUnarmedStateId]       = &_armedUnarmedState;
+      _statesIds[_config.ArmedUnarmedStateLocalId]  = &_armedUnarmedStateLocal;
+      _statesIds[_config.ArmedUnarmedStateRemoteId] = &_armedUnarmedStateRemote;
+      _statesIds[_config.InstantAlarmStateId]       = &_instantAlarmState;
+      _statesIds[_config.DelayedAlarmStateId]       = &_delayedAlarmState;
+      _statesIds[_config.AntiTamperAlarmStateId]    = &_antiTamperAlarmState;      
+    }
+  public:
+    void toggleStateValue(const char* stateId) {
+      if (_statesIds.find(stateId) == _statesIds.end())
+      {
+  #ifdef DEBUG_BEESTATUS
+        DPRINTF("BEESTATUS - StateId n: %d not found\n", stateId);
+  #endif
+        return;
+      }
+      *_statesIds[stateId] = !*_statesIds[stateId];
     }
   public:
     void setup() {
@@ -99,14 +120,19 @@ class AntiTheft {
     void loop() {
       digitalWrite(_config.AlarmOnOffLedAndContactPin, _alarmState);
 
+      int armedUnarmedPrevStateLocal = _armedUnarmedStateLocal;
+
+      // ToDo: To remove
       _buttonArmedUnarmed.loop();
       if (_buttonArmedUnarmed.isPressed())
-        _armedUnarmedState = !_armedUnarmedState;
-
+        _armedUnarmedStateLocal = !_armedUnarmedStateLocal;
       /*
-      int armedUnarmedState = digitalRead(_config.ArmedUnarmedContactPin);
-      _armedUnarmedState = armedUnarmedState == _config.ArmedUnarmedContactOpenValue ? HIGH : LOW;
+      _armedUnarmedStateLocal = digitalRead(_config.ArmedUnarmedContactPin) == _config.ArmedUnarmedContactOpenValue ? HIGH : LOW;
       */
+
+      _armedUnarmedState = _armedUnarmedStateRemote || _armedUnarmedStateLocal;
+      if (armedUnarmedPrevStateLocal != _armedUnarmedStateLocal)
+        _armedUnarmedState = _armedUnarmedStateLocal;
       
       digitalWrite(_config.ArmedUnarmedLedPin, _armedUnarmedState);
 
@@ -119,7 +145,7 @@ class AntiTheft {
       digitalWrite(_config.DelayedAlarmLedPin, _delayedAlarmState);
 
       int antiTamperAlarmState = digitalRead(_config.AntiTamperAlarmContactPin);
-      _antiTamperAlarmState = antiTamperAlarmState == _config.AntiTamperAlarmContactOpenValue ? HIGH : LOW;
+      _antiTamperAlarmState = antiTamperAlarmState == _config.AntiTamperAlarmContactOpenValue ? HIGH : LOW;      
       digitalWrite(_config.AntiTamperAlarmLedPin, _antiTamperAlarmState);
 
       switch (_state)
@@ -242,12 +268,14 @@ class AntiTheft {
       }
       /*
       Serial.printf("-----------------------------------\n", _state);
-      Serial.printf("State global:                 %d\n", _state);
-      Serial.printf("State _armedUnarmedState:     %d\n", _armedUnarmedState);
-      Serial.printf("State _instantAlarmState:     %d\n", _instantAlarmState);
-      Serial.printf("State _delayedAlarmState:     %d\n", _delayedAlarmState);
-      Serial.printf("State _antiTamperAlarmState:  %d\n", _antiTamperAlarmState);
-      Serial.printf("State _alarmState:            %d\n", _alarmState);
+      Serial.printf("State global:                    %d\n", _state);
+      Serial.printf("State _armedUnarmedState:        %d\n", _armedUnarmedState);
+      Serial.printf("State _armedUnarmedStateLocal:   %d\n", _armedUnarmedStateLocal);
+      Serial.printf("State _armedUnarmedStateRemote:  %d\n", _armedUnarmedStateRemote);
+      Serial.printf("State _instantAlarmState:        %d\n", _instantAlarmState);
+      Serial.printf("State _delayedAlarmState:        %d\n", _delayedAlarmState);
+      Serial.printf("State _antiTamperAlarmState:     %d\n", _antiTamperAlarmState);
+      Serial.printf("State _alarmState:               %d\n", _alarmState);
       */
     }
   /*
