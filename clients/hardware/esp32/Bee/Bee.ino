@@ -69,8 +69,17 @@ struct Device
     if (pAntiTheft != NULL)
       delete pAntiTheft;
   }
+  public:
+    enum class Kind {
+        Undefined,        
+        AnalogicInput,
+        DigitalOutput,
+        PWM,
+        RC,        
+        AntiTheft
+      };
   
-  String kind; // ToDo: Could be a enum
+  Kind kind; // ToDo: Could be a enum
 
   int pin;
 
@@ -145,7 +154,7 @@ private:
   {
 /*
     { // Device 2 - On board led
-      devices[2].kind = "DO";
+      devices[2].kind = Device::Kind::DigitalOutput;
       devices[2].pin = 2;
       devices[2].min = 0;
       devices[2].max = 1;
@@ -153,7 +162,7 @@ private:
     }
 
     { // Device 4 - RC sensor
-      devices[4].kind = "RC";
+      devices[4].kind = Device::Kind::RC;
       devices[4].pin = 4;
       devices[4].min = 0;   // No matter
       devices[4].max = 0;   // No matter
@@ -161,7 +170,7 @@ private:
     }
 
     { // Device 5 - PhotoResistor Led
-      devices[5].kind = "DO";
+      devices[5].kind = Device::Kind::DigitalOutput;
       devices[5].pin = 5;
       devices[5].min = 0;
       devices[5].max = 1;
@@ -169,7 +178,7 @@ private:
     }
 
     { // Device 23 - Buzzer
-      devices[23].kind = "PWM";
+      devices[23].kind = Device::Kind::PWM;
       devices[23].pin = 23;
       devices[23].min = 0;
       devices[23].max = 128;
@@ -180,7 +189,7 @@ private:
     }
 
     { // Device 34 - PhotoResistor
-      devices[34].kind = "AI";
+      devices[34].kind = Device::Kind::AnalogicInput;
       devices[34].pin = 34;
       devices[34].min = 0;
       devices[34].max = 4095;
@@ -188,7 +197,7 @@ private:
     }
 
     { // Device 35 - Thermistor
-      devices[35].kind = "AI";
+      devices[35].kind = Device::Kind::AnalogicInput;
       devices[35].pin = 35;
       devices[35].min = 0;
       devices[35].max = 4095;
@@ -196,7 +205,7 @@ private:
     }
 */
     { // Device 1000 - Main AntiTheaf
-      devices[1000].kind = "AT";
+      devices[1000].kind = Device::Kind::AntiTheft;
 
       AntiTheftConfig mainAntiTheftCnfg {
         "MAT-ALSTATE", 21,
@@ -217,34 +226,34 @@ private:
     for (device_const_iterator it = devices.begin(); it != devices.end(); it++)
     {
       const Device& device = it->second;
-      if (device.kind == "DO")
+      if (device.kind == Device::Kind::DigitalOutput)
       {
         pinMode(device.pin, OUTPUT);
         continue;
       }
-      if (device.kind == "RC")
+      if (device.kind == Device::Kind::RC)
       {
         RCSensorsManager::init(device.pin);
         continue;
       }
-      if (device.kind == "PWM")
+      if (device.kind == Device::Kind::PWM)
       {
         ledcSetup(device.pwm.channel, device.pwm.freq, device.pwm.res);
         ledcAttachPin(device.pin, device.pwm.channel);
         continue;
       }
-      if (device.kind == "AI")
+      if (device.kind == Device::Kind::AnalogicInput)
       {
         // Doesn't need initial setup
         continue;
       }
-      if (device.kind == "AT")
+      if (device.kind == Device::Kind::AntiTheft)
       {
         device.pAntiTheft->setup();
         continue;
       }
 #ifdef DEBUG_BEESTATUS
-      DPRINTF("BEESTATUS - Device id: %d Kind: %s - Kind not found\n", it->first, device.kind);
+      DPRINTF("BEESTATUS - Device id: %d Kind: %d - Kind not found\n", it->first, device.kind);
 #endif
     }
   }
@@ -510,14 +519,14 @@ private:
 
     Device& device = devices[deviceId];
     
-    if (device.kind == "RC" || device.kind == "DI" || device.kind == "AI")
+    if (device.kind == Device::Kind::RC || device.kind == Device::Kind::AnalogicInput)
     {
 #ifdef DEBUG_BEESTATUS
-      DPRINTF("BEESTATUS - Device Id: %d Kind: %s - Device is not set for write\n", deviceId, device.kind.c_str());
+      DPRINTF("BEESTATUS - Device Id: %d Kind: %d - Device is not set for write\n", deviceId, device.kind);
 #endif
       return;
     }    
-    if (device.kind == "AT") {// No need to check prev value and range because it is like an "external" device
+    if (device.kind == Device::Kind::AntiTheft) {// No need to check prev value and range because it is like an "external" device
       device.pAntiTheft->setState(itemId, value);
       // No need to store value in value field
       return;
@@ -533,23 +542,23 @@ private:
 #endif
       return;
     }   
-    if (device.kind == "DO")
+    if (device.kind == Device::Kind::DigitalOutput)
     {
       digitalWrite(device.pin, value);
       device.value = value;
       return;
     }
-    if (device.kind == "PWM")
+    if (device.kind == Device::Kind::PWM)
     {
       ledcWrite(device.pwm.channel, value);
       device.value = value;
 #ifdef DEBUG_BEESTATUS
-      DPRINTF("BEESTATUS - Device Id: %d Kind: %s PWM value: %d\n", deviceId, device.kind, value);
+      DPRINTF("BEESTATUS - Device Id: %d Kind: %d PWM value: %d\n", deviceId, device.kind, value);
 #endif      
       return;
     }   
 #ifdef DEBUG_BEESTATUS
-    DPRINTF("BEESTATUS - Device Id: %d Kind: %s not recognized\n", deviceId, device.kind.c_str());
+    DPRINTF("BEESTATUS - Device Id: %d Kind: %d not recognized\n", deviceId, device.kind);
 #endif
   }
   static void toggleItemValue(int deviceId, const char* id)
@@ -563,10 +572,10 @@ private:
     }
 
     Device& device = devices[deviceId];
-    if (device.kind == "RC" || device.kind == "DI" || device.kind == "AI")
+    if (device.kind == Device::Kind::RC || device.kind == Device::Kind::AnalogicInput)
     {
 #ifdef DEBUG_BEESTATUS
-      DPRINTF("BEESTATUS - Device Id: %d Kind: %s - Device is not set for write\n", deviceId, device.kind.c_str());
+      DPRINTF("BEESTATUS - Device Id: %d Kind: %d - Device is not set for write\n", deviceId, device.kind);
 #endif
       return;
     }
@@ -577,24 +586,24 @@ private:
     if (device.value == device.max)
       value = device.min;
 
-    if (device.kind == "DO")
+    if (device.kind == Device::Kind::DigitalOutput)
     {
       digitalWrite(device.pin, value);
       device.value = value;
       return;
     }
-    if (device.kind == "PWM")
+    if (device.kind == Device::Kind::PWM)
     {
       ledcWrite(device.pwm.channel, value);
       device.value = value;
       return;
     }
-//    if (device.kind == "AT") {
+//    if (device.kind == Device::Kind::AntiTheft) {
 //      device.pAntiTheft->toggleStateValue(itemId);
 //      return;
 //    }
 #ifdef DEBUG_BEESTATUS
-    DPRINTF("BEESTATUS - Device Id: %d Kind: %s - Kind not recognized\n", deviceId, device.kind);
+    DPRINTF("BEESTATUS - Device Id: %d Kind: %d - Kind not recognized\n", deviceId, device.kind);
 #endif
   }
 private:
@@ -681,26 +690,26 @@ public:
 #ifdef DEBUG_BEESTATUS_VERBOSE
       // DPRINTF("BEESTATUS - Elaborating Device Id: %d Kind: %s\n", pinN, pin.kind.c_str());
 #endif
-      if (device.kind == "DO")
+      if (device.kind == Device::Kind::DigitalOutput)
       {
         continue;
       }
-      if (device.kind == "PWM")
+      if (device.kind == Device::Kind::PWM)
       {
         continue;
       }
-      if (device.kind == "AI")
+      if (device.kind == Device::Kind::AnalogicInput)
       {
         int value = analogRead(device.pin);
 #ifdef DEBUG_BEESTATUS_VERBOSE
-        DPRINTF("BEESTATUS - Read Device id: %d Kind: %s analogic value: %d\n", deviceId, device.kind.c_str(), value);
+        DPRINTF("BEESTATUS - Read Device id: %d Kind: %d analogic value: %d\n", deviceId, device.kind, value);
 #endif
         int prior = setSensorsValueFromDeviceId(deviceId, value);
         if (immediately == false)
           immediately = prior;
         continue;
       }
-      if (device.kind == "RC")
+      if (device.kind == Device::Kind::RC)
       {
         if (RCSensorsManager::available() == false)
           continue;
@@ -708,14 +717,14 @@ public:
         long sensorId = RCSensorsManager::getReceivedValue();
         String sensorIdStr(sensorId);
 #ifdef DEBUG_BEESTATUS
-        DPRINTF("BEESTATUS - Read Device Id: %d Kind: %s Item Id: %s\n", deviceId, device.kind.c_str(), sensorIdStr.c_str());
+        DPRINTF("BEESTATUS - Read Device Id: %d Kind: %d Item Id: %s\n", deviceId, device.kind, sensorIdStr.c_str());
 #endif
         int prior = setSensorValue(sensorIdStr.c_str(), HIGH);
         if (immediately == false)
           immediately = prior;
         continue;
       }
-      if (device.kind == "AT") {
+      if (device.kind == Device::Kind::AntiTheft) {
         device.pAntiTheft->loop();
         for (AntiTheft::const_iterator it = device.pAntiTheft->begin(); it != device.pAntiTheft->end(); it++) {
           String      sensorId     = it->first;
@@ -727,7 +736,7 @@ public:
         continue;
       }
 #ifdef DEBUG_BEESTATUS
-      DPRINTF("BEESTATUS - Device Id: %d Kind: %s not found\n", deviceId, device.kind.c_str());
+      DPRINTF("BEESTATUS - Device Id: %d Kind: %d not found\n", deviceId, device.kind);
 #endif
     }
     return immediately;
