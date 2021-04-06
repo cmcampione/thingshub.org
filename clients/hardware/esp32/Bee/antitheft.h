@@ -62,6 +62,8 @@ class AntiTheft {
     int _armedUnarmedState;     // HIGH == Armed, LOW == Unarmed
     int _armedUnarmedStateLocal;
     int _armedUnarmedStateRemote;
+    int _armedUnarmedStateLocalPrev;
+    int _armedUnarmedStateRemotePrev;
   private:
     int _instantAlarmState;     // HIGH == Open,  LOW == Close
     int _delayedAlarmState;     // HIGH == Open,  LOW == Close
@@ -79,6 +81,8 @@ class AntiTheft {
     _armedUnarmedState(LOW),
     _armedUnarmedStateLocal(LOW),
     _armedUnarmedStateRemote(LOW),
+    _armedUnarmedStateLocalPrev(LOW),
+    _armedUnarmedStateRemotePrev(LOW),
     _buttonArmedUnarmed(cnfg.ArmedUnarmedContactPin) // ToDo: To remove
     {
       _statesIds[_config.AlarmStateId]              = &_alarmState;
@@ -87,14 +91,14 @@ class AntiTheft {
       _statesIds[_config.ArmedUnarmedStateRemoteId] = &_armedUnarmedStateRemote;
       _statesIds[_config.InstantAlarmStateId]       = &_instantAlarmState;
       _statesIds[_config.DelayedAlarmStateId]       = &_delayedAlarmState;
-      _statesIds[_config.AntiTamperAlarmStateId]    = &_antiTamperAlarmState;      
+      _statesIds[_config.AntiTamperAlarmStateId]    = &_antiTamperAlarmState;
     }
   public:
     void setState(const char* stateId, int value) {
       if (_statesIds.find(stateId) == _statesIds.end())
       {
   #ifdef DEBUG_BEESTATUS
-        DPRINTF("BEESTATUS - StateId n: %d not found\n", stateId);
+        DPRINTF("BEESTATUS - StateId: %d not found\n", stateId);
   #endif
         return;
       }
@@ -120,18 +124,23 @@ class AntiTheft {
     void loop() {
       digitalWrite(_config.AlarmOnOffLedAndContactPin, _alarmState);
 
-      _armedUnarmedState = _armedUnarmedStateRemote || _armedUnarmedStateLocal;
+      if (_armedUnarmedStateRemote != _armedUnarmedStateRemotePrev) {
+        _armedUnarmedState = _armedUnarmedStateRemote;
+        _armedUnarmedStateRemotePrev = _armedUnarmedState;
+      }
 
       // ToDo: To remove
       _buttonArmedUnarmed.loop();
       if (_buttonArmedUnarmed.isPressed()) {
-        _armedUnarmedState = !_armedUnarmedState;
-        _armedUnarmedStateRemote = _armedUnarmedState;
-        _armedUnarmedStateLocal  = _armedUnarmedState;
+        _armedUnarmedStateLocal = !_armedUnarmedStateLocal;
       }
       /*
-      _armedUnarmedState = digitalRead(_config.ArmedUnarmedContactPin) == _config.ArmedUnarmedContactOpenValue ? HIGH : LOW;
+      _armedUnarmedStateLocal = digitalRead(_config.ArmedUnarmedContactPin) == _config.ArmedUnarmedContactOpenValue ? HIGH : LOW;      
       */
+      if (_armedUnarmedStateLocal != _armedUnarmedStateLocalPrev) {
+        _armedUnarmedState = _armedUnarmedStateLocal;
+        _armedUnarmedStateLocalPrev = _armedUnarmedState;
+      }
 
       digitalWrite(_config.ArmedUnarmedLedPin, _armedUnarmedState);
 

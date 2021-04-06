@@ -519,6 +519,7 @@ private:
     }    
     if (device.kind == "AT") {// No need to check prev value and range because it is like an "external" device
       device.pAntiTheft->setState(itemId, value);
+      // No need to store value in value field
       return;
     }
     if (device.value == value)
