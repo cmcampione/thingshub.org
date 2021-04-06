@@ -132,7 +132,7 @@ class AntiTheft {
       /*
       _armedUnarmedState = digitalRead(_config.ArmedUnarmedContactPin) == _config.ArmedUnarmedContactOpenValue ? HIGH : LOW;
       */
- 
+
       digitalWrite(_config.ArmedUnarmedLedPin, _armedUnarmedState);
 
       int instanAlarmState = digitalRead(_config.InstantAlarmContactPin);
@@ -277,17 +277,4 @@ class AntiTheft {
       Serial.printf("State _alarmState:               %d\n", _alarmState);
       */
     }
-  /*
-  public:  
-    int getStateValue(int stateId) const {
-      if (_statesIds.find(stateId) == _statesIds.cend())
-      {
-  #ifdef DEBUG_BEESTATUS
-        DPRINTF("BEESTATUS - StateId n: %d not found\n", stateId);
-  #endif
-        return -1;
-      }
-      return *_statesIds.at(stateId);
-    }
-  */
 };
