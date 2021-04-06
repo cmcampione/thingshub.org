@@ -71,7 +71,6 @@ struct Pin
   }
   
   String kind; // ToDo: Could be a enum
-  String _id;
 
   int min;
   int max;
@@ -459,7 +458,7 @@ private:
       setPointRemoteSwitch.id = "MAT-AURSTATE";
       setPointRemoteSwitch.force = false; // Set value equal to 1
       setPointRemoteSwitch.forceValue = LOW;
-      setPointRemoteSwitch.toggle = true;
+      setPointRemoteSwitch.toggle = false;
       setPoint.pins.push_back(setPointRemoteSwitch);
 
       sensors["MAT-AURSTATE"].setPoints.push_back(setPoint);
@@ -492,7 +491,7 @@ public:
     setupSensors();
   }
 private:
-  static void setPinValue(int pinN, int value)
+  static void setPinValue(int pinN, const char* id, int value)
   {
     if (pins.find(pinN) == pins.end())
     {
@@ -511,17 +510,21 @@ private:
 #endif
       return;
     }
+    if (pin.value == value)
+    {
+      return;
+    }
+    if (pin.kind == "AT") {// No need to check range because is like an "external" device
+      pin.pAntiTheft->setState(id, value);
+      return;
+    }
     if (value < pin.min || value > pin.max)
     {
 #ifdef DEBUG_BEESTATUS
       DPRINTF("BEESTATUS - Pin n: %d value: %d - Value is out of range\n", pinN, value);
 #endif
       return;
-    }
-    if (pin.value == value)
-    {
-      return;
-    }
+    }   
     if (pin.kind == "DO")
     {
       digitalWrite(pinN, value);
@@ -536,7 +539,7 @@ private:
       DPRINTF("BEESTATUS - Pin n: %d kind: %s - PWM value: %d\n", pinN, pin.kind, value);
 #endif      
       return;
-    }
+    }   
 #ifdef DEBUG_BEESTATUS
     DPRINTF("BEESTATUS - Pin n: %d kind: %s not recognized\n", pinN, pin.kind.c_str());
 #endif
@@ -578,10 +581,10 @@ private:
       pin.value = value;
       return;
     }
-    if (pin.kind == "AT") {
-      pin.pAntiTheft->toggleStateValue(id);
-      return;
-    }
+//    if (pin.kind == "AT") {
+//      pin.pAntiTheft->toggleStateValue(id);
+//      return;
+//    }
 #ifdef DEBUG_BEESTATUS
     DPRINTF("BEESTATUS - Pin n: %d kind: %s - Kind not recognized\n", pinN, pin.kind);
 #endif
@@ -602,7 +605,7 @@ private:
 #ifdef DEBUG_BEESTATUS_VERBOSE
             DPRINTF("BEESTATUS - SetPointPin n: %d value: %d forced\n", setPointPin.n, setPointPin.forceValue);
 #endif
-            setPinValue(setPointPin.n, setPointPin.forceValue);
+            setPinValue(setPointPin.n, setPointPin.id.c_str(), setPointPin.forceValue);
             continue;
           }
           if (setPointPin.toggle == true)
@@ -610,7 +613,7 @@ private:
             togglePinValue(setPointPin.n, setPointPin.id.c_str());
             continue;
           }
-          setPinValue(setPointPin.n, value);
+          setPinValue(setPointPin.n, setPointPin.id.c_str(), value);
         }
       }
     }
