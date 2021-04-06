@@ -61,60 +61,63 @@ struct PWM
   int channel;
   int res;
 };
-struct Pin
+struct Device
 {
-  Pin() : pAntiTheft(NULL) {
+  Device() : pAntiTheft(NULL) {
   }
-  ~Pin() {
+  ~Device() {
     if (pAntiTheft != NULL)
       delete pAntiTheft;
   }
   
   String kind; // ToDo: Could be a enum
 
+  int pin;
+
   int min;
   int max;
   
-  PWM         pwm;        // Valid only for kind == "PWM"
-
-  AntiTheft*  pAntiTheft; // Valid only for kind == "AT"
+  PWM pwm;        // Valid only for kind == "PWM"
 
   int value;
-};
-typedef std::map<int, Pin> pin_collection;
-typedef pin_collection::const_iterator pin_const_iterator;
 
-struct SetPointPin
+  AntiTheft*  pAntiTheft; // Valid only for kind == "AT"
+};
+typedef std::map<int, Device> device_collection;
+typedef device_collection::const_iterator device_const_iterator;
+
+struct SetPointItem
 {
-  SetPointPin() : n(0), force(false), toggle(false) 
+  SetPointItem() : deviceId(0), force(false), toggle(false) 
   {}
-  int     n;
-  String  id;
+  int     deviceId;
+
+  String  itemId;
 
   bool  force;
   int   forceValue;
   bool  toggle;
 };
-typedef std::vector<SetPointPin> setPointPin_collection;
-typedef setPointPin_collection::const_iterator setPointPin_const_iterator;
+typedef std::vector<SetPointItem> setPointItem_collection;
+typedef setPointItem_collection::const_iterator setPointItem_const_iterator;
 
 struct SetPoint
 {
   int min;
   int max;
 
-  setPointPin_collection pins;
+  setPointItem_collection setPointItems;
 };
 typedef std::vector<SetPoint> setPoint_collection;
 typedef setPoint_collection::const_iterator setPoint_const_iterator;
 
 struct Sensor
 {
-  Sensor() : millis(0), now(false), value(0), pin(0), prior(false) {}
+  Sensor() : millis(0), now(false), value(0), deviceId(0), prior(false) {}
 
   String name; // ToDo: To Remove
 
-  int pin;  // Can be an real or virtual pin
+  int deviceId;
 
   bool prior;
 
@@ -135,59 +138,65 @@ public:
   static const char* thingCnfg;
   static const char* thingValue;
 private:
-  static pin_collection pins;
+  static device_collection devices;
   static sensor_collection sensors;
 private:
-  static void setupPins()
+  static void setupDevices()
   {
-    /*
-    { // Pin 2 - On board led
-      pins[2].kind = "DO";
-      pins[2].min = 0;
-      pins[2].max = 1;
-      pins[2].value = LOW; // Initial
+/*
+    { // Device 2 - On board led
+      devices[2].kind = "DO";
+      devices[2].pin = 2;
+      devices[2].min = 0;
+      devices[2].max = 1;
+      devices[2].value = LOW; // Initial
     }
 
-    { // Pin 4 - RC sensor
-      pins[4].kind = "RC";
-      pins[4].min = 0;   // No matter
-      pins[4].max = 0;   // No matter
-      pins[4].value = 0; // Initial
+    { // Device 4 - RC sensor
+      devices[4].kind = "RC";
+      devices[4].pin = 4;
+      devices[4].min = 0;   // No matter
+      devices[4].max = 0;   // No matter
+      devices[4].value = 0; // Initial
     }
 
-    { // Pin 5 - PhotoResistor Led
-      pins[5].kind = "DO";
-      pins[5].min = 0;
-      pins[5].max = 1;
-      pins[5].value = LOW; // Initial
+    { // Device 5 - PhotoResistor Led
+      devices[5].kind = "DO";
+      devices[5].pin = 5;
+      devices[5].min = 0;
+      devices[5].max = 1;
+      devices[5].value = LOW; // Initial
     }
 
-    { // Pin 23 - Buzzer
-      pins[23].kind = "PWM";
-      pins[23].min = 0;
-      pins[23].max = 128;
-      pins[23].value = 0; // Initial
-      pins[23].pwm.freq = 2000;
-      pins[23].pwm.channel = 1;
-      pins[23].pwm.res = 8;
+    { // Device 23 - Buzzer
+      devices[23].kind = "PWM";
+      devices[23].pin = 23;
+      devices[23].min = 0;
+      devices[23].max = 128;
+      devices[23].value = 0; // Initial
+      devices[23].pwm.freq = 2000;
+      devices[23].pwm.channel = 1;
+      devices[23].pwm.res = 8;
     }
 
-    { // Pin 34 - PhotoResistor
-      pins[34].kind = "AI";
-      pins[34].min = 0;
-      pins[34].max = 4095;
-      pins[34].value = 0; // Initial
+    { // Device 34 - PhotoResistor
+      devices[34].kind = "AI";
+      devices[34].pin = 34;
+      devices[34].min = 0;
+      devices[34].max = 4095;
+      devices[34].value = 0; // Initial
     }
 
-    { // Pin 15 - Thermistor
-      pins[35].kind = "AI";
-      pins[35].min = 0;
-      pins[35].max = 4095;
-      pins[35].value = 0; // Initial
+    { // Device 35 - Thermistor
+      devices[35].kind = "AI";
+      devices[35].pin = 35;
+      devices[35].min = 0;
+      devices[35].max = 4095;
+      devices[35].value = 0; // Initial
     }
-    */
-    { // Pin 1000 - Main AntiTheaf
-      pins[1000].kind = "AT";
+*/
+    { // Device 1000 - Main AntiTheaf
+      devices[1000].kind = "AT";
 
       AntiTheftConfig mainAntiTheftCnfg {
         "MAT-ALSTATE", 21,
@@ -202,113 +211,112 @@ private:
         10000,
         5000
       };
-      pins[1000].pAntiTheft = new AntiTheft(mainAntiTheftCnfg);
+      devices[1000].pAntiTheft = new AntiTheft(mainAntiTheftCnfg);
     }
 
-    for (pin_const_iterator it = pins.begin(); it != pins.end(); it++)
+    for (device_const_iterator it = devices.begin(); it != devices.end(); it++)
     {
-      int pinN        = it->first;
-      const Pin &pin  = it->second;
-      if (pin.kind == "DO")
+      const Device& device = it->second;
+      if (device.kind == "DO")
       {
-        pinMode(pinN, OUTPUT);
+        pinMode(device.pin, OUTPUT);
         continue;
       }
-      if (pin.kind == "RC")
+      if (device.kind == "RC")
       {
-        RCSensorsManager::init(pinN);
+        RCSensorsManager::init(device.pin);
         continue;
       }
-      if (pin.kind == "PWM")
+      if (device.kind == "PWM")
       {
-        ledcSetup(pin.pwm.channel, pin.pwm.freq, pin.pwm.res);
-        ledcAttachPin(pinN, pin.pwm.channel);
+        ledcSetup(device.pwm.channel, device.pwm.freq, device.pwm.res);
+        ledcAttachPin(device.pin, device.pwm.channel);
         continue;
       }
-      if (pin.kind == "AI")
+      if (device.kind == "AI")
       {
         // Doesn't need initial setup
         continue;
       }
-      if (pin.kind == "AT")
+      if (device.kind == "AT")
       {
-        pin.pAntiTheft->setup();
+        device.pAntiTheft->setup();
         continue;
       }
 #ifdef DEBUG_BEESTATUS
-      DPRINTF("BEESTATUS - Pin n: %d kind: %s - Kind not found\n", pinN, pin.kind);
+      DPRINTF("BEESTATUS - Device id: %d kind: %s - Kind not found\n", it->first, device.kind);
 #endif
     }
   }
   static void setupSensors()
   {
-    /*
+/*    
     { // Telecomando 1 Apri
       sensors["8171288"].name = "Telecomando 1 Apri";
-      sensors["8171288"].pin = 4;
+      sensors["8171288"].deviceId = 4;
 
       SetPoint setPoint;
       setPoint.min = 1;
       setPoint.max = 1;
 
-      SetPointPin setPointOnBoardLed;
-      setPointOnBoardLed.n = 2;
+      SetPointItem setPointOnBoardLed;
+      setPointOnBoardLed.itemId = 2;
       setPointOnBoardLed.force = false; // Set value equal to 1
       setPointOnBoardLed.forceValue = LOW;
       setPointOnBoardLed.toggle = false;
-      setPoint.pins.push_back(setPointOnBoardLed);
+      setPoint.setPointItems.push_back(setPointOnBoardLed);
 
-      SetPointPin setPointBuzzer;
-      setPointBuzzer.n = 23;
+      SetPointItem setPointBuzzer;
+      setPointBuzzer.itemId = 23;
       setPointBuzzer.force = true;
       setPointBuzzer.forceValue = 5; //128
       setPointBuzzer.toggle = false;
-      setPoint.pins.push_back(setPointBuzzer);
+      setPoint.setPointItems.push_back(setPointBuzzer);
 
       sensors["8171288"].setPoints.push_back(setPoint);
     }
 
     { // Telecomando 1 Chiudi
       sensors["8171284"].name = "Telecomando 1 Chiudi";
-      sensors["8171284"].pin = 4;
+      sensors["8171284"].deviceId = 4;
 
       SetPoint setPoint;
       setPoint.min = 1;
       setPoint.max = 1;
 
-      SetPointPin setPointOnBoardLed;
-      setPointOnBoardLed.n = 2;
+      SetPointItem setPointOnBoardLed;
+      setPointOnBoardLed.itemId = 2;
       setPointOnBoardLed.force = true;
       setPointOnBoardLed.forceValue = LOW;
       setPointOnBoardLed.toggle = false;
-      setPoint.pins.push_back(setPointOnBoardLed);
+      setPoint.setPointItems.push_back(setPointOnBoardLed);
 
-      SetPointPin setPointBuzzer;
-      setPointBuzzer.n = 23;
+      SetPointItem setPointBuzzer;
+      setPointBuzzer.itemId = 23;
       setPointBuzzer.force = true;
       setPointBuzzer.forceValue = 0;
       setPointBuzzer.toggle = false;
-      setPoint.pins.push_back(setPointBuzzer);
+      setPoint.setPointItems.push_back(setPointBuzzer);
 
       sensors["8171284"].setPoints.push_back(setPoint);
     }
 
     { // Pir Salone
       sensors["31669624"].name = "Pir Salone";
-      sensors["31669624"].pin = 4;
+      sensors["31669624"].deviceId = 4;
       sensors["31669624"].prior = true;
 
       SetPoint setPointLedOn;
       setPointLedOn.min = 1;
       setPointLedOn.max = 1;
 
-      SetPointPin setPointPin2LedOn;
-      setPointPin2LedOn.n = 2;
-      setPointPin2LedOn.force = false;
-      setPointPin2LedOn.forceValue = HIGH;
-      setPointPin2LedOn.toggle = false;
+      SetPointItem setPointItem2LedOn;
+      setPointItem2LedOn.itemId = 2;
+      setPointItem2LedOn.force = false;
+      setPointItem2LedOn.forceValue = HIGH;
+      setPointItem2LedOn.toggle = false;
 
-      setPointLedOn.pins.push_back(setPointPin2LedOn);
+      setPointLedOn.setPointItems.push_back(setPointItem2LedOn);
 
       sensors["31669624"].setPoints.push_back(setPointLedOn);
 
@@ -316,33 +324,33 @@ private:
       setPointLedOff.min = 0;
       setPointLedOff.max = 0;
 
-      SetPointPin setPointPin2LedOff;
-      setPointPin2LedOff.n = 2;
-      setPointPin2LedOff.force = true;
-      setPointPin2LedOff.forceValue = LOW;
-      setPointPin2LedOff.toggle = false;
+      SetPointItem setPointItem2LedOff;
+      setPointItem2LedOff.itemId = 2;
+      setPointItem2LedOff.force = true;
+      setPointItem2LedOff.forceValue = LOW;
+      setPointItem2LedOff.toggle = false;
 
-      setPointLedOff.pins.push_back(setPointPin2LedOff);
+      setPointLedOff.setPointItems.push_back(setPointItem2LedOff);
 
       sensors["31669624"].setPoints.push_back(setPointLedOff);
     }
 
     { // Contatto Filare
       sensors["7271203"].name = "Contatto Filare";
-      sensors["7271203"].pin = 4;
+      sensors["7271203"].deviceId = 4;
       sensors["7271203"].prior = true;
 
       SetPoint setPointLedOn;
       setPointLedOn.min = 1;
       setPointLedOn.max = 1;
 
-      SetPointPin setPointPin2LedOn;
-      setPointPin2LedOn.n = 2;
-      setPointPin2LedOn.force = false;
-      setPointPin2LedOn.forceValue = HIGH;
-      setPointPin2LedOn.toggle = false;
+      SetPointItem setPointItem2LedOn;
+      setPointItem2LedOn.itemId = 2;
+      setPointItem2LedOn.force = false;
+      setPointItem2LedOn.forceValue = HIGH;
+      setPointItem2LedOn.toggle = false;
 
-      setPointLedOn.pins.push_back(setPointPin2LedOn);
+      setPointLedOn.setPointItems.push_back(setPointItem2LedOn);
 
       sensors["7271203"].setPoints.push_back(setPointLedOn);
 
@@ -350,33 +358,33 @@ private:
       setPointLedOff.min = 0;
       setPointLedOff.max = 0;
 
-      SetPointPin setPointPin2LedOff;
-      setPointPin2LedOff.n = 2;
-      setPointPin2LedOff.force = true;
-      setPointPin2LedOff.forceValue = LOW;
-      setPointPin2LedOff.toggle = false;
+      SetPointItem setPointItem2LedOff;
+      setPointItem2LedOff.itemId = 2;
+      setPointItem2LedOff.force = true;
+      setPointItem2LedOff.forceValue = LOW;
+      setPointItem2LedOff.toggle = false;
 
-      setPointLedOff.pins.push_back(setPointPin2LedOff);
+      setPointLedOff.setPointItems.push_back(setPointItem2LedOff);
 
       sensors["7271203"].setPoints.push_back(setPointLedOff);
     }
 
     { // Sensore fumi
       sensors["7830832"].name = "Sensore Fumi";
-      sensors["7830832"].pin = 4;
+      sensors["7830832"].deviceId = 4;
       sensors["7830832"].prior = true;
 
       SetPoint setPointLedOn;
       setPointLedOn.min = 1;
       setPointLedOn.max = 1;
 
-      SetPointPin setPointPin2LedOn;
-      setPointPin2LedOn.n = 2;
-      setPointPin2LedOn.force = false;
-      setPointPin2LedOn.forceValue = HIGH;
-      setPointPin2LedOn.toggle = false;
+      SetPointItem setPointItem2LedOn;
+      setPointItem2LedOn.itemId = 2;
+      setPointItem2LedOn.force = false;
+      setPointItem2LedOn.forceValue = HIGH;
+      setPointItem2LedOn.toggle = false;
 
-      setPointLedOn.pins.push_back(setPointPin2LedOn);
+      setPointLedOn.setPointItems.push_back(setPointItem2LedOn);
 
       sensors["7830832"].setPoints.push_back(setPointLedOn);
 
@@ -384,32 +392,32 @@ private:
       setPointLedOff.min = 0;
       setPointLedOff.max = 0;
 
-      SetPointPin setPointPin2LedOff;
-      setPointPin2LedOff.n = 2;
-      setPointPin2LedOff.force = true;
-      setPointPin2LedOff.forceValue = LOW;
-      setPointPin2LedOff.toggle = false;
+      SetPointItem setPointItem2LedOff;
+      setPointItem2LedOff.itemId = 2;
+      setPointItem2LedOff.force = true;
+      setPointItem2LedOff.forceValue = LOW;
+      setPointItem2LedOff.toggle = false;
 
-      setPointLedOff.pins.push_back(setPointPin2LedOff);
+      setPointLedOff.setPointItems.push_back(setPointItem2LedOff);
 
       sensors["7830832"].setPoints.push_back(setPointLedOff);
     }
 
     { // Luminosità 01
       sensors["PhotoResistor-01"].name = "Luminosità 01";
-      sensors["PhotoResistor-01"].pin = 34;
+      sensors["PhotoResistor-01"].deviceId = 34;
 
       SetPoint setPointLedOn;
       setPointLedOn.min = 0;
       setPointLedOn.max = 250;
 
-      SetPointPin setPointPin5LedOn;
-      setPointPin5LedOn.n = 5;
-      setPointPin5LedOn.force = true;
-      setPointPin5LedOn.forceValue = 1;
-      setPointPin5LedOn.toggle = false;
+      SetPointItem setPointItem5LedOn;
+      setPointItem5LedOn.itemId = 5;
+      setPointItem5LedOn.force = true;
+      setPointItem5LedOn.forceValue = HIGH;
+      setPointItem5LedOn.toggle = false;
 
-      setPointLedOn.pins.push_back(setPointPin5LedOn);
+      setPointLedOn.setPointItems.push_back(setPointItem5LedOn);
 
       sensors["PhotoResistor-01"].setPoints.push_back(setPointLedOn);
 
@@ -417,168 +425,167 @@ private:
       setPointLedOff.min = 251;
       setPointLedOff.max = 4095;
 
-      SetPointPin setPointPin5LedOff;
-      setPointPin5LedOff.n = 5;
-      setPointPin5LedOff.force = true;
-      setPointPin5LedOff.forceValue = 0;
-      setPointPin5LedOff.toggle = false;
+      SetPointItem setPointItem5LedOff;
+      setPointItem5LedOff.itemId = 5;
+      setPointItem5LedOff.force = true;
+      setPointItem5LedOff.forceValue = LOW;
+      setPointItem5LedOff.toggle = false;
 
-      setPointLedOff.pins.push_back(setPointPin5LedOff);
+      setPointLedOff.setPointItems.push_back(setPointItem5LedOff);
 
       sensors["PhotoResistor-01"].setPoints.push_back(setPointLedOff);
     }
 
     { // Temperatura 01
       sensors["Temperatura-01"].name = "Temperatura 01";
-      sensors["Temperatura-01"].pin = 35;
+      sensors["Temperatura-01"].deviceId = 35;
     }
-    */
-
+*/
     { // AntiTheaf - ArmedUnarmed
       sensors["MAT-AUSTATE"].name = "Antifurto Principale - ArmatoDisarmato";
-      sensors["MAT-AUSTATE"].pin = 1000;
+      sensors["MAT-AUSTATE"].deviceId = 1000;
       // sensors["MAT-AUSTATE"].prior = true;
     }
     { // AntiTheaf - ArmedUnarmedLocal
       sensors["MAT-AULSTATE"].name = "Antifurto Principale - ArmatoDisarmato Local";
-      sensors["MAT-AULSTATE"].pin = 1000;
+      sensors["MAT-AULSTATE"].deviceId = 1000;
       // sensors["MAT-AUSTATE"].prior = true;
     }
     { // AntiTheaf - ArmedUnarmedRemote
       sensors["MAT-AURSTATE"].name = "Antifurto Principale - ArmatoDisarmato Remote";
-      sensors["MAT-AURSTATE"].pin = 1000;
+      sensors["MAT-AURSTATE"].deviceId = 1000;
       // sensors["MAT-AUSTATE"].prior = true;
 
       SetPoint setPoint;
       setPoint.min = 0;
       setPoint.max = 1;
 
-      SetPointPin setPointRemoteSwitch;
-      setPointRemoteSwitch.n = 1000;
-      setPointRemoteSwitch.id = "MAT-AURSTATE";
-      setPointRemoteSwitch.force = false; // Set value equal to 1
-      setPointRemoteSwitch.forceValue = LOW;
-      setPointRemoteSwitch.toggle = false;
-      setPoint.pins.push_back(setPointRemoteSwitch);
+      SetPointItem setPointRemoteArmUnarmItem;
+      setPointRemoteArmUnarmItem.deviceId = 1000;
+      setPointRemoteArmUnarmItem.itemId = "MAT-AURSTATE";
+      setPointRemoteArmUnarmItem.force = false; // Set value equal to 1
+      setPointRemoteArmUnarmItem.forceValue = LOW;
+      setPointRemoteArmUnarmItem.toggle = false;
+      setPoint.setPointItems.push_back(setPointRemoteArmUnarmItem);
 
       sensors["MAT-AURSTATE"].setPoints.push_back(setPoint);
     }
     { // AntiTheaf - AlarmState
       sensors["MAT-ALSTATE"].name = "Antifurto Principale - Allarme on-off";
-      sensors["MAT-ALSTATE"].pin = 1000;
+      sensors["MAT-ALSTATE"].deviceId = 1000;
       sensors["MAT-ALSTATE"].prior = true;
     }
     { // AntiTheaf - Porte balcone
       sensors["MAT-IASTATE"].name = "Antifurto Principale - Porte balcone aperte-chiuse";
-      sensors["MAT-IASTATE"].pin = 1000;
+      sensors["MAT-IASTATE"].deviceId = 1000;
       // sensors["MAT-IASTATE"].prior = true;
     }
     { // AntiTheaf - Porta ingresso
       sensors["MAT-DASTATE"].name = "Antifurto Principale - Porta ingresso aperta-chiusa";
-      sensors["MAT-DASTATE"].pin = 1000;
+      sensors["MAT-DASTATE"].deviceId = 1000;
       // sensors["MAT-DASTATE"].prior = true;
     }
     { // AntiTheaf - Anti Tamper
       sensors["MAT-AASTATE"].name = "Antifurto Principale - Anti Tamper aperto-chiuso";
-      sensors["MAT-AASTATE"].pin = 1000;
+      sensors["MAT-AASTATE"].deviceId = 1000;
       // sensors["MAT-AASTATE"].prior = true;
     }
   }
 public:
   static void setup()
   {
-    setupPins();
+    setupDevices();
     setupSensors();
   }
 private:
-  static void setPinValue(int pinN, const char* id, int value)
+  static void setItemValue(int deviceId, const char* itemId, int value)
   {
-    if (pins.find(pinN) == pins.end())
+    if (devices.find(deviceId) == devices.end())
     {
 #ifdef DEBUG_BEESTATUS
-      DPRINTF("BEESTATUS - Pin n: %d not found\n", pinN);
+      DPRINTF("BEESTATUS - Device n: %d not found\n", deviceId);
 #endif
       return;
     }
 
-    Pin& pin = pins[pinN];
+    Device& device = devices[deviceId];
     
-    if (pin.kind == "RC" || pin.kind == "DI" || pin.kind == "AI")
+    if (device.kind == "RC" || device.kind == "DI" || device.kind == "AI")
     {
 #ifdef DEBUG_BEESTATUS
-      DPRINTF("BEESTATUS - Pin n: %d kind: %s - Pin is not set for write\n", pinN, pin.kind.c_str());
+      DPRINTF("BEESTATUS - Device n: %d kind: %s - Device is not set for write\n", deviceId, device.kind.c_str());
 #endif
       return;
+    }    
+    if (device.kind == "AT") {// No need to check prev value and range because it is like an "external" device
+      device.pAntiTheft->setState(itemId, value);
+      return;
     }
-    if (pin.value == value)
+    if (device.value == value)
     {
       return;
     }
-    if (pin.kind == "AT") {// No need to check range because is like an "external" device
-      pin.pAntiTheft->setState(id, value);
-      return;
-    }
-    if (value < pin.min || value > pin.max)
+    if (value < device.min || value > device.max)
     {
 #ifdef DEBUG_BEESTATUS
-      DPRINTF("BEESTATUS - Pin n: %d value: %d - Value is out of range\n", pinN, value);
+      DPRINTF("BEESTATUS - Device n: %d value: %d - Value is out of range\n", deviceId, value);
 #endif
       return;
     }   
-    if (pin.kind == "DO")
+    if (device.kind == "DO")
     {
-      digitalWrite(pinN, value);
-      pin.value = value;
+      digitalWrite(device.pin, value);
+      device.value = value;
       return;
     }
-    if (pin.kind == "PWM")
+    if (device.kind == "PWM")
     {
-      ledcWrite(pin.pwm.channel, value);
-      pin.value = value;
+      ledcWrite(device.pwm.channel, value);
+      device.value = value;
 #ifdef DEBUG_BEESTATUS
-      DPRINTF("BEESTATUS - Pin n: %d kind: %s - PWM value: %d\n", pinN, pin.kind, value);
+      DPRINTF("BEESTATUS - Device n: %d kind: %s - PWM value: %d\n", deviceId, device.kind, value);
 #endif      
       return;
     }   
 #ifdef DEBUG_BEESTATUS
-    DPRINTF("BEESTATUS - Pin n: %d kind: %s not recognized\n", pinN, pin.kind.c_str());
+    DPRINTF("BEESTATUS - Device n: %d kind: %s not recognized\n", deviceId, device.kind.c_str());
 #endif
   }
-  static void togglePinValue(int pinN, const char* id)
+  static void toggleItemValue(int deviceId, const char* id)
   {
-    if (pins.find(pinN) == pins.end())
+    if (devices.find(deviceId) == devices.end())
     {
 #ifdef DEBUG_BEESTATUS
-      DPRINTF("BEESTATUS - Pin n: %d not found\n", pinN);
+      DPRINTF("BEESTATUS - Device n: %d not found\n", deviceId);
 #endif
       return;
     }
 
-    Pin& pin = pins[pinN];
-    if (pin.kind == "RC" || pin.kind == "DI" || pin.kind == "AI")
+    Device& device = devices[deviceId];
+    if (device.kind == "RC" || device.kind == "DI" || device.kind == "AI")
     {
 #ifdef DEBUG_BEESTATUS
-      DPRINTF("BEESTATUS - Pin n: %d kind: %s - Pin is not set for write\n", pinN, pin.kind.c_str());
+      DPRINTF("BEESTATUS - Device n: %d kind: %s - Device is not set for write\n", deviceId, device.kind.c_str());
 #endif
       return;
     }
 
-    int value = pin.min;
-    if (pin.value == pin.min)
-      value = pin.max;
-    if (pin.value == pin.max)
-      value = pin.min;
+    int value = device.min;
+    if (device.value == device.min)
+      value = device.max;
+    if (device.value == device.max)
+      value = device.min;
 
-    if (pin.kind == "DO")
+    if (device.kind == "DO")
     {
-      digitalWrite(pinN, value);
-      pin.value = value;
+      digitalWrite(device.pin, value);
+      device.value = value;
       return;
     }
-    if (pin.kind == "PWM")
+    if (device.kind == "PWM")
     {
-      ledcWrite(pin.pwm.channel, value);
-      pin.value = value;
+      ledcWrite(device.pwm.channel, value);
+      device.value = value;
       return;
     }
 //    if (pin.kind == "AT") {
@@ -586,7 +593,7 @@ private:
 //      return;
 //    }
 #ifdef DEBUG_BEESTATUS
-    DPRINTF("BEESTATUS - Pin n: %d kind: %s - Kind not recognized\n", pinN, pin.kind);
+    DPRINTF("BEESTATUS - Device n: %d kind: %s - Kind not recognized\n", deviceId, device.kind);
 #endif
   }
 private:
@@ -597,35 +604,35 @@ private:
       const SetPoint& setPoint = *it;
       if (value >= setPoint.min && value <= setPoint.max)
       {
-        for (setPointPin_const_iterator n = setPoint.pins.begin(); n != setPoint.pins.end(); n++)
+        for (setPointItem_const_iterator item = setPoint.setPointItems.begin(); item != setPoint.setPointItems.end(); item++)
         {
-          const SetPointPin& setPointPin = *n;
-          if (setPointPin.force == true)
+          const SetPointItem& setPointItem = *item;
+          if (setPointItem.force == true)
           {
 #ifdef DEBUG_BEESTATUS_VERBOSE
-            DPRINTF("BEESTATUS - SetPointPin n: %d value: %d forced\n", setPointPin.n, setPointPin.forceValue);
+            DPRINTF("BEESTATUS - SetPointItemDevice Id: %d Value: %d forced\n", setPointItem.deviceId, setPointItem.forceValue);
 #endif
-            setPinValue(setPointPin.n, setPointPin.id.c_str(), setPointPin.forceValue);
+            setItemValue(setPointItem.deviceId, setPointItem.itemId.c_str(), setPointItem.forceValue);
             continue;
           }
-          if (setPointPin.toggle == true)
+          if (setPointItem.toggle == true)
           {
-            togglePinValue(setPointPin.n, setPointPin.id.c_str());
+            toggleItemValue(setPointItem.deviceId, setPointItem.itemId.c_str());
             continue;
           }
-          setPinValue(setPointPin.n, setPointPin.id.c_str(), value);
+          setItemValue(setPointItem.deviceId, setPointItem.itemId.c_str(), value);
         }
       }
     }
   }
 private:
-  static bool setSensorsValueFromPin(int pin, int value)
+  static bool setSensorsValueFromDeviceId(int deviceId, int value)
   {
     bool immediately = false;
     for (sensor_iterator it = sensors.begin(); it != sensors.end(); it++)
     {
       Sensor& sensor = it->second;
-      if (sensor.pin != pin)
+      if (sensor.deviceId != deviceId)
         continue;
 
       if (immediately == false)
@@ -654,9 +661,9 @@ public:
     if (sensor.value == value)
       return false;
       
-    sensor.now = true;
+    sensor.now    = true;
     sensor.millis = millis();
-    sensor.value = value;
+    sensor.value  = value;
 
     checkSetPoints(sensor.setPoints, value);
 
@@ -666,33 +673,33 @@ public:
   static bool loop()
   {
     bool immediately = false;
-    for (pin_const_iterator it = pins.begin(); it != pins.end(); it++)
+    for (device_const_iterator it = devices.begin(); it != devices.end(); it++)
     {
-      int pinN        = it->first;
-      const Pin& pin  = it->second;
+      int deviceId          = it->first;
+      const Device& device  = it->second;
 #ifdef DEBUG_BEESTATUS_VERBOSE
-      // DPRINTF("BEESTATUS - Elaborating Pin n: %d kind: %s\n", pinN, pin.kind.c_str());
+      // DPRINTF("BEESTATUS - Elaborating Device n: %d kind: %s\n", pinN, pin.kind.c_str());
 #endif
-      if (pin.kind == "DO")
+      if (device.kind == "DO")
       {
         continue;
       }
-      if (pin.kind == "PWM")
+      if (device.kind == "PWM")
       {
         continue;
       }
-      if (pin.kind == "AI")
+      if (device.kind == "AI")
       {
-        int value = analogRead(pinN);
+        int value = analogRead(device.pin);
 #ifdef DEBUG_BEESTATUS_VERBOSE
-        DPRINTF("BEESTATUS - Read Pin n: %d kind: %s analogic value: %d\n", pinN, pin.kind.c_str(), value);
+        DPRINTF("BEESTATUS - Read Device id: %d kind: %s analogic value: %d\n", deviceId, device.kind.c_str(), value);
 #endif
-        int prior = setSensorsValueFromPin(pinN, value);
+        int prior = setSensorsValueFromDeviceId(deviceId, value);
         if (immediately == false)
           immediately = prior;
         continue;
       }
-      if (pin.kind == "RC")
+      if (device.kind == "RC")
       {
         if (RCSensorsManager::available() == false)
           continue;
@@ -700,26 +707,26 @@ public:
         long sensorId = RCSensorsManager::getReceivedValue();
         String sensorIdStr(sensorId);
 #ifdef DEBUG_BEESTATUS
-        DPRINTF("BEESTATUS - Read Pin n: %d kind: %s sensor id: %s\n", pinN, pin.kind.c_str(), sensorIdStr.c_str());
+        DPRINTF("BEESTATUS - Read Device Id: %d kind: %s Item Id: %s\n", deviceId, device.kind.c_str(), sensorIdStr.c_str());
 #endif
         int prior = setSensorValue(sensorIdStr.c_str(), HIGH);
         if (immediately == false)
           immediately = prior;
         continue;
       }
-      if (pin.kind == "AT") {
-        pin.pAntiTheft->loop();
-        for (AntiTheft::const_iterator it = pin.pAntiTheft->begin(); it != pin.pAntiTheft->end(); it++) {
-          String      stateId     = it->first;
-          const int*  stateValue  = it->second;
-          int prior = setSensorValue(stateId.c_str(), *stateValue);
+      if (device.kind == "AT") {
+        device.pAntiTheft->loop();
+        for (AntiTheft::const_iterator it = device.pAntiTheft->begin(); it != device.pAntiTheft->end(); it++) {
+          String      sensorId     = it->first;
+          const int*  sensorValue  = it->second;
+          int prior = setSensorValue(sensorId.c_str(), *sensorValue);
           if (immediately == false)
             immediately = prior;
         }
         continue;
       }
 #ifdef DEBUG_BEESTATUS
-      DPRINTF("BEESTATUS - Pin n: %d kind: %s not found\n", pinN, pin.kind.c_str());
+      DPRINTF("BEESTATUS - Device n: %d kind: %s not found\n", deviceId, device.kind.c_str());
 #endif
     }
     return immediately;
@@ -785,7 +792,7 @@ public:
 const char* BeeStatus::thingCnfg = "";
 const char* BeeStatus::thingValue = "f4c3c80b-d561-4a7b-80a5-f4805fdab9bb";
 
-pin_collection BeeStatus::pins;
+device_collection BeeStatus::devices;
 sensor_collection BeeStatus::sensors;
 
 // WiFi
