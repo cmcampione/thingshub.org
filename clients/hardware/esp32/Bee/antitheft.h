@@ -90,7 +90,7 @@ class AntiTheft {
       _statesIds[_config.AntiTamperAlarmStateId]    = &_antiTamperAlarmState;      
     }
   public:
-    void toggleStateValue(const char* stateId) {
+    void setState(const char* stateId, int value) {
       if (_statesIds.find(stateId) == _statesIds.end())
       {
   #ifdef DEBUG_BEESTATUS
@@ -98,7 +98,7 @@ class AntiTheft {
   #endif
         return;
       }
-      *_statesIds[stateId] = !*_statesIds[stateId];
+      *_statesIds[stateId] = value;
     }
   public:
     void setup() {
@@ -120,20 +120,19 @@ class AntiTheft {
     void loop() {
       digitalWrite(_config.AlarmOnOffLedAndContactPin, _alarmState);
 
-      int armedUnarmedPrevStateLocal = _armedUnarmedStateLocal;
+      _armedUnarmedState = _armedUnarmedStateRemote || _armedUnarmedStateLocal;
 
       // ToDo: To remove
       _buttonArmedUnarmed.loop();
-      if (_buttonArmedUnarmed.isPressed())
-        _armedUnarmedStateLocal = !_armedUnarmedStateLocal;
+      if (_buttonArmedUnarmed.isPressed()) {
+        _armedUnarmedState = !_armedUnarmedState;
+        _armedUnarmedStateRemote = _armedUnarmedState;
+        _armedUnarmedStateLocal  = _armedUnarmedState;
+      }
       /*
-      _armedUnarmedStateLocal = digitalRead(_config.ArmedUnarmedContactPin) == _config.ArmedUnarmedContactOpenValue ? HIGH : LOW;
+      _armedUnarmedState = digitalRead(_config.ArmedUnarmedContactPin) == _config.ArmedUnarmedContactOpenValue ? HIGH : LOW;
       */
-
-      _armedUnarmedState = _armedUnarmedStateRemote || _armedUnarmedStateLocal;
-      if (armedUnarmedPrevStateLocal != _armedUnarmedStateLocal)
-        _armedUnarmedState = _armedUnarmedStateLocal;
-      
+ 
       digitalWrite(_config.ArmedUnarmedLedPin, _armedUnarmedState);
 
       int instanAlarmState = digitalRead(_config.InstantAlarmContactPin);
