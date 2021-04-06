@@ -26,9 +26,9 @@ class RCSensorsManager
 private:
   static RCSwitch mySwitch;  
 public:
-  static void init(int pinN)
+  static void init(int pin)
   {
-    mySwitch.enableReceive(pinN);
+    mySwitch.enableReceive(pin);
   }
 public:
   static bool available()
@@ -244,7 +244,7 @@ private:
         continue;
       }
 #ifdef DEBUG_BEESTATUS
-      DPRINTF("BEESTATUS - Device id: %d kind: %s - Kind not found\n", it->first, device.kind);
+      DPRINTF("BEESTATUS - Device id: %d Kind: %s - Kind not found\n", it->first, device.kind);
 #endif
     }
   }
@@ -457,13 +457,13 @@ private:
       // sensors["MAT-AUSTATE"].prior = true;
 
       SetPoint setPoint;
-      setPoint.min = 0;
-      setPoint.max = 1;
+      setPoint.min = LOW;
+      setPoint.max = HIGH;
 
       SetPointItem setPointRemoteArmUnarmItem;
       setPointRemoteArmUnarmItem.deviceId = 1000;
       setPointRemoteArmUnarmItem.itemId = "MAT-AURSTATE";
-      setPointRemoteArmUnarmItem.force = false; // Set value equal to 1
+      setPointRemoteArmUnarmItem.force = false;
       setPointRemoteArmUnarmItem.forceValue = LOW;
       setPointRemoteArmUnarmItem.toggle = false;
       setPoint.setPointItems.push_back(setPointRemoteArmUnarmItem);
@@ -503,7 +503,7 @@ private:
     if (devices.find(deviceId) == devices.end())
     {
 #ifdef DEBUG_BEESTATUS
-      DPRINTF("BEESTATUS - Device n: %d not found\n", deviceId);
+      DPRINTF("BEESTATUS - Device Id: %d not found\n", deviceId);
 #endif
       return;
     }
@@ -513,7 +513,7 @@ private:
     if (device.kind == "RC" || device.kind == "DI" || device.kind == "AI")
     {
 #ifdef DEBUG_BEESTATUS
-      DPRINTF("BEESTATUS - Device n: %d kind: %s - Device is not set for write\n", deviceId, device.kind.c_str());
+      DPRINTF("BEESTATUS - Device Id: %d Kind: %s - Device is not set for write\n", deviceId, device.kind.c_str());
 #endif
       return;
     }    
@@ -528,7 +528,7 @@ private:
     if (value < device.min || value > device.max)
     {
 #ifdef DEBUG_BEESTATUS
-      DPRINTF("BEESTATUS - Device n: %d value: %d - Value is out of range\n", deviceId, value);
+      DPRINTF("BEESTATUS - Device Id: %d Value: %d - Value is out of range\n", deviceId, value);
 #endif
       return;
     }   
@@ -543,12 +543,12 @@ private:
       ledcWrite(device.pwm.channel, value);
       device.value = value;
 #ifdef DEBUG_BEESTATUS
-      DPRINTF("BEESTATUS - Device n: %d kind: %s - PWM value: %d\n", deviceId, device.kind, value);
+      DPRINTF("BEESTATUS - Device Id: %d Kind: %s PWM value: %d\n", deviceId, device.kind, value);
 #endif      
       return;
     }   
 #ifdef DEBUG_BEESTATUS
-    DPRINTF("BEESTATUS - Device n: %d kind: %s not recognized\n", deviceId, device.kind.c_str());
+    DPRINTF("BEESTATUS - Device Id: %d Kind: %s not recognized\n", deviceId, device.kind.c_str());
 #endif
   }
   static void toggleItemValue(int deviceId, const char* id)
@@ -556,7 +556,7 @@ private:
     if (devices.find(deviceId) == devices.end())
     {
 #ifdef DEBUG_BEESTATUS
-      DPRINTF("BEESTATUS - Device n: %d not found\n", deviceId);
+      DPRINTF("BEESTATUS - Device Id: %d not found\n", deviceId);
 #endif
       return;
     }
@@ -565,7 +565,7 @@ private:
     if (device.kind == "RC" || device.kind == "DI" || device.kind == "AI")
     {
 #ifdef DEBUG_BEESTATUS
-      DPRINTF("BEESTATUS - Device n: %d kind: %s - Device is not set for write\n", deviceId, device.kind.c_str());
+      DPRINTF("BEESTATUS - Device Id: %d Kind: %s - Device is not set for write\n", deviceId, device.kind.c_str());
 #endif
       return;
     }
@@ -588,12 +588,12 @@ private:
       device.value = value;
       return;
     }
-//    if (pin.kind == "AT") {
-//      pin.pAntiTheft->toggleStateValue(id);
+//    if (device.kind == "AT") {
+//      device.pAntiTheft->toggleStateValue(itemId);
 //      return;
 //    }
 #ifdef DEBUG_BEESTATUS
-    DPRINTF("BEESTATUS - Device n: %d kind: %s - Kind not recognized\n", deviceId, device.kind);
+    DPRINTF("BEESTATUS - Device Id: %d Kind: %s - Kind not recognized\n", deviceId, device.kind);
 #endif
   }
 private:
@@ -678,7 +678,7 @@ public:
       int deviceId          = it->first;
       const Device& device  = it->second;
 #ifdef DEBUG_BEESTATUS_VERBOSE
-      // DPRINTF("BEESTATUS - Elaborating Device n: %d kind: %s\n", pinN, pin.kind.c_str());
+      // DPRINTF("BEESTATUS - Elaborating Device Id: %d Kind: %s\n", pinN, pin.kind.c_str());
 #endif
       if (device.kind == "DO")
       {
@@ -692,7 +692,7 @@ public:
       {
         int value = analogRead(device.pin);
 #ifdef DEBUG_BEESTATUS_VERBOSE
-        DPRINTF("BEESTATUS - Read Device id: %d kind: %s analogic value: %d\n", deviceId, device.kind.c_str(), value);
+        DPRINTF("BEESTATUS - Read Device id: %d Kind: %s analogic value: %d\n", deviceId, device.kind.c_str(), value);
 #endif
         int prior = setSensorsValueFromDeviceId(deviceId, value);
         if (immediately == false)
@@ -707,7 +707,7 @@ public:
         long sensorId = RCSensorsManager::getReceivedValue();
         String sensorIdStr(sensorId);
 #ifdef DEBUG_BEESTATUS
-        DPRINTF("BEESTATUS - Read Device Id: %d kind: %s Item Id: %s\n", deviceId, device.kind.c_str(), sensorIdStr.c_str());
+        DPRINTF("BEESTATUS - Read Device Id: %d Kind: %s Item Id: %s\n", deviceId, device.kind.c_str(), sensorIdStr.c_str());
 #endif
         int prior = setSensorValue(sensorIdStr.c_str(), HIGH);
         if (immediately == false)
@@ -726,7 +726,7 @@ public:
         continue;
       }
 #ifdef DEBUG_BEESTATUS
-      DPRINTF("BEESTATUS - Device n: %d kind: %s not found\n", deviceId, device.kind.c_str());
+      DPRINTF("BEESTATUS - Device Id: %d Kind: %s not found\n", deviceId, device.kind.c_str());
 #endif
     }
     return immediately;
@@ -887,24 +887,36 @@ private:
     switch (type)
     {
       case sIOtype_DISCONNECT:
+#ifdef DEBUG_SOCKETIOMANAGER
             DPRINTF("[IOc] Disconnected!\n");
+#endif            
             break;
       case sIOtype_CONNECT:
+#ifdef DEBUG_SOCKETIOMANAGER
           DPRINTF("[IOc] Connected to url: %s\n", payload);
+#endif
           // join default namespace (no auto join in Socket.IO V3)
           webSocket.send(sIOtype_CONNECT, "/");
           break;
       case sIOtype_ACK:
+#ifdef DEBUG_SOCKETIOMANAGER      
           DPRINTF("[IOc] get ack: %u\n", length);
+#endif          
           break;
       case sIOtype_ERROR:
+#ifdef DEBUG_SOCKETIOMANAGER      
           DPRINTF("[IOc] get error: %u\n", length);
+#endif
           break;
       case sIOtype_BINARY_EVENT:
+#ifdef DEBUG_SOCKETIOMANAGER      
           DPRINTF("[IOc] get binary: %u\n", length);
+#endif          
           break;
       case sIOtype_BINARY_ACK:
+#ifdef DEBUG_SOCKETIOMANAGER      
           DPRINTF("[IOc] get binary ack: %u\n", length);
+#endif          
           break;
       case sIOtype_EVENT:
         DeserializationError error = deserializeJson(jMsg, payload);
@@ -1137,9 +1149,10 @@ void loop()
     http.end(); //Free resources
 
     restCallInterval = millis();
-
+/*
     DPRINT("getFreeHeap : ");
     DPRINTLN(ESP.getFreeHeap());
+*/    
   }
 
   //
