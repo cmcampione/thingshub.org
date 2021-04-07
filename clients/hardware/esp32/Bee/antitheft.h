@@ -144,16 +144,13 @@ class AntiTheft {
 
       digitalWrite(_config.ArmedUnarmedLedPin, _armedUnarmedState);
 
-      int instanAlarmState = digitalRead(_config.InstantAlarmContactPin);
-      _instantAlarmState = instanAlarmState == _config.InstantAlarmContactOpenValue ? HIGH : LOW;
+      _instantAlarmState = digitalRead(_config.InstantAlarmContactPin) == _config.InstantAlarmContactOpenValue ? HIGH : LOW;
       digitalWrite(_config.InstantAlarmLedPin, _instantAlarmState);
-
-      int delayedAlarmState = digitalRead(_config.DelayedAlarmContactPin);
-      _delayedAlarmState = delayedAlarmState == _config.DelayedAlarmContactOpenValue ? HIGH : LOW;
+      
+      _delayedAlarmState = digitalRead(_config.DelayedAlarmContactPin == _config.DelayedAlarmContactOpenValue ? HIGH : LOW;
       digitalWrite(_config.DelayedAlarmLedPin, _delayedAlarmState);
-
-      int antiTamperAlarmState = digitalRead(_config.AntiTamperAlarmContactPin);
-      _antiTamperAlarmState = antiTamperAlarmState == _config.AntiTamperAlarmContactOpenValue ? HIGH : LOW;      
+      
+      _antiTamperAlarmState = digitalRead(_config.AntiTamperAlarmContactPin) == _config.AntiTamperAlarmContactOpenValue ? HIGH : LOW;      
       digitalWrite(_config.AntiTamperAlarmLedPin, _antiTamperAlarmState);
 
       switch (_state)
