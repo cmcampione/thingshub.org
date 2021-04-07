@@ -79,18 +79,18 @@ struct Device
         AntiTheft
       };
   
-  Kind kind; // ToDo: Could be a enum
+  Kind kind;
 
   int pin;
 
   int min;
   int max;
   
-  PWM pwm;        // Valid only for kind == "PWM"
+  PWM pwm;                // Valid only for kind == "PWM"
 
   int value;
 
-  AntiTheft*  pAntiTheft; // Valid only for kind == "AT"
+  AntiTheft*  pAntiTheft; // Valid only for kind == "AntiTheft"
 };
 typedef std::map<int, Device> device_collection;
 typedef device_collection::const_iterator device_const_iterator;
@@ -648,9 +648,9 @@ private:
       if (immediately == false)
         immediately = sensor.prior;
 
-      sensor.now = true;
+      sensor.now    = true;
       sensor.millis = millis();
-      sensor.value = value;
+      sensor.value  = value;
 
       checkSetPoints(sensor.setPoints, value);
     }
@@ -1121,7 +1121,6 @@ void loop()
   if (WiFi.status() != WL_CONNECTED)
     return;
   //
-
   if ((immediately == true) || (millis() - restCallInterval >= 5000))
   {
     StaticJsonDocument<sensorsCapacity> doc;
@@ -1164,7 +1163,6 @@ void loop()
     DPRINTLN(ESP.getFreeHeap());
 */    
   }
-
   //
   SocketIOManager::loop();
 }
