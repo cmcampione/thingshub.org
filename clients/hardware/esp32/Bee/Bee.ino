@@ -79,18 +79,16 @@ struct Device
         AntiTheft
       };
   
-  Kind kind;
+  Kind kind;              
 
-  int pin;
+  int pin;               // Valid only for kind == AnalogicInput, DigitalOutput, PWM, RC
+  PWM pwm;               // Valid only for kind == "PWM"
+  AntiTheft* pAntiTheft; // Valid only for kind == "AntiTheft"
 
   int min;
   int max;
-  
-  PWM pwm;                // Valid only for kind == "PWM"
 
-  int value;
-
-  AntiTheft*  pAntiTheft; // Valid only for kind == "AntiTheft"
+  int value;  
 };
 typedef std::map<int, Device> device_collection;
 typedef device_collection::const_iterator device_const_iterator;
@@ -269,14 +267,16 @@ private:
       setPoint.max = 1;
 
       SetPointItem setPointOnBoardLed;
-      setPointOnBoardLed.itemId = 2;
+      setPointOnBoardLed.deviceId = 2;
+      setPointOnBoardLed.itemId = 2; // ToDo: Could be not necessary
       setPointOnBoardLed.force = false; // Set value equal to 1
       setPointOnBoardLed.forceValue = LOW;
       setPointOnBoardLed.toggle = false;
       setPoint.setPointItems.push_back(setPointOnBoardLed);
 
       SetPointItem setPointBuzzer;
-      setPointBuzzer.itemId = 23;
+      setPointBuzzer.deviceId = 23;
+      setPointBuzzer.itemId = 23; // ToDo: Could be not necessary
       setPointBuzzer.force = true;
       setPointBuzzer.forceValue = 5; //128
       setPointBuzzer.toggle = false;
@@ -294,14 +294,16 @@ private:
       setPoint.max = 1;
 
       SetPointItem setPointOnBoardLed;
-      setPointOnBoardLed.itemId = 2;
+      setPointOnBoardLed.deviceId = 2;
+      setPointOnBoardLed.itemId = 2; // ToDo: Could be not necessary
       setPointOnBoardLed.force = true;
       setPointOnBoardLed.forceValue = LOW;
       setPointOnBoardLed.toggle = false;
       setPoint.setPointItems.push_back(setPointOnBoardLed);
 
       SetPointItem setPointBuzzer;
-      setPointBuzzer.itemId = 23;
+      setPointBuzzer.deviceId = 23;
+      setPointBuzzer.itemId = 23; // ToDo: Could be not necessary
       setPointBuzzer.force = true;
       setPointBuzzer.forceValue = 0;
       setPointBuzzer.toggle = false;
@@ -320,7 +322,8 @@ private:
       setPointLedOn.max = 1;
 
       SetPointItem setPointItem2LedOn;
-      setPointItem2LedOn.itemId = 2;
+      setPointItem2LedOn.deviceId = 2;
+      setPointItem2LedOn.itemId = 2; // ToDo: Could be not necessary
       setPointItem2LedOn.force = false;
       setPointItem2LedOn.forceValue = HIGH;
       setPointItem2LedOn.toggle = false;
@@ -334,7 +337,8 @@ private:
       setPointLedOff.max = 0;
 
       SetPointItem setPointItem2LedOff;
-      setPointItem2LedOff.itemId = 2;
+      setPointItem2LedOff.deviceId = 2;
+      setPointItem2LedOff.itemId = 2; // ToDo: Could be not necessary
       setPointItem2LedOff.force = true;
       setPointItem2LedOff.forceValue = LOW;
       setPointItem2LedOff.toggle = false;
@@ -354,7 +358,8 @@ private:
       setPointLedOn.max = 1;
 
       SetPointItem setPointItem2LedOn;
-      setPointItem2LedOn.itemId = 2;
+      setPointItem2LedOn.deviceId = 2;
+      setPointItem2LedOn.itemId = 2; // ToDo: Could be not necessary
       setPointItem2LedOn.force = false;
       setPointItem2LedOn.forceValue = HIGH;
       setPointItem2LedOn.toggle = false;
@@ -368,7 +373,8 @@ private:
       setPointLedOff.max = 0;
 
       SetPointItem setPointItem2LedOff;
-      setPointItem2LedOff.itemId = 2;
+      setPointItem2LedOff.deviceId = 2;
+      setPointItem2LedOff.itemId = 2; // ToDo: Could be not necessary
       setPointItem2LedOff.force = true;
       setPointItem2LedOff.forceValue = LOW;
       setPointItem2LedOff.toggle = false;
@@ -388,7 +394,8 @@ private:
       setPointLedOn.max = 1;
 
       SetPointItem setPointItem2LedOn;
-      setPointItem2LedOn.itemId = 2;
+      setPointItem2LedOn.deviceId = 2;
+      setPointItem2LedOn.itemId = 2; // ToDo: Could be not necessary
       setPointItem2LedOn.force = false;
       setPointItem2LedOn.forceValue = HIGH;
       setPointItem2LedOn.toggle = false;
@@ -402,7 +409,8 @@ private:
       setPointLedOff.max = 0;
 
       SetPointItem setPointItem2LedOff;
-      setPointItem2LedOff.itemId = 2;
+      setPointItem2LedOff.deviceId =2;
+      setPointItem2LedOff.itemId = 2; // ToDo: Could be not necessary
       setPointItem2LedOff.force = true;
       setPointItem2LedOff.forceValue = LOW;
       setPointItem2LedOff.toggle = false;
@@ -421,7 +429,8 @@ private:
       setPointLedOn.max = 250;
 
       SetPointItem setPointItem5LedOn;
-      setPointItem5LedOn.itemId = 5;
+      setPointItem5LedOn.deviceId = 5;
+      setPointItem5LedOn.itemId = 5; // ToDo: Could be not necessary
       setPointItem5LedOn.force = true;
       setPointItem5LedOn.forceValue = HIGH;
       setPointItem5LedOn.toggle = false;
@@ -435,7 +444,8 @@ private:
       setPointLedOff.max = 4095;
 
       SetPointItem setPointItem5LedOff;
-      setPointItem5LedOff.itemId = 5;
+      setPointItem5LedOff.deviceId = 5;
+      setPointItem5LedOff.itemId = 5; // ToDo: Could be not necessary
       setPointItem5LedOff.force = true;
       setPointItem5LedOff.forceValue = LOW;
       setPointItem5LedOff.toggle = false;
