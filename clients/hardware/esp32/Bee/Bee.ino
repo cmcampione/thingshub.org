@@ -63,7 +63,7 @@ struct PWM
 };
 struct Device
 {
-  Device() : pAntiTheft(NULL) {
+  Device() : pAntiTheft(NULL), kind(Device::Kind::Undefined) {
   }
   ~Device() {
     if (pAntiTheft != NULL)
@@ -162,9 +162,6 @@ private:
     { // Device 4 - RC sensor
       devices[4].kind = Device::Kind::RC;
       devices[4].pin = 4;
-      devices[4].min = 0;   // No matter
-      devices[4].max = 0;   // No matter
-      devices[4].value = 0; // Initial
     }
 
     { // Device 5 - PhotoResistor Led
@@ -204,7 +201,6 @@ private:
 */
     { // Device 1000 - Main AntiTheaf
       devices[1000].kind = Device::Kind::AntiTheft;
-
       AntiTheftConfig mainAntiTheftCnfg {
         "MAT-ALSTATE", 21,
         "MAT-AUSTATE", 15,  2, HIGH,
@@ -608,10 +604,6 @@ private:
       device.value = value;
       return;
     }
-//    if (device.kind == Device::Kind::AntiTheft) {
-//      device.pAntiTheft->toggleStateValue(itemId);
-//      return;
-//    }
 #ifdef DEBUG_BEESTATUS
     DPRINTF("BEESTATUS - Device Id: %d Kind: %d - Kind not recognized\n", deviceId, device.kind);
 #endif
@@ -808,7 +800,6 @@ public:
 #endif
   }
 };
-
 const char* BeeStatus::thingCnfg = "";
 const char* BeeStatus::thingValue = "f4c3c80b-d561-4a7b-80a5-f4805fdab9bb";
 
@@ -884,7 +875,6 @@ class SocketIOManager
 private:
   static SocketIOclient webSocket;
   static std::map<String, std::function<void(const StaticJsonDocument<msgCapacity>&)>> events;
-
 private:
   static void trigger(const StaticJsonDocument<msgCapacity> &jMsg)
   {
@@ -954,7 +944,6 @@ private:
         break;
     }
   }
-
 public:
   static void on(const char *event, std::function<void(const StaticJsonDocument<msgCapacity> &)> func)
   {
@@ -974,6 +963,7 @@ public:
 #endif
     }
   }
+public:
   static void beginSocketSSLWithCA(const char *host, uint16_t port, const char *url = "/socket.io/?EIO=4", const char *CA_cert = NULL, const char *protocol = "arduino")
   {
     SocketIOManager::webSocket.configureEIOping(true);
@@ -1096,7 +1086,7 @@ void onUpdateThingValue(const StaticJsonDocument<msgCapacity>& jMsg)
       value = sensor["value"];
     }
 #ifdef DEBUG_SOCKETIOMANAGER
-    DPRINTF("DEBUG_SOCKETIOMANAGER - onUpdateThingValue: Sensor ID: %s Value: %d\n", sensorId.c_str(), value);
+    DPRINTF("DEBUG_SOCKETIOMANAGER - onUpdateThingValue: Sensor Id: %s Value: %d\n", sensorId.c_str(), value);
 #endif
     BeeStatus::setSensorValue(sensorId.c_str(), value);
   }
