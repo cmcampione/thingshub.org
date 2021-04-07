@@ -147,7 +147,7 @@ class AntiTheft {
       _instantAlarmState = digitalRead(_config.InstantAlarmContactPin) == _config.InstantAlarmContactOpenValue ? HIGH : LOW;
       digitalWrite(_config.InstantAlarmLedPin, _instantAlarmState);
       
-      _delayedAlarmState = digitalRead(_config.DelayedAlarmContactPin == _config.DelayedAlarmContactOpenValue ? HIGH : LOW;
+      _delayedAlarmState = digitalRead(_config.DelayedAlarmContactPin) == _config.DelayedAlarmContactOpenValue ? HIGH : LOW;
       digitalWrite(_config.DelayedAlarmLedPin, _delayedAlarmState);
       
       _antiTamperAlarmState = digitalRead(_config.AntiTamperAlarmContactPin) == _config.AntiTamperAlarmContactOpenValue ? HIGH : LOW;      
