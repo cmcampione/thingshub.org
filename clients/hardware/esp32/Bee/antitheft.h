@@ -141,6 +141,7 @@ class AntiTheft {
         _armedUnarmedState = _armedUnarmedStateLocal;
         _armedUnarmedStateLocalPrev = _armedUnarmedState;
         _armedUnarmedStateRemotePrev = _armedUnarmedState;
+        _armedUnarmedStateRemote = _armedUnarmedState;
       }
 
       digitalWrite(_config.ArmedUnarmedLedPin, _armedUnarmedState);
