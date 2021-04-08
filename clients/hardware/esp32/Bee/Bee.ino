@@ -1117,27 +1117,29 @@ void loop()
 {
 #ifdef DEBUG_TIMING
   unsigned long before = 0;
-  unsigned long after  = 0;
+  unsigned long after = 0;
+  unsigned long mainBefore = millis();
+  // DPRINTF("Main::loop() before: %lu\n", mainBefore);
 #endif
   //
 #ifdef DEBUG_TIMING
   before = millis();
-  DPRINTF("BeeStatus::loop() before: %lu", before);
+  // DPRINTF("BeeStatus::loop() before: %lu\n", before);
 #endif
   bool immediately = BeeStatus::loop();
 #ifdef DEBUG_TIMING
   after = millis();
-  DPRINTF("BeeStatus::loop() after: %lu - diff: %lu", after, after - before);
+  // DPRINTF("BeeStatus::loop() after: %lu - diff: %lu\n", after, after - before);
 #endif
   // Check if wifi is ok, eventually try reconnecting every "WiFiManager::check_wifi_interval" milliseconds
 #ifdef DEBUG_TIMING
   before = millis();
-  DPRINTF("WiFiManager::loop() before: %lu", before);
+  // DPRINTF("WiFiManager::loop() before: %lu\n", before);
 #endif
   WiFiManager::loop();
 #ifdef DEBUG_TIMING
   after = millis();
-  DPRINTF("WiFiManager::loop() after: %lu - diff: %lu", after, after - before);
+  // DPRINTF("WiFiManager::loop() after: %lu - diff: %lu\n", after, after - before);
 #endif
   if (WiFi.status() != WL_CONNECTED)
     return;
@@ -1145,8 +1147,8 @@ void loop()
   if ((immediately == true) || (millis() - restCallInterval >= 5000))
   {
 #ifdef DEBUG_TIMING
-  before = millis();
-  DPRINTF("HTTPCall::loop() before: %lu", before);
+    before = millis();
+    DPRINTF("HTTPCall::loop() before: %lu - immediately: %d - ", before, immediately);
 #endif
     StaticJsonDocument<sensorsCapacity> doc;
     BeeStatus::toJson(doc);
@@ -1185,7 +1187,7 @@ void loop()
     restCallInterval = millis();
 #ifdef DEBUG_TIMING
   after = millis();
-  DPRINTF("HTTPCall::loop() after: %lu - diff: %lu", after, after - before);
+  DPRINTF("HTTPCall::loop() after: %lu - diff: %lu\n", after, after - before);
 #endif    
 /*
     DPRINT("getFreeHeap : ");
@@ -1195,11 +1197,15 @@ void loop()
   //
 #ifdef DEBUG_TIMING
   before = millis();
-  DPRINTF("SocketIOManager::loop() before: %lu", before);
+  // DPRINTF("SocketIOManager::loop() before: %lu\n", before);
 #endif
   SocketIOManager::loop();
 #ifdef DEBUG_TIMING
   after = millis();
-  DPRINTF("SocketIOManager::loop() after: %lu - diff: %lu", after, after - before);
-#endif  
+  // DPRINTF("SocketIOManager::loop() after: %lu - diff: %lu\n", after, after - before);
+#endif
+#ifdef DEBUG_TIMING
+  after = millis();
+  // DPRINTF("Main::loop() after: %lu - diff: %lu\n", after, after - mainBefore);
+#endif
 }
