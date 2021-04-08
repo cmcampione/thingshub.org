@@ -1115,15 +1115,39 @@ char jsonDoc[512]; // ToDo: To check correct size
 
 void loop()
 {
+#ifdef DEBUG_TIMING
+  unsigned long before = 0;
+  unsigned long after  = 0;
+#endif
   //
+#ifdef DEBUG_TIMING
+  before = millis();
+  DPRINTF("BeeStatus::loop() before: %lu", before);
+#endif
   bool immediately = BeeStatus::loop();
+#ifdef DEBUG_TIMING
+  after = millis();
+  DPRINTF("BeeStatus::loop() after: %lu - diff: %lu", after, after - before);
+#endif
   // Check if wifi is ok, eventually try reconnecting every "WiFiManager::check_wifi_interval" milliseconds
+#ifdef DEBUG_TIMING
+  before = millis();
+  DPRINTF("WiFiManager::loop() before: %lu", before);
+#endif
   WiFiManager::loop();
+#ifdef DEBUG_TIMING
+  after = millis();
+  DPRINTF("WiFiManager::loop() after: %lu - diff: %lu", after, after - before);
+#endif
   if (WiFi.status() != WL_CONNECTED)
     return;
   //
   if ((immediately == true) || (millis() - restCallInterval >= 5000))
   {
+#ifdef DEBUG_TIMING
+  before = millis();
+  DPRINTF("HTTPCall::loop() before: %lu", before);
+#endif
     StaticJsonDocument<sensorsCapacity> doc;
     BeeStatus::toJson(doc);
 
@@ -1159,11 +1183,23 @@ void loop()
     http.end(); //Free resources
 
     restCallInterval = millis();
+#ifdef DEBUG_TIMING
+  after = millis();
+  DPRINTF("HTTPCall::loop() after: %lu - diff: %lu", after, after - before);
+#endif    
 /*
     DPRINT("getFreeHeap : ");
     DPRINTLN(ESP.getFreeHeap());
 */    
   }
   //
+#ifdef DEBUG_TIMING
+  before = millis();
+  DPRINTF("SocketIOManager::loop() before: %lu", before);
+#endif
   SocketIOManager::loop();
+#ifdef DEBUG_TIMING
+  after = millis();
+  DPRINTF("SocketIOManager::loop() after: %lu - diff: %lu", after, after - before);
+#endif  
 }
