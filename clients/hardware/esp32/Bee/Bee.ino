@@ -1110,7 +1110,7 @@ void setup()
 
 HTTPClient http;
 String url = String("/api/things/") + String(BeeStatus::thingValue) + String("/value");
-char jsonDoc[512];
+char jsonDoc[512]; // ToDo: Check correct size
 
 void loop()
 {
