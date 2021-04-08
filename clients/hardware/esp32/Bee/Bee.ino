@@ -85,8 +85,7 @@ struct Device
   PWM pwm;               // Valid only for kind == "PWM"
   AntiTheft* pAntiTheft; // Valid only for kind == "AntiTheft"
 
-  int min;
-  int max;
+  int min, max;          // Useful to check range value and to toggle the state
 
   int value;  
 };
@@ -101,8 +100,9 @@ struct SetPointItem
 
   String  itemId;
 
-  bool  force;
+  bool  force;        // "force" has more priority than "toggle"
   int   forceValue;
+
   bool  toggle;
 };
 typedef std::vector<SetPointItem> setPointItem_collection;
@@ -150,6 +150,7 @@ private:
 private:
   static void setupDevices()
   {
+    // It is just a case if the device ID is equal to the pin number
 /*
     { // Device 2 - On board led
       devices[2].kind = Device::Kind::DigitalOutput;
@@ -567,7 +568,7 @@ private:
     DPRINTF("BEESTATUS - Device Id: %d Kind: %d not recognized\n", deviceId, device.kind);
 #endif
   }
-  static void toggleItemValue(int deviceId, const char* id)
+  static void toggleItemValue(int deviceId, const char* itemId)
   {
     if (devices.find(deviceId) == devices.end())
     {
@@ -1110,7 +1111,7 @@ void setup()
 
 HTTPClient http;
 String url = String("/api/things/") + String(BeeStatus::thingValue) + String("/value");
-char jsonDoc[512]; // ToDo: Check correct size
+char jsonDoc[512]; // ToDo: To check correct size
 
 void loop()
 {
