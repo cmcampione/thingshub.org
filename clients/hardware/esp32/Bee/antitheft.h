@@ -132,17 +132,20 @@ class AntiTheft {
       // ToDo: To remove
       _buttonArmedUnarmed.loop();
       if (_buttonArmedUnarmed.isPressed()) {
-        _armedUnarmedStateLocal = !_armedUnarmedStateLocal;
+        _armedUnarmedState = !_armedUnarmedState;
+        _armedUnarmedStateRemotePrev = _armedUnarmedState;
+        _armedUnarmedStateRemote = _armedUnarmedState;
       }
-      /*
-      _armedUnarmedStateLocal = digitalRead(_config.ArmedUnarmedContactPin) == _config.ArmedUnarmedContactOpenValue ? HIGH : LOW;      
-      */
+/*
+      _armedUnarmedStateLocal = digitalRead(_config.ArmedUnarmedContactPin) == _config.ArmedUnarmedContactOpenValue ? HIGH : LOW;
+      
       if (_armedUnarmedStateLocal != _armedUnarmedStateLocalPrev) {
         _armedUnarmedState = _armedUnarmedStateLocal;
         _armedUnarmedStateLocalPrev = _armedUnarmedState;
         _armedUnarmedStateRemotePrev = _armedUnarmedState;
         _armedUnarmedStateRemote = _armedUnarmedState;
       }
+*/
 
       digitalWrite(_config.ArmedUnarmedLedPin, _armedUnarmedState);
 
