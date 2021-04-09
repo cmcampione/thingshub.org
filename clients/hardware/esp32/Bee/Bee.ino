@@ -1109,37 +1109,33 @@ void setup()
   SocketIOManager::beginSocketSSLWithCA("api.thingshub.org", 3000, "/socket.io/?EIO=4&token=491e94d9-9041-4e5e-b6cb-9dad91bbf63d", root_ca, "arduino");
 }
 
-HTTPClient http;
-String url = String("/api/things/") + String(BeeStatus::thingValue) + String("/value");
-char jsonDoc[512]; // ToDo: To check correct size
-
 void loop()
 {
 #ifdef DEBUG_TIMING
   unsigned long before = 0;
   unsigned long after = 0;
   unsigned long mainBefore = millis();
-  // DPRINTF("Main::loop() before: %lu\n", mainBefore);
+  DPRINTF("Main::loop() before: %lu\n", mainBefore);
 #endif
   //
 #ifdef DEBUG_TIMING
   before = millis();
-  // DPRINTF("BeeStatus::loop() before: %lu\n", before);
+  DPRINTF("BeeStatus::loop() before: %lu - ", before);
 #endif
   bool immediately = BeeStatus::loop();
 #ifdef DEBUG_TIMING
   after = millis();
-  // DPRINTF("BeeStatus::loop() after: %lu - diff: %lu\n", after, after - before);
+  DPRINTF("after: %lu - diff: %lu\n", after, after - before);
 #endif
   // Check if wifi is ok, eventually try reconnecting every "WiFiManager::check_wifi_interval" milliseconds
 #ifdef DEBUG_TIMING
   before = millis();
-  // DPRINTF("WiFiManager::loop() before: %lu\n", before);
+  DPRINTF("WiFiManager::loop() before: %lu - ", before);
 #endif
   WiFiManager::loop();
 #ifdef DEBUG_TIMING
   after = millis();
-  // DPRINTF("WiFiManager::loop() after: %lu - diff: %lu\n", after, after - before);
+  DPRINTF("after: %lu - diff: %lu\n", after, after - before);
 #endif
   if (WiFi.status() != WL_CONNECTED)
     return;
@@ -1148,27 +1144,21 @@ void loop()
   {
 #ifdef DEBUG_TIMING
     before = millis();
-    DPRINTF("HTTPCall::loop() before: %lu - immediately: %d - ", before, immediately);
+    DPRINTF("HTTPCall::loop() before: %lu - ", before);
 #endif
     StaticJsonDocument<sensorsCapacity> doc;
     BeeStatus::toJson(doc);
 
-/*
     HTTPClient http;
     String url = String("/api/things/") + String(BeeStatus::thingValue) + String("/value");
     http.begin("api.thingshub.org", 3000, url, root_ca); // Specify the URL and certificate
     http.addHeader("thapikey", "491e94d9-9041-4e5e-b6cb-9dad91bbf63d");
     http.addHeader("Content-Type", "application/json");
     char jsonDoc[512];
-*/
-
-    http.begin("api.thingshub.org", 3000, url, root_ca); // Specify the URL and certificate
-    http.addHeader("thapikey", "491e94d9-9041-4e5e-b6cb-9dad91bbf63d");
-    http.addHeader("Content-Type", "application/json");
-    
+ 
     serializeJson(doc, jsonDoc);
 
-    int httpCode = http.PUT(jsonDoc);
+    int httpCode = http.PUT(jsonDoc);    
 #ifdef DEBUG_RESTCALL
     DPRINTF("RestCall Http return code : %d\n", httpCode);
 #endif
@@ -1185,10 +1175,11 @@ void loop()
     http.end(); //Free resources
 
     restCallInterval = millis();
+
 #ifdef DEBUG_TIMING
-  after = millis();
-  DPRINTF("HTTPCall::loop() after: %lu - diff: %lu\n", after, after - before);
-#endif    
+    after = millis();
+    DPRINTF("after: %lu - diff: %lu\n", after, after - before);
+#endif 
 /*
     DPRINT("getFreeHeap : ");
     DPRINTLN(ESP.getFreeHeap());
@@ -1197,15 +1188,16 @@ void loop()
   //
 #ifdef DEBUG_TIMING
   before = millis();
-  // DPRINTF("SocketIOManager::loop() before: %lu\n", before);
+  DPRINTF("SocketIOManager::loop() before: %lu - ", before);
 #endif
   SocketIOManager::loop();
 #ifdef DEBUG_TIMING
   after = millis();
-  // DPRINTF("SocketIOManager::loop() after: %lu - diff: %lu\n", after, after - before);
+  DPRINTF("after: %lu - diff: %lu\n", after, after - before);
 #endif
 #ifdef DEBUG_TIMING
   after = millis();
-  // DPRINTF("Main::loop() after: %lu - diff: %lu\n", after, after - mainBefore);
+  DPRINTF("Main::loop() after: %lu - diff: %lu\n", after, after - mainBefore);
+  DPRINTLN("---------------------------------------------------------------------------------");
 #endif
 }
