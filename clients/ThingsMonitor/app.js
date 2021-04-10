@@ -46,6 +46,7 @@ if (!configThingKind) {
 }
 
 //
+/*
 const ThingsConfigs = new Map([
 	["f4c3c80b-d561-4a7b-80a5-f4805fdab9bb", {// My home
 		config: {
@@ -130,7 +131,100 @@ const ThingsConfigs = new Map([
 		}		
 	}]
 ]);
-
+*/
+const ThingsConfigs = new Map([
+	["f4c3c80b-d561-4a7b-80a5-f4805fdab9bb", {// My home
+		config: {
+			configThingId: "fb9071b5-133a-4716-86c6-4e14d798a2d1", // My Home - Config
+			thingKind: "Home appliance", // Home appliance
+			onUpdateThingValueInterval: 20 * 1000, // 10 seconds - Bees pull every 5 seconds		
+			emails: ["cmcampione@gmail.com"],
+			thingName: "My Home",
+			checkInterval: null,
+			// Specific for Home appliance
+			sensors: new Map([
+				["MAT-ALSTATE", {
+					sensorName: "In allarme",
+					onUpdateThingValueAlarmValue: 1
+				}],
+				["MAT-AURSTATE", {
+					sensorName: "Antifurto Armato da remoto",
+					onUpdateThingValueAlarmValue: 1
+				}],
+				["MAT-AUSTATE", {
+					sensorName: "Antifurto Armato",
+					onUpdateThingValueAlarmValue: 1
+				}],
+				["MAT-DASTATE", {
+					sensorName: "Porta d'ingresso aperta",
+					onUpdateThingValueAlarmValue: 1
+				}],
+				["MAT-IASTATE", {
+					sensorName: "Porte balconi aperte",
+					onUpdateThingValueAlarmValue: 1
+				}],
+				["MAT-AASTATE", {
+					sensorName: "Antitamper aperto",
+					onUpdateThingValueAlarmValue: 1
+				}]
+			])
+		},
+		status: {
+			lastOnUpdateThingValueEvent: null,
+			inAlarmForDelay: false,
+			sensors: new Map([
+				["MAT-ALSTATE", {
+					inAlarmForAlarm: false,
+					emailAlarmSending: false,
+					emailAlarmSent: false
+				}],
+				["MAT-AURSTATE", {
+					inAlarmForAlarm: false,
+					emailAlarmSending: false,
+					emailAlarmSent: false
+				}],
+				["MAT-AUSTATE", {
+					inAlarmForAlarm: false,
+					emailAlarmSending: false,
+					emailAlarmSent: false
+				}],
+				["MAT-DASTATE", {
+					inAlarmForAlarm: false,
+					emailAlarmSending: false,
+					emailAlarmSent: false
+				}],
+				["MAT-IASTATE", {
+					inAlarmForAlarm: false,
+					emailAlarmSending: false,
+					emailAlarmSent: false
+				}],
+				["MAT-AASTATE", {
+					inAlarmForAlarm: false,
+					emailAlarmSending: false,
+					emailAlarmSent: false
+				}]
+			])
+		}
+	}],
+	["3601b4c5-706d-4917-ac21-3c2ef1f01fd0", {// My car
+		config: {
+			configThingId: "",
+			thingKind: "c3aa4d95-4cb4-415c-a251-7fe846e0fd17", // GPS
+			onUpdateThingValueInterval: 30 * 1000, // 20 seconds - GPS pull every 15 seconds		
+			emails: ["cmcampione@gmail.com"],
+			thingName: "My Car",
+			checkInterval: null,
+			// Specific for GPS
+		},
+		status: {
+			lastOnUpdateThingValueEvent: null,
+			inAlarmForDelay: false,
+			inAlarmForAlarm: false,
+			emailAlarmSending: false,
+			emailAlarmSent: false
+		}		
+	}]
+]);
 //
 async function SendAlarmEmailForDelay(emails, thingName, delay, culture) {
 
