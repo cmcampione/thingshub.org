@@ -463,17 +463,17 @@ private:
     { // AntiTheaf - ArmedUnarmed
       sensors["MAT-AUSTATE"].name = "Antifurto Principale - ArmatoDisarmato";
       sensors["MAT-AUSTATE"].deviceId = 1000;
-      // sensors["MAT-AUSTATE"].prior = true;
+      sensors["MAT-AUSTATE"].prior = true;
     }
     { // AntiTheaf - ArmedUnarmedLocal
       sensors["MAT-AULSTATE"].name = "Antifurto Principale - ArmatoDisarmato Local";
       sensors["MAT-AULSTATE"].deviceId = 1000;
-      // sensors["MAT-AUSTATE"].prior = true;
+      sensors["MAT-AUSTATE"].prior = true;
     }
     { // AntiTheaf - ArmedUnarmedRemote
       sensors["MAT-AURSTATE"].name = "Antifurto Principale - ArmatoDisarmato Remote";
       sensors["MAT-AURSTATE"].deviceId = 1000;
-      // sensors["MAT-AUSTATE"].prior = true;
+      sensors["MAT-AUSTATE"].prior = true;
 
       SetPoint setPoint;
       setPoint.min = LOW;
@@ -497,17 +497,17 @@ private:
     { // AntiTheaf - Porte balcone
       sensors["MAT-IASTATE"].name = "Antifurto Principale - Porte balcone aperte-chiuse";
       sensors["MAT-IASTATE"].deviceId = 1000;
-      // sensors["MAT-IASTATE"].prior = true;
+      sensors["MAT-IASTATE"].prior = true;
     }
     { // AntiTheaf - Porta ingresso
       sensors["MAT-DASTATE"].name = "Antifurto Principale - Porta ingresso aperta-chiusa";
       sensors["MAT-DASTATE"].deviceId = 1000;
-      // sensors["MAT-DASTATE"].prior = true;
+      sensors["MAT-DASTATE"].prior = true;
     }
     { // AntiTheaf - Anti Tamper
       sensors["MAT-AASTATE"].name = "Antifurto Principale - Anti Tamper aperto-chiuso";
       sensors["MAT-AASTATE"].deviceId = 1000;
-      // sensors["MAT-AASTATE"].prior = true;
+      sensors["MAT-AASTATE"].prior = true;
     }
   }
 public:
