@@ -3,12 +3,15 @@
 
 #include <map>
 #include <vector>
-#include "WiFi.h"
-#include "HTTPClient.h"
-#include "WebSocketsClient.h"
-#include "SocketIOclient.h"
-#include "RCSwitch.h"
-#include "ArduinoJson.h"
+#include <WiFi.h>
+#include <HTTPClient.h>
+#include <ESPmDNS.h>
+#include <WiFiUdp.h>
+#include <ArduinoOTA.h>
+#include <WebSocketsClient.h>
+#include <SocketIOclient.h>
+#include <RCSwitch.h>
+#include <ArduinoJson.h>
 #include "BuildDefine.h"
 #include "antitheft.h"
 
@@ -1104,6 +1107,33 @@ void setup()
   BeeStatus::setup();
   // WiFi setup
   WiFiManager::connect();
+  // OTA
+  ArduinoOTA
+    .onStart([]() {
+      String type;
+      if (ArduinoOTA.getCommand() == U_FLASH)
+        type = "sketch";
+      else // U_SPIFFS
+        type = "filesystem";
+
+      // NOTE: if updating SPIFFS this would be the place to unmount SPIFFS using SPIFFS.end()
+      Serial.println("Start updating " + type);
+    })
+    .onEnd([]() {
+      Serial.println("\nEnd");
+    })
+    .onProgress([](unsigned int progress, unsigned int total) {
+      Serial.printf("Progress: %u%%\r", (progress / (total / 100)));
+    })
+    .onError([](ota_error_t error) {
+      Serial.printf("Error[%u]: ", error);
+      if (error == OTA_AUTH_ERROR) Serial.println("Auth Failed");
+      else if (error == OTA_BEGIN_ERROR) Serial.println("Begin Failed");
+      else if (error == OTA_CONNECT_ERROR) Serial.println("Connect Failed");
+      else if (error == OTA_RECEIVE_ERROR) Serial.println("Receive Failed");
+      else if (error == OTA_END_ERROR) Serial.println("End Failed");
+    });
+  ArduinoOTA.begin();
   // SocketIO setup
   SocketIOManager::on("onUpdateThingValue", onUpdateThingValue);
   SocketIOManager::beginSocketSSLWithCA("api.thingshub.org", 3000, "/socket.io/?EIO=4&token=491e94d9-9041-4e5e-b6cb-9dad91bbf63d", root_ca, "arduino");
@@ -1115,7 +1145,6 @@ void loop()
   unsigned long before = 0;
   unsigned long after = 0;
   unsigned long mainBefore = millis();
-  DPRINTF("Main::loop() before: %lu\n", mainBefore);
 #endif
   //
 #ifdef DEBUG_TIMING
@@ -1139,6 +1168,16 @@ void loop()
 #endif
   if (WiFi.status() != WL_CONNECTED)
     return;
+  //
+#ifdef DEBUG_TIMING
+  before = millis();
+  DPRINTF("ArduinoOTA.handle() before: %lu - ", before);
+#endif
+   ArduinoOTA.handle();
+#ifdef DEBUG_TIMING
+  after = millis();
+  DPRINTF("ArduinoOTA.handle() after: %lu - diff: %lu\n", after, after - before);
+#endif   
   //
   if ((immediately == true) || (millis() - restCallInterval >= 5000))
   {
@@ -1197,7 +1236,7 @@ void loop()
 #endif
 #ifdef DEBUG_TIMING
   after = millis();
-  DPRINTF("Main::loop() after: %lu - diff: %lu\n", after, after - mainBefore);
+  DPRINTF("Main::loop() before: %lu - after: %lu - diff: %lu\n",mainBefore, after, after - mainBefore);
   DPRINTLN("---------------------------------------------------------------------------------");
 #endif
 }
