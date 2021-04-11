@@ -79,7 +79,7 @@ export class ThingsDataContext {
             // ToDo: response in undefined if request was cancelled
             if (axios.isCancel(response)) {
                 console.log('Request canceled', response.message);
-              }
+            }
             throw(response);
         })       
         .finally(function() {
