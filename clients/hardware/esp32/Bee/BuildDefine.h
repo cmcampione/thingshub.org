@@ -1,7 +1,7 @@
 #ifndef BuildDefine_h
 #define BuildDefine_h
 
-#define DEBUG
+//#define DEBUG
 #ifdef DEBUG    //Macros are usually in all capital letters.
   #define DPRINT(...)    Serial.print(__VA_ARGS__)     //DPRINT is a macro, debug print
   #define DPRINTF(...)   Serial.printf(__VA_ARGS__)     //DPRINT is a macro, debug print
@@ -18,7 +18,7 @@
 //#define DEBUG_RCSENSORSMANAGER
 //#define DEBUG_SOCKETIOMANAGER
 //#define DEBUG_RESTCALL
-#define DEBUG_TIMING
+//#define DEBUG_TIMING
 #endif
 
 #define WIFISETUPEXTERNAL

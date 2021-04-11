@@ -28,11 +28,11 @@ class UserDTO {
 	constructor(user, fullInfos) {
 		this.id = user._id;
 		this.name = user.name;
-  
+
 		if (!fullInfos) {
 			return;
 		}
-  
+
 		this.emails = [];
 		this.username = user.userName;
 		user.emails.foreach(email => this.emails.push(new EmailDTO(email)));

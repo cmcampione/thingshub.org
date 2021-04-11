@@ -1173,7 +1173,7 @@ void loop()
   before = millis();
   DPRINTF("ArduinoOTA.handle() before: %lu - ", before);
 #endif
-   ArduinoOTA.handle();
+  ArduinoOTA.handle();
 #ifdef DEBUG_TIMING
   after = millis();
   DPRINTF("ArduinoOTA.handle() after: %lu - diff: %lu\n", after, after - before);
@@ -1194,7 +1194,7 @@ void loop()
     http.addHeader("thapikey", "491e94d9-9041-4e5e-b6cb-9dad91bbf63d");
     http.addHeader("Content-Type", "application/json");
     char jsonDoc[512];
- 
+
     serializeJson(doc, jsonDoc);
 
     int httpCode = http.PUT(jsonDoc);    
