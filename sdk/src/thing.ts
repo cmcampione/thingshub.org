@@ -17,7 +17,7 @@ export class Thing {
     
     public creationDateTime: Date
 
-    public name:string = ""
+    public name: string = ""
 
     public kind: string = ""
 

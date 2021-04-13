@@ -6,5 +6,6 @@
         "string": "cpp",
         "unordered_map": "cpp",
         "unordered_set": "cpp"
-    }
+    },
+    "C_Cpp.intelliSenseEngineFallback": "Enabled"
 }

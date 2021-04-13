@@ -460,6 +460,7 @@ private:
       sensors["Temperatura-01"].deviceId = 35;
     }
 */
+
     { // AntiTheaf - ArmedUnarmed
       sensors["MAT-AUSTATE"].name = "Antifurto Principale - ArmatoDisarmato";
       sensors["MAT-AUSTATE"].deviceId = 1000;
@@ -1117,21 +1118,21 @@ void setup()
         type = "filesystem";
 
       // NOTE: if updating SPIFFS this would be the place to unmount SPIFFS using SPIFFS.end()
-      Serial.println("Start updating " + type);
+      DPRINTLN("Start updating " + type);
     })
     .onEnd([]() {
-      Serial.println("\nEnd");
+      DPRINTLN("\nEnd");
     })
     .onProgress([](unsigned int progress, unsigned int total) {
-      Serial.printf("Progress: %u%%\r", (progress / (total / 100)));
+      DPRINTF("Progress: %u%%\r", (progress / (total / 100)));
     })
     .onError([](ota_error_t error) {
-      Serial.printf("Error[%u]: ", error);
-      if (error == OTA_AUTH_ERROR) Serial.println("Auth Failed");
-      else if (error == OTA_BEGIN_ERROR) Serial.println("Begin Failed");
-      else if (error == OTA_CONNECT_ERROR) Serial.println("Connect Failed");
-      else if (error == OTA_RECEIVE_ERROR) Serial.println("Receive Failed");
-      else if (error == OTA_END_ERROR) Serial.println("End Failed");
+      DPRINTF("Error[%u]: ", error);
+      if (error == OTA_AUTH_ERROR) DPRINTLN("Auth Failed");
+      else if (error == OTA_BEGIN_ERROR) DPRINTLN("Begin Failed");
+      else if (error == OTA_CONNECT_ERROR) DPRINTLN("Connect Failed");
+      else if (error == OTA_RECEIVE_ERROR) DPRINTLN("Receive Failed");
+      else if (error == OTA_END_ERROR) DPRINTLN("End Failed");
     });
   ArduinoOTA.begin();
   // SocketIO setup
