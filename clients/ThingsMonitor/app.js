@@ -53,7 +53,7 @@ const ThingsConfigs = new Map([
 			configThingId: "fb9071b5-133a-4716-86c6-4e14d798a2d1", // My Home - Config
 			thingKind: "Home appliance", // Home appliance
 			onUpdateThingValueInterval: 20 * 1000, // 10 seconds - Bees pull every 5 seconds		
-			emails: ["cmcampione@gmail.com"],
+			emails: ["info@thingshub.org"],
 			thingName: "My Home",
 			checkInterval: null,
 			// Specific for Home appliance
@@ -117,7 +117,7 @@ const ThingsConfigs = new Map([
 			configThingId: "",
 			thingKind: "c3aa4d95-4cb4-415c-a251-7fe846e0fd17", // GPS
 			onUpdateThingValueInterval: 30 * 1000, // 20 seconds - GPS pull every 15 seconds		
-			emails: ["cmcampione@gmail.com"],
+			emails: ["info@thingshub.org"],
 			thingName: "My Car",
 			checkInterval: null,
 			// Specific for GPS
@@ -138,7 +138,7 @@ const ThingsConfigs = new Map([
 			configThingId: "fb9071b5-133a-4716-86c6-4e14d798a2d1", // My Home - Config
 			thingKind: "Home appliance", // Home appliance
 			onUpdateThingValueInterval: 20 * 1000, // 10 seconds - Bees pull every 5 seconds		
-			emails: ["cmcampione@gmail.com"],
+			emails: ["info@thingshub.org"],
 			thingName: "My Home",
 			checkInterval: null,
 			// Specific for Home appliance
@@ -211,7 +211,7 @@ const ThingsConfigs = new Map([
 			configThingId: "",
 			thingKind: "c3aa4d95-4cb4-415c-a251-7fe846e0fd17", // GPS
 			onUpdateThingValueInterval: 30 * 1000, // 20 seconds - GPS pull every 15 seconds		
-			emails: ["cmcampione@gmail.com"],
+			emails: ["info@thingshub.org"],
 			thingName: "My Car",
 			checkInterval: null,
 			// Specific for GPS
@@ -374,7 +374,7 @@ function onConnectError(error) {
 //
 const globalConfig = {
 	disconnectionTimeout: 10000, // 10 seconds
-	emails: ["cmcampione@gmail.com"]
+	emails: ["info@thingshub.org"]
 };
 const globalConfigStatus = {
 	isConnected: false,
