@@ -68,5 +68,4 @@ thingsMonitor.env
 # End of https://www.gitignore.io/api/node
 
 .vscode/c_cpp_properties.json
-.vscode/arduino.json
-.vscode/settings.json
+
