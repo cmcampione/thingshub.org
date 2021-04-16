@@ -139,7 +139,7 @@ const ThingsConfigs = new Map([
 		config: {
 			configThingId: "fb9071b5-133a-4716-86c6-4e14d798a2d1", // My Home - Config
 			thingKind: "Home appliance", // Home appliance
-			onUpdateThingValueInterval: 20 * 1000, // 10 seconds - Bees pull every 5 seconds		
+			onUpdateThingValueInterval: 20 * 1000, // 20 seconds - Bees pull every 5 seconds		
 			emails: [defaultAlertEmail],
 			thingName: "My Home",
 			checkInterval: null,
