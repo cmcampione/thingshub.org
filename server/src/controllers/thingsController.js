@@ -7,9 +7,11 @@ const express 			= require("express");
 const passport 			= require("passport");
 
 const utils 			= require("../utils.js");
+const logger			= require("../logger");
 const thConstants 		= require("../../../common/src/thConstants");
 const thingsMngr		= require("../bl/thingsMngr");
 const RealtimeNotifier 	= require("../realtimeNotifier");
+
 
 const router 			= express.Router();
 
@@ -159,6 +161,7 @@ router.put("/:id", async function (req, res, next){
 router.put("/:id/value", async function (req, res, next) {
 	await passport.authenticate(["localapikey", "bearer"], { session: false }, async function(err, user, info) {
 		try {
+			
 			if (err)
 				return next(err); 
 
@@ -169,17 +172,19 @@ router.put("/:id/value", async function (req, res, next) {
 			if (!thingId)
 				throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Thing's Id can't be null", 105);
 
+			logger.info("PUT ../api/things/" + thingId,{ code: 130 });
+
 			let value = req.body;
 			if (!value)
 				throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "The body message is empty", 106);
 
 			let blResult = await thingsMngr.updateThingValue(user, thingId, value, false);
 			if (!blResult)
-				return; // TODO: According to the restful paradigm what should the PUT return?
+				return; // ToDo: According to the restful paradigm what should the PUT return?
 
 			RealtimeNotifier.onUpdateThingValue(blResult, thingId, value, false);
 
-			// TODO: According to the restful paradigm what should the PUT return?
+			// ToDo: According to the restful paradigm what should the PUT return?
 			res.json(value);
 
 		}  catch (e)  {

@@ -36,13 +36,13 @@ const logger = createLogger({
 			)
 		})/* ,
     new transports.File({
-      filename,
-      format: format.combine(
+		filename,
+		format: format.combine(
         format.printf(
-          info =>
+			info =>
             `${info.timestamp} ${info.level} [${info.label}]: ${info.message}`
         )
-      )
+    )
     }) */
 	]
 });
