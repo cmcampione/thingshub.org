@@ -807,6 +807,8 @@ exports.updateThingValue = async (user, thingId, value, asCmd) => {
 		let usersIdsToNotify = await getUsersIdsToNotify(thing, true);
 
 		if (asCmd == false) {
+			if (typeof value !== "object")
+				throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "The body message is not a valid JSON object", 132);
 			thing.set({value});
 			thingModel.save(thing);
 		}

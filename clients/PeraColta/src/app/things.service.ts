@@ -23,6 +23,7 @@ export class ThingsService implements OnDestroy {
   // ToDo: Could be a singleton. Need to create a ThingsDataContextService
   private readonly thingsDatacontext = new ThingsDataContext(endPointAddress, this.accountService.getSecurityHeader);
 
+  // ToDo: Set private
   public readonly thingsManager: ThingsManager;
 
   private readonly onUpdateThingValue = (thingId: string, value: any, asCmd: boolean): void => {
@@ -34,7 +35,9 @@ export class ThingsService implements OnDestroy {
     console.log('asCmd   : ' + asCmd);
   }
 
-  constructor(@Inject('thingKind') thingKind: string, private readonly accountService: AccountService,
+  constructor(@Inject('thingKind') thingKind: string, 
+    private readonly accountService: AccountService,
+    // ToDo: Set private
     public readonly realTimeConnector: RealTimeConnectorService) {
 
     this.thingsManager = new ThingsManager(this.mainThing,

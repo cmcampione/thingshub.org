@@ -1,5 +1,5 @@
-#ifndef BuildDefine_h
-#define BuildDefine_h
+#ifndef _BuildDefine_h_
+#define _BuildDefine_h_
 
 //#define DEBUG
 #ifdef DEBUG    //Macros are usually in all capital letters.
@@ -12,14 +12,13 @@
   #define DPRINTLN(...)   //now defines a blank line
 #endif
 
-#ifdef DEBUG
 //#define DEBUG_BEESTATUS
 //#define DEBUG_BEESTATUS_VERBOSE
 //#define DEBUG_RCSENSORSMANAGER
 //#define DEBUG_SOCKETIOMANAGER
 //#define DEBUG_RESTCALL
 //#define DEBUG_TIMING
-#endif
+#define DEBUG_REST_TIMING
 
 #define WIFISETUPEXTERNAL
 

@@ -3,59 +3,24 @@
 
 #include <map>
 #include <vector>
-#include <WiFi.h>
 #include <HTTPClient.h>
 #include <ESPmDNS.h>
 #include <WiFiUdp.h>
 #include <ArduinoOTA.h>
-#include <WebSocketsClient.h>
-#include <SocketIOclient.h>
-#include <RCSwitch.h>
 #include <ArduinoJson.h>
 #include "BuildDefine.h"
-#include "antitheft.h"
+#include "WiFiMngr.h"
+#include "RCSensorsMngr.h"
+#include "AntiTheft.h"
+#include "SocketIOMngr.h"
 
 // Max capacity for actual msg
-const int sensorsCount = 10;
-const int sensorsFieldCount = 4;
+// const int sensorsCount = 20;
+// const int sensorsFieldCount = 4;
 
 // ESP32
-const int msgCapacity = 1024; // To Check. Do not move from here, some compilation error or compiler bug
-const int sensorsCapacity = JSON_OBJECT_SIZE(1) + JSON_ARRAY_SIZE(sensorsCount) + sensorsCount * JSON_OBJECT_SIZE(sensorsFieldCount) + 175; // To Change
-
-//
-class RCSensorsManager
-{
-private:
-  static RCSwitch mySwitch;  
-public:
-  static void init(int pin)
-  {
-    mySwitch.enableReceive(pin);
-  }
-public:
-  static bool available()
-  {
-    return mySwitch.available();
-  }
-  static long getReceivedValue()
-  {
-    long value = mySwitch.getReceivedValue();
-#ifdef DEBUG_RCSENSORSMANAGER
-    DPRINT("RCSENSORSMANAGER - Received ");
-    DPRINT(value);
-    DPRINT(" / ");
-    DPRINT(mySwitch.getReceivedBitlength());
-    DPRINT("bit ");
-    DPRINT("Protocol: ");
-    DPRINT(mySwitch.getReceivedProtocol());
-    DPRINTLN();
-#endif
-    mySwitch.resetAvailable();
-    return value;
-  }
-};
-RCSwitch RCSensorsManager::mySwitch = RCSwitch(); // ToDo: Do a copy? As example
+// const int sensorsCapacity = JSON_OBJECT_SIZE(1) + JSON_ARRAY_SIZE(sensorsCount) + sensorsCount * JSON_OBJECT_SIZE(sensorsFieldCount) + 175; // To Change
+const int sensorsCapacity = 1024;
 
 //
 struct PWM
@@ -116,7 +81,13 @@ struct SetPoint
   int min;
   int max;
 
+  bool prior;
+
   setPointItem_collection setPointItems;
+
+  public:
+    SetPoint() : min(0), max(0), prior(false) {
+  }
 };
 typedef std::vector<SetPoint> setPoint_collection;
 typedef setPoint_collection::const_iterator setPoint_const_iterator;
@@ -461,6 +432,18 @@ private:
     }
 */
 
+    { // Diagnostic
+      sensors["DIAG-HTTP-CLE"].name = "Ultimo errore durante la chiamata http";
+      sensors["DIAG-HTTP-CLE"].deviceId = 1001;
+      sensors["DIAG-HTTP-CLE"].prior = true;
+    }
+
+    { // Diagnostic
+      sensors["DIAG-HTTP-TLC"].name = "Tempo trascorso ultima chiamata HTTP";
+      sensors["DIAG-HTTP-TLC"].deviceId = 1001;
+      sensors["DIAG-HTTP-TLC"].prior = false;
+    }
+
     { // AntiTheaf - ArmedUnarmed
       sensors["MAT-AUSTATE"].name = "Antifurto Principale - ArmatoDisarmato";
       sensors["MAT-AUSTATE"].deviceId = 1000;
@@ -479,7 +462,8 @@ private:
       SetPoint setPoint;
       setPoint.min = LOW;
       setPoint.max = HIGH;
-
+      // setPoint.prior = true // It's not necessary because sensor.prior is already used
+      
       SetPointItem setPointRemoteArmUnarmItem;
       setPointRemoteArmUnarmItem.deviceId = 1000;
       setPointRemoteArmUnarmItem.itemId = "MAT-AURSTATE";
@@ -510,6 +494,7 @@ private:
       sensors["MAT-AASTATE"].deviceId = 1000;
       sensors["MAT-AASTATE"].prior = true;
     }
+
   }
 public:
   static void setup()
@@ -614,13 +599,17 @@ private:
 #endif
   }
 private:
-  static void checkSetPoints(const setPoint_collection& setPoints, int value)
+  static bool checkSetPoints(const setPoint_collection& setPoints, int value)
   {
+    bool prior = false;
     for (setPoint_const_iterator it = setPoints.begin(); it != setPoints.end(); it++)
     {
       const SetPoint& setPoint = *it;
       if (value >= setPoint.min && value <= setPoint.max)
       {
+        if (prior == false)
+          prior = setPoint.prior;
+
         for (setPointItem_const_iterator item = setPoint.setPointItems.begin(); item != setPoint.setPointItems.end(); item++)
         {
           const SetPointItem& setPointItem = *item;
@@ -641,27 +630,30 @@ private:
         }
       }
     }
+    return prior;
   }
 private:
   static bool setSensorsValueFromDeviceId(int deviceId, int value)
   {
-    bool immediately = false;
+    bool prior = false;
     for (sensor_iterator it = sensors.begin(); it != sensors.end(); it++)
     {
       Sensor& sensor = it->second;
       if (sensor.deviceId != deviceId)
         continue;
 
-      if (immediately == false)
-        immediately = sensor.prior;
+      if (prior == false)
+        prior = sensor.prior;
 
       sensor.now    = true;
       sensor.millis = millis();
       sensor.value  = value;
 
-      checkSetPoints(sensor.setPoints, value);
+      bool lPrior = checkSetPoints(sensor.setPoints, value);
+      if (prior == false)
+        prior = lPrior;
     }
-    return immediately;
+    return prior;
   }
 public:
   static bool setSensorValue(const char* sensorId, int value)
@@ -682,20 +674,20 @@ public:
     sensor.millis = millis();
     sensor.value  = value;
 
-    checkSetPoints(sensor.setPoints, value);
+    bool prior = checkSetPoints(sensor.setPoints, value);
 
-    return sensor.prior;
+    return (sensor.prior || prior);
   }
 public:
   static bool loop()
   {
-    bool immediately = false;
+    bool prior = false;
     for (device_const_iterator it = devices.begin(); it != devices.end(); it++)
     {
       int deviceId          = it->first;
       const Device& device  = it->second;
 #ifdef DEBUG_BEESTATUS_VERBOSE
-      // DPRINTF("BEESTATUS - Elaborating Device Id: %d Kind: %s\n", pinN, pin.kind.c_str());
+      // DPRINTF("BEESTATUS - Elaborating Device Id: %d Kind: %d\n", deviceId, device.kind);
 #endif
       if (device.kind == Device::Kind::DigitalOutput)
       {
@@ -711,9 +703,9 @@ public:
 #ifdef DEBUG_BEESTATUS_VERBOSE
         DPRINTF("BEESTATUS - Read Device id: %d Kind: %d analogic value: %d\n", deviceId, device.kind, value);
 #endif
-        int prior = setSensorsValueFromDeviceId(deviceId, value);
-        if (immediately == false)
-          immediately = prior;
+        bool lPrior = setSensorsValueFromDeviceId(deviceId, value);
+        if (prior == false)
+          prior = lPrior;        
         continue;
       }
       if (device.kind == Device::Kind::RC)
@@ -726,9 +718,9 @@ public:
 #ifdef DEBUG_BEESTATUS
         DPRINTF("BEESTATUS - Read Device Id: %d Kind: %d Item Id: %s\n", deviceId, device.kind, sensorIdStr.c_str());
 #endif
-        int prior = setSensorValue(sensorIdStr.c_str(), HIGH);
-        if (immediately == false)
-          immediately = prior;
+        bool lPrior = setSensorValue(sensorIdStr.c_str(), HIGH);
+        if (prior == false)
+          prior = lPrior;
         continue;
       }
       if (device.kind == Device::Kind::AntiTheft) {
@@ -736,17 +728,18 @@ public:
         for (AntiTheft::const_iterator it = device.pAntiTheft->begin(); it != device.pAntiTheft->end(); it++) {
           String      sensorId     = it->first;
           const int*  sensorValue  = it->second;
-          int prior = setSensorValue(sensorId.c_str(), *sensorValue);
-          if (immediately == false)
-            immediately = prior;
+
+          bool lPrior = setSensorValue(sensorId.c_str(), *sensorValue);
+          if (prior == false)
+            prior = lPrior;
         }
         continue;
       }
 #ifdef DEBUG_BEESTATUS
-      DPRINTF("BEESTATUS - Device Id: %d Kind: %d not found\n", deviceId, device.kind);
+      DPRINTF("BEESTATUS - Device Id: %d Kind: %d Device kind not elaborate\n", deviceId, device.kind);
 #endif
     }
-    return immediately;
+    return prior;
   }
 public:
   static void toJson(StaticJsonDocument<sensorsCapacity>& doc)
@@ -773,7 +766,7 @@ public:
       */
 #ifdef DEBUG_BEESTATUS_VERBOSE
     // Declare a buffer to hold the result
-    char output[1024]; // To check
+    char output[sensorsCapacity]; // To check
     int count = 0;
 #endif
     doc.clear();
@@ -806,182 +799,11 @@ public:
   }
 };
 const char* BeeStatus::thingCnfg = "";
-const char* BeeStatus::thingValue = "f4c3c80b-d561-4a7b-80a5-f4805fdab9bb";
+const char* BeeStatus::thingValue = "f4c3c80b-d561-4a7b-80a5-f4805fdab9bb"; // AntiTheft
+// const char* BeeStatus::thingValue = "73e545e2-6be9-4281-bd48-ab82c9b792f3"; // Various sensors
 
 device_collection BeeStatus::devices;
 sensor_collection BeeStatus::sensors;
-
-// WiFi
-class WiFiManager
-{
-private:
-  static const char *wifi_ssid;
-  static const char *wifi_password;
-
-  static const unsigned long check_wifi_interval;
-
-  static boolean wifi_reconnection;
-  static unsigned long check_wifi;
-
-public:
-  WiFiManager()
-  {
-  }
-  static void connect()
-  {
-    do
-    {
-      WiFi.begin(WiFiManager::wifi_ssid, WiFiManager::wifi_password);
-      delay(5000);
-      DPRINTLN("Connecting to WiFi...");
-    } while (WiFi.status() != WL_CONNECTED);
-    DPRINTLN("Connected to the WiFi");
-  }
-  static void loop()
-  {
-    // if wifi is down, try reconnecting every 15 seconds
-    if (WiFi.status() != WL_CONNECTED)
-    {
-      WiFiManager::wifi_reconnection = true;
-      if (millis() - WiFiManager::check_wifi >= WiFiManager::check_wifi_interval)
-      {
-        WiFiManager::check_wifi = millis();
-        WiFi.disconnect();
-        WiFi.begin(WiFiManager::wifi_ssid, WiFiManager::wifi_password);
-        DPRINTLN("Reconnecting to WiFi...");
-      }
-    }
-    if ((WiFi.status() == WL_CONNECTED) && (WiFiManager::wifi_reconnection == true))
-    {
-      WiFiManager::wifi_reconnection = false;
-      DPRINTLN("Reconnected to WiFi");
-    }
-  }
-};
-
-#ifdef WIFISETUPEXTERNAL
-
-#include "WiFiSetup.h"
-
-#else
-
-const char *WiFiManager::wifi_ssid = "";
-const char *WiFiManager::wifi_password = "";
-
-#endif
-
-const unsigned long WiFiManager::check_wifi_interval = 15000;
-unsigned long WiFiManager::check_wifi = 0;
-boolean WiFiManager::wifi_reconnection = false;
-
-// SocketIO
-class SocketIOManager
-{
-private:
-  static SocketIOclient webSocket;
-  static std::map<String, std::function<void(const StaticJsonDocument<msgCapacity>&)>> events;
-private:
-  static void trigger(const StaticJsonDocument<msgCapacity> &jMsg)
-  {
-    const char* event = jMsg[0];
-    auto e = events.find(event);
-    if (e != events.end())
-    {
-      e->second(jMsg);
-    }
-    else
-    {
-#ifdef DEBUG_SOCKETIOMANAGER
-      DPRINTF("DEBUG_SOCKETIOMANAGER - event %s not found. %d events available\n", event, events.size());
-#endif
-    }
-  }
-  static void handleEvent(socketIOmessageType_t type, uint8_t *payload, size_t length)
-  {
-    StaticJsonDocument<msgCapacity> jMsg;
-    switch (type)
-    {
-      case sIOtype_DISCONNECT:
-#ifdef DEBUG_SOCKETIOMANAGER
-            DPRINTF("[IOc] Disconnected!\n");
-#endif            
-            break;
-      case sIOtype_CONNECT:
-#ifdef DEBUG_SOCKETIOMANAGER
-          DPRINTF("[IOc] Connected to url: %s\n", payload);
-#endif
-          // join default namespace (no auto join in Socket.IO V3)
-          webSocket.send(sIOtype_CONNECT, "/");
-          break;
-      case sIOtype_ACK:
-#ifdef DEBUG_SOCKETIOMANAGER      
-          DPRINTF("[IOc] get ack: %u\n", length);
-#endif          
-          break;
-      case sIOtype_ERROR:
-#ifdef DEBUG_SOCKETIOMANAGER      
-          DPRINTF("[IOc] get error: %u\n", length);
-#endif
-          break;
-      case sIOtype_BINARY_EVENT:
-#ifdef DEBUG_SOCKETIOMANAGER      
-          DPRINTF("[IOc] get binary: %u\n", length);
-#endif          
-          break;
-      case sIOtype_BINARY_ACK:
-#ifdef DEBUG_SOCKETIOMANAGER      
-          DPRINTF("[IOc] get binary ack: %u\n", length);
-#endif          
-          break;
-      case sIOtype_EVENT:
-        DeserializationError error = deserializeJson(jMsg, payload);
-        if (error)
-        {
-  #ifdef DEBUG_SOCKETIOMANAGER
-          DPRINTF("DEBUG_SOCKETIOMANAGER - deserializeJson() failed: socketIOmessageType_t = %c\n", type);
-          DPRINTF("DEBUG_SOCKETIOMANAGER - payload = %s\n", length == 0 ? (uint8_t *)"" : payload);
-          DPRINTF("DEBUG_SOCKETIOMANAGER - deserializeJson() error: ");
-          DPRINTLN(error.c_str());
-  #endif
-          return;
-        }
-        trigger(jMsg);
-        break;
-    }
-  }
-public:
-  static void on(const char *event, std::function<void(const StaticJsonDocument<msgCapacity> &)> func)
-  {
-    events[event] = func;
-  }
-  static void remove(const char *event)
-  {
-    auto e = events.find(event);
-    if (e != events.end())
-    {
-      events.erase(e);
-    }
-    else
-    {
-#ifdef DEBUG_SOCKETIOMANAGER
-      DPRINTF("DEBUG_SOCKETIOMANAGER - event %s not found, can not be removed\n", event);
-#endif
-    }
-  }
-public:
-  static void beginSocketSSLWithCA(const char *host, uint16_t port, const char *url = "/socket.io/?EIO=4", const char *CA_cert = NULL, const char *protocol = "arduino")
-  {
-    SocketIOManager::webSocket.configureEIOping(true);
-    SocketIOManager::webSocket.onEvent(handleEvent);                     
-    SocketIOManager::webSocket.beginSocketIOSSLWithCA(host, port, url, CA_cert, protocol); 
-  }
-  static void loop()
-  {
-    SocketIOManager::webSocket.loop();
-  }
-};
-SocketIOclient SocketIOManager::webSocket;
-std::map<String, std::function<void(const StaticJsonDocument<msgCapacity> &)>> SocketIOManager::events;
 
 //
 const char* root_ca =
@@ -1143,16 +965,18 @@ void setup()
 void loop()
 {
 #ifdef DEBUG_TIMING
+  unsigned long mainBefore = millis();
+#endif
+#if defined(DEBUG_TIMING) || defined(DEBUG_REST_TIMING)
   unsigned long before = 0;
   unsigned long after = 0;
-  unsigned long mainBefore = millis();
 #endif
   //
 #ifdef DEBUG_TIMING
   before = millis();
   DPRINTF("BeeStatus::loop() before: %lu - ", before);
 #endif
-  bool immediately = BeeStatus::loop();
+  bool prior = BeeStatus::loop();
 #ifdef DEBUG_TIMING
   after = millis();
   DPRINTF("after: %lu - diff: %lu\n", after, after - before);
@@ -1180,9 +1004,9 @@ void loop()
   DPRINTF("ArduinoOTA.handle() after: %lu - diff: %lu\n", after, after - before);
 #endif   
   //
-  if ((immediately == true) || (millis() - restCallInterval >= 5000))
+  if ((prior == true) || (millis() - restCallInterval >= 5000))
   {
-#ifdef DEBUG_TIMING
+#ifdef DEBUG_REST_TIMING
     before = millis();
     DPRINTF("HTTPCall::loop() before: %lu - ", before);
 #endif
@@ -1194,7 +1018,7 @@ void loop()
     http.begin("api.thingshub.org", 3000, url, root_ca); // Specify the URL and certificate
     http.addHeader("thapikey", "491e94d9-9041-4e5e-b6cb-9dad91bbf63d");
     http.addHeader("Content-Type", "application/json");
-    char jsonDoc[512];
+    char jsonDoc[sensorsCapacity];
 
     serializeJson(doc, jsonDoc);
 
@@ -1210,15 +1034,19 @@ void loop()
       DPRINT("RestCall return payload : ");
       DPRINTLN(payload);
 #endif
+#ifdef DEBUG_REST_TIMING
+      BeeStatus::setSensorValue("DIAG-HTTP-CLE", httpCode);
+#endif
     }
 
     http.end(); //Free resources
 
     restCallInterval = millis();
 
-#ifdef DEBUG_TIMING
+#ifdef DEBUG_REST_TIMING
     after = millis();
     DPRINTF("after: %lu - diff: %lu\n", after, after - before);
+    BeeStatus::setSensorValue("DIAG-HTTP-TLC", after - before);
 #endif 
 /*
     DPRINT("getFreeHeap : ");
