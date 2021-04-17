@@ -18,7 +18,7 @@ int armedDelaySpan  = 0;
 int alarmOnSpan     = 0;
 int alarmOfSpan     = 0;
 
-int millis() {
+unsigned long millis() {
     return 1000;
 }
 

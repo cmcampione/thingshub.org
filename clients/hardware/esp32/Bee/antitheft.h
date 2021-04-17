@@ -1,3 +1,6 @@
+#ifndef _AntiTheft_h_
+#define _AntiTheft_h_
+
 #include <map>
 #include <ezButton.h>
 
@@ -289,3 +292,5 @@ class AntiTheft {
       */
     }
 };
+
+#endif

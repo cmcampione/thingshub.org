@@ -172,11 +172,14 @@ router.put("/:id/value", async function (req, res, next) {
 			if (!thingId)
 				throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Thing's Id can't be null", 105);
 
-			logger.info("PUT ../api/things/" + thingId,{ code: 130 });
-
 			let value = req.body;
 			if (!value)
 				throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "The body message is empty", 106);
+
+			if (typeof value !== "object")
+				throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "The body message is not a valid JSON object", 131);
+
+			logger.info("PUT ../api/things/" + thingId + " Value: " + JSON.stringify(value),{ code: 130 });
 
 			let blResult = await thingsMngr.updateThingValue(user, thingId, value, false);
 			if (!blResult)
