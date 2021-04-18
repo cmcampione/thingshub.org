@@ -53,10 +53,14 @@ var corsOptions = {
 app.use(cors(corsOptions));
 
 // parse application/x-www-form-urlencoded
-app.use(bodyParser.urlencoded({ extended: false }));
+// app.use(bodyParser.urlencoded({ extended: false }));
+app.use(express.urlencoded({ 
+	extended: false 
+}));
 
 // parse application/json
-app.use(bodyParser.json());
+// app.use(bodyParser.json());
+app.use(express.json());
 
 // Passport setup
 
