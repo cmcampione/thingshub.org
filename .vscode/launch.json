@@ -2,7 +2,7 @@
     // Usare IntelliSense per informazioni sui possibili attributi.
     // Al passaggio del mouse vengono visualizzate le descrizioni degli attributi esistenti.
     // Per ulteriori informazioni, visitare: https://go.microsoft.com/fwlink/?linkid=830387
-    "version": "0.2.0",
+    "version": "0.2.0",    
     "configurations": [
         
         {
@@ -15,7 +15,8 @@
             "type": "node",
             "request": "launch",
             "name": "Launch ThingsHub Server",            
-            "program": "${workspaceFolder}\\server\\src\\server.js"
+            "program": "${workspaceFolder}\\server\\src\\server.js",
+            "outputCapture": "std"
         },
         {
             "type": "node",
