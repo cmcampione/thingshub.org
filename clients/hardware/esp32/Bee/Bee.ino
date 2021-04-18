@@ -14,12 +14,6 @@
 #include "AntiTheft.h"
 #include "SocketIOMngr.h"
 
-// Max capacity for actual msg
-// const int sensorsCount = 20;
-// const int sensorsFieldCount = 4;
-
-// ESP32
-// const int sensorsCapacity = JSON_OBJECT_SIZE(1) + JSON_ARRAY_SIZE(sensorsCount) + sensorsCount * JSON_OBJECT_SIZE(sensorsFieldCount) + 175; // To Change
 const int sensorsCapacity = 1024;
 
 //
@@ -433,15 +427,15 @@ private:
 */
 
     { // Diagnostic
-      sensors["DIAG-HTTP-CLE"].name = "Ultimo errore durante la chiamata http";
-      sensors["DIAG-HTTP-CLE"].deviceId = 1001;
-      sensors["DIAG-HTTP-CLE"].prior = true;
+      sensors["DIAG-HTTP-CALL-PREV-HTTPCODE"].name = "httcode prima di questa chiamata HTTP";
+      sensors["DIAG-HTTP-CALL-PREV-HTTPCODE"].deviceId = 1001;
+      sensors["DIAG-HTTP-CALL-PREV-HTTPCODE"].prior = true;
     }
 
     { // Diagnostic
-      sensors["DIAG-HTTP-TLC"].name = "Tempo trascorso ultima chiamata HTTP";
-      sensors["DIAG-HTTP-TLC"].deviceId = 1001;
-      sensors["DIAG-HTTP-TLC"].prior = false;
+      sensors["DIAG-HTTP-CALL-PREV-TIMING"].name = "Tempo trascorso prima di questa chiamata HTTP";
+      sensors["DIAG-HTTP-CALL-PREV-TIMING"].deviceId = 1001;
+      sensors["DIAG-HTTP-CALL-PREV-TIMING"].prior = false;
     }
 
     { // AntiTheaf - ArmedUnarmed
@@ -1035,7 +1029,7 @@ void loop()
       DPRINTLN(payload);
 #endif
 #ifdef DEBUG_REST_TIMING
-      BeeStatus::setSensorValue("DIAG-HTTP-CLE", httpCode);
+      BeeStatus::setSensorValue("DIAG-HTTP-CALL-PREV-HTTPCODE", httpCode);
 #endif
     }
 
@@ -1046,7 +1040,7 @@ void loop()
 #ifdef DEBUG_REST_TIMING
     after = millis();
     DPRINTF("after: %lu - diff: %lu\n", after, after - before);
-    BeeStatus::setSensorValue("DIAG-HTTP-TLC", after - before);
+    BeeStatus::setSensorValue("DIAG-HTTP-CALL-PREV-TIMING", after - before);
 #endif 
 /*
     DPRINT("getFreeHeap : ");
