@@ -150,6 +150,7 @@ app.use(passport.session());
 // Routers
 
 app.get("/api", async function (req, res) {
+	
 	let msg = "the bees are laborious";
 
 	let users = await usersManager.find({});
@@ -182,7 +183,7 @@ app.use(function(req, res, next) {
 app.use((err, req, res, next) => {
 	if (err) {
 		let errMsg;
-		if (err.statusCode == null) {
+		if (typeof err.message !== "object") {
 			res.status(httpStatusCodes.INTERNAL_SERVER_ERROR);
 			errMsg = utils.ErrorCustom.formatMessage(9, err);
 			res.json(errMsg);
