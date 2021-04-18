@@ -119,5 +119,4 @@ class SocketIOManager
 SocketIOclient SocketIOManager::webSocket;
 std::map<String, std::function<void(const StaticJsonDocument<msgCapacity> &)>> SocketIOManager::events;
 
-
 #endif

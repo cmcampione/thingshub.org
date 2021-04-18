@@ -95,7 +95,7 @@ export class SensorsService implements OnDestroy {
     return await this.thingsService.putThingValue({ thingId: thing.id, asCmd: true, value: sensorsRaw });
   }
 
-  //
+  // Useful for ngrx
   public async getAllSensors(): Promise<Sensor[]> {
     this.thingsService.init();
     this.thingsService.realTimeConnector.realTimeConnectorRaw.setHook('onUpdateThingValue', this.onUpdateThingValue);
