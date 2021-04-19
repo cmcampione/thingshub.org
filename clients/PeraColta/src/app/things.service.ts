@@ -35,7 +35,7 @@ export class ThingsService implements OnDestroy {
     console.log('asCmd   : ' + asCmd);
   }
 
-  constructor(@Inject('thingKind') thingKind: string, 
+  constructor(@Inject('thingKind') thingKind: string,
     private readonly accountService: AccountService,
     // ToDo: Set private
     public readonly realTimeConnector: RealTimeConnectorService) {
