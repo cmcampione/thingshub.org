@@ -1,5 +1,5 @@
 import { Injectable, OnDestroy } from '@angular/core';
-import { Sensor } from './sensor';
+import { Sensor, SensorKind, SensorKindType } from './sensor';
 import { ThingsService } from './things.service';
 import { Thing, HttpRequestCanceler } from 'thingshub-js-sdk';
 
@@ -9,8 +9,6 @@ interface SensorRaw {
   millis: number;
   value: number;
 }
-
-// it's no iniectable because keep things state
 @Injectable()
 export class SensorsService implements OnDestroy {
 
@@ -65,7 +63,11 @@ export class SensorsService implements OnDestroy {
           millis: sensorRaw.millis,
           value: sensorRaw.value,
           props: {
-            name: thing.name
+            name: thing.name,
+            kind: SensorKind.Undefined,
+            kindType: SensorKindType.Undefined,
+            min: 0,
+            max: 0
           },
           status: {
             now: sensorRaw.now,
@@ -111,7 +113,11 @@ export class SensorsService implements OnDestroy {
           millis: sensorRaw.millis,
           value: sensorRaw.value,
           props: {
-            name: thing.name
+            name: thing.name,
+            kind: SensorKind.Undefined,
+            kindType: SensorKindType.Undefined,
+            min: 0,
+            max: 0
           },
           status: {
             now: sensorRaw.now,

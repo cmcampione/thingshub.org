@@ -33,7 +33,7 @@ struct Device
   }
   public:
     enum class Kind {
-        Undefined,        
+        Undefined = 0,        
         AnalogicInput,
         DigitalOutput,
         PWM,
