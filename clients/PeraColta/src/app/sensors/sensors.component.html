@@ -4,14 +4,19 @@
   </ion-card-header>
   <ion-list>
     <ion-item *ngFor="let sensor of sensors">
-      <div>
+
+      <ion-avatar slot="start">
+        <ion-icon name="construct-outline"></ion-icon>
+      </ion-avatar>
+
+      <ion-label>
         <h1>{{sensor.name}}</h1>
-        <p><small>{{sensor.id}}</small></p>
-        <button (click)="acknowledge(sensor)">Riconosci</button>
+        <p>{{sensor.id}}</p>
+        <ion-button (click)="acknowledge(sensor)">Riconosci</ion-button>
         <p>Millis: {{sensor.millis}}</p>        
         <p>Now: {{sensor.now}}</p>
         <p>Value: {{sensor.value}}</p>
-      </div>
+      </ion-label>
     </ion-item>
   </ion-list>
 </ion-card>
