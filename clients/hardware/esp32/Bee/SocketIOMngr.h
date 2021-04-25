@@ -23,13 +23,13 @@ class SocketIOManager
             auto e = events.find(event);
             if (e != events.end())
             {
-            e->second(jMsg);
+                e->second(jMsg);
             }
             else
             {
-        #ifdef DEBUG_SOCKETIOMANAGER
-            DPRINTF("DEBUG_SOCKETIOMANAGER - event %s not found. %d events available\n", event, events.size());
-        #endif
+#ifdef DEBUG_SOCKETIOMANAGER
+                DPRINTF("DEBUG_SOCKETIOMANAGER - event %s not found. %d events available\n", event, events.size());
+#endif
             }
         }
         static void handleEvent(socketIOmessageType_t type, uint8_t *payload, size_t length)
@@ -38,48 +38,48 @@ class SocketIOManager
             switch (type)
             {
             case sIOtype_DISCONNECT:
-        #ifdef DEBUG_SOCKETIOMANAGER
-                    DPRINTF("[IOc] Disconnected!\n");
-        #endif            
-                    break;
+#ifdef DEBUG_SOCKETIOMANAGER
+                DPRINTF("[IOc] Disconnected!\n");
+#endif            
+                break;
             case sIOtype_CONNECT:
-        #ifdef DEBUG_SOCKETIOMANAGER
+#ifdef DEBUG_SOCKETIOMANAGER
                 DPRINTF("[IOc] Connected to url: %s\n", payload);
-        #endif
+#endif
                 // join default namespace (no auto join in Socket.IO V3)
                 webSocket.send(sIOtype_CONNECT, "/");
                 break;
             case sIOtype_ACK:
-        #ifdef DEBUG_SOCKETIOMANAGER      
+#ifdef DEBUG_SOCKETIOMANAGER      
                 DPRINTF("[IOc] get ack: %u\n", length);
-        #endif          
+#endif          
                 break;
             case sIOtype_ERROR:
-        #ifdef DEBUG_SOCKETIOMANAGER      
+#ifdef DEBUG_SOCKETIOMANAGER      
                 DPRINTF("[IOc] get error: %u\n", length);
-        #endif
+#endif
                 break;
             case sIOtype_BINARY_EVENT:
-        #ifdef DEBUG_SOCKETIOMANAGER      
+#ifdef DEBUG_SOCKETIOMANAGER      
                 DPRINTF("[IOc] get binary: %u\n", length);
-        #endif          
+#endif          
                 break;
             case sIOtype_BINARY_ACK:
-        #ifdef DEBUG_SOCKETIOMANAGER      
+#ifdef DEBUG_SOCKETIOMANAGER      
                 DPRINTF("[IOc] get binary ack: %u\n", length);
-        #endif          
+#endif          
                 break;
             case sIOtype_EVENT:
                 DeserializationError error = deserializeJson(jMsg, payload);
                 if (error)
                 {
-        #ifdef DEBUG_SOCKETIOMANAGER
-                DPRINTF("DEBUG_SOCKETIOMANAGER - deserializeJson() failed: socketIOmessageType_t = %c\n", type);
-                DPRINTF("DEBUG_SOCKETIOMANAGER - payload = %s\n", length == 0 ? (uint8_t *)"" : payload);
-                DPRINTF("DEBUG_SOCKETIOMANAGER - deserializeJson() error: ");
-                DPRINTLN(error.c_str());
-        #endif
-                return;
+#ifdef DEBUG_SOCKETIOMANAGER
+                    DPRINTF("DEBUG_SOCKETIOMANAGER - deserializeJson() failed: socketIOmessageType_t = %c\n", type);
+                    DPRINTF("DEBUG_SOCKETIOMANAGER - payload = %s\n", length == 0 ? (uint8_t *)"" : payload);
+                    DPRINTF("DEBUG_SOCKETIOMANAGER - deserializeJson() error: ");
+                    DPRINTLN(error.c_str());
+#endif
+                    return;
                 }
                 trigger(jMsg);
                 break;
@@ -95,13 +95,13 @@ class SocketIOManager
             auto e = events.find(event);
             if (e != events.end())
             {
-            events.erase(e);
+                events.erase(e);
             }
             else
             {
-        #ifdef DEBUG_SOCKETIOMANAGER
-            DPRINTF("DEBUG_SOCKETIOMANAGER - event %s not found, can not be removed\n", event);
-        #endif
+#ifdef DEBUG_SOCKETIOMANAGER
+                DPRINTF("DEBUG_SOCKETIOMANAGER - event %s not found, can not be removed\n", event);
+#endif
             }
         }
     public:
