@@ -24,9 +24,9 @@ public:
     {
         do
         {
-        WiFi.begin(WiFiManager::wifi_ssid, WiFiManager::wifi_password);
-        delay(5000);
-        DPRINTLN("Connecting to WiFi...");
+            WiFi.begin(WiFiManager::wifi_ssid, WiFiManager::wifi_password);
+            delay(5000);
+            DPRINTLN("Connecting to WiFi...");
         } while (WiFi.status() != WL_CONNECTED);
         DPRINTLN("Connected to the WiFi");
     }
@@ -35,19 +35,19 @@ public:
         // if wifi is down, try reconnecting every 15 seconds
         if (WiFi.status() != WL_CONNECTED)
         {
-        WiFiManager::wifi_reconnection = true;
-        if (millis() - WiFiManager::check_wifi >= WiFiManager::check_wifi_interval)
-        {
-            WiFiManager::check_wifi = millis();
-            WiFi.disconnect();
-            WiFi.begin(WiFiManager::wifi_ssid, WiFiManager::wifi_password);
-            DPRINTLN("Reconnecting to WiFi...");
-        }
+            WiFiManager::wifi_reconnection = true;
+            if (millis() - WiFiManager::check_wifi >= WiFiManager::check_wifi_interval)
+            {
+                WiFiManager::check_wifi = millis();
+                WiFi.disconnect();
+                WiFi.begin(WiFiManager::wifi_ssid, WiFiManager::wifi_password);
+                DPRINTLN("Reconnecting to WiFi...");
+            }
         }
         if ((WiFi.status() == WL_CONNECTED) && (WiFiManager::wifi_reconnection == true))
         {
-        WiFiManager::wifi_reconnection = false;
-        DPRINTLN("Reconnected to WiFi");
+            WiFiManager::wifi_reconnection = false;
+            DPRINTLN("Reconnected to WiFi");
         }
     }
 };

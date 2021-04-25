@@ -1016,7 +1016,7 @@ void loop()
 
     serializeJson(doc, jsonDoc);
 
-    int httpCode = http.PUT(jsonDoc);    
+    int httpCode = http.PUT(jsonDoc);
 #ifdef DEBUG_RESTCALL
     DPRINTF("RestCall Http return code : %d\n", httpCode);
 #endif
