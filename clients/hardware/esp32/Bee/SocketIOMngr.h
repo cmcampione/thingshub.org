@@ -105,16 +105,21 @@ class SocketIOManager
             }
         }
     public:
+        static bool sendEVENT(const char * payload, size_t length = 0)
+        {
+            return SocketIOManager::webSocket.sendEVENT(payload, length);
+        }
+    public:
         static void beginSocketSSLWithCA(const char *host, uint16_t port, const char *url = "/socket.io/?EIO=4", const char *CA_cert = NULL, const char *protocol = "arduino")
         {
-            SocketIOManager::webSocket.configureEIOping(true);
             SocketIOManager::webSocket.onEvent(handleEvent);                     
             SocketIOManager::webSocket.beginSocketIOSSLWithCA(host, port, url, CA_cert, protocol); 
         }
+    public:        
         static void loop()
         {
             SocketIOManager::webSocket.loop();
-        }
+        }    
 };
 SocketIOclient SocketIOManager::webSocket;
 std::map<String, std::function<void(const StaticJsonDocument<msgCapacity> &)>> SocketIOManager::events;

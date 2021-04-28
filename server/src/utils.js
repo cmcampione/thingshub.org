@@ -5,6 +5,7 @@ const fs   				= require("fs");
 const path 				= require("path");
 const { v4: uuid } 		= require("uuid");
 const jwt  				= require("jsonwebtoken");
+const logger			= require("./logger");
 
 const UserDTO 			= require("../../common/src/dtos").UserDTO;
 
@@ -17,6 +18,8 @@ class ErrorCustom {
 			internalCode,
 			message,
 		};
+		// ToDo: To remove for better place
+		logger.error(message,{ code: internalCode });
 	}
 	static formatMessage(internalCode, message) {
 		return {

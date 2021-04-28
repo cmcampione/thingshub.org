@@ -116,10 +116,9 @@ private:
   static device_collection devices;
   static sensor_collection sensors;
 private:
-  static void setupDevices()
+  static void setupDevicesVarius()
   {
     // It is just a case if the device ID is equal to the pin number
-/*
     { // Device 2 - On board led
       devices[2].kind = Device::Kind::DigitalOutput;
       devices[2].pin = 2;
@@ -167,7 +166,9 @@ private:
       devices[35].max = 4095;
       devices[35].value = 0; // Initial
     }
-*/
+  }
+  static void setupDevicesAntiTheaf()
+  {
     { // Device 1000 - Main AntiTheaf
       devices[1000].kind = Device::Kind::AntiTheft;
       AntiTheftConfig mainAntiTheftCnfg {
@@ -185,7 +186,12 @@ private:
       };
       devices[1000].pAntiTheft = new AntiTheft(mainAntiTheftCnfg);
     }
-
+  }
+  static void setupDevices()
+  {    
+    // setupDevicesVarius();
+    setupDevicesAntiTheaf();
+    
     for (device_const_iterator it = devices.begin(); it != devices.end(); it++)
     {
       const Device& device = it->second;
@@ -220,9 +226,9 @@ private:
 #endif
     }
   }
-  static void setupSensors()
-  {
-/*    
+private:
+  static void setupSensorsVarius() 
+  {  
     { // Telecomando 1 Apri
       sensors["8171288"].name = "Telecomando 1 Apri";
       sensors["8171288"].deviceId = 4;
@@ -424,20 +430,9 @@ private:
       sensors["Temperatura-01"].name = "Temperatura 01";
       sensors["Temperatura-01"].deviceId = 35;
     }
-*/
-
-    { // Diagnostic
-      sensors["DIAG-HTTP-CALL-PREV-HTTPCODE"].name = "httcode prima di questa chiamata HTTP";
-      sensors["DIAG-HTTP-CALL-PREV-HTTPCODE"].deviceId = 1001;
-      sensors["DIAG-HTTP-CALL-PREV-HTTPCODE"].prior = true;
-    }
-
-    { // Diagnostic
-      sensors["DIAG-HTTP-CALL-PREV-TIMING"].name = "Tempo trascorso prima di questa chiamata HTTP";
-      sensors["DIAG-HTTP-CALL-PREV-TIMING"].deviceId = 1001;
-      sensors["DIAG-HTTP-CALL-PREV-TIMING"].prior = false;
-    }
-
+  }
+  static void setupSensorsAntiTheaf()
+  {
     { // AntiTheaf - ArmedUnarmed
       sensors["MAT-AUSTATE"].name = "Antifurto Principale - ArmatoDisarmato";
       sensors["MAT-AUSTATE"].deviceId = 1000;
@@ -488,7 +483,24 @@ private:
       sensors["MAT-AASTATE"].deviceId = 1000;
       sensors["MAT-AASTATE"].prior = true;
     }
+  }
+private:  
+  static void setupSensors()
+  {
+    { // Diagnostic
+      sensors["DIAG-HTTP-CALL-PREV-HTTPCODE"].name = "httcode prima di questa chiamata HTTP";
+      sensors["DIAG-HTTP-CALL-PREV-HTTPCODE"].deviceId = 1001;
+      sensors["DIAG-HTTP-CALL-PREV-HTTPCODE"].prior = true;
+    }
 
+    { // Diagnostic
+      sensors["DIAG-HTTP-CALL-PREV-TIMING"].name = "Tempo trascorso prima di questa chiamata HTTP";
+      sensors["DIAG-HTTP-CALL-PREV-TIMING"].deviceId = 1001;
+      sensors["DIAG-HTTP-CALL-PREV-TIMING"].prior = false;
+    }
+
+    // setupSensorsVarius();
+    setupSensorsAntiTheaf();
   }
 public:
   static void setup()
@@ -953,7 +965,7 @@ void setup()
   ArduinoOTA.begin();
   // SocketIO setup
   SocketIOManager::on("onUpdateThingValue", onUpdateThingValue);
-  SocketIOManager::beginSocketSSLWithCA("api.thingshub.org", 3000, "/socket.io/?EIO=4&token=491e94d9-9041-4e5e-b6cb-9dad91bbf63d", root_ca, "arduino");
+  SocketIOManager::beginSocketSSLWithCA("api.thingshub.org", 3000, "/socket.io/?EIO=4&token=491e94d9-9041-4e5e-b6cb-9dad91bbf63d", root_ca, "arduino");  
 }
 
 void loop()
@@ -1000,22 +1012,44 @@ void loop()
   //
   if ((prior == true) || (millis() - restCallInterval >= 5000))
   {
+    StaticJsonDocument<sensorsCapacity> doc;
+    BeeStatus::toJson(doc);
+/*
+    {
+#ifdef DEBUG_REST_TIMING
+      before = millis();
+      DPRINTF("SocketIOManager::sendEVENT() before: %lu - ", before);
+#endif      
+      DynamicJsonDocument event(1024);
+      JsonArray array = event.to<JsonArray>();
+
+      array.add("log");
+      JsonObject param1 = array.createNestedObject();
+      param1["value"] = doc;
+
+      String output;
+      serializeJson(event, output);
+
+      SocketIOManager::sendEVENT(output.c_str());
+
+#ifdef DEBUG_REST_TIMING
+      after = millis();
+      DPRINTF("after: %lu - diff: %lu\n", after, after - before);
+#endif      
+    }
+*/    
+    HTTPClient http;
+    String url = String("/api/things/") + String(BeeStatus::thingValue) + String("/value");
+    http.begin("api.thingshub.org", 3000, url, root_ca); // Specify the URL and certificate    
+    http.addHeader("thapikey", "491e94d9-9041-4e5e-b6cb-9dad91bbf63d");
+    http.addHeader("Content-Type", "application/json");
+
+    String jsonDoc;
+    serializeJson(doc, jsonDoc);
 #ifdef DEBUG_REST_TIMING
     before = millis();
     DPRINTF("HTTPCall::loop() before: %lu - ", before);
 #endif
-    StaticJsonDocument<sensorsCapacity> doc;
-    BeeStatus::toJson(doc);
-
-    HTTPClient http;
-    String url = String("/api/things/") + String(BeeStatus::thingValue) + String("/value");
-    http.begin("api.thingshub.org", 3000, url, root_ca); // Specify the URL and certificate
-    http.addHeader("thapikey", "491e94d9-9041-4e5e-b6cb-9dad91bbf63d");
-    http.addHeader("Content-Type", "application/json");
-    char jsonDoc[sensorsCapacity];
-
-    serializeJson(doc, jsonDoc);
-
     int httpCode = http.PUT(jsonDoc);
 #ifdef DEBUG_RESTCALL
     DPRINTF("RestCall Http return code : %d\n", httpCode);
