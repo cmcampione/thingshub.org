@@ -1,5 +1,5 @@
 import { Injectable, OnDestroy } from '@angular/core';
-import { Sensor, SensorKind, SensorKindType } from './sensor';
+import { Sensor, SensorKind, SensorKindType } from './sensor.model';
 import { ThingsService } from './things.service';
 import { Thing, HttpRequestCanceler } from 'thingshub-js-sdk';
 
