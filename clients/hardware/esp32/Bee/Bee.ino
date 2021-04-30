@@ -176,6 +176,7 @@ private:
         "MAT-AUSTATE", 15,  2, HIGH,
         "MAT-AULSTATE", "MAT-AURSTATE",
         "MAT-IASTATE", 4, 16, HIGH,
+        "MAT-IASTATE-VALUE",
         //"MAT-DASTATE", 17,  5, HIGH,   // don't run
         "MAT-DASTATE", 17, 23, HIGH, // run
         //"MAT-DASTATE", 17,  3, HIGH, // don't run
@@ -472,6 +473,11 @@ private:
       sensors["MAT-IASTATE"].name = "Antifurto Principale - Porte balcone aperte-chiuse";
       sensors["MAT-IASTATE"].deviceId = 1000;
       sensors["MAT-IASTATE"].prior = true;
+    }
+    { // AntiTheaf - Porte balcone valore
+      sensors["MAT-IASTATE-VALUE"].name = "Antifurto Principale - Porte balcone aperte-chiuse valore";
+      sensors["MAT-IASTATE-VALUE"].deviceId = 1000;
+      sensors["MAT-IASTATE-VALUE"].prior = false;
     }
     { // AntiTheaf - Porta ingresso
       sensors["MAT-DASTATE"].name = "Antifurto Principale - Porta ingresso aperta-chiusa";
