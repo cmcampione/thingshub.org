@@ -24,7 +24,7 @@ export class RealTimeConnectorService {
     this.connectionStatus.next(change);
   };
 
-  // ToDo: Could be injected to chande connection type
+  // ToDo: Could be injected to chance connection type
   // tslint:disable-next-line: member-ordering
   public readonly realTimeConnectorRaw = new thingshub.SocketIORealtimeConnector(
     endPointAddress.server,
