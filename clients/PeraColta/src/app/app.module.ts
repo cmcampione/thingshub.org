@@ -15,13 +15,22 @@ import { MapComponent } from './map/map.component';
 import { ThingsComponent } from './things/things.component';
 import { ContentPageComponent } from './content-page/content-page.component';
 import { SensorsComponent } from './sensors/sensors.component';
-import { Sensors1Component } from './sensors1/sensors1.component';
+
 import { FormsModule } from '@angular/forms';
-import { StoreModule } from '@ngrx/store';
-import { reducers, metaReducers, SensorEffects } from './reducers';
-import { EffectsModule } from '@ngrx/effects';
 import { SensorsService } from './sensors.service';
 import { ThingsService } from './things.service';
+
+import { StoreModule } from '@ngrx/store';
+import { EffectsModule } from '@ngrx/effects';
+
+import { reducers, metaReducers, SensorEffects } from './reducers';
+import { Sensors1Component } from './sensors1/sensors1.component';
+
+import { sensorsValueReducer } from './state/sensors-value.reducer';
+import { sensorsConfigReducer } from './state/sensors-config.reducer';
+import { SensorsValueService } from './sensors-value.service';
+import { SensorValueEffects } from './sensor-value.effect';
+import { Sensors2Component } from './sensors2/sensors2.component';
 
 @NgModule({
   declarations: [
@@ -30,6 +39,7 @@ import { ThingsService } from './things.service';
     MapComponent,
     SensorsComponent,
     Sensors1Component,
+    Sensors2Component,
     ThingsComponent,
     ContentPageComponent],
   entryComponents: [],
@@ -40,21 +50,24 @@ import { ThingsService } from './things.service';
     FormsModule,
     AgmCoreModule.forRoot({
       apiKey: 'AIzaSyD11pjYHyE0ekfygLBNJhvL1FgUp9-twkQ'
-    })
-    ,StoreModule.forRoot(reducers, {metaReducers}),
-    EffectsModule.forRoot([SensorEffects])
+    }),
+    StoreModule.forRoot({ sensorsValue: sensorsValueReducer, sensorsConfig: sensorsConfigReducer }),
+    EffectsModule.forRoot([SensorEffects, SensorValueEffects])
   ],
   providers: [
     StatusBar,
     SplashScreen,
-    { provide: 'thingKind', useValue: 'Home appliance' },
+    { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
+    { provide: 'thingKind', useValue: 'Home appliance' }, // ToDo: To fix for different types
     ThingsService,
     {
       provide: SensorsService,
       deps: [ThingsService]
     },
-    SensorsService,
-    { provide: RouteReuseStrategy, useClass: IonicRouteStrategy }
+    {
+      provide: SensorsValueService,
+      deps: [ThingsService]
+    }
   ],
   bootstrap: [AppComponent]
 })

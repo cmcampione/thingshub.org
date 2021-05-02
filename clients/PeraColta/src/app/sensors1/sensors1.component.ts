@@ -37,7 +37,7 @@ export class Sensors1Component implements OnInit, OnDestroy {
   }
 
   public async acknowledge(sensor: Sensor) {
-   /*  try {
+  /*  try {
       await this.sensorsService.setSensorValue(sensor, {
         id: sensor.id,
         value: 0

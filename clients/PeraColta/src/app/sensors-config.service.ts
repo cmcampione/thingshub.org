@@ -1,0 +1,73 @@
+import { Injectable, OnDestroy } from '@angular/core';
+import { ThingsService } from './things.service';
+import { Thing, HttpRequestCanceler } from 'thingshub-js-sdk';
+import { SensorConfig, SensorKind, SensorKindType } from './sensor-config.model';
+
+interface SensorConfigRaw {
+    thingId: string;
+    id: string;
+    name: string;
+    kind: SensorKind;
+    kindType: SensorKindType;
+    min: number;
+    max: number;
+}
+
+@Injectable()
+export class SensorsConfigService implements OnDestroy {
+
+private things: Thing[] = [];// It's only a ref to this.thingsService.mainThing.children
+public sensorsConfig: SensorConfig[] = [];
+
+constructor(public readonly thingsService: ThingsService) {
+    this.things = this.thingsService.mainThing.children;
+}
+
+private searchThingById(id: string): Thing {
+    return this.things.find((thing) => {
+        return thing.id === id;
+    })
+}
+private searchSensorConfigById(id: string): SensorConfig {
+    return this.sensorsConfig.find((sensor) => {
+        return sensor.id === id;
+    })
+}
+
+async init(canceler: HttpRequestCanceler) {
+    this.thingsService.init();
+    await this.thingsService.thingsManager.getMoreThings(canceler);
+
+    this.things.forEach(thing =>
+        thing.value.sensors.forEach((sensorConfigRaw: SensorConfigRaw) => {
+            // ToDo: Try a copy of objects
+            const sensorConfig: SensorConfig = {
+                thingId: thing.id,
+                id: sensorConfigRaw.id,
+                name: sensorConfigRaw.name,
+                kind: sensorConfigRaw.kind,
+                kindType: sensorConfigRaw.kindType,
+                min: sensorConfigRaw.min,
+                max: sensorConfigRaw.max
+            }
+        this.sensorsConfig.push(sensorConfig);
+        })
+    )
+}
+done() {
+    this.thingsService.done();
+}
+  // ToDo: It's not called see https://github.com/angular/angular/issues/28857
+ngOnDestroy() {
+    this.done();
+}
+
+public async setSensorValue(SensorConfig : SensorConfig, value: any): Promise<any> {
+    const thing: Thing = this.searchThingById(SensorConfig.thingId);
+    if (!thing)
+      return; // Sanity check
+    const sensorsValueRaw = {sensors: [value]}
+    // asCmd
+    return await this.thingsService.putThingValue({ thingId: thing.id, asCmd: true, value: sensorsValueRaw });
+    }
+}

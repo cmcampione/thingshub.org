@@ -13,7 +13,6 @@ import { Injectable } from '@angular/core';
 import { SensorsService } from '../sensors.service';
 import { map, mergeMap, catchError } from 'rxjs/operators';
 import { EMPTY, from } from 'rxjs';
-import { NumericValueAccessor } from '@ionic/angular';
 
 // Actions
 
