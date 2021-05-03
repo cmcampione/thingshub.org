@@ -1,5 +1,5 @@
-import { SensorValue } from '../sensor-value.model';
-import { SensorConfig } from '../sensor-config.model';
+import { SensorValue } from '../sensors/sensor-value.model';
+import { SensorConfig } from '../sensors/sensor-config.model';
 
 export interface AppState {
     sensorsValue: ReadonlyArray<SensorValue>;

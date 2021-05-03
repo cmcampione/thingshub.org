@@ -1,5 +1,5 @@
 import { createAction, props } from '@ngrx/store';
-import { SensorConfig } from '../sensor-config.model';
+import { SensorConfig } from '../sensors/sensor-config.model';
 
 export const GET_ALL_SENSORS_CONFIG          = '[Sensors Config] Load Sensors Config';
 export const GET_ALL_SENSORS_CONFIG_SUCCESS  = '[Sensors Config] Sensors Config Loaded Success';

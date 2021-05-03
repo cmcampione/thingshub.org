@@ -1,8 +1,8 @@
 import { createSelector, createFeatureSelector } from '@ngrx/store';
 import { AppState } from './app.state';
-import { SensorValue } from '../sensor-value.model';
-import { SensorConfig, SensorKind, SensorKindType } from '../sensor-config.model';
-import { Sensor } from '../sensor.model';
+import { SensorValue } from '../sensors/sensor-value.model';
+import { SensorConfig, SensorKind, SensorKindType } from '../sensors/sensor-config.model';
+import { Sensor } from '../sensors/sensor.model';
 
 export const selectSensorsValue = createFeatureSelector<
     AppState,

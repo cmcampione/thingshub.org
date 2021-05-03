@@ -22,7 +22,7 @@ import { EffectsModule } from '@ngrx/effects';
 
 import { sensorsValueReducer } from './state/sensors-value.reducer';
 import { sensorsConfigReducer } from './state/sensors-config.reducer';
-import { Sensors2Component } from './sensors2/sensors2.component';
+import { SensorsComponent } from './sensors/sensors.component';
 import { SensorsValueEffectsModule } from './sensors-value-effects/sensors-value-effects.module';
 import { SensorsConfigEffectsModule } from './sensors-config-effects/sensors-config-effects.module';
 
@@ -32,7 +32,7 @@ import { SensorsConfigEffectsModule } from './sensors-config-effects/sensors-con
     LoginComponent,
     MapComponent,
     Sensors0Component,
-    Sensors2Component,
+    SensorsComponent,
     ThingsComponent,
     ContentPageComponent],
   entryComponents: [],

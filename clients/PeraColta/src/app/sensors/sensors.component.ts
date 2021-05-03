@@ -1,17 +1,17 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { HttpRequestCanceler } from 'thingshub-js-sdk';
-import { Sensor } from '../sensor.model';
+import { Sensor } from './sensor.model';
 import { Observable } from 'rxjs';
 import { select, Store } from '@ngrx/store';
 import { selectSensors } from '../state/sensors.selectors';
 import { getAllSensorsValue } from '../state/sensors-value.actions';
 
 @Component({
-  selector: 'app-sensors2',
-  templateUrl: './sensors2.component.html',
-  styleUrls: ['./sensors2.component.css']
+  selector: 'app-sensors',
+  templateUrl: './sensors.component.html',
+  styleUrls: ['./sensors.component.css']
 })
-export class Sensors2Component implements OnInit, OnDestroy {
+export class SensorsComponent implements OnInit, OnDestroy {
 
   private canceler = new HttpRequestCanceler();
   public  sensors$ = this.store.pipe(select(selectSensors));

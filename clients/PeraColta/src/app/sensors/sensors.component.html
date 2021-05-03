@@ -1,13 +1,12 @@
 <ion-card>
   <ion-card-header>
-    <ion-card-title>My home</ion-card-title>
+    <ion-card-title>My Home - New Sensors</ion-card-title>
   </ion-card-header>
   <ion-list>
     <ion-item *ngFor="let sensor of sensors$ | async">
       <ion-label>
         <h1>{{sensor.name}}</h1>
         <p>{{sensor.id}}</p>
-        <!-- <ion-button (click)="acknowledge(sensor)">Riconosci</ion-button> -->
         <p>Millis: {{sensor.millis}}</p>        
         <p>Now: {{sensor.now}}</p>
         <p>Value: {{sensor.value}}</p>
