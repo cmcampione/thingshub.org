@@ -16,8 +16,7 @@ import * as fromReducer from '../reducers';
     { provide: 'thingKind', useValue: 'Home appliance' },
     ThingsService,
     {
-      provide: SensorsService,
-      deps: [ThingsService]
+      provide: SensorsService
     }
   ]
 })

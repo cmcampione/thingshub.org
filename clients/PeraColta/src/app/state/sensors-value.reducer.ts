@@ -7,6 +7,7 @@ export const initialState: ReadonlyArray<SensorValue> = [];
 export const sensorsValueReducer = createReducer(
     initialState,
     on(getAllSensorsValue, state => state),
+    // ToDo: Is it correct to return only "payload" without consider "state"?
     on(getAllSensorsValueSuccess, (state, { payload }) => {
         return payload;
     })
