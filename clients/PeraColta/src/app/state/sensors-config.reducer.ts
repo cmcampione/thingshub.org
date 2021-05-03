@@ -1,8 +1,14 @@
 import { createReducer, on, Action } from '@ngrx/store';
 import { SensorConfig } from '../sensor-config.model';
+import { getAllSensorsConfig, getAllSensorsConfigSuccess } from './sensors-config.actions';
 
 export const initialState: ReadonlyArray<SensorConfig> = [];
 
 export const sensorsConfigReducer = createReducer(
-    initialState
+    initialState,
+    on(getAllSensorsConfig, state => state),
+    // ToDo: Is it correct to return only "payload" without consider "state"?
+    on(getAllSensorsConfigSuccess, (state, { payload }) => {
+        return payload;
+    })
 );
