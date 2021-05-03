@@ -8,7 +8,7 @@ import {
 } from '@ngrx/store';
 import { Actions, ofType, createEffect } from '@ngrx/effects';
 import { environment } from '../../environments/environment';
-import { Sensor } from '../sensor.model'
+import { Sensor } from '../sensors/sensor.model'
 import { Injectable } from '@angular/core';
 import { SensorsService } from '../sensors.service';
 import { map, mergeMap, catchError } from 'rxjs/operators';

@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { HttpRequestCanceler } from 'thingshub-js-sdk';
 import { ThingsService } from '../things.service';
-import { Sensor } from '../sensor.model';
+import { Sensor } from '../sensors/sensor.model';
 import { SensorsService } from '../sensors.service';
 import { Observable } from 'rxjs';
 import { Store } from '@ngrx/store';
