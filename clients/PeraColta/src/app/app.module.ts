@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { RouteReuseStrategy } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 
 import { IonicModule, IonicRouteStrategy } from '@ionic/angular';
 import { SplashScreen } from '@ionic-native/splash-screen/ngx';
@@ -16,21 +17,19 @@ import { ThingsComponent } from './things/things.component';
 import { ContentPageComponent } from './content-page/content-page.component';
 import { SensorsComponent } from './sensors/sensors.component';
 
-import { FormsModule } from '@angular/forms';
 import { SensorsService } from './sensors.service';
 import { ThingsService } from './things.service';
 
 import { StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
 
-import { reducers, metaReducers, SensorEffects } from './reducers';
+import { SensorEffects } from './reducers';
 import { Sensors1Component } from './sensors1/sensors1.component';
 
 import { sensorsValueReducer } from './state/sensors-value.reducer';
 import { sensorsConfigReducer } from './state/sensors-config.reducer';
-import { SensorsValueService } from './sensors-value.service';
-import { SensorValueEffects } from './sensor-value.effect';
 import { Sensors2Component } from './sensors2/sensors2.component';
+import { SensorsValueEffectsModule } from './sensors-value-effects/sensors-value-effects.module';
 
 @NgModule({
   declarations: [
@@ -52,22 +51,17 @@ import { Sensors2Component } from './sensors2/sensors2.component';
       apiKey: 'AIzaSyD11pjYHyE0ekfygLBNJhvL1FgUp9-twkQ'
     }),
     StoreModule.forRoot({ sensorsValue: sensorsValueReducer, sensorsConfig: sensorsConfigReducer }),
-    EffectsModule.forRoot([SensorEffects, SensorValueEffects])
+    EffectsModule.forRoot([SensorEffects]),
+    SensorsValueEffectsModule
   ],
   providers: [
     StatusBar,
     SplashScreen,
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
+    // Useful only for Effects
     { provide: 'thingKind', useValue: 'Home appliance' }, // ToDo: To fix for different types
     ThingsService,
-    {
-      provide: SensorsService,
-      deps: [ThingsService]
-    },
-    {
-      provide: SensorsValueService,
-      deps: [ThingsService]
-    }
+    SensorsService
   ],
   bootstrap: [AppComponent]
 })

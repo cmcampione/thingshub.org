@@ -62,8 +62,29 @@ ngOnDestroy() {
     this.done();
 }
 
-public async setSensorValue(SensorConfig : SensorConfig, value: any): Promise<any> {
-    const thing: Thing = this.searchThingById(SensorConfig.thingId);
+public async getAll(): Promise<ReadonlyArray<SensorConfig>> {
+    await this.thingsService.thingsManager.getMoreThings(null);// ToDo: why null?
+    const sensorsConfig: SensorConfig[] = [];
+    this.things.forEach(thing =>
+        thing.value.sensors.forEach((sensorConfigRaw: SensorConfigRaw) => {
+            // ToDo: Try to use spread operator
+            const sensorConfig: SensorConfig = {
+                thingId: thing.id,
+                id: sensorConfigRaw.id,
+                name: sensorConfigRaw.name,
+                kind: sensorConfigRaw.kind,
+                kindType: sensorConfigRaw.kindType,
+                min: sensorConfigRaw.min,
+                max: sensorConfigRaw.max
+            }
+            sensorsConfig.push(sensorConfig);
+        }))
+    return sensorsConfig;
+}
+
+
+public async setSensorValue(sensorConfig : SensorConfig, value: any): Promise<any> {
+    const thing: Thing = this.searchThingById(sensorConfig.thingId);
     if (!thing)
       return; // Sanity check
     const sensorsValueRaw = {sensors: [value]}
