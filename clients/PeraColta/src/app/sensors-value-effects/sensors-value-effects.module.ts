@@ -12,9 +12,9 @@ import { SensorsValueEffects } from './sensors-value.effect';
     EffectsModule.forFeature([SensorsValueEffects])
   ],
   providers: [
-    { provide: 'thingKind', useValue: 'Home appliance' }, // ToDo: To fix for different types
+    { provide: 'thingKind', useValue: 'Home appliance' },
     ThingsService,
     SensorsValueService
-  ],
+  ]
 })
 export class SensorsValueEffectsModule { }

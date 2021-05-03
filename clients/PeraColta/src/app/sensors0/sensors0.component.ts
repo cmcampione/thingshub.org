@@ -5,19 +5,16 @@ import { Sensor } from '../sensor.model';
 import { SensorsService } from '../sensors.service';
 
 @Component({
-  selector: 'app-sensors',
-  templateUrl: './sensors.component.html',
-  styleUrls: ['./sensors.component.css'],
+  selector: 'app-sensors0',
+  templateUrl: './sensors0.component.html',
+  styleUrls: ['./sensors0.component.css'],
   providers: [
     { provide: 'thingKind', useValue: 'Home appliance' },
     ThingsService,
-    {
-      provide: SensorsService,
-      deps: [ThingsService]
-    }
+    SensorsService
   ]
 })
-export class SensorsComponent implements OnInit, OnDestroy {
+export class Sensors0Component implements OnInit, OnDestroy {
 
   private canceler = new HttpRequestCanceler();
   public readonly sensors: Sensor[];
