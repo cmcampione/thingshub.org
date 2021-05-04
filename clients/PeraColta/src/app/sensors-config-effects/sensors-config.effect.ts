@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { EMPTY, from } from 'rxjs';
 import { map, mergeMap, catchError } from 'rxjs/operators';
-import { SensorsConfigService } from '../sensors-config.service';
+import { SensorsConfigService } from '../sensors/sensors-config.service';
 import { GET_ALL_SENSORS_CONFIG, GET_ALL_SENSORS_CONFIG_SUCCESS } from '../state/sensors-config.actions';
 
 @Injectable()

@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ThingsService } from '../things.service';
-import { SensorsConfigService } from '../sensors-config.service';
+import { SensorsConfigService } from '../sensors/sensors-config.service';
 import { EffectsModule } from '@ngrx/effects';
 import { SensorsConfigEffects } from './sensors-Config.effect';
 
