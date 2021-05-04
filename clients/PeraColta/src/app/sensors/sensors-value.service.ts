@@ -13,7 +13,7 @@ interface SensorValueRaw {
 @Injectable()
 export class SensorsValueService implements OnDestroy {
 
-    private things: Thing[] = [];// It's only a ref to this.thingsService.mainThing.children
+    private things: Thing[] = [];// It will be only a ref to this.thingsService.mainThing.children
 
 
     constructor(public readonly thingsService: ThingsSensorsValueService) {
