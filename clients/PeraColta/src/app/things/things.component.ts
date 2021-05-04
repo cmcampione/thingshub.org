@@ -7,7 +7,7 @@ import { ThingsService } from '../things.service';
   templateUrl: './things.component.html',
   styleUrls: ['./things.component.css'],
   providers: [
-    { provide: 'thingKind', useValue: 'first thing' },
+    { provide: 'thingKind', useValue: 'Home appliance' },
     ThingsService,
   ]
 })
