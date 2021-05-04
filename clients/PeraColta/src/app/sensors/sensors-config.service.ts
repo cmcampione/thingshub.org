@@ -4,7 +4,6 @@ import { SensorConfig, SensorKind, SensorKindType } from './sensor-config.model'
 import { ThingsSensorsConfigService } from './things-sensors-config.service';
 
 interface SensorConfigRaw {
-    thingId: string;
     id: string;
     name: string;
     kind: SensorKind;
@@ -66,7 +65,7 @@ public async getAll(): Promise<ReadonlyArray<SensorConfig>> {
     await this.thingsService.thingsManager.getMoreThings(null);// ToDo: why null?
     const sensorsConfig: SensorConfig[] = [];
     this.things.forEach(thing =>
-        thing.value.sensors.forEach((sensorConfigRaw: SensorConfigRaw) => {
+        thing.value.sensorsConfig.forEach((sensorConfigRaw: SensorConfigRaw) => {
             // ToDo: Try to use spread operator
             const sensorConfig: SensorConfig = {
                 thingId: thing.id,
