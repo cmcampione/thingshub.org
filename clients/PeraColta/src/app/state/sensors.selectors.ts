@@ -4,11 +4,11 @@ import { SensorValue } from '../sensors/sensor-value.model';
 import { SensorConfig, SensorKind, SensorKindType } from '../sensors/sensor-config.model';
 import { Sensor } from '../sensors/sensor.model';
 
-export const selectSensorsValue = createFeatureSelector<
+const selectSensorsValue = createFeatureSelector<
     AppState,
     ReadonlyArray<SensorValue>>('sensorsValue');
 
-export const selectSensorsConfig = createFeatureSelector<
+const selectSensorsConfig = createFeatureSelector<
     AppState,
     ReadonlyArray<SensorConfig>>('sensorsConfig');
 
