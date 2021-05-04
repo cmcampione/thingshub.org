@@ -24,7 +24,6 @@ import { sensorsValueReducer } from './state/sensors-value.reducer';
 import { sensorsConfigReducer } from './state/sensors-config.reducer';
 
 import { SensorsModule } from './sensors/sensors.module';
-import { ThingsService } from './things.service';
 
 @NgModule({
   declarations: [
