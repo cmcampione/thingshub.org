@@ -14,17 +14,16 @@ import { AgmCoreModule } from '@agm/core';
 import { LoginComponent } from './login/login.component';
 import { MapComponent } from './map/map.component';
 import { ThingsComponent } from './things/things.component';
-import { ContentPageComponent } from './content-page/content-page.component';
 import { Sensors0Component } from './sensors0/sensors0.component';
+import { ContentPageComponent } from './content-page/content-page.component';
 
 import { StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
 
 import { sensorsValueReducer } from './state/sensors-value.reducer';
 import { sensorsConfigReducer } from './state/sensors-config.reducer';
-import { SensorsComponent } from './sensors/sensors.component';
-import { SensorsValueEffectsModule } from './sensors-value-effects/sensors-value-effects.module';
-import { SensorsConfigEffectsModule } from './sensors-config-effects/sensors-config-effects.module';
+
+import { SensorsModule } from './sensors/sensors.module';
 
 @NgModule({
   declarations: [
@@ -32,7 +31,6 @@ import { SensorsConfigEffectsModule } from './sensors-config-effects/sensors-con
     LoginComponent,
     MapComponent,
     Sensors0Component,
-    SensorsComponent,
     ThingsComponent,
     ContentPageComponent],
   entryComponents: [],
@@ -48,8 +46,7 @@ import { SensorsConfigEffectsModule } from './sensors-config-effects/sensors-con
     EffectsModule.forRoot(), // The EffectsModule.forRoot() method must be added to your AppModule imports
                              // even if you don't register any root-level effects.
                              // https://ngrx.io/guide/effects
-    SensorsValueEffectsModule,
-    // SensorsConfigEffectsModule
+    SensorsModule
   ],
   providers: [
     StatusBar,
