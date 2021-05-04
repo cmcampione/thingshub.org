@@ -1,7 +1,7 @@
 import { Injectable, OnDestroy } from '@angular/core';
-import { ThingsService } from '../things.service';
 import { Thing, HttpRequestCanceler } from 'thingshub-js-sdk';
 import { SensorValue } from './sensor-value.model';
+import { ThingsSensorsValueService } from './things-sensors-value.service';
 
 interface SensorValueRaw {
     id: string;
@@ -16,7 +16,7 @@ export class SensorsValueService implements OnDestroy {
     private things: Thing[] = [];// It's only a ref to this.thingsService.mainThing.children
 
 
-    constructor(public readonly thingsService: ThingsService) {
+    constructor(public readonly thingsService: ThingsSensorsValueService) {
         this.things = this.thingsService.mainThing.children;
     }
 
