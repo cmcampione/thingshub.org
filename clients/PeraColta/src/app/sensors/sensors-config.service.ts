@@ -15,79 +15,58 @@ interface SensorConfigRaw {
 @Injectable()
 export class SensorsConfigService implements OnDestroy {
 
-private things: Thing[] = [];// It's only a ref to this.thingsService.mainThing.children
-public sensorsConfig: SensorConfig[] = [];
+    private things: Thing[] = [];// It's only a ref to this.thingsService.mainThing.children
+    public sensorsConfig: SensorConfig[] = [];
 
-constructor(public readonly thingsService: ThingsSensorsConfigService) {
-    this.things = this.thingsService.mainThing.children;
-}
+    constructor(public readonly thingsService: ThingsSensorsConfigService) {
+        this.things = this.thingsService.mainThing.children;
+    }
 
-private searchThingById(id: string): Thing {
-    return this.things.find((thing) => {
-        return thing.id === id;
-    })
-}
-private searchSensorConfigById(id: string): SensorConfig {
-    return this.sensorsConfig.find((sensor) => {
-        return sensor.id === id;
-    })
-}
+    async init(canceler: HttpRequestCanceler) {
+        this.thingsService.init();
+        await this.thingsService.thingsManager.getMoreThings(canceler);
 
-async init(canceler: HttpRequestCanceler) {
-    this.thingsService.init();
-    await this.thingsService.thingsManager.getMoreThings(canceler);
+        this.things.forEach(thing =>
+            thing.value.sensors.forEach((sensorConfigRaw: SensorConfigRaw) => {
+                // ToDo: Try a copy of objects
+                const sensorConfig: SensorConfig = {
+                    thingId: thing.id,
+                    id: sensorConfigRaw.id,
+                    name: sensorConfigRaw.name,
+                    kind: sensorConfigRaw.kind,
+                    kindType: sensorConfigRaw.kindType,
+                    min: sensorConfigRaw.min,
+                    max: sensorConfigRaw.max
+                }
+            this.sensorsConfig.push(sensorConfig);
+            })
+        )
+    }
+    done() {
+        this.thingsService.done();
+    }
+    // ToDo: It's not called see https://github.com/angular/angular/issues/28857
+    ngOnDestroy() {
+        this.done();
+    }
 
-    this.things.forEach(thing =>
-        thing.value.sensors.forEach((sensorConfigRaw: SensorConfigRaw) => {
-            // ToDo: Try a copy of objects
-            const sensorConfig: SensorConfig = {
-                thingId: thing.id,
-                id: sensorConfigRaw.id,
-                name: sensorConfigRaw.name,
-                kind: sensorConfigRaw.kind,
-                kindType: sensorConfigRaw.kindType,
-                min: sensorConfigRaw.min,
-                max: sensorConfigRaw.max
-            }
-        this.sensorsConfig.push(sensorConfig);
-        })
-    )
-}
-done() {
-    this.thingsService.done();
-}
-  // ToDo: It's not called see https://github.com/angular/angular/issues/28857
-ngOnDestroy() {
-    this.done();
-}
-
-public async getAll(): Promise<ReadonlyArray<SensorConfig>> {
-    await this.thingsService.thingsManager.getMoreThings(null);// ToDo: why null?
-    const sensorsConfig: SensorConfig[] = [];
-    this.things.forEach(thing =>
-        thing.value.sensorsConfig.forEach((sensorConfigRaw: SensorConfigRaw) => {
-            // ToDo: Try to use spread operator
-            const sensorConfig: SensorConfig = {
-                thingId: thing.id,
-                id: sensorConfigRaw.id,
-                name: sensorConfigRaw.name,
-                kind: sensorConfigRaw.kind,
-                kindType: sensorConfigRaw.kindType,
-                min: sensorConfigRaw.min,
-                max: sensorConfigRaw.max
-            }
-            sensorsConfig.push(sensorConfig);
-        }))
-    return sensorsConfig;
-}
-
-
-public async setSensorValue(sensorConfig : SensorConfig, value: any): Promise<any> {
-    const thing: Thing = this.searchThingById(sensorConfig.thingId);
-    if (!thing)
-      return; // Sanity check
-    const sensorsValueRaw = {sensors: [value]}
-    // asCmd
-    return await this.thingsService.putThingValue({ thingId: thing.id, asCmd: true, value: sensorsValueRaw });
+    public async getAll(): Promise<ReadonlyArray<SensorConfig>> {
+        await this.thingsService.thingsManager.getMoreThings(null);// ToDo: why null?
+        const sensorsConfig: SensorConfig[] = [];
+        this.things.forEach(thing =>
+            thing.value.sensorsConfig.forEach((sensorConfigRaw: SensorConfigRaw) => {
+                // ToDo: Try to use spread operator
+                const sensorConfig: SensorConfig = {
+                    thingId: thing.id,
+                    id: sensorConfigRaw.id,
+                    name: sensorConfigRaw.name,
+                    kind: sensorConfigRaw.kind,
+                    kindType: sensorConfigRaw.kindType,
+                    min: sensorConfigRaw.min,
+                    max: sensorConfigRaw.max
+                }
+                sensorsConfig.push(sensorConfig);
+            }))
+        return sensorsConfig;
     }
 }

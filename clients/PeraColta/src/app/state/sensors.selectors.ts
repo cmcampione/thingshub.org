@@ -19,13 +19,14 @@ export const selectSensors = createSelector(
         return sensorsValue.map((sensorValueRaw) => {
             let sensorConfigRaw: SensorConfig = {
                 thingId: null,
-                name: null,
+                name: 'No name',
                 id: sensorValueRaw.id,
                 kind: SensorKind.Undefined,
                 kindType: SensorKindType.Undefined,
                 min: 0,
                 max: 0
             }
+            // ToDo: Id must be unique for all sensors and relato config
             const sc = sensorsConfig.find((sensorConfig) => sensorValueRaw.id === sensorConfig.id);
             if (sc)
                 sensorConfigRaw = sc;

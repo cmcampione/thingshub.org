@@ -1,4 +1,4 @@
-import { createReducer, on, Action } from '@ngrx/store';
+import { createReducer, on } from '@ngrx/store';
 import { SensorValue } from '../sensors/sensor-value.model';
 import { getAllSensorsValue, getAllSensorsValueSuccess } from './sensors-value.actions';
 

@@ -5,6 +5,8 @@ import { selectSensors } from '../state/sensors.selectors';
 import { getAllSensorsValue } from '../state/sensors-value.actions';
 import { getAllSensorsConfig } from '../state/sensors-config.actions';
 
+// ToDo: We have to use canceler
+// ToDo: We have to implement pagination support
 @Component({
   selector: 'app-sensors',
   templateUrl: './sensors.component.html',
@@ -19,7 +21,7 @@ export class SensorsComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.store.dispatch(getAllSensorsConfig()); // ToDo: is it sure that SensorsConfig arrival before SensorsValue?
+    this.store.dispatch(getAllSensorsConfig()); // ToDo: is it sure that SensorsConfig arrivals before SensorsValue?
     this.store.dispatch(getAllSensorsValue());
   }
   ngOnDestroy() {
