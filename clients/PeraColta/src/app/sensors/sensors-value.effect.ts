@@ -10,8 +10,8 @@ export class SensorsValueEffects {
 
     loadSensorsValue$ = createEffect(() => this.actions$.pipe(
         ofType(GET_ALL_SENSORS_VALUE),
-        mergeMap(() => from(this.sensorsValueService.getAll())
-            .pipe(
+        mergeMap(() =>
+            from(this.sensorsValueService.getAll()).pipe(
                 map(sensorsValue => ({ type: GET_ALL_SENSORS_VALUE_SUCCESS, payload: sensorsValue })),
                 catchError(() => EMPTY) // ToDo: Manage error
             )

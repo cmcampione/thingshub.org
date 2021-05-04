@@ -73,7 +73,7 @@ export class SensorsService implements OnDestroy {
     this.thingsService.realTimeConnector.realTimeConnectorRaw.remHook('onUpdateThingValue', this.onUpdateThingValue);
     this.thingsService.done();
   }
-  // ToDo: It's not called see https://github.com/angular/angular/issues/28857
+
   ngOnDestroy() {
     this.done();
   }

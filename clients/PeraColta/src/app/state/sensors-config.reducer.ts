@@ -7,8 +7,5 @@ export const initialState: ReadonlyArray<SensorConfig> = [];
 export const sensorsConfigReducer = createReducer(
     initialState,
     on(getAllSensorsConfig, state => state),
-    // ToDo: Is it correct to return only "payload" without consider "state"?
-    on(getAllSensorsConfigSuccess, (state, { payload }) => {
-        return payload;
-    })
+    on(getAllSensorsConfigSuccess, (state, { payload }) => [...payload]) // [...payload] clone the array
 );
