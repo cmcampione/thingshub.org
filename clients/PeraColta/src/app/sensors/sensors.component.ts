@@ -3,6 +3,7 @@ import { HttpRequestCanceler } from 'thingshub-js-sdk';
 import { select, Store } from '@ngrx/store';
 import { selectSensors } from '../state/sensors.selectors';
 import { getAllSensorsValue } from '../state/sensors-value.actions';
+import { getAllSensorsConfig } from '../state/sensors-config.actions';
 
 @Component({
   selector: 'app-sensors',
@@ -18,6 +19,7 @@ export class SensorsComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
+    this.store.dispatch(getAllSensorsConfig()); // ToDo: is it sure that SensorsConfig arrival before SensorsValue?
     this.store.dispatch(getAllSensorsValue());
   }
   ngOnDestroy() {
