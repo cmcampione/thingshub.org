@@ -15,7 +15,7 @@ const selectSensorsConfig = createFeatureSelector<
 export const selectSensors = createSelector(
     selectSensorsValue,
     selectSensorsConfig,
-    (sensorsValue : Array<SensorValue>, sensorsConfig : Array<SensorConfig>) : Sensor[] => {
+    (sensorsValue : ReadonlyArray<SensorValue>, sensorsConfig : ReadonlyArray<SensorConfig>) : ReadonlyArray<Sensor> => {
         return sensorsValue.map((sensorValueRaw) => {
             let sensorConfigRaw: SensorConfig = {
                 thingId: null,
@@ -26,7 +26,7 @@ export const selectSensors = createSelector(
                 min: 0,
                 max: 0
             }
-            // ToDo: Id must be unique for all sensors and relato config
+            // ToDo: Id must be unique for all sensors and relate config
             const sc = sensorsConfig.find((sensorConfig) => sensorValueRaw.id === sensorConfig.id);
             if (sc)
                 sensorConfigRaw = sc;
@@ -45,3 +45,9 @@ export const selectSensors = createSelector(
                 sensorValue: sensorValueRaw
         }});
     });
+
+export const selectSensor = createSelector(
+    selectSensorsValue,
+    (sensorsValue: Array<SensorValue>, props) =>
+        sensorsValue.filter((sensorValue) => props.thingId === sensorValue.thingId && props.sensorId === sensorValue.id)
+)
