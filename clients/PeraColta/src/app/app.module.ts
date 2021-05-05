@@ -42,6 +42,7 @@ import { SensorsModule } from './sensors/sensors.module';
     AgmCoreModule.forRoot({
       apiKey: 'AIzaSyD11pjYHyE0ekfygLBNJhvL1FgUp9-twkQ'
     }),
+    // ToDo: Try to move in SensorsModule
     StoreModule.forRoot({ sensorsValue: sensorsValueReducer, sensorsConfig: sensorsConfigReducer }),
     EffectsModule.forRoot(), // The EffectsModule.forRoot() method must be added to your AppModule imports
                              // even if you don't register any root-level effects.
