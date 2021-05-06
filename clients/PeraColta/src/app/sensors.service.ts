@@ -67,21 +67,23 @@ export class SensorsService implements OnDestroy {
     this.thingsService.realTimeConnector.realTimeConnectorRaw.setHook('onUpdateThingValue', this.onUpdateThingValue);
     await this.thingsService.thingsManager.getMoreThings(canceler);
 
-    this.things.forEach(thing =>
-      thing.value.sensors.forEach((sensorRaw: SensorRaw) => {
-        const sensor: Sensor = {
-          thingId: thing.id,
-          name: thing.name,
-          id: sensorRaw.id,
-          now: sensorRaw.now,
-          millis: sensorRaw.millis,
-          value: sensorRaw.value,
-          sensorConfig: null,
-          sensorValue: null
-        }
-        this.sensors.push(sensor);
+    this.things.forEach(thing => {
+        if (!thing.value.sensors)
+          return;
+        thing.value.sensors.forEach((sensorRaw: SensorRaw) => {
+          const sensor: Sensor = {
+            thingId: thing.id,
+            name: thing.name,
+            id: sensorRaw.id,
+            now: sensorRaw.now,
+            millis: sensorRaw.millis,
+            value: sensorRaw.value,
+            sensorConfig: null,
+            sensorValue: null
+          }
+          this.sensors.push(sensor);
+        })
       })
-    )
   }
 
   // ToDo: Try to render as private member
