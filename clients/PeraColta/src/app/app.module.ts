@@ -24,6 +24,8 @@ import { sensorsValueReducer } from './state/sensors-value.reducer';
 import { sensorsConfigReducer } from './state/sensors-config.reducer';
 
 import { SensorsModule } from './sensors/sensors.module';
+import { StoreDevtoolsModule } from '@ngrx/store-devtools';
+import { environment } from '../environments/environment';
 
 @NgModule({
   declarations: [
@@ -44,6 +46,7 @@ import { SensorsModule } from './sensors/sensors.module';
     }),
     // ToDo: Try to move in SensorsModule
     StoreModule.forRoot({ sensorsValue: sensorsValueReducer, sensorsConfig: sensorsConfigReducer }),
+    StoreDevtoolsModule.instrument({ maxAge: 25, logOnly: environment.production }),
     EffectsModule.forRoot(), // The EffectsModule.forRoot() method must be added to your AppModule imports
                              // even if you don't register any root-level effects.
                              // https://ngrx.io/guide/effects
