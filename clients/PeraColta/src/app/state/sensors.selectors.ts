@@ -46,8 +46,16 @@ export const selectSensors = createSelector(
         }});
     });
 
+/* ToDo: To remove
 export const selectSensor = createSelector(
     selectSensorsValue,
-    (sensorsValue: Array<SensorValue>, props) =>
-        sensorsValue.filter((sensorValue) => props.thingId === sensorValue.thingId && props.sensorId === sensorValue.id)
+    (sensorsValue: Array<SensorValue>, props : { thingId: string, sensorsId: string }) =>
+        sensorsValue.find((sensorValue) => props.thingId === sensorValue.thingId && props.sensorId === sensorValue.id)
 )
+
+export const selectSensor = (thingId: string, sensorId: string) => createSelector(
+    selectSensorsValue,
+    (sensorsValue: Array<SensorValue>) =>
+        sensorsValue.find(sensorValue => thingId === sensorValue.thingId && sensorId === sensorValue.id)
+)
+*/

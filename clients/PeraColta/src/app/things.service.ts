@@ -49,6 +49,7 @@ export class ThingsService implements OnDestroy {
     this.thingsManager.init();
     this.realTimeConnector.realTimeConnectorRaw.setHook('onUpdateThingValue', this.onUpdateThingValue);
   }
+  // ToDo: Try to render as private member
   public done() {
     this.realTimeConnector.realTimeConnectorRaw.remHook('onUpdateThingValue', this.onUpdateThingValue);
     this.thingsManager.done();

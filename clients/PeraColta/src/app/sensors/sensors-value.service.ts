@@ -15,7 +15,6 @@ export class SensorsValueService implements OnDestroy {
 
     private things: Thing[] = [];// It will be only a ref to this.thingsService.mainThing.children
 
-
     constructor(public readonly thingsService: ThingsSensorsValueService) {
         this.things = this.thingsService.mainThing.children;
     }
@@ -26,10 +25,11 @@ export class SensorsValueService implements OnDestroy {
         })
     }
 
-    done() {
+    // ToDo: Try to render as private member
+    private done() {
         this.thingsService.done();
     }
-    // ToDo: It's not called see https://github.com/angular/angular/issues/28857
+    // ToDo: It's not called for Effect cleanup
     ngOnDestroy() {
         this.done();
     }
