@@ -55,7 +55,7 @@ export class SensorsService implements OnDestroy {
           id: sensorRaw.id,
           now: sensorRaw.now,
           millis: sensorRaw.millis,
-          value
+          value: sensorRaw.value
         };
         this.store.dispatch(setSensorValue({ newSensorValue } ));
       }
