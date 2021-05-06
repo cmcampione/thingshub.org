@@ -5,7 +5,7 @@ import { AccountService } from './account.service';
 import { Subject } from 'rxjs';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root' // It's one and only one
 })
 export class RealTimeConnectorService {
 

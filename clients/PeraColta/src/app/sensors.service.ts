@@ -2,6 +2,9 @@ import { Injectable, OnDestroy } from '@angular/core';
 import { Sensor } from './sensors/sensor.model';
 import { ThingsService } from './things.service';
 import { Thing, HttpRequestCanceler } from 'thingshub-js-sdk';
+import { Store } from '@ngrx/store';
+import { setSensorValue } from './state/sensors-value.actions';
+import { SensorValue } from './sensors/sensor-value.model';
 
 interface SensorRaw {
   id: string;
@@ -15,7 +18,8 @@ export class SensorsService implements OnDestroy {
   private things: Thing[] = [];// It's only a ref to this.thingsService.mainThing.children
   public sensors: Sensor[] = [];
 
-  constructor(public readonly thingsService: ThingsService) {
+  constructor(public readonly thingsService: ThingsService,
+    private readonly store: Store) {
     this.things = this.thingsService.mainThing.children;
   }
 
@@ -45,6 +49,16 @@ export class SensorsService implements OnDestroy {
         sensor.millis = sensorRaw.millis;
         sensor.value = sensorRaw.value;
       }
+      if (this.store) {
+        const newSensorValue: SensorValue = {
+          thingId,
+          id: sensorRaw.id,
+          now: sensorRaw.now,
+          millis: sensorRaw.millis,
+          value
+        };
+        this.store.dispatch(setSensorValue({ newSensorValue } ));
+      }
     });
   }
 
@@ -69,6 +83,8 @@ export class SensorsService implements OnDestroy {
       })
     )
   }
+
+  // ToDo: Try to render as private member
   done() {
     this.thingsService.realTimeConnector.realTimeConnectorRaw.remHook('onUpdateThingValue', this.onUpdateThingValue);
     this.thingsService.done();
