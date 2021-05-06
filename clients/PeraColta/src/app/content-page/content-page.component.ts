@@ -21,7 +21,6 @@ export class ContentPageComponent implements OnInit, OnDestroy {
   public connIconName = 'globe';
   public connIconColor = 'danger';
 
-
   public isLoggedIn = false;
   private readonly checkLogin = (accountUserData: AccountUserData) => {
     this.isLoggedIn = accountUserData != null;

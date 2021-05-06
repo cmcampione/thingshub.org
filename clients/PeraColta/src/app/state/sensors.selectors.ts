@@ -6,11 +6,11 @@ import { Sensor } from '../sensors/sensor.model';
 
 const selectSensorsValue = createFeatureSelector<
     AppState,
-    ReadonlyArray<SensorValue>>('sensorsValue');
+    ReadonlyArray<SensorValue>>('sensorsValue'); // ToDo: avoid hard coded string
 
 const selectSensorsConfig = createFeatureSelector<
     AppState,
-    ReadonlyArray<SensorConfig>>('sensorsConfig');
+    ReadonlyArray<SensorConfig>>('sensorsConfig'); // ToDo: avoid hard coded string
 
 export const selectSensors = createSelector(
     selectSensorsValue,
