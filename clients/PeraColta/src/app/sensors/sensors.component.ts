@@ -21,7 +21,12 @@ export class SensorsComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.store.dispatch(getAllSensorsConfig()); // ToDo: is it sure that SensorsConfig arrivals before SensorsValue?
+    // Reducers are pure functions in that they produce the same output for a given input.
+    // They are without side effects and handle each state transition synchronously.
+    // Each reducer function takes the latest Action dispatched, the current state,
+    // and determines whether to return a newly modified state or the original state.
+    // https://ngrx.io/guide/store/reducers
+    this.store.dispatch(getAllSensorsConfig()); // It is syncronous as abose comment
     this.store.dispatch(getAllSensorsValue());
   }
   ngOnDestroy() {

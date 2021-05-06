@@ -8,12 +8,17 @@ import { SensorsConfigService } from './sensors-config.service';
 import { SensorsComponent } from './sensors.component';
 import { ThingsSensorsConfigService } from './things-sensors-config.service';
 import { ThingsSensorsValueService } from './things-sensors-value.service';
+import { sensorsConfigReducer } from '../state/sensors-config.reducer';
+import { sensorsValueReducer } from '../state/sensors-value.reducer';
+import { StoreModule } from '@ngrx/store';
 
 @NgModule({
   declarations: [SensorsComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA], // To disable some error message from ionic
   imports: [
     CommonModule,
+    StoreModule.forFeature('sensorsValue', sensorsValueReducer), // ToDo: avoid hard coded string
+    StoreModule.forFeature('sensorsConfig', sensorsConfigReducer), // ToDo: avoid hard coded string
     EffectsModule.forFeature([SensorsValueEffects, SensorsConfigEffects])
   ],
   exports: [SensorsComponent],

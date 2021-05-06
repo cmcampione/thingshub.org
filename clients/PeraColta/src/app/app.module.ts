@@ -20,9 +20,6 @@ import { ContentPageComponent } from './content-page/content-page.component';
 import { StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
 
-import { sensorsValueReducer } from './state/sensors-value.reducer';
-import { sensorsConfigReducer } from './state/sensors-config.reducer';
-
 import { SensorsModule } from './sensors/sensors.module';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { environment } from '../environments/environment';
@@ -44,8 +41,7 @@ import { environment } from '../environments/environment';
     AgmCoreModule.forRoot({
       apiKey: 'AIzaSyD11pjYHyE0ekfygLBNJhvL1FgUp9-twkQ'
     }),
-    // ToDo: Try to move in SensorsModule
-    StoreModule.forRoot({ sensorsValue: sensorsValueReducer, sensorsConfig: sensorsConfigReducer }),
+    StoreModule.forRoot({  }),
     StoreDevtoolsModule.instrument({ maxAge: 25, logOnly: environment.production }),
     EffectsModule.forRoot(), // The EffectsModule.forRoot() method must be added to your AppModule imports
                              // even if you don't register any root-level effects.
