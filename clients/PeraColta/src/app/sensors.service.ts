@@ -3,7 +3,7 @@ import { Sensor } from './sensors/sensor.model';
 import { ThingsService } from './things.service';
 import { Thing, HttpRequestCanceler } from 'thingshub-js-sdk';
 import { Store } from '@ngrx/store';
-import { setSensorValue } from './state/sensors-value.actions';
+import { setSensorValue } from './sensors/sensors-value.actions';
 import { SensorValue } from './sensors/sensor-value.model';
 
 interface SensorRaw {

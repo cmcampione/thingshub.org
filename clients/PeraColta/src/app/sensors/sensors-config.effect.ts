@@ -3,7 +3,7 @@ import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { EMPTY, from } from 'rxjs';
 import { map, mergeMap, catchError } from 'rxjs/operators';
 import { SensorsConfigService } from './sensors-config.service';
-import { GET_ALL_SENSORS_CONFIG, GET_ALL_SENSORS_CONFIG_SUCCESS } from '../state/sensors-config.actions';
+import { GET_ALL_SENSORS_CONFIG, GET_ALL_SENSORS_CONFIG_SUCCESS } from '../sensors/sensors-config.actions';
 
 @Injectable()
 export class SensorsConfigEffects {

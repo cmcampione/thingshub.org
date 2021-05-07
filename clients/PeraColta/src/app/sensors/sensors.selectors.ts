@@ -1,5 +1,5 @@
 import { createSelector, createFeatureSelector } from '@ngrx/store';
-import { AppState } from './app.state';
+import { AppState } from '../state/app.state';
 import { SensorValue } from '../sensors/sensor-value.model';
 import { SensorConfig, SensorKind, SensorKindType } from '../sensors/sensor-config.model';
 import { Sensor } from '../sensors/sensor.model';
