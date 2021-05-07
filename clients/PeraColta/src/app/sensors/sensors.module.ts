@@ -8,8 +8,8 @@ import { SensorsConfigService } from './sensors-config.service';
 import { SensorsComponent } from './sensors.component';
 import { ThingsSensorsConfigService } from './things-sensors-config.service';
 import { ThingsSensorsValueService } from './things-sensors-value.service';
-import { sensorsConfigReducer } from '../state/sensors-config.reducer';
-import { sensorsValueReducer } from '../state/sensors-value.reducer';
+import { sensorsConfigReducer } from '../sensors/sensors-config.reducer';
+import { sensorsValueReducer } from '../sensors/sensors-value.reducer';
 import { StoreModule } from '@ngrx/store';
 
 @NgModule({

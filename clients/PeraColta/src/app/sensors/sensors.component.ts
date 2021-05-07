@@ -1,9 +1,9 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { HttpRequestCanceler } from 'thingshub-js-sdk';
 import { select, Store } from '@ngrx/store';
-import { selectSensors } from '../state/sensors.selectors';
-import { getAllSensorsValue } from '../state/sensors-value.actions';
-import { getAllSensorsConfig } from '../state/sensors-config.actions';
+import { selectSensors } from '../sensors/sensors.selectors';
+import { getAllSensorsValue } from '../sensors/sensors-value.actions';
+import { getAllSensorsConfig } from '../sensors/sensors-config.actions';
 
 // ToDo: We have to use canceler
 // ToDo: We have to implement pagination support
