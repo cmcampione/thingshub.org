@@ -1,10 +1,8 @@
 import { Injectable, OnDestroy } from '@angular/core';
-import { Sensor } from './sensors/sensor.model';
-import { ThingsService } from './things.service';
+import { Sensor } from '../sensors/sensor.model';
+import { ThingsService } from '../things.service';
 import { Thing, HttpRequestCanceler } from 'thingshub-js-sdk';
 import { Store } from '@ngrx/store';
-import { setSensorValue } from './sensors/sensors-value.actions';
-import { SensorValue } from './sensors/sensor-value.model';
 
 interface SensorRaw {
   id: string;
@@ -13,7 +11,7 @@ interface SensorRaw {
   value: number;
 }
 @Injectable()
-export class SensorsService implements OnDestroy {
+export class Sensors0Service implements OnDestroy {
 
   private things: Thing[] = [];// It's only a ref to this.thingsService.mainThing.children
   public sensors: Sensor[] = [];
@@ -48,16 +46,6 @@ export class SensorsService implements OnDestroy {
         sensor.now = sensorRaw.now;
         sensor.millis = sensorRaw.millis;
         sensor.value = sensorRaw.value;
-      }
-      if (this.store) {
-        const newSensorValue: SensorValue = {
-          thingId,
-          id: sensorRaw.id,
-          now: sensorRaw.now,
-          millis: sensorRaw.millis,
-          value: sensorRaw.value
-        };
-        this.store.dispatch(setSensorValue({ newSensorValue } ));
       }
     });
   }
@@ -103,29 +91,5 @@ export class SensorsService implements OnDestroy {
     const sensorsRaw = {sensors: [value]}
     // asCmd
     return await this.thingsService.putThingValue({ thingId: thing.id, asCmd: true, value: sensorsRaw });
-  }
-
-  // Useful for ngrx
-  public async getAllSensors(): Promise<Sensor[]> {
-    this.thingsService.init();
-    this.thingsService.realTimeConnector.realTimeConnectorRaw.setHook('onUpdateThingValue', this.onUpdateThingValue);
-    await this.thingsService.thingsManager.getMoreThings(null);
-    const sensors: Sensor[] = [];
-    this.things.forEach(thing =>
-      thing.value.sensors.forEach((sensorRaw: SensorRaw) => {
-        const sensor: Sensor = {
-          thingId: thing.id,
-          name: thing.name,
-          id: sensorRaw.id,
-          now: sensorRaw.now,
-          millis: sensorRaw.millis,
-          value: sensorRaw.value,
-          sensorConfig: null,
-          sensorValue: null
-        }
-        sensors.push(sensor);
-      })
-    )
-    return sensors;
   }
 }
