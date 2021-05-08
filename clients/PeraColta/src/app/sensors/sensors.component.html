@@ -4,17 +4,20 @@
   </ion-card-header>
   <ion-list>
     <ion-item *ngFor="let sensor of sensors$ | async">
+      <ion-icon name="desktop" style="zoom:4.0;" item-start></ion-icon>
       <ion-label>
         <h1>{{sensor.sensorConfig.name}}</h1>
         <p>{{sensor.id}}</p>
         <p>Millis: {{sensor.sensorValue.millis}}</p>        
         <p>Now: {{sensor.sensorValue.now}}</p>
-        <p>Value: {{sensor.sensorValue.value}}</p>
-        <ion-range min="-200" max="200" color="secondary">
-          <ion-label slot="start">-200</ion-label>
-          <ion-label slot="end">200</ion-label>
-        </ion-range>
+        <p>Value: {{sensor.sensorValue.value}}</p>        
       </ion-label>
+      <ion-label>
+        <ion-range min="-200" max="200" color="secondary">
+        <ion-label slot="start">-200</ion-label>
+        <ion-label slot="end">200</ion-label>
+      </ion-range>
+    </ion-label>
     </ion-item>
   </ion-list>
 </ion-card>
