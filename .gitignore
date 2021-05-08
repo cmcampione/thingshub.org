@@ -69,3 +69,5 @@ thingsMonitor.env
 
 .vscode/c_cpp_properties.json
 
+clients/PeraColta/.vs/slnx.sqlite
+clients/PeraColta/.vs/PeraColta/v16/.suo
