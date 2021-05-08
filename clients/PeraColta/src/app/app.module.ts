@@ -3,25 +3,27 @@ import { BrowserModule } from '@angular/platform-browser';
 import { RouteReuseStrategy } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 
+import { StoreModule } from '@ngrx/store';
+import { EffectsModule } from '@ngrx/effects';
+import { StoreDevtoolsModule } from '@ngrx/store-devtools';
+
 import { IonicModule, IonicRouteStrategy } from '@ionic/angular';
 import { SplashScreen } from '@ionic-native/splash-screen/ngx';
 import { StatusBar } from '@ionic-native/status-bar/ngx';
 
+import { AgmCoreModule } from '@agm/core';
+
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
 
-import { AgmCoreModule } from '@agm/core';
 import { LoginComponent } from './login/login.component';
 import { MapComponent } from './map/map.component';
 import { ThingsComponent } from './things/things.component';
 import { Sensors0Component } from './sensors0/sensors0.component';
 import { ContentPageComponent } from './content-page/content-page.component';
 
-import { StoreModule } from '@ngrx/store';
-import { EffectsModule } from '@ngrx/effects';
-
 import { SensorsModule } from './sensors/sensors.module';
-import { StoreDevtoolsModule } from '@ngrx/store-devtools';
+
 import { environment } from '../environments/environment';
 
 @NgModule({
