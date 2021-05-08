@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { HttpRequestCanceler } from 'thingshub-js-sdk';
 import { ThingsService } from '../things.service';
 import { Sensor } from '../sensors/sensor.model';
-import { SensorsService } from '../sensors.service';
+import { Sensors0Service } from './sensors0.service';
 
 @Component({
   selector: 'app-sensors0',
@@ -11,7 +11,7 @@ import { SensorsService } from '../sensors.service';
   providers: [
     { provide: 'thingKind', useValue: 'Home appliance' },
     ThingsService,
-    SensorsService
+    Sensors0Service
   ]
 })
 export class Sensors0Component implements OnInit, OnDestroy {
@@ -19,7 +19,7 @@ export class Sensors0Component implements OnInit, OnDestroy {
   private canceler = new HttpRequestCanceler();
   public readonly sensors: Sensor[];
 
-  constructor(private readonly sensorsService: SensorsService) {
+  constructor(private readonly sensorsService: Sensors0Service) {
     this.sensors = sensorsService.sensors;
   }
   async ngOnInit() {

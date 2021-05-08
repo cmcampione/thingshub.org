@@ -2,8 +2,17 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { HttpRequestCanceler } from 'thingshub-js-sdk';
 import { select, Store } from '@ngrx/store';
 import { selectSensors } from '../sensors/sensors.selectors';
-import { getAllSensorsValue } from '../sensors/sensors-value.actions';
+import { getAllSensorsValue, setSensorValue } from '../sensors/sensors-value.actions';
 import { getAllSensorsConfig } from '../sensors/sensors-config.actions';
+import { RealTimeConnectorService } from '../real-time-connector.service';
+import { SensorValue } from './sensor-value.model';
+
+interface SensorRaw {
+  id: string;
+  now: boolean;
+  millis: number;
+  value: number;
+}
 
 // ToDo: We have to use canceler
 // ToDo: We have to implement pagination support
@@ -17,7 +26,27 @@ export class SensorsComponent implements OnInit, OnDestroy {
   private canceler = new HttpRequestCanceler();
   public  sensors$ = this.store.pipe(select(selectSensors));
 
-  constructor(private readonly store: Store) {
+  private readonly onUpdateThingValue = (thingId: string, value: any, asCmd: boolean): void => {
+    if (asCmd)
+      return;
+    // ToDo: Check for correct thing kind
+    if (!value.sensors)
+      return;
+    value.sensors.forEach((sensorRaw: SensorRaw) => {
+      const newSensorValue: SensorValue = {
+        thingId,
+        id: sensorRaw.id,
+        now: sensorRaw.now,
+        millis: sensorRaw.millis,
+        value: sensorRaw.value
+      };
+      this.store.dispatch(setSensorValue({ newSensorValue } ));
+    });
+  }
+
+  constructor(private readonly store: Store,
+    public readonly realTimeConnector: RealTimeConnectorService) {
+      this.realTimeConnector.realTimeConnectorRaw.setHook('onUpdateThingValue', this.onUpdateThingValue);
   }
 
   ngOnInit() {
@@ -30,6 +59,7 @@ export class SensorsComponent implements OnInit, OnDestroy {
     this.store.dispatch(getAllSensorsValue());
   }
   ngOnDestroy() {
+    this.realTimeConnector.realTimeConnectorRaw.remHook('onUpdateThingValue', this.onUpdateThingValue);
     this.canceler.cancel();
   }
 }
