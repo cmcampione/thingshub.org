@@ -29,7 +29,7 @@ export class SensorsComponent implements OnInit, OnDestroy {
   private readonly onUpdateThingValue = (thingId: string, value: any, asCmd: boolean): void => {
     if (asCmd)
       return;
-    // ToDo: Check for correct thing kind
+    // ToDo: Check for correct thing kind. Waiting for change server notification to add thinkKind parameter
     if (!value.sensors)
       return;
     value.sensors.forEach((sensorRaw: SensorRaw) => {

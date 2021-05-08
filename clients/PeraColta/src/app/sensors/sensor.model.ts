@@ -1,7 +1,5 @@
 import { SensorConfig, SensorKind, SensorKindType } from './sensor-config.model';
 import { SensorValue } from './sensor-value.model';
-
-
 export interface Sensor {
   thingId: string,
   id: string,
