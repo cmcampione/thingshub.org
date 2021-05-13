@@ -11,9 +11,10 @@ import { ThingsSensorsValueService } from './things-sensors-value.service';
 import { sensorsConfigReducer } from '../sensors/sensors-config.reducer';
 import { sensorsValueReducer } from '../sensors/sensors-value.reducer';
 import { StoreModule } from '@ngrx/store';
+import { SensorComponent } from './sensor/sensor.component';
 
 @NgModule({
-  declarations: [SensorsComponent],
+  declarations: [SensorsComponent, SensorComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA], // To disable some error message from ionic
   imports: [
     CommonModule,

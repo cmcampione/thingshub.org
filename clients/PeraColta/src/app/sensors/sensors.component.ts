@@ -6,6 +6,7 @@ import { getAllSensorsValue, setSensorValue } from '../sensors/sensors-value.act
 import { getAllSensorsConfig } from '../sensors/sensors-config.actions';
 import { RealTimeConnectorService } from '../real-time-connector.service';
 import { SensorValue } from './sensor-value.model';
+import { Sensor } from './sensor.model';
 
 interface SensorRaw {
   id: string;
@@ -61,5 +62,10 @@ export class SensorsComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.realTimeConnector.realTimeConnectorRaw.remHook('onUpdateThingValue', this.onUpdateThingValue);
     this.canceler.cancel();
+  }
+
+  // https://netbasal.com/angular-2-improve-performance-with-trackby-cc147b5104e5
+  trackByFn(index, item: Sensor) {
+    return item.sensorValue.id; // or item.id
   }
 }
