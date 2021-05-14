@@ -23,17 +23,20 @@ export class SensorComponent implements OnInit {
   ngOnInit() {}
 
   get iconColor() : string {
-    if (this.sensor.sensorConfig.kind === SensorKind.Digital && this.sensor.sensorValue.value == 1)
+    if (this.sensor.sensorValue.value >= this.sensor.sensorConfig.redValueMin &&
+      this.sensor.sensorValue.value <= this.sensor.sensorConfig.redValueMax)
       return 'red';
     if (this.sensor.sensorValue.now === true)
       return 'yellow';
-    if (this.sensor.sensorConfig.kind === SensorKind.Digital && this.sensor.sensorValue.value == 0)
+    if (this.sensor.sensorValue.value >= this.sensor.sensorConfig.greenValueMin &&
+      this.sensor.sensorValue.value <= this.sensor.sensorConfig.greenValueMax)
       return 'green';
-    return "";
+    return '';
   }
 
   changingValue($event: any) {
-    let value = {
+    // ToDo: Check value range
+    const value = {
       id: this.sensor.id,
       value: $event.detail.value
     }

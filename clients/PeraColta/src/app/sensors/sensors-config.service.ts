@@ -8,6 +8,10 @@ interface SensorConfigRaw {
     name: string;
     kind: SensorKind;
     kindType: SensorKindType;
+    redValueMin: number;
+    redValueMax: number;
+    greenValueMin: number;
+    greenValueMax: number;
     min: number;
     max: number;
 }
@@ -35,6 +39,10 @@ export class SensorsConfigService implements OnDestroy {
                     name: sensorConfigRaw.name,
                     kind: sensorConfigRaw.kind,
                     kindType: sensorConfigRaw.kindType,
+                    redValueMin: sensorConfigRaw.redValueMin,
+                    redValueMax: sensorConfigRaw.redValueMax,
+                    greenValueMin: sensorConfigRaw.greenValueMin,
+                    greenValueMax: sensorConfigRaw.greenValueMax,
                     min: sensorConfigRaw.min,
                     max: sensorConfigRaw.max
                 }
@@ -63,6 +71,10 @@ export class SensorsConfigService implements OnDestroy {
                     name: sensorConfigRaw.name,
                     kind: sensorConfigRaw.kind,
                     kindType: sensorConfigRaw.kindType,
+                    redValueMin: sensorConfigRaw.redValueMin,
+                    redValueMax: sensorConfigRaw.redValueMax,
+                    greenValueMin: sensorConfigRaw.greenValueMin,
+                    greenValueMax: sensorConfigRaw.greenValueMax,
                     min: sensorConfigRaw.min,
                     max: sensorConfigRaw.max
                 }

@@ -1,4 +1,4 @@
-// 
+//
 
 export enum SensorKind {
     Undefined = 0,
@@ -12,14 +12,17 @@ export enum SensorKindType {
     Output,
     InputOutput
 }
-
 export interface SensorConfig {
     thingId: string;
     id: string;
     name: string;
     kind: SensorKind;
     kindType: SensorKindType;
-    min: number;
-    max: number;
+    redValueMin: number;
+    redValueMax: number;
+    greenValueMin: number;
+    greenValueMax: number;
+    min: number; // For SensorKind.Digital its value is 0
+    max: number; // For SensorKind.Digital its value is 1
 }
 
