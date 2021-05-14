@@ -13,19 +13,19 @@
 
     <ion-range *ngIf = "(sensor.sensorConfig.kind === SensorKind.Analogic) &&
       (sensor.sensorConfig.kindType === SensorKindType.Output || sensor.sensorConfig.kindType === SensorKindType.InputOutput)"
-        min="-200" max="200" color="secondary">
-      <ion-label slot="start">-200</ion-label>
-      <ion-label slot="end">200</ion-label>
+        min={{sensor.sensorConfig.min}} max={{sensor.sensorConfig.max}} color="secondary">
+      <ion-label slot="start">{{sensor.sensorConfig.min}}</ion-label>
+      <ion-label slot="end">{{sensor.sensorConfig.max}}</ion-label>
     </ion-range>
     
     <ion-segment *ngIf = "(sensor.sensorConfig.kind === SensorKind.Digital) &&
       (sensor.sensorConfig.kindType === SensorKindType.Output || sensor.sensorConfig.kindType === SensorKindType.InputOutput)"
       value = {{sensor.sensorValue.value}}
       (ionChange)="changingValue($event)">
-      <ion-segment-button value=0>
+      <ion-segment-button value={{sensor.sensorConfig.min}}>
         <ion-label>Off</ion-label>
       </ion-segment-button>
-      <ion-segment-button value=1>
+      <ion-segment-button value={{sensor.sensorConfig.max}}>
         <ion-label>On</ion-label>
       </ion-segment-button>
     </ion-segment>

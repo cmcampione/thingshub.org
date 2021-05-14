@@ -23,6 +23,10 @@ export const selectSensors = createSelector(
                 id: sensorValueRaw.id,
                 kind: SensorKind.Undefined,
                 kindType: SensorKindType.Undefined,
+                redValueMin: 0,
+                redValueMax: 0,
+                greenValueMin: 0,
+                greenValueMax: 0,
                 min: 0,
                 max: 0
             }
@@ -32,7 +36,7 @@ export const selectSensors = createSelector(
                 sensorConfigRaw = sc;
             return {
                 thingId: sensorValueRaw.thingId,
-                id: sensorValueRaw.id, // equal to sensorConfigRaw.id
+                id: sensorValueRaw.id, // It's equal to sensorConfigRaw.id
 
                 // ToDo: To remove
                 name: sensorConfigRaw.name,
