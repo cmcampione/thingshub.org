@@ -23,13 +23,12 @@ export class AccountDataContext {
     private authTokenRequest: Promise<any>;
 
     private getNewAccessToken() {
-
         if (!this.authTokenRequest) {
             this.authTokenRequest = this.accountActionControl.refreshToken();
             this.authTokenRequest.then(response => {
-              this.authTokenRequest = null;
+                this.authTokenRequest = null;
             }).catch(error => {
-              this.authTokenRequest = null;
+                this.authTokenRequest = null;
             });
         }
         return this.authTokenRequest;
@@ -39,39 +38,33 @@ export class AccountDataContext {
 
         this.accountUrl = endPointAddress.api + "/account";
 
-        /* axios.interceptors.response.use((response) => {
-            return response;
-          },
-          async err => {
-              const error = err.response;
-              if (accountActionControl &&
-                error &&
-                error.status === 401 &&
-                error.config &&
-                !error.config.__isRetryRequest) {
-      
-                try {
-                      const response = await this.getNewAccessToken();
-                      error.config.__isRetryRequest = true;
-                      // set new access token after refreshing it
-                      error.config.headers = this.accountActionControl.getSecurityHeader();
-                      return axios(error.config);
-                  }
-                  catch (e) {
-                      // refreshing has failed => redirect to login
-                      // clear cookie (with logout action) and return to identityserver to new login
-                      // (window as any).location = "/account/logout";
-                      // TODO: Can be called many times - https://docs.google.com/spreadsheets/d/1Ks-K10kmLcHOom7igTkQ8wtRSJ-73i1hftUAE4E9q80/edit#gid=1455384855&range=D7
-                      this.accountActionControl.resetApp();
-                      return Promise.reject(e);
-                  }
-              }
-      
-              return Promise.reject(error);
-          }); */
+        axios.interceptors.response.use(response => response,
+            async err => {
+                const error = err.response;
+                if (accountActionControl && error &&
+                    error.status === 401 && error.config &&
+                    !error.config.__isRetryRequest) {
+                    try {
+                        const response = await this.getNewAccessToken();
+                        error.config.__isRetryRequest = true;
+                        // set new access token after refreshing it
+                        error.config.headers = { ...error.config.headers, ...this.accountActionControl.getSecurityHeader()};
+                        return axios(error.config);
+                    }
+                    catch (e) {
+                        // refreshing has failed => redirect to login
+                        // clear cookie (with logout action) and return to identityserver to new login
+                        // (window as any).location = "/account/logout";
+                        // ToDo: Can be called many times
+                        this.accountActionControl.resetApp();
+                        return Promise.reject(e);
+                    }
+                }
+                return Promise.reject(err);
+            }
+        );
     }
 
-    // TODO: https://docs.google.com/spreadsheets/d/1Ks-K10kmLcHOom7igTkQ8wtRSJ-73i1hftUAE4E9q80/edit#gid=1455384855&range=C4
     public async login({ username, password }: { username: string; password: string; }) 
         : Promise<AccountUserData> {
         let loginData = {
@@ -93,7 +86,7 @@ export class AccountDataContext {
             exp: accountUserDataRaw.exp
         };
     }
-    // TODO: To check
+    // ToDo: To check
     public async loginBasic({ username, password }: { username: string; password: string; }) : Promise<any> {
         const response = await axios.post(this.accountUrl + "/login", "grant_type=client_credentials", {
             headers: {

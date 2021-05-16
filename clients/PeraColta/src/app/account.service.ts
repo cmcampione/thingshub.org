@@ -14,14 +14,10 @@ export class AccountService {
 
   public isLoggedIn$: Subject<AccountUserData> = new Subject<AccountUserData>();
 
-  private actionControl: AccountActionControl = {
-    getSecurityHeader : () => {
-      return this.getSecurityHeader();
-    },
-    refreshToken: (): Promise<any> => {
-
-      // Shows login Component
-      this.isLoggedIn$.next(null);
+  private accountActionControl: AccountActionControl = {
+    getSecurityHeader : () => this.getSecurityHeader(),
+    refreshToken: () : Promise<any> => {
+      this.isLoggedIn$.next(null);// Shows login Component
       return new Promise((resolve, reject) => {
         const subscription = this.isLoggedIn$.subscribe((accountUserData: AccountUserData) => {
           subscription.unsubscribe();
@@ -50,7 +46,7 @@ export class AccountService {
 
   constructor() {
     this.accountManager = new AccountManager('thingshub',
-      new AccountDataContext(endPointAddress, this.actionControl));
+      new AccountDataContext(endPointAddress, this.accountActionControl));
   }
 
   public get remember(): boolean {
@@ -62,7 +58,7 @@ export class AccountService {
     if (!this.userId) {
       this.userId = loginData.id;
     }
-    // The user is changed without appropriate logout
+    // The user is changed without appropriate logout action
     if (this.userId !== loginData.id) {
       this.userId = null;
       this.accountManager.resetLoginData();

@@ -12,7 +12,7 @@ export class RealTimeConnectorService {
   constructor(private accountService: AccountService) {
   }
 
-  public readonly connectionStatus = new Subject<thingshub.RealtimeConnectionStates>();
+  public readonly connectionStatus$ = new Subject<thingshub.RealtimeConnectionStates>();
 
   private readonly onError = (error: any) => {
     console.log(error);
@@ -21,7 +21,7 @@ export class RealTimeConnectorService {
     console.log(error);
   }
   private readonly onStateChanged = (change: thingshub.RealtimeConnectionStates): void => {
-    this.connectionStatus.next(change);
+    this.connectionStatus$.next(change);
   };
 
   // ToDo: Could be injected to chance connection type

@@ -38,7 +38,7 @@ module.exports = {
 		new WebpackShellPluginNext({
 			onBuildEnd: [".\\node_modules\\.bin\\dts-bundle-generator -o ./dist/thingshub.d.ts ./src/index.ts  --umd-module-name thingshub"]
 		}),
-		// TODO: Not executed in correct order
+		// ToDo: Not executed in correct order
 		// Useful to avoid publish in npm repo
 		new FileManagerPlugin({
 			events: {
