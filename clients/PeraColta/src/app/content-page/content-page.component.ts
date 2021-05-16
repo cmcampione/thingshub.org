@@ -12,11 +12,17 @@ import { Subscription } from 'rxjs';
 })
 export class ContentPageComponent implements OnInit, OnDestroy {
 
-  public title = 'Hardworking bees are working here';
+  // tslint:disable-next-line: max-line-length
+  // It's public for this: https://stackoverflow.com/questions/34574167/angular2-should-private-variables-be-accessible-in-the-template/34574732#34574732
 
-  public connectionStatus: thingshub.RealtimeConnectionStates = thingshub.RealtimeConnectionStates.Disconnected;
+  public title = 'PeraColta - Hardworking bees are working here';
+
+  private connectionStatus: thingshub.RealtimeConnectionStates = thingshub.RealtimeConnectionStates.Disconnected;
   private readonly subscriptionIsLoggedIn: Subscription = null;
   private readonly subscriptionRealTimeConnector: Subscription = null;
+
+  // tslint:disable-next-line: max-line-length
+  // They are public for this: https://stackoverflow.com/questions/34574167/angular2-should-private-variables-be-accessible-in-the-template/34574732#34574732
 
   public connIconName = 'globe';
   public connIconColor = 'danger';
@@ -27,7 +33,6 @@ export class ContentPageComponent implements OnInit, OnDestroy {
     if (this.isLoggedIn) {
       this.realTimeConnector.realTimeConnectorRaw.subscribe();
     } else {
-      // ToDo: ToTry better
       this.realTimeConnector.realTimeConnectorRaw.unsubscribe();
     }
   }
@@ -56,16 +61,19 @@ export class ContentPageComponent implements OnInit, OnDestroy {
   constructor(private accountService: AccountService,
     private realTimeConnector: RealTimeConnectorService) {
       this.subscriptionIsLoggedIn = this.accountService.isLoggedIn$.subscribe(this.checkLogin);
-      this.subscriptionRealTimeConnector = this.realTimeConnector.connectionStatus.subscribe({
+      this.subscriptionRealTimeConnector = this.realTimeConnector.connectionStatus$.subscribe({
         next: this.setConnectionIcon
       });
   }
 
   ngOnInit() {
     if (this.isLoggedIn) {
+      // ToDo: Seems it's never called
       this.realTimeConnector.realTimeConnectorRaw.subscribe();
     }
   }
+
+  // ToDo: Seems it's never called
   ngOnDestroy() {
     if (this.isLoggedIn) {
       this.realTimeConnector.realTimeConnectorRaw.unsubscribe();
