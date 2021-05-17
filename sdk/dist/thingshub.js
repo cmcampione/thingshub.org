@@ -3839,9 +3839,9 @@ class AccountDataContext {
                 error.status === 401 && error.config &&
                 !error.config.__isRetryRequest) {
                 try {
-                    const response = yield this.getNewAccessToken();
+                    const response = yield this.accountActionControl.refreshToken();
                     error.config.__isRetryRequest = true;
-                    // set new access token after refreshing it
+                    // set new access token after refresh it
                     error.config.headers = Object.assign(Object.assign({}, error.config.headers), this.accountActionControl.getSecurityHeader());
                     return axios_1.default(error.config);
                 }
@@ -3856,17 +3856,6 @@ class AccountDataContext {
             }
             return Promise.reject(err);
         }));
-    }
-    getNewAccessToken() {
-        if (!this.authTokenRequest) {
-            this.authTokenRequest = this.accountActionControl.refreshToken();
-            this.authTokenRequest.then(response => {
-                this.authTokenRequest = null;
-            }).catch(error => {
-                this.authTokenRequest = null;
-            });
-        }
-        return this.authTokenRequest;
     }
     login({ username, password }) {
         return __awaiter(this, void 0, void 0, function* () {

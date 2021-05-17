@@ -35,7 +35,7 @@ export class Helpers {
 
     public static getRangeItemsFromResponse(response: any) : ItemsRange  {
         
-        //TODO: It's very common find "response.headers" syntax so for now is good
+        //ToDo: It's very common find "response.headers" syntax so for now is good
         var contentRange = response.headers["content-range"];
 
         var top: number = 0;

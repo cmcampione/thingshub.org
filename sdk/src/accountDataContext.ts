@@ -20,20 +20,6 @@ export class AccountDataContext {
 
     private accountUrl:string = "";
 
-    private authTokenRequest: Promise<any>;
-
-    private getNewAccessToken() {
-        if (!this.authTokenRequest) {
-            this.authTokenRequest = this.accountActionControl.refreshToken();
-            this.authTokenRequest.then(response => {
-                this.authTokenRequest = null;
-            }).catch(error => {
-                this.authTokenRequest = null;
-            });
-        }
-        return this.authTokenRequest;
-    }
-
     constructor(endPointAddress: EndPointAddress, private accountActionControl?: AccountActionControl) {
 
         this.accountUrl = endPointAddress.api + "/account";
@@ -45,9 +31,10 @@ export class AccountDataContext {
                     error.status === 401 && error.config &&
                     !error.config.__isRetryRequest) {
                     try {
-                        const response = await this.getNewAccessToken();
+                        const response = await this.accountActionControl.refreshToken();
+                        // ToDo: I don't know if this is useful only for "login refresh token", I have to test with real refresh token http call
                         error.config.__isRetryRequest = true;
-                        // set new access token after refreshing it
+                        // set new access token after refresh it
                         error.config.headers = { ...error.config.headers, ...this.accountActionControl.getSecurityHeader()};
                         return axios(error.config);
                     }
@@ -65,6 +52,17 @@ export class AccountDataContext {
         );
     }
 
+    /* 
+    async function foo() {
+        return 1
+    }
+
+    ...is similar to:
+
+    function foo() {
+        return Promise.resolve(1)
+    }
+    */
     public async login({ username, password }: { username: string; password: string; }) 
         : Promise<AccountUserData> {
         let loginData = {
