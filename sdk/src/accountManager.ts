@@ -17,7 +17,7 @@ export class AccountManager {
     //INFO: apiKey is never persistent
     private _apiKey : string = null;
 
-    //TODO: Why is public?
+    //ToDo: Why is public?
     public resetLoginData() : void {
 
         this._accessToken = null;

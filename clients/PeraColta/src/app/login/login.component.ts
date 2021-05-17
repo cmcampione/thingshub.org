@@ -31,7 +31,9 @@ export class LoginComponent implements OnInit {
         return;
       }
       const loginData = await this.accountService.login(this.username, this.password, this.remember);
-    } catch (e) {
+    }
+    catch (e) {
+      // ToDo: May be need to reset ngrx State
       this.username = '';
       const msg = (e instanceof Error) ? e.message : e.data.message;
       const toast = await this.toastController.create({
@@ -39,7 +41,8 @@ export class LoginComponent implements OnInit {
         duration: 2000
       });
       toast.present();
-    } finally {
+    }
+    finally {
       this.password = '';
     }
   }

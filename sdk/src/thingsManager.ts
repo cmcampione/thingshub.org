@@ -128,7 +128,7 @@ export class ThingsManager {
     // INFO:    In Books example where "this.mainThing" is a "generic root thing" 
     //          "getMoreThings" fills "this.mainThing.children" with "books" collection 
     //          and each "this.mainThing.children[0..n].children" is filled with collection of "generic root thing" like "book comments"
-    public async getMoreThings(canceler : HttpRequestCanceler) : Promise<void> {
+    public async getMoreThings(canceler : HttpRequestCanceler) : Promise<ThingsDataSet[]> {
         let self = this;
         
         var data = await this.getMoreThingChildren(this.mainThing, this.getThingsParams, canceler);
@@ -139,7 +139,7 @@ export class ThingsManager {
         for (let i = 0; i < data.things.length; i++)
             promises.push(self.getMoreThingChildren(data.things[i], self.getChindrenThingsParams, canceler));
 
-        Promise.all(promises);
+        return Promise.all(promises);
     }
 
     public getThingsTotalItems() : Number {
