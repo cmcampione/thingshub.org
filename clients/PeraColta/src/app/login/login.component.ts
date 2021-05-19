@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { AccountService } from '../account.service';
 import { ToastController } from '@ionic/angular';
+import { Store } from '@ngrx/store';
+import { resetAppState } from '../app.actions';
 
 @Component({
   selector: 'app-login',
@@ -13,7 +15,8 @@ export class LoginComponent implements OnInit {
   public password = '';
   public remember = this.accountService.remember;
 
-  constructor(private accountService: AccountService,
+  constructor(private readonly store: Store,
+    private accountService: AccountService,
     public toastController: ToastController) {
   }
 
@@ -33,7 +36,7 @@ export class LoginComponent implements OnInit {
       const loginData = await this.accountService.login(this.username, this.password, this.remember);
     }
     catch (e) {
-      // ToDo: May be need to reset ngrx State
+      this.store.dispatch(resetAppState());
       this.username = '';
       const msg = (e instanceof Error) ? e.message : e.data.message;
       const toast = await this.toastController.create({
