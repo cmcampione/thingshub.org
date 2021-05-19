@@ -6,6 +6,8 @@ import { Subscription } from 'rxjs';
 import { Platform } from '@ionic/angular';
 import { SplashScreen } from '@ionic-native/splash-screen/ngx';
 import { StatusBar } from '@ionic-native/status-bar/ngx';
+import { Store } from '@ngrx/store';
+import { resetAppState } from './app.actions';
 
 @Component({
   selector: 'app-root',
@@ -26,6 +28,7 @@ export class AppComponent implements OnDestroy {
     private platform: Platform,
     private splashScreen: SplashScreen,
     private statusBar: StatusBar,
+    private readonly store: Store,
     private accountService: AccountService) {
     this.initializeApp();
 
@@ -40,6 +43,7 @@ export class AppComponent implements OnDestroy {
   }
 
   async logout() {
+    this.store.dispatch(resetAppState());
     try {
       await this.accountService.logout();
     } catch (e) {

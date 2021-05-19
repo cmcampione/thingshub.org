@@ -25,6 +25,7 @@ import { ContentPageComponent } from './content-page/content-page.component';
 import { SensorsModule } from './sensors/sensors.module';
 
 import { environment } from '../environments/environment';
+import { appReducer } from './app.reducer';
 
 @NgModule({
   declarations: [
@@ -43,7 +44,7 @@ import { environment } from '../environments/environment';
     AgmCoreModule.forRoot({
       apiKey: 'AIzaSyD11pjYHyE0ekfygLBNJhvL1FgUp9-twkQ'
     }),
-    StoreModule.forRoot({  }, {
+    StoreModule.forRoot({}, {
       // https://ngrx.io/guide/store/configuration/runtime-checks
       runtimeChecks: {
         strictStateImmutability: true,
@@ -52,7 +53,7 @@ import { environment } from '../environments/environment';
         strictActionSerializability: true,
         strictActionWithinNgZone: true,
         strictActionTypeUniqueness: true,
-      }}),
+    }}),
     StoreDevtoolsModule.instrument({ maxAge: 25, logOnly: environment.production }),
     EffectsModule.forRoot(), // The EffectsModule.forRoot() method must be added to your AppModule imports
                              // even if you don't register any root-level effects.

@@ -1,15 +1,15 @@
 import { createSelector, createFeatureSelector } from '@ngrx/store';
-import { AppState } from '../state/app.state';
+import { SensorsState } from './sensors.state';
 import { SensorValue } from '../sensors/sensor-value.model';
 import { SensorConfig, SensorKind, SensorKindType } from '../sensors/sensor-config.model';
 import { Sensor } from '../sensors/sensor.model';
 
 const selectSensorsValue = createFeatureSelector<
-    AppState,
+    SensorsState,
     ReadonlyArray<SensorValue>>('sensorsValue'); // ToDo: avoid hard coded string
 
 const selectSensorsConfig = createFeatureSelector<
-    AppState,
+    SensorsState,
     ReadonlyArray<SensorConfig>>('sensorsConfig'); // ToDo: avoid hard coded string
 
 export const selectSensors = createSelector(

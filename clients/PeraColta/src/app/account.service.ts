@@ -23,12 +23,12 @@ export class AccountService {
           subscription.unsubscribe();
           if (accountUserData != null) {
             resolve(accountUserData);
-            return accountUserData; // ToDo: I don't know is return accountUserData is necessary after a resolve
+            return accountUserData; // ToDo: I don't know if return accountUserData is necessary after a resolve
           }
           // With accountUserData == null assert UserId changed without appropriate logout
           const err = new Error('User is changed without appropriate logout action');
           reject(err);
-          return err;// ToDo: I don't know is return err is necessary after a reject
+          return err;// ToDo: I don't know if return err is necessary after a reject
         });
       });
     },
