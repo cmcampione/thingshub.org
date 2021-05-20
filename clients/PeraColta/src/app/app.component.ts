@@ -14,7 +14,7 @@ import { AccountService } from './account.service';
 })
 export class AppComponent implements OnInit, OnDestroy {
   private readonly subscriptionIsLoggedIn: Subscription = null;
-  private isLoggedIn = false; // ToDo: May be removed?
+  private isLoggedIn = false; // ToDo: May be removed? Can be useful?
 
   initializeApp() {
     this.platform.ready().then(() => {
@@ -37,6 +37,7 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   // ToDo: Seems it's never called
+  // https://stackoverflow.com/questions/40468267/angular-2-does-ngondestroy-get-called-on-refresh-or-just-when-navigate-away-fr
   ngOnDestroy() {
     this.subscriptionIsLoggedIn.unsubscribe();
   }
@@ -53,6 +54,7 @@ export class AppComponent implements OnInit, OnDestroy {
     try {
       await this.accountService.logout();
     } catch (e) {
+      // Info: Logout error doesn't need to notify any UI message
       console.log(e);
     }
   }

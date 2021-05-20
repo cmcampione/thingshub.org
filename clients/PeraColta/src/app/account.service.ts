@@ -35,13 +35,11 @@ export class AccountService {
     resetApp: () => console.log('resetApp')
   };
 
-  // ToDo: These method are public for MapComponent and ThingsComponent Access
+  // ToDo: This method are public for MapComponent and ThingsComponent Access, maybe can not really necessary
   public getSecurityHeader = () => {
     return { Authorization: 'Bearer ' + this.accountManager.accessToken};
   }
-  public getSecurityToken = () => {
-    return 'token=' + this.accountManager.accessToken;
-  }
+  public getSecurityToken = () => 'token=' + this.accountManager.accessToken;
 
   constructor() {
     this.accountManager = new AccountManager('thingshub',
@@ -61,7 +59,7 @@ export class AccountService {
     if (!this.userId) {
       this.userId = loginData.id;
     }
-    // The user is changed without appropriate logout action
+    // The user was changed without appropriate logout action
     if (this.userId !== loginData.id) {
       this.userId = null;
       this.accountManager.resetLoginData();

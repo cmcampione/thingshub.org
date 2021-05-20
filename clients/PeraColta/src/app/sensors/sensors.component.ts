@@ -47,6 +47,7 @@ export class SensorsComponent implements OnInit, OnDestroy {
 
   constructor(private readonly store: Store,
     public readonly realTimeConnector: RealTimeConnectorService) {
+      // Info: Here I'm already loggedin so is possible to register an event handler
       this.realTimeConnector.realTimeConnectorRaw.setHook('onUpdateThingValue', this.onUpdateThingValue);
   }
 
