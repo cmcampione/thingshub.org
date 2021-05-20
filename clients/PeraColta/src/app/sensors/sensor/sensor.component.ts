@@ -34,13 +34,21 @@ export class SensorComponent implements OnInit {
     return '';
   }
 
-  changingValue($event: any) {
+  async changingValue($event: any) {
     // ToDo: Check value range
     const value = {
       id: this.sensor.id,
       value: $event.detail.value
     }
-    this.sensorsValueService.setSensorValue(this.sensor.sensorValue, value )
+    try {
+      await this.sensorsValueService.setSensorValue(this.sensor.sensorValue, value )
+    }
+    catch(error) {
+      // ToDo: During 401 error we don't have to notify nothing, but for different error we should notify some error message
+      // Could be used CustomError check
+      // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error
+      console.log('error');
+    }
   }
 
 }

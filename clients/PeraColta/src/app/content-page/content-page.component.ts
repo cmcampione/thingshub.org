@@ -1,5 +1,4 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { AccountUserData } from 'thingshub-js-sdk';
 import { AccountService } from '../account.service';
 import { RealTimeConnectorService } from '../real-time-connector.service';
 import * as thingshub from 'thingshub-js-sdk';
@@ -14,22 +13,21 @@ export class ContentPageComponent implements OnInit, OnDestroy {
 
   // tslint:disable-next-line: max-line-length
   // It's public for this: https://stackoverflow.com/questions/34574167/angular2-should-private-variables-be-accessible-in-the-template/34574732#34574732
-
   public title = 'PeraColta - Hardworking bees are working here';
 
-  private connectionStatus: thingshub.RealtimeConnectionStates = thingshub.RealtimeConnectionStates.Disconnected;
   private readonly subscriptionIsLoggedIn: Subscription = null;
+
+  private connectionStatus: thingshub.RealtimeConnectionStates = thingshub.RealtimeConnectionStates.Disconnected;
   private readonly subscriptionRealTimeConnector: Subscription = null;
 
   // tslint:disable-next-line: max-line-length
   // They are public for this: https://stackoverflow.com/questions/34574167/angular2-should-private-variables-be-accessible-in-the-template/34574732#34574732
-
   public connIconName = 'globe';
   public connIconColor = 'danger';
-
   public isLoggedIn = false;
-  private readonly checkLogin = (accountUserData: AccountUserData) => {
-    this.isLoggedIn = accountUserData != null;
+
+  private readonly checkLogin = (isLoggedIn: boolean) => {
+    this.isLoggedIn = isLoggedIn;
     if (this.isLoggedIn) {
       this.realTimeConnector.realTimeConnectorRaw.subscribe();
     } else {
@@ -67,8 +65,8 @@ export class ContentPageComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
+    this.isLoggedIn = this.accountService.isLoggedIn;
     if (this.isLoggedIn) {
-      // ToDo: Seems it's never called
       this.realTimeConnector.realTimeConnectorRaw.subscribe();
     }
   }
