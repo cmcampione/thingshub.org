@@ -24,14 +24,10 @@ export class SensorsValueService implements OnDestroy {
             return thing.id === id;
         })
     }
-
-    // ToDo: Try to render as private member
-    private done() {
-        this.thingsService.done();
-    }
+    
     // ToDo: It's not called for Effect cleanup
     ngOnDestroy() {
-        this.done();
+        this.thingsService.done();
     }
 
     public async getAll(): Promise<ReadonlyArray<SensorValue>> {

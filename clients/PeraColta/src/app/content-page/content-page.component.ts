@@ -72,6 +72,7 @@ export class ContentPageComponent implements OnInit, OnDestroy {
   }
 
   // ToDo: Seems it's never called
+  // https://stackoverflow.com/questions/40468267/angular-2-does-ngondestroy-get-called-on-refresh-or-just-when-navigate-away-fr
   ngOnDestroy() {
     if (this.isLoggedIn) {
       this.realTimeConnector.realTimeConnectorRaw.unsubscribe();

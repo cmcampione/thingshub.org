@@ -26,8 +26,8 @@ import { SensorComponent } from './sensor/sensor.component';
   providers: [
     ThingsSensorsConfigService, // It's necessary for Effect bootstrap
     ThingsSensorsValueService,  // It's necessary for Effect bootstrap
-    SensorsValueService,
-    SensorsConfigService
+    SensorsValueService,        // It's necessary for Effect bootstrap
+    SensorsConfigService        // It's necessary for Effect bootstrap
   ]
 })
 export class SensorsModule { }
