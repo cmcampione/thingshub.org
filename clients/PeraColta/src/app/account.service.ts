@@ -12,20 +12,20 @@ export class AccountService {
 
   private userId: string = null;
 
-  public isLoggedIn$: Subject<AccountUserData> = new Subject<AccountUserData>();
+  public isLoggedIn$: Subject<boolean> = new Subject<boolean>();
 
   private accountActionControl: AccountActionControl = {
     getSecurityHeader : () => this.getSecurityHeader(),
     refreshToken: () : Promise<any> => {
-      this.isLoggedIn$.next(null);// Shows login Component
+      this.isLoggedIn$.next(false);// Shows login Component
       return new Promise((resolve, reject) => {
-        const subscription = this.isLoggedIn$.subscribe((accountUserData: AccountUserData) => {
+        const subscription = this.isLoggedIn$.subscribe((isLoggedIn: boolean) => {
           subscription.unsubscribe();
-          if (accountUserData != null) {
-            resolve(accountUserData);
-            return accountUserData; // ToDo: I don't know if return accountUserData is necessary after a resolve
+          if (isLoggedIn) {
+            resolve(isLoggedIn);
+            return isLoggedIn; // ToDo: I don't know if return accountUserData is necessary after a resolve
           }
-          // With accountUserData == null assert UserId changed without appropriate logout
+          // With accountUserData == false assert UserId changed without appropriate logout
           const err = new Error('User is changed without appropriate logout action');
           reject(err);
           return err;// ToDo: I don't know if return err is necessary after a reject
@@ -35,6 +35,7 @@ export class AccountService {
     resetApp: () => console.log('resetApp')
   };
 
+  // ToDo: These method are public for MapComponent and ThingsComponent Access
   public getSecurityHeader = () => {
     return { Authorization: 'Bearer ' + this.accountManager.accessToken};
   }
@@ -45,6 +46,10 @@ export class AccountService {
   constructor() {
     this.accountManager = new AccountManager('thingshub',
       new AccountDataContext(endPointAddress, this.accountActionControl));
+  }
+
+  public get isLoggedIn(): boolean {
+    return this.accountManager.isLoggedIn;
   }
 
   public get remember(): boolean {
@@ -60,10 +65,10 @@ export class AccountService {
     if (this.userId !== loginData.id) {
       this.userId = null;
       this.accountManager.resetLoginData();
-      this.isLoggedIn$.next(null);
-      throw new Error('User is changed without appropriate logout action');
+      this.isLoggedIn$.next(false);
+      throw new Error('User was changed without appropriate logout action');
     }
-    this.isLoggedIn$.next(loginData);
+    this.isLoggedIn$.next(true);
     return loginData;
   }
   public async logout() {
@@ -74,7 +79,7 @@ export class AccountService {
     } finally {
       this.userId = null;
       this.accountManager.resetLoginData();
-      this.isLoggedIn$.next(null);
+      this.isLoggedIn$.next(false);
     }
   }
 }

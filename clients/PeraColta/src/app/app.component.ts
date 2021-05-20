@@ -1,22 +1,20 @@
-import { Component, OnDestroy } from '@angular/core';
-import { AccountService } from './account.service';
-import { AccountUserData } from 'thingshub-js-sdk';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
-
 import { Platform } from '@ionic/angular';
 import { SplashScreen } from '@ionic-native/splash-screen/ngx';
 import { StatusBar } from '@ionic-native/status-bar/ngx';
 import { Store } from '@ngrx/store';
 import { resetAppState } from './app.actions';
+import { AccountService } from './account.service';
 
 @Component({
   selector: 'app-root',
   templateUrl: 'app.component.html',
   styleUrls: ['app.component.scss']
 })
-export class AppComponent implements OnDestroy {
+export class AppComponent implements OnInit, OnDestroy {
   private readonly subscriptionIsLoggedIn: Subscription = null;
-  public isLoggedIn = false;
+  private isLoggedIn = false; // ToDo: May be removed?
 
   initializeApp() {
     this.platform.ready().then(() => {
@@ -31,18 +29,26 @@ export class AppComponent implements OnDestroy {
     private readonly store: Store,
     private accountService: AccountService) {
     this.initializeApp();
-
     this.subscriptionIsLoggedIn = this.accountService.isLoggedIn$.subscribe(this.checkLogin);
   }
+
+  ngOnInit() {
+    this.isLoggedIn = this.accountService.isLoggedIn;
+  }
+
+  // ToDo: Seems it's never called
   ngOnDestroy() {
     this.subscriptionIsLoggedIn.unsubscribe();
   }
 
-  private readonly checkLogin = (accountUserData: AccountUserData) => {
-    this.isLoggedIn = accountUserData != null;
+  private readonly checkLogin = (isLoggedIn: boolean) => {
+    this.isLoggedIn = isLoggedIn;
   }
 
+  // ToDo: Why it is in this component?
   async logout() {
+    if (!this.accountService.isLoggedIn)
+      return;
     this.store.dispatch(resetAppState());
     try {
       await this.accountService.logout();

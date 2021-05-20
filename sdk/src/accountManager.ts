@@ -14,7 +14,7 @@ export class AccountManager {
 
     private deltaTime: number = null;
     
-    //INFO: apiKey is never persistent
+    //Info: apiKey is never persistent
     private _apiKey : string = null;
 
     //ToDo: Why is public?
@@ -81,7 +81,7 @@ export class AccountManager {
         if (apiKey) {
             // Sanity check
             this.resetLoginData();
-            // INFO: By design ApiKey is never persistent
+            // Info: By design ApiKey is never persistent
             this._apiKey = apiKey;
             return;
         }
