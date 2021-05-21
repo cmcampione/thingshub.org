@@ -124,9 +124,7 @@ export class AccountManager {
             return;
 
         const accountUserDataRaw: any = jwtDecode(this.accessToken);
-
-        let dateNow = new Date();
-        if (accountUserDataRaw.exp < Math.trunc(dateNow.getTime()/1000)) {
+        if (accountUserDataRaw.exp < Math.floor(Date.now()/1000)) {
             this.resetLoginData();
         }
     }       
@@ -138,12 +136,8 @@ export class AccountManager {
         return this._accessToken;
     }
 
-    public getSecurityHeader = (): object => {
-        return this.apiKey ? { thapikey: this.apiKey } : { Authorization: "Bearer " + this.accessToken} ;
-    }
-    public getSecurityToken = (): string => {
-        return this.apiKey ? "token=" + this.apiKey : "token=" + this.accessToken;
-    }
+    public getSecurityHeader = (): object => this.apiKey ? { thapikey: this.apiKey } : { Authorization: "Bearer " + this.accessToken} ;    
+    public getSecurityToken = (): string => this.apiKey ? "token=" + this.apiKey : "token=" + this.accessToken;
 
     public get isLoggedIn() : boolean {
         if (this.apiKey)
@@ -153,12 +147,7 @@ export class AccountManager {
             return false;
 
         const accountUserDataRaw: any = jwtDecode(this.accessToken);
-
-        let dateNow = new Date();
-        let dateNowN = Math.floor(dateNow.getTime()/1000);
-        if (accountUserDataRaw.exp < Math.floor(dateNow.getTime()/1000))
-            return false;
-        return true;
+        return (accountUserDataRaw.exp >= Math.floor(Date.now()/1000));
     }
 
     public get remember() : boolean {

@@ -35,7 +35,7 @@ export class AccountService {
     resetApp: () => console.log('resetApp')
   };
 
-  // ToDo: This method are public for MapComponent and ThingsComponent Access, maybe can not really necessary
+  // ToDo: This method are public for MapComponent and ThingsServer Access, maybe can not really necessary
   public getSecurityHeader = () => {
     return { Authorization: 'Bearer ' + this.accountManager.accessToken};
   }

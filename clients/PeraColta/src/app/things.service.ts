@@ -60,8 +60,7 @@ export class ThingsService implements OnDestroy {
     this.done();
   }
 
-  // Only simple wrappers to "thingsDatacontext"
-
+  // Only a simple wrappers to "thingsDatacontext"
   public async putThingValue({ thingId, asCmd, value }: { thingId: string; asCmd: boolean; value: any; })
     : Promise<any> {
     return await this.thingsManager.putThingValue(thingId, asCmd, value);
