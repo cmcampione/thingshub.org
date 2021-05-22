@@ -54,7 +54,7 @@ export class ThingsDataContext {
         });
         return response.data;
     }
-    // INFO: To abort call "canceler.cancel()"
+    // Info: To abort call "canceler.cancel()"
     public getThings(parameter: ThingsGetParams, canceler?: HttpRequestCanceler): Promise<ThingsDTOsDataSet> {
         
         var urlRaw = this.thingsUrl() + "?" +

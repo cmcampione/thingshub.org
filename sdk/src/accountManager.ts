@@ -161,6 +161,7 @@ export class AccountManager {
             return false;
         return localStorage.getItem(this._appName + "_Remember") == "true" ? true : false;
     }
+    
     public async login(username: string, password: string, remember: boolean) : Promise<AccountUserData> {
 
         this._apiKey =  null;
