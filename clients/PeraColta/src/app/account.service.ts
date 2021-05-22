@@ -35,10 +35,11 @@ export class AccountService {
     resetApp: () => console.log('resetApp')
   };
 
-  // ToDo: This method are public for MapComponent and ThingsServer Access, maybe can not really necessary
+  // ToDo: This method is public for MapComponent and ThingsServer Access, maybe can not really necessary
   public getSecurityHeader = () => {
     return { Authorization: 'Bearer ' + this.accountManager.accessToken};
   }
+  // ToDo: This method is public for RealTimeConnector, maybe can not really necessary
   public getSecurityToken = () => 'token=' + this.accountManager.accessToken;
 
   constructor() {
@@ -76,7 +77,7 @@ export class AccountService {
       throw(e);
     } finally {
       this.userId = null;
-      this.accountManager.resetLoginData();
+      this.accountManager.resetLoginData(); // Sanity check
       this.isLoggedIn$.next(false);
     }
   }

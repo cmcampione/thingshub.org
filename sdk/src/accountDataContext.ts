@@ -66,7 +66,7 @@ export class AccountDataContext {
     */
     public async login({ username, password }: { username: string; password: string; }) 
         : Promise<AccountUserData> {
-        let loginData = {
+        const loginData = {
             username,
             password
         };
@@ -78,7 +78,6 @@ export class AccountDataContext {
         };
         const response = await axios.post(this.accountUrl + "/login", qs.stringify(loginData), config);
         const accountUserDataRaw: any = jwtDecode(response.data.access_token);
-        let dummy1 = Date.now() / 1000;
         return {
             accessToken: response.data.access_token,
             id: accountUserDataRaw.sub,
