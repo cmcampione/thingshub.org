@@ -71,11 +71,14 @@ const publicKey = fs.readFileSync(path.join(__dirname, "../certs/certificate.pem
  * @return {String} The JWT Token
  */
 exports.createToken = ({ exp = 3600, sub = "", name = "" } = {}) => {
+	// Info: Used floor as showed in specifications
+	const iat = Math.floor(Date.now() / 1000);
 	const token = jwt.sign({
 		jti : uuid(),
 		sub,
 		name,
-		exp : Math.floor(Date.now() / 1000) + exp,
+		exp : iat + exp,
+		iat : iat
 	}, privateKey, {
 		algorithm: "RS256",
 	});

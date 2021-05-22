@@ -7,7 +7,8 @@ export interface AccountUserData {
     accessToken: string;
     id: string;
     name: string;
-    exp: number
+    exp: number,
+    iat: number
 }
 
 export interface AccountActionControl {
@@ -77,11 +78,13 @@ export class AccountDataContext {
         };
         const response = await axios.post(this.accountUrl + "/login", qs.stringify(loginData), config);
         const accountUserDataRaw: any = jwtDecode(response.data.access_token);
+        let dummy1 = Date.now() / 1000;
         return {
             accessToken: response.data.access_token,
             id: accountUserDataRaw.sub,
             name: accountUserDataRaw.name,
-            exp: accountUserDataRaw.exp
+            exp: accountUserDataRaw.exp,
+            iat: accountUserDataRaw.iat
         };
     }
     // ToDo: To check

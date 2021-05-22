@@ -14,10 +14,12 @@ export class AccountManager {
 
     private deltaTime: number = null;
     
-    //Info: apiKey is never persistent
+    //Info: By design ApiKey is never persistent
     private _apiKey : string = null;
 
-    //ToDo: Why is public?
+    // Info: Don't reset apiKey (By design ApiKey is never persistent)
+    // Info: It's public because can happen a successful login but not useful for the client's logic,
+    //       so the client has the need to clean up login data
     public resetLoginData() : void {
 
         this._accessToken = null;
@@ -42,6 +44,7 @@ export class AccountManager {
         localStorage.removeItem(this._appName + "_Username");
         sessionStorage.removeItem(this._appName + "_Username");
     }
+    // Info: Reset apiKey (By design ApiKey is never persistent)
     private setLoginData(accountUserData: AccountUserData, remember: boolean) : void {
         
         this._apiKey = null;
@@ -51,7 +54,7 @@ export class AccountManager {
         this._userId = accountUserData.id;
         this._userName = accountUserData.name;
 
-        this.deltaTime = 0;
+        this.deltaTime = Math.floor(Date.now()/1000) - accountUserData.iat;
 
         // Useful for node app
         if(typeof localStorage === 'undefined')
@@ -102,6 +105,8 @@ export class AccountManager {
         if (this.remember == false)
             return;
 
+        // Info: In localStorage data should be the same of sessionStorage
+
         this._accessToken = localStorage.getItem(this._appName + "_AccessToken");
 
         this._userId = localStorage.getItem(this._appName + "_UserId");
@@ -124,7 +129,7 @@ export class AccountManager {
             return;
 
         const accountUserDataRaw: any = jwtDecode(this.accessToken);
-        if (accountUserDataRaw.exp < Math.floor(Date.now()/1000)) {
+        if (accountUserDataRaw.exp + this.deltaTime < Math.floor(Date.now()/1000)) {
             this.resetLoginData();
         }
     }       
@@ -147,7 +152,7 @@ export class AccountManager {
             return false;
 
         const accountUserDataRaw: any = jwtDecode(this.accessToken);
-        return (accountUserDataRaw.exp >= Math.floor(Date.now()/1000));
+        return (accountUserDataRaw.exp + this.deltaTime >= Math.floor(Date.now()/1000));
     }
 
     public get remember() : boolean {
@@ -159,11 +164,12 @@ export class AccountManager {
     public async login(username: string, password: string, remember: boolean) : Promise<AccountUserData> {
 
         this._apiKey =  null;
-        this.resetLoginData();
+        this.resetLoginData();// Does'nt reset apiKey
 
         const accountUserData: AccountUserData = await this.accountDataContext.login({ username, password });
 
         this.setLoginData(accountUserData, remember);
+
         return accountUserData;
     }  
     public async logout() : Promise<any> {
@@ -175,7 +181,7 @@ export class AccountManager {
             throw(e);
         }
         finally {
-            this._apiKey = null;
+            this._apiKey = null;// Sanity check
             this.resetLoginData();
         }
     }

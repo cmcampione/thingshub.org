@@ -3883,11 +3883,13 @@ class AccountDataContext {
             };
             const response = yield axios_1.default.post(this.accountUrl + "/login", qs.stringify(loginData), config);
             const accountUserDataRaw = jwt_decode_1.default(response.data.access_token);
+            let dummy1 = Date.now() / 1000;
             return {
                 accessToken: response.data.access_token,
                 id: accountUserDataRaw.sub,
                 name: accountUserDataRaw.name,
-                exp: accountUserDataRaw.exp
+                exp: accountUserDataRaw.exp,
+                iat: accountUserDataRaw.iat
             };
         });
     }
@@ -3944,14 +3946,10 @@ class AccountManager {
         this._userId = null;
         this._userName = null;
         this.deltaTime = null;
-        //Info: apiKey is never persistent
+        //Info: By design ApiKey is never persistent
         this._apiKey = null;
-        this.getSecurityHeader = () => {
-            return this.apiKey ? { thapikey: this.apiKey } : { Authorization: "Bearer " + this.accessToken };
-        };
-        this.getSecurityToken = () => {
-            return this.apiKey ? "token=" + this.apiKey : "token=" + this.accessToken;
-        };
+        this.getSecurityHeader = () => this.apiKey ? { thapikey: this.apiKey } : { Authorization: "Bearer " + this.accessToken };
+        this.getSecurityToken = () => this.apiKey ? "token=" + this.apiKey : "token=" + this.accessToken;
         this._appName = appName;
         this.accountDataContext = accountDataContext;
         this.getLoginData(apiKey);
@@ -3960,12 +3958,13 @@ class AccountManager {
         if (!this.accessToken)
             return;
         const accountUserDataRaw = jwt_decode_1.default(this.accessToken);
-        let dateNow = new Date();
-        if (accountUserDataRaw.exp < Math.trunc(dateNow.getTime() / 1000)) {
+        if (accountUserDataRaw.exp + this.deltaTime < Math.floor(Date.now() / 1000)) {
             this.resetLoginData();
         }
     }
-    //ToDo: Why is public?
+    // Info: Don't reset apiKey (By design ApiKey is never persistent)
+    // Info: It's public because can happen a successful login but not useful for the client's logic,
+    //       so the client has the need to clean up login data
     resetLoginData() {
         this._accessToken = null;
         this._userId = null;
@@ -3983,12 +3982,13 @@ class AccountManager {
         localStorage.removeItem(this._appName + "_Username");
         sessionStorage.removeItem(this._appName + "_Username");
     }
+    // Info: Reset apiKey (By design ApiKey is never persistent)
     setLoginData(accountUserData, remember) {
         this._apiKey = null;
         this._accessToken = accountUserData.accessToken;
         this._userId = accountUserData.id;
         this._userName = accountUserData.name;
-        this.deltaTime = 0;
+        this.deltaTime = Math.floor(Date.now() / 1000) - accountUserData.iat;
         // Useful for node app
         if (typeof localStorage === 'undefined')
             return;
@@ -4022,6 +4022,7 @@ class AccountManager {
         this.deltaTime = parseInt(sessionStorage.getItem(this._appName + "_DeltaTime"));
         if (this.remember == false)
             return;
+        // Info: In localStorage data should be the same of sessionStorage
         this._accessToken = localStorage.getItem(this._appName + "_AccessToken");
         this._userId = localStorage.getItem(this._appName + "_UserId");
         this._userName = localStorage.getItem(this._appName + "_Username");
@@ -4039,11 +4040,7 @@ class AccountManager {
         if (!this.accessToken)
             return false;
         const accountUserDataRaw = jwt_decode_1.default(this.accessToken);
-        let dateNow = new Date();
-        let dateNowN = Math.floor(dateNow.getTime() / 1000);
-        if (accountUserDataRaw.exp < Math.floor(dateNow.getTime() / 1000))
-            return false;
-        return true;
+        return (accountUserDataRaw.exp + this.deltaTime >= Math.floor(Date.now() / 1000));
     }
     get remember() {
         // Useful for node app
@@ -4054,7 +4051,7 @@ class AccountManager {
     login(username, password, remember) {
         return __awaiter(this, void 0, void 0, function* () {
             this._apiKey = null;
-            this.resetLoginData();
+            this.resetLoginData(); // Does'nt reset apiKey
             const accountUserData = yield this.accountDataContext.login({ username, password });
             this.setLoginData(accountUserData, remember);
             return accountUserData;
@@ -4069,7 +4066,7 @@ class AccountManager {
                 throw (e);
             }
             finally {
-                this._apiKey = null;
+                this._apiKey = null; // Sanity check
                 this.resetLoginData();
             }
         });
