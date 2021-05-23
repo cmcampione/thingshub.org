@@ -10,56 +10,48 @@ export interface AccountUserData {
     exp: number,
     iat: number
 }
-
 export interface AccountActionControl {
-    getSecurityHeader: () => object;
-    refreshToken: () => Promise<any>;
-    resetApp: () => void;
+    isLoggedIn:             () => boolean;
+    isAccessTokenExpired:   () => boolean; 
+    getSecurityHeader:      () => object;
+    refreshToken:           () => Promise<any>;
+    resetApp:               () => void;
 }
 
 export class AccountDataContext {
 
     private accountUrl:string = "";
 
-    constructor(endPointAddress: EndPointAddress, private accountActionControl?: AccountActionControl) {
+    constructor(endPointAddress: EndPointAddress, accountActionControl: AccountActionControl) {
 
         this.accountUrl = endPointAddress.api + "/account";
 
-        axios.interceptors.request.use((config) => {
-            if (this.accountActionControl)
-                config.headers = { ...config.headers, ...this.accountActionControl.getSecurityHeader()};
-            return config;
+        axios.interceptors.request.use(async config => {
+            if (!accountActionControl) // Sanity check
+                return config;
+            
+            // Useful for http calls like login without authentication
+            if (!accountActionControl.isLoggedIn())
+                return config;
+
+            if (!accountActionControl.isAccessTokenExpired())
+            {
+                config.headers = { ...config.headers, ...accountActionControl.getSecurityHeader()};
+                return config;
+            }
+
+            try {
+                await accountActionControl.refreshToken();               
+                config.headers = { ...config.headers, ...accountActionControl.getSecurityHeader()};
+                return config;
+            }
+            catch (e) {
+                accountActionControl.resetApp();
+                return Promise.reject(e);
+            }
         }, function (error) {
-            // Do something with request error
             return Promise.reject(error);
         });
-
-        axios.interceptors.response.use(response => response,
-            async err => {
-                const error = err.response;
-                if (accountActionControl && error &&
-                    error.status === 401 && error.config &&
-                    !error.config.__isRetryRequest) {
-                    try {
-                        const response = await this.accountActionControl.refreshToken();
-                        // ToDo: I don't know if this is useful only for "login refresh token", I have to test with real refresh token http call
-                        error.config.__isRetryRequest = true;
-                        // set new access token after refresh it
-                        error.config.headers = { ...error.config.headers, ...this.accountActionControl.getSecurityHeader()};
-                        return axios(error.config);
-                    }
-                    catch (e) {
-                        // refreshing has failed => redirect to login
-                        // clear cookie (with logout action) and return to identityserver to new login
-                        // (window as any).location = "/account/logout";
-                        // ToDo: Can be called many times
-                        this.accountActionControl.resetApp();
-                        return Promise.reject(e);
-                    }
-                }
-                return Promise.reject(err);
-            }
-        );
     }
 
     /* 

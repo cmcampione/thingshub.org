@@ -189,14 +189,15 @@ export interface AccountUserData {
 	iat: number;
 }
 export interface AccountActionControl {
+	isLoggedIn: () => boolean;
+	isAccessTokenExpired: () => boolean;
 	getSecurityHeader: () => object;
 	refreshToken: () => Promise<any>;
 	resetApp: () => void;
 }
 export declare class AccountDataContext {
-	private accountActionControl?;
 	private accountUrl;
-	constructor(endPointAddress: EndPointAddress, accountActionControl?: AccountActionControl);
+	constructor(endPointAddress: EndPointAddress, accountActionControl: AccountActionControl);
 	login({ username, password }: {
 		username: string;
 		password: string;
@@ -219,11 +220,12 @@ export declare class AccountManager {
 	resetLoginData(): void;
 	private setLoginData;
 	private getLoginData;
-	constructor(appName: string, endPointAddress: EndPointAddress, apiKey?: string);
+	constructor(appName: string, endPointAddress: EndPointAddress, apiKey?: string, accountActionControl?: AccountActionControl);
 	get apiKey(): string;
 	get accessToken(): string;
 	getSecurityHeader: () => object;
 	getSecurityToken: () => string;
+	get isAccessTokenExpired(): boolean;
 	get isLoggedIn(): boolean;
 	get remember(): boolean;
 	login(username: string, password: string, remember: boolean): Promise<AccountUserData>;

@@ -3830,41 +3830,30 @@ const axios_1 = __webpack_require__(/*! axios */ "axios");
 const jwt_decode_1 = __webpack_require__(/*! jwt-decode */ "./node_modules/jwt-decode/build/jwt-decode.esm.js");
 class AccountDataContext {
     constructor(endPointAddress, accountActionControl) {
-        this.accountActionControl = accountActionControl;
         this.accountUrl = "";
         this.accountUrl = endPointAddress.api + "/account";
-        axios_1.default.interceptors.request.use((config) => {
-            if (this.accountActionControl)
-                config.headers = Object.assign(Object.assign({}, config.headers), this.accountActionControl.getSecurityHeader());
-            return config;
-        }, function (error) {
-            // Do something with request error
+        axios_1.default.interceptors.request.use((config) => __awaiter(this, void 0, void 0, function* () {
+            if (!accountActionControl) // Sanity check
+                return config;
+            // Useful for http calls like login without authentication
+            if (!accountActionControl.isLoggedIn())
+                return config;
+            if (!accountActionControl.isAccessTokenExpired()) {
+                config.headers = Object.assign(Object.assign({}, config.headers), accountActionControl.getSecurityHeader());
+                return config;
+            }
+            try {
+                yield accountActionControl.refreshToken();
+                config.headers = Object.assign(Object.assign({}, config.headers), accountActionControl.getSecurityHeader());
+                return config;
+            }
+            catch (e) {
+                accountActionControl.resetApp();
+                return Promise.reject(e);
+            }
+        }), function (error) {
             return Promise.reject(error);
         });
-        axios_1.default.interceptors.response.use(response => response, (err) => __awaiter(this, void 0, void 0, function* () {
-            const error = err.response;
-            if (accountActionControl && error &&
-                error.status === 401 && error.config &&
-                !error.config.__isRetryRequest) {
-                try {
-                    const response = yield this.accountActionControl.refreshToken();
-                    // ToDo: I don't know if this is useful only for "login refresh token", I have to test with real refresh token http call
-                    error.config.__isRetryRequest = true;
-                    // set new access token after refresh it
-                    error.config.headers = Object.assign(Object.assign({}, error.config.headers), this.accountActionControl.getSecurityHeader());
-                    return axios_1.default(error.config);
-                }
-                catch (e) {
-                    // refreshing has failed => redirect to login
-                    // clear cookie (with logout action) and return to identityserver to new login
-                    // (window as any).location = "/account/logout";
-                    // ToDo: Can be called many times
-                    this.accountActionControl.resetApp();
-                    return Promise.reject(e);
-                }
-            }
-            return Promise.reject(err);
-        }));
     }
     /*
     async function foo() {
@@ -3946,7 +3935,7 @@ exports.AccountManager = void 0;
 const jwt_decode_1 = __webpack_require__(/*! jwt-decode */ "./node_modules/jwt-decode/build/jwt-decode.esm.js");
 const accountDataContext_1 = __webpack_require__(/*! ./accountDataContext */ "./src/accountDataContext.ts");
 class AccountManager {
-    constructor(appName, endPointAddress, apiKey) {
+    constructor(appName, endPointAddress, apiKey, accountActionControl) {
         this._appName = null;
         this._accessToken = null;
         this._userId = null;
@@ -3955,6 +3944,8 @@ class AccountManager {
         //Info: By design ApiKey is never persistent
         this._apiKey = null;
         this.defaultAccountActionControl = {
+            isLoggedIn: () => this.getSecurityHeader() !== null,
+            isAccessTokenExpired: () => this.isAccessTokenExpired,
             getSecurityHeader: () => this.getSecurityHeader(),
             refreshToken: () => Promise.reject(),
             resetApp: () => console.log('resetApp')
@@ -3974,18 +3965,18 @@ class AccountManager {
             return null;
         };
         this._appName = appName;
-        this.accountDataContext = new accountDataContext_1.AccountDataContext(endPointAddress, this.defaultAccountActionControl);
+        let aAc = accountActionControl ? accountActionControl : this.defaultAccountActionControl;
+        this.accountDataContext = new accountDataContext_1.AccountDataContext(endPointAddress, aAc);
         this.getLoginData(apiKey);
         if (this.apiKey)
             return;
         if (!this.accessToken)
             return;
-        const accountUserDataRaw = jwt_decode_1.default(this.accessToken);
-        if (accountUserDataRaw.exp + this.deltaTime < Math.floor(Date.now() / 1000)) {
+        if (this.isAccessTokenExpired) {
             this.resetLoginData();
         }
     }
-    // Info: Don't reset apiKey (By design ApiKey is never persistent)
+    // Info: Doesn't reset apiKey (By design ApiKey is never persistent)
     // Info: It's public because can happen a successful login but not useful for the client's logic,
     //       so the client has the need to clean up login data
     resetLoginData() {
@@ -4057,13 +4048,21 @@ class AccountManager {
     get accessToken() {
         return this._accessToken;
     }
+    get isAccessTokenExpired() {
+        if (this.apiKey)
+            return false; // ApiKey never exipire
+        // Sanity check
+        if (!this.accessToken)
+            return true;
+        const accountUserDataRaw = jwt_decode_1.default(this.accessToken);
+        return (accountUserDataRaw.exp + this.deltaTime < Math.floor(Date.now() / 1000));
+    }
     get isLoggedIn() {
         if (this.apiKey)
             return true;
         if (!this.accessToken)
             return false;
-        const accountUserDataRaw = jwt_decode_1.default(this.accessToken);
-        return (accountUserDataRaw.exp + this.deltaTime >= Math.floor(Date.now() / 1000));
+        return !this.isAccessTokenExpired;
     }
     get remember() {
         // Useful for node app
@@ -4073,8 +4072,8 @@ class AccountManager {
     }
     login(username, password, remember) {
         return __awaiter(this, void 0, void 0, function* () {
-            this._apiKey = null;
-            this.resetLoginData(); // Does'nt reset apiKey
+            this._apiKey = null; // resetLoginData does Not reset api Key
+            this.resetLoginData();
             const accountUserData = yield this.accountDataContext.login({ username, password });
             this.setLoginData(accountUserData, remember);
             return accountUserData;

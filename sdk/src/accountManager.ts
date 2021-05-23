@@ -19,12 +19,14 @@ export class AccountManager {
     private _apiKey : string = null;
 
     private defaultAccountActionControl: AccountActionControl = {
-        getSecurityHeader : () => this.getSecurityHeader(),
-        refreshToken: () : Promise<any> => Promise.reject(),
-        resetApp: () => console.log('resetApp')
+        isLoggedIn:             () => this.getSecurityHeader() !== null,
+        isAccessTokenExpired:   () => this.isAccessTokenExpired,
+        getSecurityHeader:      () => this.getSecurityHeader(),
+        refreshToken:           () => Promise.reject(),
+        resetApp:               () => console.log('resetApp')
     };
 
-    // Info: Don't reset apiKey (By design ApiKey is never persistent)
+    // Info: Doesn't reset apiKey (By design ApiKey is never persistent)
     // Info: It's public because can happen a successful login but not useful for the client's logic,
     //       so the client has the need to clean up login data
     public resetLoginData() : void {
@@ -122,10 +124,11 @@ export class AccountManager {
         this.deltaTime = parseInt(localStorage.getItem(this._appName + "_DeltaTime"));
     }
 
-    constructor(appName: string, endPointAddress: EndPointAddress, apiKey?: string) {
+    constructor(appName: string, endPointAddress: EndPointAddress, apiKey?: string, accountActionControl?: AccountActionControl) {
 
         this._appName = appName;
-        this.accountDataContext =  new AccountDataContext(endPointAddress, this.defaultAccountActionControl);
+        let aAc = accountActionControl ? accountActionControl : this.defaultAccountActionControl;
+        this.accountDataContext =  new AccountDataContext(endPointAddress, aAc);
         this.getLoginData(apiKey);
 
         if (this.apiKey)
@@ -134,8 +137,7 @@ export class AccountManager {
         if (!this.accessToken)
             return;
 
-        const accountUserDataRaw: any = jwtDecode(this.accessToken);
-        if (accountUserDataRaw.exp + this.deltaTime < Math.floor(Date.now()/1000)) {
+        if (this.isAccessTokenExpired) {
             this.resetLoginData();
         }
     }       
@@ -153,7 +155,7 @@ export class AccountManager {
         if (this.accessToken)
             return { Authorization: "Bearer " + this.accessToken}
         return null;
-    }   
+    }
     public getSecurityToken = () : string => { 
         if (this.apiKey)
             return "token=" + this.apiKey;
@@ -162,6 +164,16 @@ export class AccountManager {
         return null;
     }
 
+    public get isAccessTokenExpired() : boolean {
+        if (this.apiKey)
+            return false; // ApiKey never exipire
+        // Sanity check
+        if (!this.accessToken)
+            return true;
+
+        const accountUserDataRaw: any = jwtDecode(this.accessToken);
+        return (accountUserDataRaw.exp + this.deltaTime < Math.floor(Date.now()/1000));
+    }
     public get isLoggedIn() : boolean {
         if (this.apiKey)
             return true;
@@ -169,8 +181,7 @@ export class AccountManager {
         if (!this.accessToken)
             return false;
 
-        const accountUserDataRaw: any = jwtDecode(this.accessToken);
-        return (accountUserDataRaw.exp + this.deltaTime >= Math.floor(Date.now()/1000));
+        return !this.isAccessTokenExpired;
     }
 
     public get remember() : boolean {
@@ -182,8 +193,8 @@ export class AccountManager {
     
     public async login(username: string, password: string, remember: boolean) : Promise<AccountUserData> {
 
-        this._apiKey =  null;
-        this.resetLoginData();// Does'nt reset apiKey
+        this._apiKey =  null;// resetLoginData does Not reset api Key
+        this.resetLoginData();
 
         const accountUserData: AccountUserData = await this.accountDataContext.login({ username, password });
 

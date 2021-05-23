@@ -15,8 +15,10 @@ export class AccountService {
   public isLoggedIn$: Subject<boolean> = new Subject<boolean>();
 
   private accountActionControl: AccountActionControl = {
-    getSecurityHeader : () => this.getSecurityHeader(),
-    refreshToken: () : Promise<any> => {
+    isLoggedIn:           (): boolean => this.accountManager.getSecurityHeader() !== null,
+    isAccessTokenExpired: (): boolean => this.accountManager.isAccessTokenExpired,
+    getSecurityHeader :   (): object => this.accountManager.getSecurityHeader(),
+    refreshToken:         (): Promise<any> => {
       this.isLoggedIn$.next(false);// Shows login Component
       return new Promise((resolve, reject) => {
         const subscription = this.isLoggedIn$.subscribe((isLoggedIn: boolean) => {
@@ -32,16 +34,14 @@ export class AccountService {
         });
       });
     },
-    resetApp: () => console.log('resetApp')
+    resetApp:             (): void => console.log('resetApp')
   };
-
-  private getSecurityHeader = () => this.accountManager.getSecurityHeader();
 
   // ToDo: This method is public for only RealTimeConnector, maybe can not really necessary
   public getSecurityToken = () => this.accountManager.getSecurityToken();
 
   constructor() {
-    this.accountManager = new AccountManager('thingshub', endPointAddress);
+    this.accountManager = new AccountManager('thingshub', endPointAddress, null, this.accountActionControl);
   }
 
   public get isLoggedIn(): boolean {
@@ -69,7 +69,8 @@ export class AccountService {
   }
   public async logout() {
     try {
-      await this.accountManager.logout();
+      if (!this.accountManager.isAccessTokenExpired)
+        await this.accountManager.logout();
     } catch (e) {
       throw(e);
     } finally {
