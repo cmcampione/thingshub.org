@@ -1,7 +1,6 @@
 import { Injectable, OnDestroy, Inject, isDevMode  } from '@angular/core';
 import { Thing, ThingUserReadClaims, ThingUserChangeClaims, ThingsDataContext, ThingsManager } from 'thingshub-js-sdk';
 import { endPointAddress } from './utils';
-import { AccountService } from './account.service';
 import { RealTimeConnectorService } from './real-time-connector.service';
 
 @Injectable()
@@ -20,7 +19,7 @@ export class ThingsService implements OnDestroy {
     creatorUserChangeClaims: ThingUserChangeClaims.AllClaims
   };
   // ToDo: Could be a singleton. Need to create a ThingsDataContextService
-  private readonly thingsDatacontext = new ThingsDataContext(endPointAddress, this.accountService.getSecurityHeader);
+  private readonly thingsDatacontext = new ThingsDataContext(endPointAddress);
 
   // ToDo: Set private
   public readonly thingsManager: ThingsManager;
@@ -35,7 +34,6 @@ export class ThingsService implements OnDestroy {
   }
 
   constructor(@Inject('thingKind') thingKind: string,
-    private readonly accountService: AccountService,
     // ToDo: Set private
     public readonly realTimeConnector: RealTimeConnectorService) {
 

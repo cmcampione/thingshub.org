@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs';
-import { AccountDataContext, AccountUserData, AccountActionControl, AccountManager } from 'thingshub-js-sdk';
+import { AccountUserData, AccountActionControl, AccountManager } from 'thingshub-js-sdk';
 import { endPointAddress } from './utils';
 
 @Injectable({
@@ -35,16 +35,13 @@ export class AccountService {
     resetApp: () => console.log('resetApp')
   };
 
-  // ToDo: This method is public for MapComponent and ThingsServer Access, maybe can not really necessary
-  public getSecurityHeader = () => {
-    return { Authorization: 'Bearer ' + this.accountManager.accessToken};
-  }
-  // ToDo: This method is public for RealTimeConnector, maybe can not really necessary
-  public getSecurityToken = () => 'token=' + this.accountManager.accessToken;
+  private getSecurityHeader = () => this.accountManager.getSecurityHeader();
+
+  // ToDo: This method is public for only RealTimeConnector, maybe can not really necessary
+  public getSecurityToken = () => this.accountManager.getSecurityToken();
 
   constructor() {
-    this.accountManager = new AccountManager('thingshub',
-      new AccountDataContext(endPointAddress, this.accountActionControl));
+    this.accountManager = new AccountManager('thingshub', endPointAddress);
   }
 
   public get isLoggedIn(): boolean {

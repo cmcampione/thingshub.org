@@ -2,7 +2,6 @@ import * as moment from 'moment';
 import { Component, OnInit, OnDestroy, LOCALE_ID, Inject } from '@angular/core';
 import * as thingshub from 'thingshub-js-sdk';
 import { endPointAddress } from '../utils';
-import { AccountService } from '../account.service';
 import { RealTimeConnectorService } from '../real-time-connector.service';
 
 @Component({
@@ -26,9 +25,8 @@ export class MapComponent implements OnInit, OnDestroy  {
   public lng = 7.809007;
 
   constructor(@Inject(LOCALE_ID) private locale: string,
-    accountService: AccountService,
     private realTimeConnector: RealTimeConnectorService) {
-    this.thingsDataContext = new thingshub.ThingsDataContext(endPointAddress, accountService.getSecurityHeader);
+    this.thingsDataContext = new thingshub.ThingsDataContext(endPointAddress);
   }
 
   private setValue(value: any) {

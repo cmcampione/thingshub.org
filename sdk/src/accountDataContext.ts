@@ -25,6 +25,15 @@ export class AccountDataContext {
 
         this.accountUrl = endPointAddress.api + "/account";
 
+        axios.interceptors.request.use((config) => {
+            if (this.accountActionControl)
+                config.headers = { ...config.headers, ...this.accountActionControl.getSecurityHeader()};
+            return config;
+        }, function (error) {
+            // Do something with request error
+            return Promise.reject(error);
+        });
+
         axios.interceptors.response.use(response => response,
             async err => {
                 const error = err.response;
@@ -97,9 +106,7 @@ export class AccountDataContext {
         return response.data;
     }
     public async logout() : Promise<any> {
-        const response = await axios.get(this.accountUrl + "/logout", {
-            headers: this.accountActionControl ? this.accountActionControl.getSecurityHeader() : null
-        });
+        const response = await axios.get(this.accountUrl + "/logout");
         return response.data;
     }
 }

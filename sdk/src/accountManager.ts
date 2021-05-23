@@ -1,5 +1,6 @@
 import jwtDecode from "jwt-decode";
-import {AccountDataContext, AccountUserData} from "./accountDataContext";
+import { EndPointAddress } from "src";
+import {AccountActionControl, AccountDataContext, AccountUserData} from "./accountDataContext";
 
 export class AccountManager {
 
@@ -16,6 +17,12 @@ export class AccountManager {
     
     //Info: By design ApiKey is never persistent
     private _apiKey : string = null;
+
+    private defaultAccountActionControl: AccountActionControl = {
+        getSecurityHeader : () => this.getSecurityHeader(),
+        refreshToken: () : Promise<any> => Promise.reject(),
+        resetApp: () => console.log('resetApp')
+    };
 
     // Info: Don't reset apiKey (By design ApiKey is never persistent)
     // Info: It's public because can happen a successful login but not useful for the client's logic,
@@ -115,11 +122,10 @@ export class AccountManager {
         this.deltaTime = parseInt(localStorage.getItem(this._appName + "_DeltaTime"));
     }
 
-    constructor(appName: string, accountDataContext: AccountDataContext, apiKey?: string) {
+    constructor(appName: string, endPointAddress: EndPointAddress, apiKey?: string) {
 
         this._appName = appName;
-        this.accountDataContext = accountDataContext;
-
+        this.accountDataContext =  new AccountDataContext(endPointAddress, this.defaultAccountActionControl);
         this.getLoginData(apiKey);
 
         if (this.apiKey)
@@ -141,8 +147,20 @@ export class AccountManager {
         return this._accessToken;
     }
 
-    public getSecurityHeader = (): object => this.apiKey ? { thapikey: this.apiKey } : { Authorization: "Bearer " + this.accessToken} ;    
-    public getSecurityToken = (): string => this.apiKey ? "token=" + this.apiKey : "token=" + this.accessToken;
+    public getSecurityHeader = () : object => {
+        if (this.apiKey)
+            return { thapikey: this.apiKey }
+        if (this.accessToken)
+            return { Authorization: "Bearer " + this.accessToken}
+        return null;
+    }   
+    public getSecurityToken = () : string => { 
+        if (this.apiKey)
+            return "token=" + this.apiKey;
+        if (this.accessToken)
+            return "token=" + this.accessToken;
+        return null;
+    }
 
     public get isLoggedIn() : boolean {
         if (this.apiKey)
