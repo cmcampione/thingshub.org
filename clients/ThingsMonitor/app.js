@@ -363,8 +363,7 @@ ThingsConfigs.forEach((value, key, map) => {
 });
 
 //
-const accountDataContext = new thingshub.AccountDataContext(endPoint);
-const accountManager = new thingshub.AccountManager("thingshub", accountDataContext, mainApiKey);
+const accountManager = new thingshub.AccountManager("thingshub", endPoint, mainApiKey);
 
 function onError(error) {
 	logger.error(error, { code: 16});
@@ -755,7 +754,7 @@ realTimeConnector.api()
 	});
 
 // 
-const thingsDatacontext = new thingshub.ThingsDataContext(endPoint, accountManager.getSecurityHeader);
+const thingsDatacontext = new thingshub.ThingsDataContext(endPoint);
 //
 const thingsManagerClaims = {
 

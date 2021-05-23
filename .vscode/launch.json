@@ -36,7 +36,7 @@
             "name": "Launch SDK webpack",
             "type": "node",
             "request": "launch",
-            "program": "${workspaceRoot}\\sdk\\node_modules\\webpack-dev-server\\bin\\webpack-dev-server.js",
+            "program": "${workspaceFolder}\\sdk\\node_modules\\webpack\\bin\\webpack.js",
             "cwd": "${workspaceRoot}\\sdk"
         },
         {

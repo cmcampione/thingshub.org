@@ -3833,6 +3833,14 @@ class AccountDataContext {
         this.accountActionControl = accountActionControl;
         this.accountUrl = "";
         this.accountUrl = endPointAddress.api + "/account";
+        axios_1.default.interceptors.request.use((config) => {
+            if (this.accountActionControl)
+                config.headers = Object.assign(Object.assign({}, config.headers), this.accountActionControl.getSecurityHeader());
+            return config;
+        }, function (error) {
+            // Do something with request error
+            return Promise.reject(error);
+        });
         axios_1.default.interceptors.response.use(response => response, (err) => __awaiter(this, void 0, void 0, function* () {
             const error = err.response;
             if (accountActionControl && error &&
@@ -3871,7 +3879,7 @@ class AccountDataContext {
     */
     login({ username, password }) {
         return __awaiter(this, void 0, void 0, function* () {
-            let loginData = {
+            const loginData = {
                 username,
                 password
             };
@@ -3883,7 +3891,6 @@ class AccountDataContext {
             };
             const response = yield axios_1.default.post(this.accountUrl + "/login", qs.stringify(loginData), config);
             const accountUserDataRaw = jwt_decode_1.default(response.data.access_token);
-            let dummy1 = Date.now() / 1000;
             return {
                 accessToken: response.data.access_token,
                 id: accountUserDataRaw.sub,
@@ -3907,9 +3914,7 @@ class AccountDataContext {
     }
     logout() {
         return __awaiter(this, void 0, void 0, function* () {
-            const response = yield axios_1.default.get(this.accountUrl + "/logout", {
-                headers: this.accountActionControl ? this.accountActionControl.getSecurityHeader() : null
-            });
+            const response = yield axios_1.default.get(this.accountUrl + "/logout");
             return response.data;
         });
     }
@@ -3939,8 +3944,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.AccountManager = void 0;
 const jwt_decode_1 = __webpack_require__(/*! jwt-decode */ "./node_modules/jwt-decode/build/jwt-decode.esm.js");
+const accountDataContext_1 = __webpack_require__(/*! ./accountDataContext */ "./src/accountDataContext.ts");
 class AccountManager {
-    constructor(appName, accountDataContext, apiKey) {
+    constructor(appName, endPointAddress, apiKey) {
         this._appName = null;
         this._accessToken = null;
         this._userId = null;
@@ -3948,10 +3954,27 @@ class AccountManager {
         this.deltaTime = null;
         //Info: By design ApiKey is never persistent
         this._apiKey = null;
-        this.getSecurityHeader = () => this.apiKey ? { thapikey: this.apiKey } : { Authorization: "Bearer " + this.accessToken };
-        this.getSecurityToken = () => this.apiKey ? "token=" + this.apiKey : "token=" + this.accessToken;
+        this.defaultAccountActionControl = {
+            getSecurityHeader: () => this.getSecurityHeader(),
+            refreshToken: () => Promise.reject(),
+            resetApp: () => console.log('resetApp')
+        };
+        this.getSecurityHeader = () => {
+            if (this.apiKey)
+                return { thapikey: this.apiKey };
+            if (this.accessToken)
+                return { Authorization: "Bearer " + this.accessToken };
+            return null;
+        };
+        this.getSecurityToken = () => {
+            if (this.apiKey)
+                return "token=" + this.apiKey;
+            if (this.accessToken)
+                return "token=" + this.accessToken;
+            return null;
+        };
         this._appName = appName;
-        this.accountDataContext = accountDataContext;
+        this.accountDataContext = new accountDataContext_1.AccountDataContext(endPointAddress, this.defaultAccountActionControl);
         this.getLoginData(apiKey);
         if (this.apiKey)
             return;
@@ -4371,11 +4394,9 @@ exports.ThingsDataContext = void 0;
 const axios_1 = __webpack_require__(/*! axios */ "axios");
 const helpers_1 = __webpack_require__(/*! ./helpers */ "./src/helpers.ts");
 class ThingsDataContext {
-    constructor(endPointAddress, securityHeaderHook) {
+    constructor(endPointAddress) {
         this.apiEndPointAddress = "";
-        this.securityHeaderHook = null;
         this.apiEndPointAddress = endPointAddress.api;
-        this.securityHeaderHook = securityHeaderHook;
     }
     thingsUrl(thingId) {
         return this.apiEndPointAddress + "/things/" + (thingId || "");
@@ -4397,13 +4418,11 @@ class ThingsDataContext {
     }
     getThing(thingId) {
         return __awaiter(this, void 0, void 0, function* () {
-            const response = yield axios_1.default.get(this.thingsUrl(thingId), {
-                headers: this.securityHeaderHook()
-            });
+            const response = yield axios_1.default.get(this.thingsUrl(thingId));
             return response.data;
         });
     }
-    // INFO: To abort call "canceler.cancel()"
+    // Info: To abort call "canceler.cancel()"
     getThings(parameter, canceler) {
         var urlRaw = this.thingsUrl() + "?" +
             (!!parameter.parentThingId ? ("&parentThingId=" + parameter.parentThingId) : "") +
@@ -4413,7 +4432,6 @@ class ThingsDataContext {
             (!!parameter.skip ? ("&skip=" + parameter.skip) : "") +
             (!!parameter.top ? ("&top=" + parameter.top) : "");
         return axios_1.default.get(urlRaw, {
-            headers: this.securityHeaderHook(),
             cancelToken: (canceler) ? canceler.cancelerToken : null
         })
             .then(function (response) {
@@ -4432,83 +4450,65 @@ class ThingsDataContext {
             .finally(function () {
         });
     }
-    // TOCHECK: Check Returned data
+    // ToCheck: Check Returned data
     createThing(ThingDTO) {
         return __awaiter(this, void 0, void 0, function* () {
-            const response = yield axios_1.default.post(this.thingsUrl(), ThingDTO, {
-                headers: this.securityHeaderHook()
-            });
+            const response = yield axios_1.default.post(this.thingsUrl(), ThingDTO);
             return response.data;
         });
     }
-    // TOCHECK: Check Returned data
+    // ToCheck: Check Returned data
     updateThing(thingId, ThingDTO) {
         return __awaiter(this, void 0, void 0, function* () {
-            const response = yield axios_1.default.put(this.thingsUrl(thingId), ThingDTO, {
-                headers: this.securityHeaderHook()
-            });
+            const response = yield axios_1.default.put(this.thingsUrl(thingId), ThingDTO);
             return response.data;
         });
     }
-    // TOCHECK: Check Returned data
+    // ToCheck: Check Returned data
     deleteThing(thingId) {
         return __awaiter(this, void 0, void 0, function* () {
-            const response = yield axios_1.default.delete(this.thingsUrl(thingId), {
-                headers: this.securityHeaderHook()
-            });
+            const response = yield axios_1.default.delete(this.thingsUrl(thingId));
             return response.data;
         });
     }
-    // TOCHECK: Check Returned data
+    // ToCheck: Check Returned data
     getThingChildrenIds(parentThingId) {
         return __awaiter(this, void 0, void 0, function* () {
-            const response = yield axios_1.default.get(this.thingChildrenUrl(parentThingId), {
-                headers: this.securityHeaderHook()
-            });
+            const response = yield axios_1.default.get(this.thingChildrenUrl(parentThingId));
             return response.data;
         });
     }
-    // TOCHECK: Check Returned data
+    // ToCheck: Check Returned data
     addChildToParent(parentThingId, childThingId) {
         return __awaiter(this, void 0, void 0, function* () {
-            const response = yield axios_1.default.post(this.thingChildrenUrl(parentThingId), JSON.stringify(childThingId), {
-                headers: this.securityHeaderHook()
-            });
+            const response = yield axios_1.default.post(this.thingChildrenUrl(parentThingId), JSON.stringify(childThingId));
             return response.data;
         });
     }
-    // TOCHECK: Check Returned data
+    // ToCheck: Check Returned data
     deleteThingChild(parentThingId, childThingId) {
         return __awaiter(this, void 0, void 0, function* () {
-            const response = yield axios_1.default.delete(this.thingDeleteChildUrl(parentThingId, childThingId), {
-                headers: this.securityHeaderHook()
-            });
+            const response = yield axios_1.default.delete(this.thingDeleteChildUrl(parentThingId, childThingId));
             return response.data;
         });
     }
     getThingValue(thingId) {
         return __awaiter(this, void 0, void 0, function* () {
-            const response = yield axios_1.default.get(this.thingsValueUrl(thingId), {
-                headers: this.securityHeaderHook()
-            });
+            const response = yield axios_1.default.get(this.thingsValueUrl(thingId));
             return response.data;
         });
     }
     putThingValue(thingId, asCmd, value) {
         return __awaiter(this, void 0, void 0, function* () {
             let url = asCmd ? this.thingsCmdUrl(thingId) : this.thingsValueUrl(thingId);
-            const response = yield axios_1.default.put(url, value, {
-                headers: this.securityHeaderHook()
-            });
+            const response = yield axios_1.default.put(url, value);
             return response.data;
         });
     }
-    // TOCHECK: Check Returned data
+    // ToCheck: Check Returned data
     putThingsPositions(positions) {
         return __awaiter(this, void 0, void 0, function* () {
-            const response = yield axios_1.default.put(this.thingsPositionsUrl(), positions, {
-                headers: this.securityHeaderHook()
-            });
+            const response = yield axios_1.default.put(this.thingsPositionsUrl(), positions);
             return response.data;
         });
     }
