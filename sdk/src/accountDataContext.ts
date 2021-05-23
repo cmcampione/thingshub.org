@@ -30,7 +30,7 @@ export class AccountDataContext {
             if (!accountActionControl) // Sanity check
                 return config;
             
-            // Useful for http calls like login without authentication
+            // Useful for http calls, like login, without authentication
             if (!accountActionControl.isLoggedIn())
                 return config;
 

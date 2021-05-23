@@ -306,7 +306,7 @@ export interface ThingsDataSet {
 	itemsRange: ItemsRange;
 }
 export declare class ThingsManager {
-	private mainThing;
+	private readonly mainThing;
 	private thingKind;
 	private thingClaims;
 	private thingsDataContext;
@@ -314,6 +314,7 @@ export declare class ThingsManager {
 	private getThingsParams;
 	private getChindrenThingsParams;
 	constructor(mainThing: Thing, thingKind: string, thingClaims: ThingClaims, thingsDataContext: ThingsDataContext, realtimeConnector: RealtimeConnector);
+	reset(): void;
 	init(): void;
 	done(): void;
 	private searchThingById;

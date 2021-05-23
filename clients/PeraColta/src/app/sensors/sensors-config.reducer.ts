@@ -9,5 +9,5 @@ export const sensorsConfigReducer = createReducer(
     initialState,
     on(getAllSensorsConfig, state => state),
     on(getAllSensorsConfigSuccess, (state, { payload }) => [...payload]), // [...payload] clone the array
-    on(resetAppState, state => initialState),
+    on(resetAppState, state => initialState)
 );

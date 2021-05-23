@@ -50,7 +50,7 @@ export class SensorsComponent implements OnInit, OnDestroy {
       // Info: Here I'm already loggedin so is possible to register an event handler
       this.realTimeConnector.realTimeConnectorRaw.setHook('onUpdateThingValue', this.onUpdateThingValue);
   }
-
+  // Info: Called every time component is shown
   ngOnInit() {
     // Reducers are pure functions in that they produce the same output for a given input.
     // They are without side effects and handle each state transition synchronously.
@@ -60,6 +60,7 @@ export class SensorsComponent implements OnInit, OnDestroy {
     this.store.dispatch(getAllSensorsConfig()); // It is syncronous as abose comment
     this.store.dispatch(getAllSensorsValue());
   }
+  // Info: Called every time component is hidden
   ngOnDestroy() {
     this.realTimeConnector.realTimeConnectorRaw.remHook('onUpdateThingValue', this.onUpdateThingValue);
     this.canceler.cancel();
