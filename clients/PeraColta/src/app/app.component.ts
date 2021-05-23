@@ -48,8 +48,6 @@ export class AppComponent implements OnInit, OnDestroy {
 
   // ToDo: Why it is in this component?
   async logout() {
-    if (!this.accountService.isLoggedIn)
-      return;
     this.store.dispatch(resetAppState());
     try {
       await this.accountService.logout();
