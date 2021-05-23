@@ -17,5 +17,5 @@ export const sensorsValueReducer = createReducer(
         })
         return localState;
     }),
-    on(resetAppState, state => initialState),
+    on(resetAppState, state => initialState)
 )

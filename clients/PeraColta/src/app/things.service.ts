@@ -43,6 +43,9 @@ export class ThingsService implements OnDestroy {
         this.thingsDatacontext,
         this.realTimeConnector.realTimeConnectorRaw);
   }
+  public reset() {
+    this.thingsManager.reset();
+  }
   // ToDo: It is not used with ngrx Effect, so we lost thingsManager realtime updates
   public init() {
     this.thingsManager.init();

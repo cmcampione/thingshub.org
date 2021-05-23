@@ -19,12 +19,13 @@ export interface ThingsDataSet {
     itemsRange: ItemsRange
 }
 
+// Info: ThingsManager have state
 export class ThingsManager {
     
     private getThingsParams: ThingsGetParams;
     private getChindrenThingsParams: ThingsGetParams;
 
-    constructor(private mainThing: Thing, 
+    constructor(private readonly mainThing: Thing, 
         private thingKind : string, 
         private thingClaims : ThingClaims,
         private thingsDataContext: ThingsDataContext,
@@ -39,7 +40,6 @@ export class ThingsManager {
             valueFilter: null
         }
         this.getChindrenThingsParams = {
-
             parentThingId: null, // Overrided by thingsManager
             thingFilter: {deletedStatus: ThingDeletedStates.Ok},
             top: 10,            
@@ -48,14 +48,32 @@ export class ThingsManager {
             valueFilter: null
         }
     }
+    public reset() {
+        // this.mainThing
+        this.getThingsParams = {
+            parentThingId: null,// Overrided by thingsManager
+            thingFilter: {$and: [{kind: this.thingKind}, {deletedStatus: ThingDeletedStates.Ok}]},
+            top: 10,
+            skip: 0, // Overrided by thingsManager
+            orderBy: null,
+            valueFilter: null
+        };
+        this.getChindrenThingsParams = {
+            parentThingId: null, // Overrided by thingsManager
+            thingFilter: {deletedStatus: ThingDeletedStates.Ok},
+            top: 10,            
+            skip: 0, // Overrided by thingsManager
+            orderBy: null,
+            valueFilter: null
+        };    
+    }
     public init() {
         this.realtimeConnector.setHook("onCreateThing", this.onCreateThing);
         this.realtimeConnector.setHook("onUpdateThingValue", this.onUpdateThingValue);
     }
-
     public done() {
         this.realtimeConnector.remHook("onUpdateThingValue", this.onUpdateThingValue);
-        this.realtimeConnector.remHook("onCreateThing", this.onCreateThing);
+        this.realtimeConnector.remHook("onCreateThing", this.onCreateThing);        
     }
 
     private searchThingById(id: string): Thing {

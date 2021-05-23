@@ -129,6 +129,7 @@ export class AccountManager {
         this._appName = appName;
         let aAc = accountActionControl ? accountActionControl : this.defaultAccountActionControl;
         this.accountDataContext =  new AccountDataContext(endPointAddress, aAc);
+        
         this.getLoginData(apiKey);
 
         if (this.apiKey)

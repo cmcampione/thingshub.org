@@ -66,6 +66,7 @@ export class ContentPageComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.isLoggedIn = this.accountService.isLoggedIn;
+    // Info: Useful when a page refresh occurs and the access token is still valid
     if (this.isLoggedIn) {
       this.realTimeConnector.realTimeConnectorRaw.subscribe();
     }

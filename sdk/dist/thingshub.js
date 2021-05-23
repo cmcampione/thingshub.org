@@ -3835,7 +3835,7 @@ class AccountDataContext {
         axios_1.default.interceptors.request.use((config) => __awaiter(this, void 0, void 0, function* () {
             if (!accountActionControl) // Sanity check
                 return config;
-            // Useful for http calls like login without authentication
+            // Useful for http calls, like login, without authentication
             if (!accountActionControl.isLoggedIn())
                 return config;
             if (!accountActionControl.isAccessTokenExpired()) {
@@ -4537,6 +4537,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.ThingsManager = void 0;
 const _1 = __webpack_require__(/*! . */ "./src/index.ts");
+// Info: ThingsManager have state
 class ThingsManager {
     constructor(mainThing, thingKind, thingClaims, thingsDataContext, realtimeConnector) {
         this.mainThing = mainThing;
@@ -4558,6 +4559,25 @@ class ThingsManager {
                 return;
             thing.value = value;
         };
+        this.getThingsParams = {
+            parentThingId: null,
+            thingFilter: { $and: [{ kind: this.thingKind }, { deletedStatus: 1 /* Ok */ }] },
+            top: 10,
+            skip: 0,
+            orderBy: null,
+            valueFilter: null
+        };
+        this.getChindrenThingsParams = {
+            parentThingId: null,
+            thingFilter: { deletedStatus: 1 /* Ok */ },
+            top: 10,
+            skip: 0,
+            orderBy: null,
+            valueFilter: null
+        };
+    }
+    reset() {
+        // this.mainThing
         this.getThingsParams = {
             parentThingId: null,
             thingFilter: { $and: [{ kind: this.thingKind }, { deletedStatus: 1 /* Ok */ }] },
