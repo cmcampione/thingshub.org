@@ -26,9 +26,9 @@ export class SensorsValueEffects {
         ))
     )
 
-constructor(
-    private actions$: Actions,
-    private sensorsValueService: SensorsValueService
-    ) {
+    constructor(
+        private actions$: Actions,
+        private sensorsValueService: SensorsValueService
+        ) {
     }
 }
