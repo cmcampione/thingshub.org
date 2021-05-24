@@ -9,6 +9,19 @@ import { RESET_APP_STATE } from '../app.actions';
 @Injectable()
 export class SensorsConfigEffects {
 
+    constructor(
+        private actions$: Actions,
+        private sensorsConfigService: SensorsConfigService
+        ) {
+    }
+
+    resetSensorsConfig$ = createEffect(() => this.actions$.pipe(
+        ofType(RESET_APP_STATE),
+        tap(() => this.sensorsConfigService.thingsService.reset())
+        ),
+        { dispatch: false }
+    )
+
     loadSensorsConfig$ = createEffect(() => this.actions$.pipe(
         ofType(GET_ALL_SENSORS_CONFIG),
         mergeMap(() => from(this.sensorsConfigService.getAll())
@@ -18,21 +31,4 @@ export class SensorsConfigEffects {
             )
         ))
     );
-
-   /*  resetSensorsConfig$ = createEffect(
-        () => {
-            return this.actions$.pipe(
-                ofType(RESET_APP_STATE),
-                tap(() => {
-                    console.log("");
-                })
-            )
-        }
-    ); */
-    
-constructor(
-    private actions$: Actions,
-    private sensorsConfigService: SensorsConfigService
-    ) {
-    }
 }
