@@ -4355,9 +4355,9 @@ class Thing {
     }
     collapse() {
         this.childrenSkip = 0;
-        // INFO: Not reset "this.childrenTotalItems = Number.MAX_SAFE_INTEGER" to trace potential Children number
+        // Info: Not reset "this.childrenTotalItems = Number.MAX_SAFE_INTEGER" to trace potential Children number
         // this.childrenTotalItems = Number.MAX_SAFE_INTEGER;
-        // INFO: Useful to maintain original internal array ref
+        // Info: Useful to maintain original internal array ref
         this.children.splice(0, this.children.length);
     }
     shallowCopy() {
@@ -4577,28 +4577,17 @@ class ThingsManager {
         };
     }
     reset() {
-        // this.mainThing
-        this.getThingsParams = {
-            parentThingId: null,
-            thingFilter: { $and: [{ kind: this.thingKind }, { deletedStatus: 1 /* Ok */ }] },
-            top: 10,
-            skip: 0,
-            orderBy: null,
-            valueFilter: null
-        };
-        this.getChindrenThingsParams = {
-            parentThingId: null,
-            thingFilter: { deletedStatus: 1 /* Ok */ },
-            top: 10,
-            skip: 0,
-            orderBy: null,
-            valueFilter: null
-        };
+        this.mainThing.children.splice(0, this.mainThing.children.length);
+        this.mainThing.childrenSkip = 0;
+        this.mainThing.childrenTotalItems = Number.MAX_SAFE_INTEGER;
+        this.mainThing.usersInfos.splice(0, this.mainThing.usersInfos.length);
     }
+    // Useful if we want realtime connection support
     init() {
         this.realtimeConnector.setHook("onCreateThing", this.onCreateThing);
         this.realtimeConnector.setHook("onUpdateThingValue", this.onUpdateThingValue);
     }
+    // Complementary of init(). Useful if we want realtime connection support
     done() {
         this.realtimeConnector.remHook("onUpdateThingValue", this.onUpdateThingValue);
         this.realtimeConnector.remHook("onCreateThing", this.onCreateThing);
@@ -4608,7 +4597,7 @@ class ThingsManager {
             return thing.id === id;
         });
     }
-    // INFO: Does not change mainThing state
+    // Info: Does not change mainThing state
     getThings(parameter, canceler) {
         return __awaiter(this, void 0, void 0, function* () {
             let thingsDTOsDataSet = null;
@@ -4629,9 +4618,9 @@ class ThingsManager {
             };
         });
     }
-    // INFO: Fills parentThing
-    // INFO: Does not change mainThing, but parentThing is changed    
-    // INFO: "parameter" is changed
+    // Info: Fills parentThing
+    // Info: Does not change mainThing, but parentThing is changed    
+    // Info: "parameter" is changed
     getMoreThingChildren(parentThing, parameter, canceler) {
         return __awaiter(this, void 0, void 0, function* () {
             parameter.skip = parentThing.childrenSkip;
@@ -4647,7 +4636,7 @@ class ThingsManager {
             return thingsDataSet;
         });
     }
-    // INFO:    In Books example where "this.mainThing" is a "generic root thing" 
+    // Info:    In Books example where "this.mainThing" is a "generic root thing" 
     //          "getMoreThings" fills "this.mainThing.children" with "books" collection 
     //          and each "this.mainThing.children[0..n].children" is filled with collection of "generic root thing" like "book comments"
     getMoreThings(canceler) {

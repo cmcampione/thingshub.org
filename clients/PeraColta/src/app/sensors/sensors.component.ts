@@ -58,7 +58,7 @@ export class SensorsComponent implements OnInit, OnDestroy {
     // and determines whether to return a newly modified state or the original state.
     // https://ngrx.io/guide/store/reducers
     this.store.dispatch(getAllSensorsConfig()); // It is syncronous as abose comment
-    this.store.dispatch(getAllSensorsValue());
+    this.store.dispatch(getAllSensorsValue());  // It is syncronous as abose comment
   }
   // Info: Called every time component is hidden
   ngOnDestroy() {

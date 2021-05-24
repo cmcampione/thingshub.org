@@ -49,28 +49,17 @@ export class ThingsManager {
         }
     }
     public reset() {
-        // this.mainThing
-        this.getThingsParams = {
-            parentThingId: null,// Overrided by thingsManager
-            thingFilter: {$and: [{kind: this.thingKind}, {deletedStatus: ThingDeletedStates.Ok}]},
-            top: 10,
-            skip: 0, // Overrided by thingsManager
-            orderBy: null,
-            valueFilter: null
-        };
-        this.getChindrenThingsParams = {
-            parentThingId: null, // Overrided by thingsManager
-            thingFilter: {deletedStatus: ThingDeletedStates.Ok},
-            top: 10,            
-            skip: 0, // Overrided by thingsManager
-            orderBy: null,
-            valueFilter: null
-        };    
+        this.mainThing.children.splice(0, this.mainThing.children.length);
+        this.mainThing.childrenSkip = 0;
+        this.mainThing.childrenTotalItems = Number.MAX_SAFE_INTEGER;
+        this.mainThing.usersInfos.splice(0, this.mainThing.usersInfos.length);
     }
+    // Useful if we want realtime connection support
     public init() {
         this.realtimeConnector.setHook("onCreateThing", this.onCreateThing);
         this.realtimeConnector.setHook("onUpdateThingValue", this.onUpdateThingValue);
     }
+    // Complementary of init(). Useful if we want realtime connection support
     public done() {
         this.realtimeConnector.remHook("onUpdateThingValue", this.onUpdateThingValue);
         this.realtimeConnector.remHook("onCreateThing", this.onCreateThing);        
@@ -98,7 +87,7 @@ export class ThingsManager {
         thing.value = value;
     }
 
-    // INFO: Does not change mainThing state
+    // Info: Does not change mainThing state
     private async getThings(parameter: ThingsGetParams, canceler: HttpRequestCanceler) : Promise<ThingsDataSet> {
 
         let thingsDTOsDataSet : ThingsDTOsDataSet = null;
@@ -123,9 +112,9 @@ export class ThingsManager {
         }
     }
 
-    // INFO: Fills parentThing
-    // INFO: Does not change mainThing, but parentThing is changed    
-    // INFO: "parameter" is changed
+    // Info: Fills parentThing
+    // Info: Does not change mainThing, but parentThing is changed    
+    // Info: "parameter" is changed
     private async getMoreThingChildren(parentThing : Thing, parameter: ThingsGetParams, canceler: HttpRequestCanceler) : Promise<ThingsDataSet> {
 
         parameter.skip = parentThing.childrenSkip;
@@ -143,7 +132,7 @@ export class ThingsManager {
         
         return thingsDataSet;
     }
-    // INFO:    In Books example where "this.mainThing" is a "generic root thing" 
+    // Info:    In Books example where "this.mainThing" is a "generic root thing" 
     //          "getMoreThings" fills "this.mainThing.children" with "books" collection 
     //          and each "this.mainThing.children[0..n].children" is filled with collection of "generic root thing" like "book comments"
     public async getMoreThings(canceler : HttpRequestCanceler) : Promise<ThingsDataSet[]> {

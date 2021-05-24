@@ -24,7 +24,7 @@ export class SensorsValueService implements OnDestroy {
             return thing.id === id;
         })
     }
-    
+
     // ToDo: It's not called for Effect cleanup
     ngOnDestroy() {
         this.thingsService.done();
