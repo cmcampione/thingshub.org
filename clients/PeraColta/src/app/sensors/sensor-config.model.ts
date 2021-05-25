@@ -15,6 +15,7 @@ export enum SensorKindType {
 export interface SensorConfig {
     thingId: string;
     id: string;
+    relateThing: string;
     name: string;
     kind: SensorKind;
     kindType: SensorKindType;

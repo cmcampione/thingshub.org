@@ -12,14 +12,15 @@ import { sensorsConfigReducer } from '../sensors/sensors-config.reducer';
 import { sensorsValueReducer } from '../sensors/sensors-value.reducer';
 import { StoreModule } from '@ngrx/store';
 import { SensorComponent } from './sensor/sensor.component';
+import { SensorsConfigFeatureName, SensorsValueFeatureName } from './sensors.selectors';
 
 @NgModule({
   declarations: [SensorsComponent, SensorComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA], // To disable some error message from ionic
   imports: [
     CommonModule,
-    StoreModule.forFeature('sensorsValue', sensorsValueReducer), // ToDo: avoid hard coded string
-    StoreModule.forFeature('sensorsConfig', sensorsConfigReducer), // ToDo: avoid hard coded string
+    StoreModule.forFeature(SensorsValueFeatureName, sensorsValueReducer),
+    StoreModule.forFeature(SensorsConfigFeatureName, sensorsConfigReducer),
     EffectsModule.forFeature([SensorsValueEffects, SensorsConfigEffects])
   ],
   exports: [SensorsComponent],
