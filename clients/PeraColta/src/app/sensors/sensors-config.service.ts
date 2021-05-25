@@ -38,6 +38,7 @@ export class SensorsConfigService implements OnDestroy {
                 const sensorConfig: SensorConfig = {
                     thingId: thing.id,
                     id: sensorConfigRaw.id,
+                    relateThing: thing.value.relateThing,
                     name: sensorConfigRaw.name,
                     kind: sensorConfigRaw.kind,
                     kindType: sensorConfigRaw.kindType,

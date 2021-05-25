@@ -4,13 +4,16 @@ import { SensorValue } from '../sensors/sensor-value.model';
 import { SensorConfig, SensorKind, SensorKindType } from '../sensors/sensor-config.model';
 import { Sensor } from '../sensors/sensor.model';
 
+export const SensorsValueFeatureName = 'sensorsValue';
+export const SensorsConfigFeatureName = 'sensorsConfig';
+
 const selectSensorsValue = createFeatureSelector<
     SensorsState,
-    ReadonlyArray<SensorValue>>('sensorsValue'); // ToDo: avoid hard coded string
+    ReadonlyArray<SensorValue>>(SensorsValueFeatureName);
 
 const selectSensorsConfig = createFeatureSelector<
     SensorsState,
-    ReadonlyArray<SensorConfig>>('sensorsConfig'); // ToDo: avoid hard coded string
+    ReadonlyArray<SensorConfig>>(SensorsConfigFeatureName);
 
 export const selectSensors = createSelector(
     selectSensorsValue,
@@ -21,6 +24,7 @@ export const selectSensors = createSelector(
                 thingId: null,
                 name: 'No name',
                 id: sensorValueRaw.id,
+                relateThing: null,
                 kind: SensorKind.Undefined,
                 kindType: SensorKindType.Undefined,
                 redValueMin: 0,
@@ -30,8 +34,8 @@ export const selectSensors = createSelector(
                 min: 0,
                 max: 0
             }
-            // ToDo: Id must be unique for all sensors and relate config
-            const sc = sensorsConfig.find((sensorConfig) => sensorValueRaw.id === sensorConfig.id);
+            const sc = sensorsConfig.find((sensorConfig) => sensorValueRaw.id === sensorConfig.id &&
+                sensorConfig.relateThing === sensorValueRaw.thingId);
             if (sc)
                 sensorConfigRaw = sc;
             return {
