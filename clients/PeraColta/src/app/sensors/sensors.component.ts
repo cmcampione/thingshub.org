@@ -57,17 +57,21 @@ export class SensorsComponent implements OnInit, OnDestroy {
     // Each reducer function takes the latest Action dispatched, the current state,
     // and determines whether to return a newly modified state or the original state.
     // https://ngrx.io/guide/store/reducers
-    this.store.dispatch(getAllSensorsConfig()); // It is syncronous as abose comment
-    this.store.dispatch(getAllSensorsValue());  // It is syncronous as abose comment
+
+    // Below methods are commented because we need to know the number of sensors before display this component
+    // this.store.dispatch(getAllSensorsConfig()); // It is syncronous as abose comment
+    // this.store.dispatch(getAllSensorsValue());  // It is syncronous as abose comment
   }
   // Info: Called every time component is hidden
   ngOnDestroy() {
+    // ToDo: Arrive afterrealtime sunsubscribe
     this.realTimeConnector.realTimeConnectorRaw.remHook('onUpdateThingValue', this.onUpdateThingValue);
     this.canceler.cancel();
   }
 
   // https://netbasal.com/angular-2-improve-performance-with-trackby-cc147b5104e5
   trackByFn(index, item: Sensor) {
+    // ToDo: Maybe need thingId?
     return item.sensorValue.id; // or item.id
   }
 }

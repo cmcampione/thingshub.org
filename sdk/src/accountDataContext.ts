@@ -74,8 +74,7 @@ export class AccountDataContext {
         const config = {
             headers: {
                 "Content-Type": "application/x-www-form-urlencoded"
-            },
-            __isRetryRequest: true
+            }
         };
         const response = await axios.post(this.accountUrl + "/login", qs.stringify(loginData), config);
         const accountUserDataRaw: any = jwtDecode(response.data.access_token);
