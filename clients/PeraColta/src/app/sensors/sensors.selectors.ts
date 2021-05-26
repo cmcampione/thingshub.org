@@ -34,7 +34,7 @@ export const selectSensors = createSelector(
                 min: 0,
                 max: 0
             }
-            const sc = sensorsConfig.find((sensorConfig) => sensorValueRaw.id === sensorConfig.id &&
+            const sc = sensorsConfig.find(sensorConfig => sensorValueRaw.id === sensorConfig.id &&
                 sensorConfig.relateThing === sensorValueRaw.thingId);
             if (sc)
                 sensorConfigRaw = sc;
