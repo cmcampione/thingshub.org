@@ -137,21 +137,21 @@ export declare const enum RealtimeConnectionStates {
 export declare class RealtimeConnector {
 	protected connectionStatus: RealtimeConnectionStates;
 	protected url: string;
-	protected authHook: () => void;
+	protected authHook: () => string;
 	protected errorHook: (error: any) => void;
 	protected stateChangedHook: (newState: RealtimeConnectionStates) => void;
 	protected connectErrorHook: (error: any) => void;
 	protected on_connectionStatusChange(newState: RealtimeConnectionStates): void;
 	subscribe(): void;
 	unsubscribe(): void;
-	setHook(eventName: string, hook: (...msg: any[]) => void): void;
-	remHook(eventName: any, hook: (...msg: any[]) => void): void;
-	constructor(url: string, authHook: () => void, errorHook: (error: any) => void, connectErrorHook: (error: any) => void, stateChangedHook: (change: RealtimeConnectionStates) => void);
+	setHook(_eventName: string, _hook: (...msg: any[]) => void): void;
+	remHook(_eventName: any, _hook: (...msg: any[]) => void): void;
+	constructor(url: string, authHook: () => string, errorHook: (error: any) => void, connectErrorHook: (error: any) => void, stateChangedHook: (change: RealtimeConnectionStates) => void);
 	api(): Promise<any | any>;
 }
 export declare class SocketIORealtimeConnector extends RealtimeConnector {
 	private socket;
-	constructor(url: string, authHook: () => void, errorHook: (error: any) => void, connectErrorHook: (error: any) => void, stateChangedHook: (change: RealtimeConnectionStates) => void);
+	constructor(url: string, authHook: () => string, errorHook: (error: any) => void, connectErrorHook: (error: any) => void, stateChangedHook: (change: RealtimeConnectionStates) => void);
 	private on_error;
 	private on_connect_error;
 	private on_connect;

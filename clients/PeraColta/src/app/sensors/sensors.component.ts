@@ -1,12 +1,13 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { HttpRequestCanceler } from 'thingshub-js-sdk';
 import { select, Store } from '@ngrx/store';
-import { selectSensors } from '../sensors/sensors.selectors';
+import { selectSensors, selectSensorsCount } from '../sensors/sensors.selectors';
 import { getAllSensorsValue, setSensorValue } from '../sensors/sensors-value.actions';
 import { getAllSensorsConfig } from '../sensors/sensors-config.actions';
 import { RealTimeConnectorService } from '../real-time-connector.service';
 import { SensorValue } from './sensor-value.model';
 import { Sensor } from './sensor.model';
+import { Subscription } from 'rxjs';
 
 interface SensorRaw {
   id: string;
@@ -25,7 +26,12 @@ interface SensorRaw {
 export class SensorsComponent implements OnInit, OnDestroy {
 
   private canceler = new HttpRequestCanceler();
+
   public  sensors$ = this.store.pipe(select(selectSensors));
+
+  private sensorsCount = 0;
+  public sensorsCount$ = this.store.pipe(select(selectSensorsCount));
+  private readonly subscriptionsensorsCount: Subscription = null;
 
   private readonly onUpdateThingValue = (thingId: string, value: any, asCmd: boolean): void => {
     if (asCmd)
@@ -49,6 +55,7 @@ export class SensorsComponent implements OnInit, OnDestroy {
     public readonly realTimeConnector: RealTimeConnectorService) {
       // Info: Here I'm already loggedin so is possible to register an event handler
       this.realTimeConnector.realTimeConnectorRaw.setHook('onUpdateThingValue', this.onUpdateThingValue);
+      this.subscriptionsensorsCount = this.sensorsCount$.subscribe(v => this.sensorsCount = v);
   }
   // Info: Called every time component is shown
   ngOnInit() {
@@ -58,15 +65,19 @@ export class SensorsComponent implements OnInit, OnDestroy {
     // and determines whether to return a newly modified state or the original state.
     // https://ngrx.io/guide/store/reducers
 
-    // Below methods are commented because we need to know the number of sensors before display this component
-    // this.store.dispatch(getAllSensorsConfig()); // It is syncronous as abose comment
-    // this.store.dispatch(getAllSensorsValue());  // It is syncronous as abose comment
+    // This check is useful during refresh of component and keep the state to avoid pagination problem
+    if (this.sensorsCount === 0) {
+      // Below methods are commented because we need to know the number of sensors before display this component
+      // this.store.dispatch(getAllSensorsConfig()); // It is syncronous as abose comment
+      // this.store.dispatch(getAllSensorsValue());  // It is syncronous as abose comment
+    }
   }
   // Info: Called every time component is hidden
   ngOnDestroy() {
-    // ToDo: Arrive afterrealtime sunsubscribe
+    // ToDo: Arrive after the real-time connector is unsubscribed
     this.realTimeConnector.realTimeConnectorRaw.remHook('onUpdateThingValue', this.onUpdateThingValue);
     this.canceler.cancel();
+    this.subscriptionsensorsCount.unsubscribe();
   }
 
   // https://netbasal.com/angular-2-improve-performance-with-trackby-cc147b5104e5

@@ -1,4 +1,4 @@
-import axios, { AxiosRequestConfig, AxiosPromise } from "axios";
+import axios from "axios";
 import * as io from 'socket.io-client';
 
 export const enum RealtimeConnectionStates {
@@ -14,7 +14,7 @@ export class RealtimeConnector {
 
     protected url: string = "";//   https://servername:port/route
     
-    protected authHook: () => void = null;
+    protected authHook: () => string = null;
 
     protected errorHook: (error: any) => void = null;
     protected stateChangedHook: (newState: RealtimeConnectionStates) => void = null;
@@ -31,15 +31,14 @@ export class RealtimeConnector {
     public subscribe() : void {}
     public unsubscribe() : void {}
 
-    public setHook(eventName : string, hook : (...msg: any[]) => void) : void {}
-    public remHook(eventName : any, hook : (...msg: any[]) => void) : void {}
+    public setHook(_eventName : string, _hook : (...msg: any[]) => void) : void {}
+    public remHook(_eventName : any, _hook : (...msg: any[]) => void) : void {}
 
     constructor(url : string,
-        authHook : () => void,
-        errorHook : (error) => void,
-        connectErrorHook : (error) => void,
+        authHook : () => string,
+        errorHook : (error: any) => void,
+        connectErrorHook : (error: any) => void,
         stateChangedHook : (change: RealtimeConnectionStates) => void) {
-
             this.url = url;
 
             this.authHook = authHook;
@@ -49,9 +48,10 @@ export class RealtimeConnector {
             this.stateChangedHook = stateChangedHook;
     }
 
-    public api() : Promise<any | any> {
-        return axios.get(this.url + "/api")
-        .then((response : any) => {return response; });
+    // Only for test purpose
+    public async api() : Promise<any | any> {
+        const response = await axios.get(this.url + "/api");
+        return response;
     }
 }
 
@@ -60,18 +60,18 @@ export class SocketIORealtimeConnector extends RealtimeConnector {
     private socket : SocketIOClient.Socket = null;
     
     constructor(url : string,
-        authHook : () => void,
-        errorHook : (error) => void,
-        connectErrorHook : (error) => void,
+        authHook : () => string,
+        errorHook : (error: any) => void,
+        connectErrorHook : (error: any) => void,
         stateChangedHook : (change: RealtimeConnectionStates) => void) {
             super(url, authHook, errorHook, connectErrorHook, stateChangedHook);
     }
 
-    private on_error(error) {
+    private on_error(error: any) {
         if (this.errorHook)
             this.errorHook(error);
     }
-    private on_connect_error(error) {
+    private on_connect_error(error: any) {
         if (this.connectErrorHook)
             this.connectErrorHook(error);
     }
@@ -80,9 +80,9 @@ export class SocketIORealtimeConnector extends RealtimeConnector {
         if (this.on_connectionStatusChange)
             this.on_connectionStatusChange(RealtimeConnectionStates.Connected);
     }
-    private on_disconnect(reason) {
+    private on_disconnect(_reason: any) {
         if (this.on_connectionStatusChange)
-            this.on_connectionStatusChange(RealtimeConnectionStates.Disconnected);
+            this.on_connectionStatusChange(RealtimeConnectionStates.Disconnected);         
     }
 
     public subscribe() : void {
@@ -94,16 +94,18 @@ export class SocketIORealtimeConnector extends RealtimeConnector {
         // ToDo: Add support for options of socketio
         this.socket = io(fullUrl);
 
-        this.socket.on("error", error => this.on_error(error));
+        this.socket.on("error", (error: any) => this.on_error(error));
 
-        this.socket.on("connect_error", error => this.on_connect_error(error));
+        this.socket.on("connect_error", (error: any) => this.on_connect_error(error));
         this.socket.on("connect", () => this.on_connect());
-        this.socket.on("disconnect", reason => this.on_disconnect(reason));
+        this.socket.on("disconnect", (reason: any) => this.on_disconnect(reason));
     }
     public unsubscribe() : void {
         if (!this.socket)
             return;
-
+        
+        // The socket.io source, the socket object (which is the EventEmitter) is deleted
+        // when the client disconnects so it is not necessary to manually call removeAllListeners.
         this.socket.disconnect();
         this.socket = null;
     }
@@ -112,7 +114,9 @@ export class SocketIORealtimeConnector extends RealtimeConnector {
         this.socket.on(eventName, hook);
     }
     public remHook(eventName : any, hook : (...msg: any[]) => void) : void {
-        // Could happen after unsubscribe so this.socket is null
+        // Could happen after unsubscribe, so this.socket is null
+        // The socket.io source, the socket object (which is the EventEmitter) is deleted
+        // when the client disconnects so it is not necessary to manually call removeAllListeners.
         if (!this.socket)
             return;
         this.socket.off(eventName, hook);

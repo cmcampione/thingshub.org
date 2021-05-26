@@ -3,7 +3,6 @@ import { SensorsState } from './sensors.state';
 import { SensorValue } from '../sensors/sensor-value.model';
 import { SensorConfig, SensorKind, SensorKindType } from '../sensors/sensor-config.model';
 import { Sensor } from '../sensors/sensor.model';
-import { of } from 'rxjs';
 
 export const SensorsValueFeatureName = 'sensorsValue';
 export const SensorsConfigFeatureName = 'sensorsConfig';
@@ -56,9 +55,9 @@ export const selectSensors = createSelector(
     });
 
 export const selectSensorsCount = createSelector(
-    selectSensors, 
+    selectSensors,
     (sensors: ReadonlyArray<Sensor>) => sensors.length)
-    
+
 /* ToDo: To remove
 export const selectSensor = createSelector(
     selectSensorsValue,
