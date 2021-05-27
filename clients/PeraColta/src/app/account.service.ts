@@ -28,7 +28,7 @@ export class AccountService {
             return isLoggedIn; // ToDo: I don't know if return accountUserData is necessary after a resolve
           }
           // With accountUserData == false assert UserId changed without appropriate logout
-          const err = new Error('User is changed without appropriate logout action');
+          const err = new Error('User was changed without appropriate logout action');
           reject(err);
           return err;// ToDo: I don't know if return err is necessary after a reject
         });
