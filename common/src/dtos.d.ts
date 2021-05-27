@@ -14,13 +14,13 @@ export declare class RegisterByOnlyEmailDTO {
 	public confirmationToken: string;
 	public status : any;
 
-	constructor(email, confirmationToken, status);
+	constructor(email: any, confirmationToken: any, status: any);
 }
 
 export declare class EmailDTO {
 	public value : string;
 	public isConfirmed :  boolean;
-	constructor(email);
+	constructor(email: any);
 }
 
 export declare class UserDTO { 
@@ -30,7 +30,7 @@ export declare class UserDTO {
 	public emails : EmailDTO[];
 	public masterApiKey : string;
 
-	constructor(user, fullInfos);
+	constructor(user: any, fullInfos: any);
 }
 
 export declare class UserInfoDTO {

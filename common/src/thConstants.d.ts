@@ -3,7 +3,7 @@ export declare const enum ThingDeletedStates {
 	Ok        = 1,
 	Deleted   = 2
 }
-export function validateThingDeletedStatus(deletedStatus) : boolean;
+export function validateThingDeletedStatus(deletedStatus: any) : boolean;
 
 // The User can not have more Roles in the same time
 export declare const enum ThingUserRoles {
@@ -11,7 +11,7 @@ export declare const enum ThingUserRoles {
 	Administrator = 1,
 	User          = 2
 }
-export function validateThingUserRoles(userRole) : boolean;
+export function validateThingUserRoles(userRole: any) : boolean;
 // The User can not have more Status at same time
 export declare const enum ThingUserStates {
 	NoMatter    = 0,  // Internal state. Do not use for external use like filter
@@ -19,14 +19,14 @@ export declare const enum ThingUserStates {
 	WaitForAuth = 2,
 	Deleted     = 4
 }
-export function validateThingUserStatus(userStatus) : boolean;
+export function validateThingUserStatus(userStatus: any) : boolean;
 
 export declare const enum ThingUserVisibility {
 	NoMatter  = 0,  // Internal state. Do not use for external use like filter
 	Visible       = 1,
 	Hidden        = 2
 }
-export declare function validateThingUserVisibility(visibility) : boolean;
+export declare function validateThingUserVisibility(visibility: any) : boolean;
 
 // Do not have validation function since are bitwise values
 
@@ -65,7 +65,7 @@ ThingUserReadClaims.CanReadThingUserRights | ThingUserReadClaims.CanReadThingUse
 ThingUserReadClaims.CanReadThingUserStatus | ThingUserReadClaims.CanReadThingUserReadClaims | ThingUserReadClaims.CanReadPublicReadClaims |
 ThingUserReadClaims.CanReadPublicChangeClaims | ThingUserReadClaims.CanReadEveryoneReadClaims | ThingUserReadClaims.CanReadEveryoneChangeClaims; */
 
-export function validateThingUserReadClaims(userReadClaims) : boolean;
+export function validateThingUserReadClaims(userReadClaims: any) : boolean;
 // Do not have validation function since are bitwise values
 export declare const enum ThingUserChangeClaims {
 	NoClaims = 0,
@@ -110,7 +110,7 @@ ThingUserChangeClaims.CanChangePublicReadClaims | ThingUserChangeClaims.CanChang
 ThingUserChangeClaims.CanAddChildrenThing | ThingUserChangeClaims.CanRemoveChildrenThing;
  */
 
-export function validateThingUserChangeClaims(userChangeClaims) : boolean;
+export function validateThingUserChangeClaims(userChangeClaims: any) : boolean;
 
 export declare const enum ThingKind {
 	NoMatter= "0",

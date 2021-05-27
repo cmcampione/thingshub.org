@@ -13,7 +13,7 @@ export interface AccountUserData {
 export interface AccountActionControl {
     isLoggedIn:             () => boolean;
     isAccessTokenExpired:   () => boolean; 
-    getSecurityHeader:      () => object;
+    getSecurityHeader:      () => object | null;
     refreshToken:           () => Promise<any>;
     resetApp:               () => void;
 }

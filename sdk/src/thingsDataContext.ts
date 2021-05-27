@@ -5,10 +5,10 @@ import {ThingDTO} from "../../common/src/dtos";
 import {ThingPositionRaw} from "./thingPosition";
 
 export interface ThingsGetParams {
-    parentThingId : string;
+    parentThingId : string | null;
     thingFilter : object;
-    valueFilter : object;
-    orderBy : string;
+    valueFilter : object | null;
+    orderBy : string | null;
     skip : number;
     top : number;
 }
@@ -62,7 +62,7 @@ export class ThingsDataContext {
                 (!!parameter.top ? ("&top=" + parameter.top) : "");
 
         return axios.get(urlRaw, {
-                cancelToken: (canceler) ? canceler.cancelerToken : null
+                cancelToken: (canceler) ? canceler.cancelerToken : undefined
             })
         .then(function(response: any) : ThingsDTOsDataSet {
             return {

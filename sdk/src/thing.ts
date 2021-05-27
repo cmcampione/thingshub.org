@@ -15,7 +15,7 @@ export class Thing {
 
     public id: string = ""
     
-    public creationDateTime: Date
+    public creationDateTime: Date | null = null
 
     public name: string = ""
 
@@ -24,7 +24,7 @@ export class Thing {
     public pos: number = 0
 
     public deletedStatus : ThingDeletedStates = ThingDeletedStates.NoMatter
-    public deletedDateTime : Date
+    public deletedDateTime : Date | null = null
 
     public publicReadClaims : ThingUserReadClaims = ThingUserReadClaims.NoClaims
     public publicChangeClaims : ThingUserChangeClaims = ThingUserChangeClaims.NoClaims

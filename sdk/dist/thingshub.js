@@ -3810,29 +3810,26 @@ module.exports = function getSideChannel() {
 /*!***********************************!*\
   !*** ./src/accountDataContext.ts ***!
   \***********************************/
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "AccountDataContext": () => (/* binding */ AccountDataContext)
+/* harmony export */ });
+/* harmony import */ var qs__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! qs */ "./node_modules/qs/lib/index.js");
+/* harmony import */ var qs__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(qs__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! axios */ "axios");
+/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(axios__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var jwt_decode__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! jwt-decode */ "./node_modules/jwt-decode/build/jwt-decode.esm.js");
 
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.AccountDataContext = void 0;
-const qs = __webpack_require__(/*! qs */ "./node_modules/qs/lib/index.js");
-const axios_1 = __webpack_require__(/*! axios */ "axios");
-const jwt_decode_1 = __webpack_require__(/*! jwt-decode */ "./node_modules/jwt-decode/build/jwt-decode.esm.js");
+
+
 class AccountDataContext {
     constructor(endPointAddress, accountActionControl) {
         this.accountUrl = "";
         this.accountUrl = endPointAddress.api + "/account";
-        axios_1.default.interceptors.request.use((config) => __awaiter(this, void 0, void 0, function* () {
+        axios__WEBPACK_IMPORTED_MODULE_1___default().interceptors.request.use(async (config) => {
             if (!accountActionControl) // Sanity check
                 return config;
             // Useful for http calls, like login, without authentication
@@ -3843,7 +3840,7 @@ class AccountDataContext {
                 return config;
             }
             try {
-                yield accountActionControl.refreshToken();
+                await accountActionControl.refreshToken();
                 config.headers = Object.assign(Object.assign({}, config.headers), accountActionControl.getSecurityHeader());
                 return config;
             }
@@ -3851,7 +3848,7 @@ class AccountDataContext {
                 accountActionControl.resetApp();
                 return Promise.reject(e);
             }
-        }), function (error) {
+        }, function (error) {
             return Promise.reject(error);
         });
     }
@@ -3866,48 +3863,41 @@ class AccountDataContext {
         return Promise.resolve(1)
     }
     */
-    login({ username, password }) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const loginData = {
-                username,
-                password
-            };
-            const config = {
-                headers: {
-                    "Content-Type": "application/x-www-form-urlencoded"
-                }
-            };
-            const response = yield axios_1.default.post(this.accountUrl + "/login", qs.stringify(loginData), config);
-            const accountUserDataRaw = jwt_decode_1.default(response.data.access_token);
-            return {
-                accessToken: response.data.access_token,
-                id: accountUserDataRaw.sub,
-                name: accountUserDataRaw.name,
-                exp: accountUserDataRaw.exp,
-                iat: accountUserDataRaw.iat
-            };
-        });
+    async login({ username, password }) {
+        const loginData = {
+            username,
+            password
+        };
+        const config = {
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded"
+            }
+        };
+        const response = await axios__WEBPACK_IMPORTED_MODULE_1___default().post(this.accountUrl + "/login", qs__WEBPACK_IMPORTED_MODULE_0__.stringify(loginData), config);
+        const accountUserDataRaw = (0,jwt_decode__WEBPACK_IMPORTED_MODULE_2__.default)(response.data.access_token);
+        return {
+            accessToken: response.data.access_token,
+            id: accountUserDataRaw.sub,
+            name: accountUserDataRaw.name,
+            exp: accountUserDataRaw.exp,
+            iat: accountUserDataRaw.iat
+        };
     }
     // ToDo: To check
-    loginBasic({ username, password }) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const response = yield axios_1.default.post(this.accountUrl + "/login", "grant_type=client_credentials", {
-                headers: {
-                    "Content-Type": "application/x-www-form-urlencoded",
-                    "Authorization": "Basic " + btoa(username + ":" + password)
-                }
-            });
-            return response.data;
+    async loginBasic({ username, password }) {
+        const response = await axios__WEBPACK_IMPORTED_MODULE_1___default().post(this.accountUrl + "/login", "grant_type=client_credentials", {
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+                "Authorization": "Basic " + btoa(username + ":" + password)
+            }
         });
+        return response.data;
     }
-    logout() {
-        return __awaiter(this, void 0, void 0, function* () {
-            const response = yield axios_1.default.get(this.accountUrl + "/logout");
-            return response.data;
-        });
+    async logout() {
+        const response = await axios__WEBPACK_IMPORTED_MODULE_1___default().get(this.accountUrl + "/logout");
+        return response.data;
     }
 }
-exports.AccountDataContext = AccountDataContext;
 
 
 /***/ }),
@@ -3916,30 +3906,24 @@ exports.AccountDataContext = AccountDataContext;
 /*!*******************************!*\
   !*** ./src/accountManager.ts ***!
   \*******************************/
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "AccountManager": () => (/* binding */ AccountManager)
+/* harmony export */ });
+/* harmony import */ var jwt_decode__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! jwt-decode */ "./node_modules/jwt-decode/build/jwt-decode.esm.js");
+/* harmony import */ var _accountDataContext__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./accountDataContext */ "./src/accountDataContext.ts");
 
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.AccountManager = void 0;
-const jwt_decode_1 = __webpack_require__(/*! jwt-decode */ "./node_modules/jwt-decode/build/jwt-decode.esm.js");
-const accountDataContext_1 = __webpack_require__(/*! ./accountDataContext */ "./src/accountDataContext.ts");
+
 class AccountManager {
     constructor(appName, endPointAddress, apiKey, accountActionControl) {
         this._appName = null;
         this._accessToken = null;
         this._userId = null;
         this._userName = null;
-        this.deltaTime = null;
+        this.deltaTime = 0;
         //Info: By design ApiKey is never persistent
         this._apiKey = null;
         this.defaultAccountActionControl = {
@@ -3965,7 +3949,7 @@ class AccountManager {
         };
         this._appName = appName;
         let aAc = accountActionControl ? accountActionControl : this.defaultAccountActionControl;
-        this.accountDataContext = new accountDataContext_1.AccountDataContext(endPointAddress, aAc);
+        this.accountDataContext = new _accountDataContext__WEBPACK_IMPORTED_MODULE_1__.AccountDataContext(endPointAddress, aAc);
         this.getLoginData(apiKey);
         if (this.apiKey)
             return;
@@ -4032,14 +4016,16 @@ class AccountManager {
         this._accessToken = sessionStorage.getItem(this._appName + "_AccessToken");
         this._userId = sessionStorage.getItem(this._appName + "_UserId");
         this._userName = sessionStorage.getItem(this._appName + "_Username");
-        this.deltaTime = parseInt(sessionStorage.getItem(this._appName + "_DeltaTime"));
+        let deltaTime = sessionStorage.getItem(this._appName + "_DeltaTime");
+        this.deltaTime = deltaTime ? parseInt(deltaTime) : 0;
         if (this.remember == false)
             return;
         // Info: In localStorage data should be the same of sessionStorage
         this._accessToken = localStorage.getItem(this._appName + "_AccessToken");
         this._userId = localStorage.getItem(this._appName + "_UserId");
         this._userName = localStorage.getItem(this._appName + "_Username");
-        this.deltaTime = parseInt(localStorage.getItem(this._appName + "_DeltaTime"));
+        deltaTime = localStorage.getItem(this._appName + "_DeltaTime");
+        this.deltaTime = deltaTime ? parseInt(deltaTime) : 0;
     }
     get apiKey() {
         return this._apiKey;
@@ -4053,7 +4039,7 @@ class AccountManager {
         // Sanity check
         if (!this.accessToken)
             return true;
-        const accountUserDataRaw = jwt_decode_1.default(this.accessToken);
+        const accountUserDataRaw = (0,jwt_decode__WEBPACK_IMPORTED_MODULE_0__.default)(this.accessToken);
         return (accountUserDataRaw.exp + this.deltaTime < Math.floor(Date.now() / 1000));
     }
     get isLoggedIn() {
@@ -4069,31 +4055,26 @@ class AccountManager {
             return false;
         return localStorage.getItem(this._appName + "_Remember") == "true" ? true : false;
     }
-    login(username, password, remember) {
-        return __awaiter(this, void 0, void 0, function* () {
-            this._apiKey = null; // resetLoginData does Not reset api Key
-            this.resetLoginData();
-            const accountUserData = yield this.accountDataContext.login({ username, password });
-            this.setLoginData(accountUserData, remember);
-            return accountUserData;
-        });
+    async login(username, password, remember) {
+        this._apiKey = null; // resetLoginData does Not reset api Key
+        this.resetLoginData();
+        const accountUserData = await this.accountDataContext.login({ username, password });
+        this.setLoginData(accountUserData, remember);
+        return accountUserData;
     }
-    logout() {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                return yield this.accountDataContext.logout();
-            }
-            catch (e) {
-                throw (e);
-            }
-            finally {
-                this._apiKey = null; // Sanity check
-                this.resetLoginData();
-            }
-        });
+    async logout() {
+        try {
+            return await this.accountDataContext.logout();
+        }
+        catch (e) {
+            throw (e);
+        }
+        finally {
+            this._apiKey = null; // Sanity check
+            this.resetLoginData();
+        }
     }
 }
-exports.AccountManager = AccountManager;
 
 
 /***/ }),
@@ -4102,11 +4083,11 @@ exports.AccountManager = AccountManager;
 /*!********************************!*\
   !*** ./src/endPointAddress.ts ***!
   \********************************/
-/***/ ((__unused_webpack_module, exports) => {
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
+__webpack_require__.r(__webpack_exports__);
 
-Object.defineProperty(exports, "__esModule", ({ value: true }));
 
 
 /***/ }),
@@ -4115,17 +4096,21 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 /*!************************!*\
   !*** ./src/helpers.ts ***!
   \************************/
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "HttpRequestCanceler": () => (/* binding */ HttpRequestCanceler),
+/* harmony export */   "Helpers": () => (/* binding */ Helpers)
+/* harmony export */ });
+/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! axios */ "axios");
+/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(axios__WEBPACK_IMPORTED_MODULE_0__);
 
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.Helpers = exports.HttpRequestCanceler = void 0;
-const axios_1 = __webpack_require__(/*! axios */ "axios");
 // INFO: It is a wrapper for "axios" to abort Http calls
 class HttpRequestCanceler {
     constructor() {
-        this.cancelerToken = null;
+        this.cancelerToken = undefined;
         this.executor = null;
         this.reset();
     }
@@ -4135,12 +4120,11 @@ class HttpRequestCanceler {
     }
     reset() {
         this.executor = null;
-        this.cancelerToken = new axios_1.default.CancelToken((c) => {
+        this.cancelerToken = new (axios__WEBPACK_IMPORTED_MODULE_0___default().CancelToken)((c) => {
             this.executor = c;
         });
     }
 }
-exports.HttpRequestCanceler = HttpRequestCanceler;
 class Helpers {
     static getRangeItemsFromResponse(response) {
         //ToDo: It's very common find "response.headers" syntax so for now is good
@@ -4170,7 +4154,6 @@ class Helpers {
         };
     }
 }
-exports.Helpers = Helpers;
 
 
 /***/ }),
@@ -4179,33 +4162,66 @@ exports.Helpers = Helpers;
 /*!**********************!*\
   !*** ./src/index.ts ***!
   \**********************/
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "DefaultThingPos": () => (/* reexport safe */ _common_src_thConstants__WEBPACK_IMPORTED_MODULE_1__.DefaultThingPos),
+/* harmony export */   "ThingDeletedStates": () => (/* reexport safe */ _common_src_thConstants__WEBPACK_IMPORTED_MODULE_1__.ThingDeletedStates),
+/* harmony export */   "ThingKind": () => (/* reexport safe */ _common_src_thConstants__WEBPACK_IMPORTED_MODULE_1__.ThingKind),
+/* harmony export */   "ThingUserChangeClaims": () => (/* reexport safe */ _common_src_thConstants__WEBPACK_IMPORTED_MODULE_1__.ThingUserChangeClaims),
+/* harmony export */   "ThingUserReadClaims": () => (/* reexport safe */ _common_src_thConstants__WEBPACK_IMPORTED_MODULE_1__.ThingUserReadClaims),
+/* harmony export */   "ThingUserRoles": () => (/* reexport safe */ _common_src_thConstants__WEBPACK_IMPORTED_MODULE_1__.ThingUserRoles),
+/* harmony export */   "ThingUserStates": () => (/* reexport safe */ _common_src_thConstants__WEBPACK_IMPORTED_MODULE_1__.ThingUserStates),
+/* harmony export */   "ThingUserVisibility": () => (/* reexport safe */ _common_src_thConstants__WEBPACK_IMPORTED_MODULE_1__.ThingUserVisibility),
+/* harmony export */   "validateThingDeletedStatus": () => (/* reexport safe */ _common_src_thConstants__WEBPACK_IMPORTED_MODULE_1__.validateThingDeletedStatus),
+/* harmony export */   "validateThingUserChangeClaims": () => (/* reexport safe */ _common_src_thConstants__WEBPACK_IMPORTED_MODULE_1__.validateThingUserChangeClaims),
+/* harmony export */   "validateThingUserReadClaims": () => (/* reexport safe */ _common_src_thConstants__WEBPACK_IMPORTED_MODULE_1__.validateThingUserReadClaims),
+/* harmony export */   "validateThingUserRoles": () => (/* reexport safe */ _common_src_thConstants__WEBPACK_IMPORTED_MODULE_1__.validateThingUserRoles),
+/* harmony export */   "validateThingUserStatus": () => (/* reexport safe */ _common_src_thConstants__WEBPACK_IMPORTED_MODULE_1__.validateThingUserStatus),
+/* harmony export */   "validateThingUserVisibility": () => (/* reexport safe */ _common_src_thConstants__WEBPACK_IMPORTED_MODULE_1__.validateThingUserVisibility),
+/* harmony export */   "EmailDTO": () => (/* reexport safe */ _common_src_dtos__WEBPACK_IMPORTED_MODULE_2__.EmailDTO),
+/* harmony export */   "RegisterByOnlyEmailDTO": () => (/* reexport safe */ _common_src_dtos__WEBPACK_IMPORTED_MODULE_2__.RegisterByOnlyEmailDTO),
+/* harmony export */   "RegisterByOnlyEmailStatus": () => (/* reexport safe */ _common_src_dtos__WEBPACK_IMPORTED_MODULE_2__.RegisterByOnlyEmailStatus),
+/* harmony export */   "ThingDTO": () => (/* reexport safe */ _common_src_dtos__WEBPACK_IMPORTED_MODULE_2__.ThingDTO),
+/* harmony export */   "UserDTO": () => (/* reexport safe */ _common_src_dtos__WEBPACK_IMPORTED_MODULE_2__.UserDTO),
+/* harmony export */   "UserInfoDTO": () => (/* reexport safe */ _common_src_dtos__WEBPACK_IMPORTED_MODULE_2__.UserInfoDTO),
+/* harmony export */   "RealtimeConnectionStates": () => (/* reexport safe */ _realtimeConnectors__WEBPACK_IMPORTED_MODULE_3__.RealtimeConnectionStates),
+/* harmony export */   "RealtimeConnector": () => (/* reexport safe */ _realtimeConnectors__WEBPACK_IMPORTED_MODULE_3__.RealtimeConnector),
+/* harmony export */   "SocketIORealtimeConnector": () => (/* reexport safe */ _realtimeConnectors__WEBPACK_IMPORTED_MODULE_3__.SocketIORealtimeConnector),
+/* harmony export */   "Helpers": () => (/* reexport safe */ _helpers__WEBPACK_IMPORTED_MODULE_4__.Helpers),
+/* harmony export */   "HttpRequestCanceler": () => (/* reexport safe */ _helpers__WEBPACK_IMPORTED_MODULE_4__.HttpRequestCanceler),
+/* harmony export */   "AccountDataContext": () => (/* reexport safe */ _accountDataContext__WEBPACK_IMPORTED_MODULE_6__.AccountDataContext),
+/* harmony export */   "AccountManager": () => (/* reexport safe */ _accountManager__WEBPACK_IMPORTED_MODULE_7__.AccountManager),
+/* harmony export */   "Thing": () => (/* reexport safe */ _thing__WEBPACK_IMPORTED_MODULE_8__.Thing),
+/* harmony export */   "ThingsDataContext": () => (/* reexport safe */ _thingsDataContext__WEBPACK_IMPORTED_MODULE_9__.ThingsDataContext),
+/* harmony export */   "ThingsManager": () => (/* reexport safe */ _thingsManager__WEBPACK_IMPORTED_MODULE_10__.ThingsManager)
+/* harmony export */ });
+/* harmony import */ var promise_prototype_finally__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! promise.prototype.finally */ "./node_modules/promise.prototype.finally/index.js");
+/* harmony import */ var promise_prototype_finally__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(promise_prototype_finally__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _common_src_thConstants__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../common/src/thConstants */ "../common/src/thConstants.js");
+/* harmony import */ var _common_src_dtos__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../common/src/dtos */ "../common/src/dtos.js");
+/* harmony import */ var _realtimeConnectors__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./realtimeConnectors */ "./src/realtimeConnectors.ts");
+/* harmony import */ var _helpers__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./helpers */ "./src/helpers.ts");
+/* harmony import */ var _endPointAddress__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./endPointAddress */ "./src/endPointAddress.ts");
+/* harmony import */ var _accountDataContext__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./accountDataContext */ "./src/accountDataContext.ts");
+/* harmony import */ var _accountManager__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./accountManager */ "./src/accountManager.ts");
+/* harmony import */ var _thing__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./thing */ "./src/thing.ts");
+/* harmony import */ var _thingsDataContext__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./thingsDataContext */ "./src/thingsDataContext.ts");
+/* harmony import */ var _thingsManager__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./thingsManager */ "./src/thingsManager.ts");
 
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __exportStar = (this && this.__exportStar) || function(m, exports) {
-    for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-const promise_prototype_finally_1 = __webpack_require__(/*! promise.prototype.finally */ "./node_modules/promise.prototype.finally/index.js");
-promise_prototype_finally_1.shim(); //https://stackoverflow.com/questions/35876549/typescript-type-definition-for-promise-prototype-finally
-__exportStar(__webpack_require__(/*! ../../common/src/thConstants */ "../common/src/thConstants.js"), exports);
-__exportStar(__webpack_require__(/*! ../../common/src/dtos */ "../common/src/dtos.js"), exports);
-__exportStar(__webpack_require__(/*! ./realtimeConnectors */ "./src/realtimeConnectors.ts"), exports);
-__exportStar(__webpack_require__(/*! ./helpers */ "./src/helpers.ts"), exports);
-__exportStar(__webpack_require__(/*! ./endPointAddress */ "./src/endPointAddress.ts"), exports);
-__exportStar(__webpack_require__(/*! ./accountDataContext */ "./src/accountDataContext.ts"), exports);
-__exportStar(__webpack_require__(/*! ./accountManager */ "./src/accountManager.ts"), exports);
-__exportStar(__webpack_require__(/*! ./thing */ "./src/thing.ts"), exports);
-__exportStar(__webpack_require__(/*! ./thingsDataContext */ "./src/thingsDataContext.ts"), exports);
-__exportStar(__webpack_require__(/*! ./thingsManager */ "./src/thingsManager.ts"), exports);
+(0,promise_prototype_finally__WEBPACK_IMPORTED_MODULE_0__.shim)(); //https://stackoverflow.com/questions/35876549/typescript-type-definition-for-promise-prototype-finally
+
+
+
+
+
+
+
+
+
+
 
 
 /***/ }),
@@ -4214,30 +4230,28 @@ __exportStar(__webpack_require__(/*! ./thingsManager */ "./src/thingsManager.ts"
 /*!***********************************!*\
   !*** ./src/realtimeConnectors.ts ***!
   \***********************************/
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "RealtimeConnectionStates": () => (/* binding */ RealtimeConnectionStates),
+/* harmony export */   "RealtimeConnector": () => (/* binding */ RealtimeConnector),
+/* harmony export */   "SocketIORealtimeConnector": () => (/* binding */ SocketIORealtimeConnector)
+/* harmony export */ });
+/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! axios */ "axios");
+/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(axios__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var socket_io_client__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! socket.io-client */ "socket.io-client");
+/* harmony import */ var socket_io_client__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(socket_io_client__WEBPACK_IMPORTED_MODULE_1__);
 
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.SocketIORealtimeConnector = exports.RealtimeConnector = exports.RealtimeConnectionStates = void 0;
-const axios_1 = __webpack_require__(/*! axios */ "axios");
-const io = __webpack_require__(/*! socket.io-client */ "socket.io-client");
+
 var RealtimeConnectionStates;
 (function (RealtimeConnectionStates) {
     RealtimeConnectionStates[RealtimeConnectionStates["Connecting"] = 0] = "Connecting";
     RealtimeConnectionStates[RealtimeConnectionStates["Connected"] = 1] = "Connected";
     RealtimeConnectionStates[RealtimeConnectionStates["Reconnecting"] = 2] = "Reconnecting";
     RealtimeConnectionStates[RealtimeConnectionStates["Disconnected"] = 4] = "Disconnected";
-})(RealtimeConnectionStates = exports.RealtimeConnectionStates || (exports.RealtimeConnectionStates = {}));
+})(RealtimeConnectionStates || (RealtimeConnectionStates = {}));
 class RealtimeConnector {
     constructor(url, authHook, errorHook, connectErrorHook, stateChangedHook) {
         this.connectionStatus = 4 /* Disconnected */;
@@ -4256,21 +4270,19 @@ class RealtimeConnector {
         if (this.connectionStatus == newState)
             return;
         this.connectionStatus = newState;
-        this.stateChangedHook(newState);
+        if (this.stateChangedHook)
+            this.stateChangedHook(newState);
     }
     subscribe() { }
     unsubscribe() { }
     setHook(_eventName, _hook) { }
     remHook(_eventName, _hook) { }
     // Only for test purpose
-    api() {
-        return __awaiter(this, void 0, void 0, function* () {
-            const response = yield axios_1.default.get(this.url + "/api");
-            return response;
-        });
+    async api() {
+        const response = await axios__WEBPACK_IMPORTED_MODULE_0___default().get(this.url + "/api");
+        return response;
     }
 }
-exports.RealtimeConnector = RealtimeConnector;
 class SocketIORealtimeConnector extends RealtimeConnector {
     constructor(url, authHook, errorHook, connectErrorHook, stateChangedHook) {
         super(url, authHook, errorHook, connectErrorHook, stateChangedHook);
@@ -4295,9 +4307,11 @@ class SocketIORealtimeConnector extends RealtimeConnector {
     subscribe() {
         if (this.socket)
             return;
-        let fullUrl = this.url + "?" + this.authHook();
+        let fullUrl = this.url;
+        if (this.authHook)
+            fullUrl += "?" + this.authHook();
         // ToDo: Add support for options of socketio
-        this.socket = io(fullUrl);
+        this.socket = socket_io_client__WEBPACK_IMPORTED_MODULE_1__(fullUrl);
         this.socket.on("error", (error) => this.on_error(error));
         this.socket.on("connect_error", (error) => this.on_connect_error(error));
         this.socket.on("connect", () => this.on_connect());
@@ -4312,7 +4326,8 @@ class SocketIORealtimeConnector extends RealtimeConnector {
         this.socket = null;
     }
     setHook(eventName, hook) {
-        this.socket.on(eventName, hook);
+        if (this.socket)
+            this.socket.on(eventName, hook);
     }
     remHook(eventName, hook) {
         // Could happen after unsubscribe, so this.socket is null
@@ -4323,7 +4338,6 @@ class SocketIORealtimeConnector extends RealtimeConnector {
         this.socket.off(eventName, hook);
     }
 }
-exports.SocketIORealtimeConnector = SocketIORealtimeConnector;
 
 
 /***/ }),
@@ -4332,22 +4346,25 @@ exports.SocketIORealtimeConnector = SocketIORealtimeConnector;
 /*!**********************!*\
   !*** ./src/thing.ts ***!
   \**********************/
-/***/ ((__unused_webpack_module, exports) => {
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.Thing = void 0;
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "Thing": () => (/* binding */ Thing)
+/* harmony export */ });
 class Thing {
     constructor(thingDTO) {
         this.childrenSkip = 0;
         this.childrenTotalItems = Number.MAX_SAFE_INTEGER;
         this.children = [];
         this.id = "";
+        this.creationDateTime = null;
         this.name = "";
         this.kind = "";
         this.pos = 0;
         this.deletedStatus = 0 /* NoMatter */;
+        this.deletedDateTime = null;
         this.publicReadClaims = 0 /* NoClaims */;
         this.publicChangeClaims = 0 /* NoClaims */;
         this.everyoneReadClaims = 0 /* NoClaims */;
@@ -4381,7 +4398,6 @@ class Thing {
         return copyThing;
     }
 }
-exports.Thing = Thing;
 
 
 /***/ }),
@@ -4390,23 +4406,18 @@ exports.Thing = Thing;
 /*!**********************************!*\
   !*** ./src/thingsDataContext.ts ***!
   \**********************************/
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "ThingsDataContext": () => (/* binding */ ThingsDataContext)
+/* harmony export */ });
+/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! axios */ "axios");
+/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(axios__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _helpers__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./helpers */ "./src/helpers.ts");
 
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.ThingsDataContext = void 0;
-const axios_1 = __webpack_require__(/*! axios */ "axios");
-const helpers_1 = __webpack_require__(/*! ./helpers */ "./src/helpers.ts");
+
 class ThingsDataContext {
     constructor(endPointAddress) {
         this.apiEndPointAddress = "";
@@ -4430,11 +4441,9 @@ class ThingsDataContext {
     thingDeleteChildUrl(parentThingId, childThingId) {
         return this.apiEndPointAddress + "/things/" + parentThingId + "/childrenIds/" + childThingId;
     }
-    getThing(thingId) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const response = yield axios_1.default.get(this.thingsUrl(thingId));
-            return response.data;
-        });
+    async getThing(thingId) {
+        const response = await axios__WEBPACK_IMPORTED_MODULE_0___default().get(this.thingsUrl(thingId));
+        return response.data;
     }
     // Info: To abort call "canceler.cancel()"
     getThings(parameter, canceler) {
@@ -4445,18 +4454,18 @@ class ThingsDataContext {
             (!!parameter.orderBy ? ("&orderBy=" + parameter.orderBy) : "") +
             (!!parameter.skip ? ("&skip=" + parameter.skip) : "") +
             (!!parameter.top ? ("&top=" + parameter.top) : "");
-        return axios_1.default.get(urlRaw, {
-            cancelToken: (canceler) ? canceler.cancelerToken : null
+        return axios__WEBPACK_IMPORTED_MODULE_0___default().get(urlRaw, {
+            cancelToken: (canceler) ? canceler.cancelerToken : undefined
         })
             .then(function (response) {
             return {
                 things: response.data,
-                itemsRange: helpers_1.Helpers.getRangeItemsFromResponse(response)
+                itemsRange: _helpers__WEBPACK_IMPORTED_MODULE_1__.Helpers.getRangeItemsFromResponse(response)
             };
         })
             .catch(function (response) {
             // ToDo: response in undefined if request was cancelled
-            if (axios_1.default.isCancel(response)) {
+            if (axios__WEBPACK_IMPORTED_MODULE_0___default().isCancel(response)) {
                 console.log('Request canceled', response.message);
             }
             throw (response);
@@ -4465,69 +4474,50 @@ class ThingsDataContext {
         });
     }
     // ToCheck: Check Returned data
-    createThing(ThingDTO) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const response = yield axios_1.default.post(this.thingsUrl(), ThingDTO);
-            return response.data;
-        });
+    async createThing(ThingDTO) {
+        const response = await axios__WEBPACK_IMPORTED_MODULE_0___default().post(this.thingsUrl(), ThingDTO);
+        return response.data;
     }
     // ToCheck: Check Returned data
-    updateThing(thingId, ThingDTO) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const response = yield axios_1.default.put(this.thingsUrl(thingId), ThingDTO);
-            return response.data;
-        });
+    async updateThing(thingId, ThingDTO) {
+        const response = await axios__WEBPACK_IMPORTED_MODULE_0___default().put(this.thingsUrl(thingId), ThingDTO);
+        return response.data;
     }
     // ToCheck: Check Returned data
-    deleteThing(thingId) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const response = yield axios_1.default.delete(this.thingsUrl(thingId));
-            return response.data;
-        });
+    async deleteThing(thingId) {
+        const response = await axios__WEBPACK_IMPORTED_MODULE_0___default().delete(this.thingsUrl(thingId));
+        return response.data;
     }
     // ToCheck: Check Returned data
-    getThingChildrenIds(parentThingId) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const response = yield axios_1.default.get(this.thingChildrenUrl(parentThingId));
-            return response.data;
-        });
+    async getThingChildrenIds(parentThingId) {
+        const response = await axios__WEBPACK_IMPORTED_MODULE_0___default().get(this.thingChildrenUrl(parentThingId));
+        return response.data;
     }
     // ToCheck: Check Returned data
-    addChildToParent(parentThingId, childThingId) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const response = yield axios_1.default.post(this.thingChildrenUrl(parentThingId), JSON.stringify(childThingId));
-            return response.data;
-        });
+    async addChildToParent(parentThingId, childThingId) {
+        const response = await axios__WEBPACK_IMPORTED_MODULE_0___default().post(this.thingChildrenUrl(parentThingId), JSON.stringify(childThingId));
+        return response.data;
     }
     // ToCheck: Check Returned data
-    deleteThingChild(parentThingId, childThingId) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const response = yield axios_1.default.delete(this.thingDeleteChildUrl(parentThingId, childThingId));
-            return response.data;
-        });
+    async deleteThingChild(parentThingId, childThingId) {
+        const response = await axios__WEBPACK_IMPORTED_MODULE_0___default().delete(this.thingDeleteChildUrl(parentThingId, childThingId));
+        return response.data;
     }
-    getThingValue(thingId) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const response = yield axios_1.default.get(this.thingsValueUrl(thingId));
-            return response.data;
-        });
+    async getThingValue(thingId) {
+        const response = await axios__WEBPACK_IMPORTED_MODULE_0___default().get(this.thingsValueUrl(thingId));
+        return response.data;
     }
-    putThingValue(thingId, asCmd, value) {
-        return __awaiter(this, void 0, void 0, function* () {
-            let url = asCmd ? this.thingsCmdUrl(thingId) : this.thingsValueUrl(thingId);
-            const response = yield axios_1.default.put(url, value);
-            return response.data;
-        });
+    async putThingValue(thingId, asCmd, value) {
+        let url = asCmd ? this.thingsCmdUrl(thingId) : this.thingsValueUrl(thingId);
+        const response = await axios__WEBPACK_IMPORTED_MODULE_0___default().put(url, value);
+        return response.data;
     }
     // ToCheck: Check Returned data
-    putThingsPositions(positions) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const response = yield axios_1.default.put(this.thingsPositionsUrl(), positions);
-            return response.data;
-        });
+    async putThingsPositions(positions) {
+        const response = await axios__WEBPACK_IMPORTED_MODULE_0___default().put(this.thingsPositionsUrl(), positions);
+        return response.data;
     }
 }
-exports.ThingsDataContext = ThingsDataContext;
 
 
 /***/ }),
@@ -4536,22 +4526,15 @@ exports.ThingsDataContext = ThingsDataContext;
 /*!******************************!*\
   !*** ./src/thingsManager.ts ***!
   \******************************/
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "ThingsManager": () => (/* binding */ ThingsManager)
+/* harmony export */ });
+/* harmony import */ var ___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! . */ "./src/index.ts");
 
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.ThingsManager = void 0;
-const _1 = __webpack_require__(/*! . */ "./src/index.ts");
 // Info: ThingsManager have state
 class ThingsManager {
     constructor(mainThing, thingKind, thingClaims, thingsDataContext, realtimeConnector) {
@@ -4613,75 +4596,64 @@ class ThingsManager {
         });
     }
     // Info: Does not change mainThing state
-    getThings(parameter, canceler) {
-        return __awaiter(this, void 0, void 0, function* () {
-            let thingsDTOsDataSet = null;
-            let things = [];
-            try {
-                thingsDTOsDataSet = yield this.thingsDataContext.getThings(parameter, canceler);
-                for (let i = 0; i < thingsDTOsDataSet.things.length; i++) {
-                    var thing = new _1.Thing(thingsDTOsDataSet.things[i]);
-                    things.push(thing);
-                }
+    async getThings(parameter, canceler) {
+        let thingsDTOsDataSet;
+        let things = [];
+        try {
+            thingsDTOsDataSet = await this.thingsDataContext.getThings(parameter, canceler);
+            for (let i = 0; i < thingsDTOsDataSet.things.length; i++) {
+                var thing = new ___WEBPACK_IMPORTED_MODULE_0__.Thing(thingsDTOsDataSet.things[i]);
+                things.push(thing);
             }
-            catch (e) {
-                throw e;
-            }
-            return {
-                things: things,
-                itemsRange: thingsDTOsDataSet.itemsRange
-            };
-        });
+        }
+        catch (e) {
+            throw e;
+        }
+        return {
+            things: things,
+            itemsRange: thingsDTOsDataSet.itemsRange
+        };
     }
     // Info: Fills parentThing
     // Info: Does not change mainThing, but parentThing is changed    
     // Info: "parameter" is changed
-    getMoreThingChildren(parentThing, parameter, canceler) {
-        return __awaiter(this, void 0, void 0, function* () {
-            parameter.skip = parentThing.childrenSkip;
-            parameter.parentThingId = parentThing.id;
-            const thingsDataSet = yield this.getThings(parameter, canceler);
-            parentThing.childrenTotalItems = thingsDataSet.itemsRange.totalItems;
-            parentThing.childrenSkip = parentThing.childrenSkip + parameter.top;
-            //  Fix range
-            if (parentThing.childrenSkip > parentThing.childrenTotalItems)
-                parentThing.childrenSkip = parentThing.childrenTotalItems;
-            for (var i = 0; i < thingsDataSet.things.length; i++)
-                parentThing.children.push(thingsDataSet.things[i]);
-            return thingsDataSet;
-        });
+    async getMoreThingChildren(parentThing, parameter, canceler) {
+        parameter.skip = parentThing.childrenSkip;
+        parameter.parentThingId = parentThing.id;
+        const thingsDataSet = await this.getThings(parameter, canceler);
+        parentThing.childrenTotalItems = thingsDataSet.itemsRange.totalItems;
+        parentThing.childrenSkip = parentThing.childrenSkip + parameter.top;
+        //  Fix range
+        if (parentThing.childrenSkip > parentThing.childrenTotalItems)
+            parentThing.childrenSkip = parentThing.childrenTotalItems;
+        for (var i = 0; i < thingsDataSet.things.length; i++)
+            parentThing.children.push(thingsDataSet.things[i]);
+        return thingsDataSet;
     }
     // Info:    In Books example where "this.mainThing" is a "generic root thing" 
     //          "getMoreThings" fills "this.mainThing.children" with "books" collection 
     //          and each "this.mainThing.children[0..n].children" is filled with collection of "generic root thing" like "book comments"
-    getMoreThings(canceler) {
-        return __awaiter(this, void 0, void 0, function* () {
-            let self = this;
-            var data = yield this.getMoreThingChildren(this.mainThing, this.getThingsParams, canceler);
-            let promises = [];
-            // Try to get all things children
-            for (let i = 0; i < data.things.length; i++)
-                promises.push(self.getMoreThingChildren(data.things[i], self.getChindrenThingsParams, canceler));
-            return Promise.all(promises);
-        });
+    async getMoreThings(canceler) {
+        let self = this;
+        var data = await this.getMoreThingChildren(this.mainThing, this.getThingsParams, canceler);
+        let promises = [];
+        // Try to get all things children
+        for (let i = 0; i < data.things.length; i++)
+            promises.push(self.getMoreThingChildren(data.things[i], self.getChindrenThingsParams, canceler));
+        return Promise.all(promises);
     }
     getThingsTotalItems() {
         return this.mainThing.childrenTotalItems;
     }
     // Only wrappers
-    getThing(thingId) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const thingDTO = yield this.thingsDataContext.getThing(thingId);
-            return new _1.Thing(thingDTO);
-        });
+    async getThing(thingId) {
+        const thingDTO = await this.thingsDataContext.getThing(thingId);
+        return new ___WEBPACK_IMPORTED_MODULE_0__.Thing(thingDTO);
     }
-    putThingValue(thingId, asCmd, value) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return yield this.thingsDataContext.putThingValue(thingId, asCmd, value);
-        });
+    async putThingValue(thingId, asCmd, value) {
+        return await this.thingsDataContext.putThingValue(thingId, asCmd, value);
     }
 }
-exports.ThingsManager = ThingsManager;
 
 
 /***/ }),
@@ -4738,13 +4710,25 @@ module.exports = __WEBPACK_EXTERNAL_MODULE_socket_io_client__;
 /******/ 		};
 /******/ 	
 /******/ 		// Execute the module function
-/******/ 		__webpack_modules__[moduleId].call(module.exports, module, module.exports, __webpack_require__);
+/******/ 		__webpack_modules__[moduleId](module, module.exports, __webpack_require__);
 /******/ 	
 /******/ 		// Return the exports of the module
 /******/ 		return module.exports;
 /******/ 	}
 /******/ 	
 /************************************************************************/
+/******/ 	/* webpack/runtime/compat get default export */
+/******/ 	(() => {
+/******/ 		// getDefaultExport function for compatibility with non-harmony modules
+/******/ 		__webpack_require__.n = (module) => {
+/******/ 			var getter = module && module.__esModule ?
+/******/ 				() => (module['default']) :
+/******/ 				() => (module);
+/******/ 			__webpack_require__.d(getter, { a: getter });
+/******/ 			return getter;
+/******/ 		};
+/******/ 	})();
+/******/ 	
 /******/ 	/* webpack/runtime/define property getters */
 /******/ 	(() => {
 /******/ 		// define getter functions for harmony exports

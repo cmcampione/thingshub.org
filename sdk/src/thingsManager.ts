@@ -65,7 +65,7 @@ export class ThingsManager {
         this.realtimeConnector.remHook("onCreateThing", this.onCreateThing);        
     }
 
-    private searchThingById(id: string): Thing {
+    private searchThingById(id: string): Thing | undefined {
         return this.mainThing.children.find((thing) => {
             return thing.id === id;
         })
@@ -79,7 +79,7 @@ export class ThingsManager {
     }
 
     private readonly onUpdateThingValue = (thingId: string, value: any, asCmd: boolean): void => {
-        let thing: Thing = this.searchThingById(thingId);
+        let thing: Thing | undefined = this.searchThingById(thingId);
         if (!thing)
             return;
         if (asCmd)
@@ -90,7 +90,7 @@ export class ThingsManager {
     // Info: Does not change mainThing state
     private async getThings(parameter: ThingsGetParams, canceler: HttpRequestCanceler) : Promise<ThingsDataSet> {
 
-        let thingsDTOsDataSet : ThingsDTOsDataSet = null;
+        let thingsDTOsDataSet : ThingsDTOsDataSet;
         let things : Thing[] = [];
         
         try {

@@ -9,7 +9,7 @@ export interface ItemsRange {
 // INFO: It is a wrapper for "axios" to abort Http calls
 export class HttpRequestCanceler {
 
-    public cancelerToken: CancelToken = null;
+    public cancelerToken: CancelToken | undefined = undefined;
     private executor : any = null;
 
     public constructor() {

@@ -14,18 +14,19 @@ export class RealtimeConnector {
 
     protected url: string = "";//   https://servername:port/route
     
-    protected authHook: () => string = null;
+    protected authHook: null | (() => string) = null;
 
-    protected errorHook: (error: any) => void = null;
-    protected stateChangedHook: (newState: RealtimeConnectionStates) => void = null;
-    protected connectErrorHook: (error: any) => void = null;
+    protected errorHook: null | ((error: any) => void) = null;
+    protected stateChangedHook: null | ((newState: RealtimeConnectionStates) => void) = null;
+    protected connectErrorHook: null | ((error: any) => void) = null;
 
     protected on_connectionStatusChange(newState : RealtimeConnectionStates) {
         if (this.connectionStatus == newState)
             return;
         
         this.connectionStatus = newState;
-        this.stateChangedHook(newState);
+        if (this.stateChangedHook)
+            this.stateChangedHook(newState);
     }
 
     public subscribe() : void {}
@@ -57,7 +58,7 @@ export class RealtimeConnector {
 
 export class SocketIORealtimeConnector extends RealtimeConnector {
     
-    private socket : SocketIOClient.Socket = null;
+    private socket : SocketIOClient.Socket | null = null;
     
     constructor(url : string,
         authHook : () => string,
@@ -89,7 +90,9 @@ export class SocketIORealtimeConnector extends RealtimeConnector {
         if (this.socket)
             return;
 
-        let fullUrl = this.url + "?" + this.authHook();
+        let fullUrl = this.url;
+        if (this.authHook)
+            fullUrl += "?" + this.authHook();
 
         // ToDo: Add support for options of socketio
         this.socket = io(fullUrl);
@@ -111,7 +114,8 @@ export class SocketIORealtimeConnector extends RealtimeConnector {
     }
 
     public setHook(eventName : string, hook : (...msg: any[]) => void) : void {
-        this.socket.on(eventName, hook);
+        if (this.socket)
+            this.socket.on(eventName, hook);
     }
     public remHook(eventName : any, hook : (...msg: any[]) => void) : void {
         // Could happen after unsubscribe, so this.socket is null
