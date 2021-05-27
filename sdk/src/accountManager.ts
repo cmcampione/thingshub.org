@@ -6,17 +6,17 @@ export class AccountManager {
 
     private accountDataContext: AccountDataContext;
 
-    private _appName: string = null;    
+    private _appName: string | null = null;
 
-    private _accessToken:string = null;
+    private _accessToken:string | null =  null;
 
-    private _userId: string = null;
-    private _userName: string = null;
+    private _userId: string | null =  null;
+    private _userName: string | null =  null;
 
-    private deltaTime: number = null;
+    private deltaTime: number = 0;
     
     //Info: By design ApiKey is never persistent
-    private _apiKey : string = null;
+    private _apiKey : string | null =  null;
 
     private defaultAccountActionControl: AccountActionControl = {
         isLoggedIn:             () => this.getSecurityHeader() !== null,
@@ -107,9 +107,11 @@ export class AccountManager {
         this._accessToken = sessionStorage.getItem(this._appName + "_AccessToken");
 
         this._userId = sessionStorage.getItem(this._appName + "_UserId");
+        
         this._userName = sessionStorage.getItem(this._appName + "_Username");
 
-        this.deltaTime = parseInt(sessionStorage.getItem(this._appName + "_DeltaTime"));
+        let deltaTime = sessionStorage.getItem(this._appName + "_DeltaTime");
+        this.deltaTime = deltaTime ? parseInt(deltaTime) : 0;
 
         if (this.remember == false)
             return;
@@ -121,7 +123,8 @@ export class AccountManager {
         this._userId = localStorage.getItem(this._appName + "_UserId");
         this._userName = localStorage.getItem(this._appName + "_Username");
 
-        this.deltaTime = parseInt(localStorage.getItem(this._appName + "_DeltaTime"));
+        deltaTime = localStorage.getItem(this._appName + "_DeltaTime");
+        this.deltaTime = deltaTime ? parseInt(deltaTime) : 0;
     }
 
     constructor(appName: string, endPointAddress: EndPointAddress, apiKey?: string, accountActionControl?: AccountActionControl) {
@@ -143,21 +146,21 @@ export class AccountManager {
         }
     }       
 
-    public get apiKey() : string {
+    public get apiKey() : string | null {
         return this._apiKey;
     }
-    public get accessToken() : string {
+    public get accessToken() : string | null {
         return this._accessToken;
     }
 
-    public getSecurityHeader = () : object => {
+    public getSecurityHeader = () : object | null => {
         if (this.apiKey)
             return { thapikey: this.apiKey }
         if (this.accessToken)
             return { Authorization: "Bearer " + this.accessToken}
         return null;
     }
-    public getSecurityToken = () : string => { 
+    public getSecurityToken = () : string | null => { 
         if (this.apiKey)
             return "token=" + this.apiKey;
         if (this.accessToken)

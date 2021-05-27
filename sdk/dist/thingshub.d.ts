@@ -7,26 +7,26 @@ export declare const enum ThingDeletedStates {
 	Ok = 1,
 	Deleted = 2
 }
-export function validateThingDeletedStatus(deletedStatus): boolean;
+export function validateThingDeletedStatus(deletedStatus: any): boolean;
 export declare const enum ThingUserRoles {
 	NoMatter = 0,
 	Administrator = 1,
 	User = 2
 }
-export function validateThingUserRoles(userRole): boolean;
+export function validateThingUserRoles(userRole: any): boolean;
 export declare const enum ThingUserStates {
 	NoMatter = 0,
 	Ok = 1,
 	WaitForAuth = 2,
 	Deleted = 4
 }
-export function validateThingUserStatus(userStatus): boolean;
+export function validateThingUserStatus(userStatus: any): boolean;
 export declare const enum ThingUserVisibility {
 	NoMatter = 0,
 	Visible = 1,
 	Hidden = 2
 }
-export declare function validateThingUserVisibility(visibility): boolean;
+export declare function validateThingUserVisibility(visibility: any): boolean;
 export declare const enum ThingUserReadClaims {
 	NoClaims = 0,
 	CanReadCreationDate = 2,
@@ -47,7 +47,7 @@ export declare const enum ThingUserReadClaims {
 	CanReadThingUserChangeClaims = 1,
 	AllClaims = 65535
 }
-export function validateThingUserReadClaims(userReadClaims): boolean;
+export function validateThingUserReadClaims(userReadClaims: any): boolean;
 export declare const enum ThingUserChangeClaims {
 	NoClaims = 0,
 	CanDeleteThing = 1,
@@ -73,7 +73,7 @@ export declare const enum ThingUserChangeClaims {
 	CanOtherUsersChangeMyThingPos = 262144,
 	AllClaims = 1048575
 }
-export function validateThingUserChangeClaims(userChangeClaims): boolean;
+export function validateThingUserChangeClaims(userChangeClaims: any): boolean;
 export declare const enum ThingKind {
 	NoMatter = "0",
 	genericId = "1",
@@ -88,12 +88,12 @@ export declare class RegisterByOnlyEmailDTO {
 	public email: string;
 	public confirmationToken: string;
 	public status: any;
-	constructor(email, confirmationToken, status);
+	constructor(email: any, confirmationToken: any, status: any);
 }
 export declare class EmailDTO {
 	public value: string;
 	public isConfirmed: boolean;
-	constructor(email);
+	constructor(email: any);
 }
 export declare class UserDTO {
 	public id: string;
@@ -101,7 +101,7 @@ export declare class UserDTO {
 	public username: string;
 	public emails: EmailDTO[];
 	public masterApiKey: string;
-	constructor(user, fullInfos);
+	constructor(user: any, fullInfos: any);
 }
 export declare class UserInfoDTO {
 	public id: string;
@@ -137,10 +137,10 @@ export declare const enum RealtimeConnectionStates {
 export declare class RealtimeConnector {
 	protected connectionStatus: RealtimeConnectionStates;
 	protected url: string;
-	protected authHook: () => string;
-	protected errorHook: (error: any) => void;
-	protected stateChangedHook: (newState: RealtimeConnectionStates) => void;
-	protected connectErrorHook: (error: any) => void;
+	protected authHook: null | (() => string);
+	protected errorHook: null | ((error: any) => void);
+	protected stateChangedHook: null | ((newState: RealtimeConnectionStates) => void);
+	protected connectErrorHook: null | ((error: any) => void);
 	protected on_connectionStatusChange(newState: RealtimeConnectionStates): void;
 	subscribe(): void;
 	unsubscribe(): void;
@@ -167,7 +167,7 @@ export interface ItemsRange {
 	totalItems: number;
 }
 export declare class HttpRequestCanceler {
-	cancelerToken: CancelToken;
+	cancelerToken: CancelToken | undefined;
 	private executor;
 	constructor();
 	cancel(): void;
@@ -191,7 +191,7 @@ export interface AccountUserData {
 export interface AccountActionControl {
 	isLoggedIn: () => boolean;
 	isAccessTokenExpired: () => boolean;
-	getSecurityHeader: () => object;
+	getSecurityHeader: () => object | null;
 	refreshToken: () => Promise<any>;
 	resetApp: () => void;
 }
@@ -221,10 +221,10 @@ export declare class AccountManager {
 	private setLoginData;
 	private getLoginData;
 	constructor(appName: string, endPointAddress: EndPointAddress, apiKey?: string, accountActionControl?: AccountActionControl);
-	get apiKey(): string;
-	get accessToken(): string;
-	getSecurityHeader: () => object;
-	getSecurityToken: () => string;
+	get apiKey(): string | null;
+	get accessToken(): string | null;
+	getSecurityHeader: () => object | null;
+	getSecurityToken: () => string | null;
 	get isAccessTokenExpired(): boolean;
 	get isLoggedIn(): boolean;
 	get remember(): boolean;
@@ -237,12 +237,12 @@ export declare class Thing {
 	childrenTotalItems: number;
 	children: Thing[];
 	id: string;
-	creationDateTime: Date;
+	creationDateTime: Date | null;
 	name: string;
 	kind: string;
 	pos: number;
 	deletedStatus: ThingDeletedStates;
-	deletedDateTime: Date;
+	deletedDateTime: Date | null;
 	publicReadClaims: ThingUserReadClaims;
 	publicChangeClaims: ThingUserChangeClaims;
 	everyoneReadClaims: ThingUserReadClaims;
@@ -261,10 +261,10 @@ export declare class Thing {
 }
 export declare type ThingPositionRaw = any;
 export interface ThingsGetParams {
-	parentThingId: string;
+	parentThingId: string | null;
 	thingFilter: object;
-	valueFilter: object;
-	orderBy: string;
+	valueFilter: object | null;
+	orderBy: string | null;
 	skip: number;
 	top: number;
 }
