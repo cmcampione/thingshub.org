@@ -41,13 +41,13 @@ export class SensorComponent implements OnInit {
       value: $event.detail.value
     }
     try {
-      await this.sensorsValueService.setSensorValue(this.sensor.sensorValue, value )
+      await this.sensorsValueService.setSensorValue(this.sensor.sensorValue, value)
     }
     catch(error) {
       // ToDo: During 401 error we don't have to notify nothing, but for different error we should notify some error message
       // Could be used CustomError check
       // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error
-      console.log('error');
+      console.log(error);
     }
   }
 

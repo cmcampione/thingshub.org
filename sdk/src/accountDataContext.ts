@@ -47,7 +47,7 @@ export class AccountDataContext {
             }
             catch (e) {
                 accountActionControl.resetApp();
-                return Promise.reject(e);
+                throw e;
             }
         }, function (error) {
             return Promise.reject(error);

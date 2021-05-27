@@ -1,5 +1,5 @@
 export declare const enum ThingDeletedStates {
-	NoMatter  = 0,  // Interna state. Do not useful for external usage
+	NoMatter  = 0,  // Internal state. Do not useful for external usage
 	Ok        = 1,
 	Deleted   = 2
 }
