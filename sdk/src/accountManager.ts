@@ -1,5 +1,5 @@
 import jwtDecode from "jwt-decode";
-import { EndPointAddress } from "src";
+import { EndPointAddress } from "./endPointAddress";
 import {AccountActionControl, AccountDataContext, AccountUserData} from "./accountDataContext";
 
 export class AccountManager {
@@ -220,3 +220,4 @@ export class AccountManager {
         }
     }
 }
+

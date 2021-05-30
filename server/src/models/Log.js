@@ -1,6 +1,6 @@
 "use strict";
 
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 const logSchema = mongoose.Schema({
 	timestamp: Date,
 	level: String,
@@ -8,8 +8,6 @@ const logSchema = mongoose.Schema({
 	message: String
 });
 
-const Log = mongoose.model("Log", logSchema);
+export const Log = mongoose.model("Log", logSchema);
 
-exports.save = log => log.save(log);
-
-exports.Log = Log;
+export const save = log => log.save(log);

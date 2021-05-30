@@ -1,27 +1,27 @@
 "use strict";
 
-const { v4: uuid } = require("uuid");
-const mongoose = require("mongoose");
-const userPendingModel = require("../models/UserPending.js");
+import { v4 as uuid } from "uuid";
+import mongoose from "mongoose";
+import * as userPendingModel from "../models/UserPending.js";
 
 /**
  * Returns a user if it finds one, otherwise returns null if a user is not found.
  * @param   {String}  id - The unique id of the user to find
  * @returns {Promise} resolved user if found, otherwise resolves undefined
  */
-exports.findUserById = id => userPendingModel.findUserById(id);
+export const findUserById = id => userPendingModel.findUserById(id);
 
 /**
  * Returns a user if it finds one, otherwise returns null if a user is not found.
  * @param   {String}   email - The unique user name to find
  * @returns {Promise} resolved user if found, otherwise resolves undefined
  */
-exports.findUserByEmail = email => userPendingModel.findUserByEmail(email);
+export const findUserByEmail = email => userPendingModel.findUserByEmail(email);
 
-exports.findUserByEmailAndConfirmToken = (email, confirmationToken) =>
+export const findUserByEmailAndConfirmToken = (email, confirmationToken) =>
 	userPendingModel.findUserByEmailAndConfirmToken(email, confirmationToken);
 
-exports.createUserPending = (email) => {
+export const createUserPending = (email) => {
 	const userPending = new userPendingModel.UserPending({
 		_id: new mongoose.Types.ObjectId(),
 		email,
@@ -31,4 +31,4 @@ exports.createUserPending = (email) => {
 	return userPendingModel.save(userPending);
 };
 
-exports.deleteUser = userPending => userPendingModel.delete(userPending);
+export const deleteUser = userPending => userPendingModel.remove(userPending);

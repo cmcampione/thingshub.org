@@ -11,18 +11,28 @@
 return /******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
-/***/ "../common/src/dtos.js":
-/*!*****************************!*\
-  !*** ../common/src/dtos.js ***!
-  \*****************************/
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+/***/ "../common/src/dtos.mjs":
+/*!******************************!*\
+  !*** ../common/src/dtos.mjs ***!
+  \******************************/
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "RegisterByOnlyEmailStatus": () => (/* binding */ RegisterByOnlyEmailStatus),
+/* harmony export */   "RegisterByOnlyEmailDTO": () => (/* binding */ RegisterByOnlyEmailDTO),
+/* harmony export */   "EmailDTO": () => (/* binding */ EmailDTO),
+/* harmony export */   "UserDTO": () => (/* binding */ UserDTO),
+/* harmony export */   "UserInfoDTO": () => (/* binding */ UserInfoDTO),
+/* harmony export */   "ThingDTO": () => (/* binding */ ThingDTO)
+/* harmony export */ });
+/* harmony import */ var _thConstants_mjs__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./thConstants.mjs */ "../common/src/thConstants.mjs");
 
 
-const thConstants = __webpack_require__(/*! ./thConstants */ "../common/src/thConstants.js");
 
-exports.RegisterByOnlyEmailStatus = {
+
+const RegisterByOnlyEmailStatus = {
 	UserAlreadyRegistered : 1,
 	ConfirmPendingEmailSent : 2,
 };
@@ -34,16 +44,12 @@ class RegisterByOnlyEmailDTO {
 		this.status = status;
 	}
 }
-exports.RegisterByOnlyEmailDTO = RegisterByOnlyEmailDTO;
-
 class EmailDTO {
 	constructor(email) {
 		this.value = email.email;
 		this.isConfimed = email.isConfimed;
 	}
 }
-exports.EmailDTO = EmailDTO;
-
 class UserDTO { 
 	constructor(user, fullInfos) {
 		this.id = user._id;
@@ -59,7 +65,6 @@ class UserDTO {
 		this.masterApiKey = user.masterApiKey;
 	}
 }
-exports.UserDTO = UserDTO;
 
 class UserInfoDTO {
 	constructor() {
@@ -68,7 +73,6 @@ class UserInfoDTO {
 		this.name = "the bees are laborious";
 	}
 }
-exports.UserInfoDTO = UserInfoDTO;
 
 class ThingDTO {
 	constructor() {
@@ -79,32 +83,31 @@ class ThingDTO {
 		
 		this.name = "";
 		
-		this.kind = thConstants.ThingKind.genericId;
+		this.kind = _thConstants_mjs__WEBPACK_IMPORTED_MODULE_0__.ThingKind.genericId;
 		
 		this.pos = 0;// Not used during creation or updating of thing
 		
-		this.deletedStatus = thConstants.ThingDeletedStates.NoMatter;
+		this.deletedStatus = _thConstants_mjs__WEBPACK_IMPORTED_MODULE_0__.ThingDeletedStates.NoMatter;
 		this.deletedDate = null;
 		
-		this.publicReadClaims = thConstants.ThingUserReadClaims.NoClaims;
-		this.publicChangeClaims = thConstants.ThingUserChangeClaims.NoClaims;
+		this.publicReadClaims = _thConstants_mjs__WEBPACK_IMPORTED_MODULE_0__.ThingUserReadClaims.NoClaims;
+		this.publicChangeClaims = _thConstants_mjs__WEBPACK_IMPORTED_MODULE_0__.ThingUserChangeClaims.NoClaims;
 		
-		this.everyoneReadClaims = thConstants.ThingUserReadClaims.NoClaims;
-		this.everyoneChangeClaims = thConstants.ThingUserChangeClaims.NoClaims;
+		this.everyoneReadClaims = _thConstants_mjs__WEBPACK_IMPORTED_MODULE_0__.ThingUserReadClaims.NoClaims;
+		this.everyoneChangeClaims = _thConstants_mjs__WEBPACK_IMPORTED_MODULE_0__.ThingUserChangeClaims.NoClaims;
 		
 		this.value = {};
 		
-		this.userStatus = thConstants.ThingUserStates.NoMatter;
-		this.userRole = thConstants.ThingUserRoles.NoMatter;
-		this.userVisibility = thConstants.ThingUserVisibility.NoMatter;
+		this.userStatus = _thConstants_mjs__WEBPACK_IMPORTED_MODULE_0__.ThingUserStates.NoMatter;
+		this.userRole = _thConstants_mjs__WEBPACK_IMPORTED_MODULE_0__.ThingUserRoles.NoMatter;
+		this.userVisibility = _thConstants_mjs__WEBPACK_IMPORTED_MODULE_0__.ThingUserVisibility.NoMatter;
 		
-		this.userReadClaims = thConstants.ThingUserReadClaims.NoClaims;
-		this.userChangeClaims = thConstants.ThingUserChangeClaims.NoClaims;
+		this.userReadClaims = _thConstants_mjs__WEBPACK_IMPORTED_MODULE_0__.ThingUserReadClaims.NoClaims;
+		this.userChangeClaims = _thConstants_mjs__WEBPACK_IMPORTED_MODULE_0__.ThingUserChangeClaims.NoClaims;
 		
 		this.usersInfos = []; // Not used during creation or updating of thing
 	}
 }
-exports.ThingDTO = ThingDTO;
 
 
 
@@ -112,13 +115,30 @@ exports.ThingDTO = ThingDTO;
 
 /***/ }),
 
-/***/ "../common/src/thConstants.js":
-/*!************************************!*\
-  !*** ../common/src/thConstants.js ***!
-  \************************************/
-/***/ ((__unused_webpack_module, exports) => {
+/***/ "../common/src/thConstants.mjs":
+/*!*************************************!*\
+  !*** ../common/src/thConstants.mjs ***!
+  \*************************************/
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "ThingDeletedStates": () => (/* binding */ ThingDeletedStates),
+/* harmony export */   "validateThingDeletedStatus": () => (/* binding */ validateThingDeletedStatus),
+/* harmony export */   "ThingUserRoles": () => (/* binding */ ThingUserRoles),
+/* harmony export */   "validateThingUserRoles": () => (/* binding */ validateThingUserRoles),
+/* harmony export */   "ThingUserStates": () => (/* binding */ ThingUserStates),
+/* harmony export */   "validateThingUserStatus": () => (/* binding */ validateThingUserStatus),
+/* harmony export */   "ThingUserVisibility": () => (/* binding */ ThingUserVisibility),
+/* harmony export */   "validateThingUserVisibility": () => (/* binding */ validateThingUserVisibility),
+/* harmony export */   "ThingUserReadClaims": () => (/* binding */ ThingUserReadClaims),
+/* harmony export */   "validateThingUserReadClaims": () => (/* binding */ validateThingUserReadClaims),
+/* harmony export */   "ThingUserChangeClaims": () => (/* binding */ ThingUserChangeClaims),
+/* harmony export */   "validateThingUserChangeClaims": () => (/* binding */ validateThingUserChangeClaims),
+/* harmony export */   "ThingKind": () => (/* binding */ ThingKind),
+/* harmony export */   "DefaultThingPos": () => (/* binding */ DefaultThingPos)
+/* harmony export */ });
 
 
 const ThingDeletedStates = {
@@ -126,9 +146,8 @@ const ThingDeletedStates = {
 	Ok        : 1,
 	Deleted   : 2
 };
-exports.ThingDeletedStates = ThingDeletedStates;
 
-exports.validateThingDeletedStatus = function validateThingDeletedStatus(deletedStatus) {
+function validateThingDeletedStatus(deletedStatus) {
 	switch(deletedStatus) {
 	case ThingDeletedStates.NoMatter:
 	case ThingDeletedStates.Ok:
@@ -136,7 +155,7 @@ exports.validateThingDeletedStatus = function validateThingDeletedStatus(deleted
 		return true;
 	}
 	return false;
-};
+}
 
 // The User can not have more Roles in the same time
 const ThingUserRoles = {
@@ -144,9 +163,8 @@ const ThingUserRoles = {
 	Administrator : 1,
 	User          : 2
 };
-exports.ThingUserRoles = ThingUserRoles;
 
-exports.validateThingUserRoles = function validateThingUserRoles(userRole) {
+function validateThingUserRoles(userRole) {
 	switch(userRole) {
 	case ThingUserRoles.NoMatter:
 	case ThingUserRoles.Administrator:
@@ -154,7 +172,7 @@ exports.validateThingUserRoles = function validateThingUserRoles(userRole) {
 		return true;
 	}
 	return false;
-};
+}
 
 // The User can not have more Status at same time
 const ThingUserStates = {
@@ -163,9 +181,8 @@ const ThingUserStates = {
 	WaitForAuth : 2,
 	Deleted     : 4
 };
-exports.ThingUserStates = ThingUserStates;
 
-exports.validateThingUserStatus = function validateThingUserStatus(userStatus) {
+function validateThingUserStatus(userStatus) {
 	switch(userStatus) {
 	case ThingUserStates.NoMatter:
 	case ThingUserStates.Ok:
@@ -174,16 +191,15 @@ exports.validateThingUserStatus = function validateThingUserStatus(userStatus) {
 		return true;
 	}
 	return false;
-};
+}
 
 const ThingUserVisibility = {
 	NoMatter  : 0,  // Internal state. Do not use for external use like filter
 	Visible       : 1,
 	Hidden        : 2
 };
-exports.ThingUserVisibility = ThingUserVisibility;
 
-exports.validateThingUserVisibility = function validateThingUserVisibility(visibility) {
+function validateThingUserVisibility(visibility) {
 	switch(visibility) {
 	case ThingUserVisibility.NoMatter:
 	case ThingUserVisibility.Visible:
@@ -191,7 +207,7 @@ exports.validateThingUserVisibility = function validateThingUserVisibility(visib
 		return true;
 	}
 	return false;
-};
+}
 
 // Do not have validation function since are bitwise values
 
@@ -227,10 +243,9 @@ ThingUserReadClaims.CanReadThingUserRights | ThingUserReadClaims.CanReadThingUse
 ThingUserReadClaims.CanReadThingUserStatus | ThingUserReadClaims.CanReadThingUserReadClaims | ThingUserReadClaims.CanReadPublicReadClaims |
 ThingUserReadClaims.CanReadPublicChangeClaims | ThingUserReadClaims.CanReadEveryoneReadClaims | ThingUserReadClaims.CanReadEveryoneChangeClaims;
 
-exports.ThingUserReadClaims = ThingUserReadClaims;
-exports.validateThingUserReadClaims = (userReadClaims) => {
+function validateThingUserReadClaims(userReadClaims) {
 	return userReadClaims <= ThingUserReadClaims.AllClaims && userReadClaims >= ThingUserReadClaims.NoClaims;
-};
+}
 
 // Do not have validation function since are bitwise values
 const ThingUserChangeClaims = {
@@ -273,21 +288,17 @@ ThingUserChangeClaims.CanChangeThingUserStatus | ThingUserChangeClaims.CanChange
 ThingUserChangeClaims.CanChangePublicReadClaims | ThingUserChangeClaims.CanChangePublicChangeClaims | ThingUserChangeClaims.CanChangeEveryoneReadClaims | ThingUserChangeClaims.CanChangeEveryoneChangeClaims |
 ThingUserChangeClaims.CanAddChildrenThing | ThingUserChangeClaims.CanRemoveChildrenThing;
 
-exports.ThingUserChangeClaims = ThingUserChangeClaims;
-exports.validateThingUserChangeClaims = (userChangeClaims) => {
+function validateThingUserChangeClaims(userChangeClaims) {
 	return userChangeClaims <= ThingUserChangeClaims.AllClaims && userChangeClaims >= ThingUserChangeClaims.NoClaims;
-};
+}
 
-exports.ThingKind = {
+const ThingKind = {
 	NoMatter: "0",
 	genericId : "1",
 	genericTxt : "the bees are laborious"
 };
 
 const DefaultThingPos = Number.MAX_SAFE_INTEGER;
-exports.DefaultThingPos = DefaultThingPos;
-
-
 
 
 /***/ }),
@@ -3836,12 +3847,12 @@ class AccountDataContext {
             if (!accountActionControl.isLoggedIn())
                 return config;
             if (!accountActionControl.isAccessTokenExpired()) {
-                config.headers = Object.assign(Object.assign({}, config.headers), accountActionControl.getSecurityHeader());
+                config.headers = { ...config.headers, ...accountActionControl.getSecurityHeader() };
                 return config;
             }
             try {
                 await accountActionControl.refreshToken();
-                config.headers = Object.assign(Object.assign({}, config.headers), accountActionControl.getSecurityHeader());
+                config.headers = { ...config.headers, ...accountActionControl.getSecurityHeader() };
                 return config;
             }
             catch (e) {
@@ -3849,7 +3860,7 @@ class AccountDataContext {
                 throw e;
             }
         }, function (error) {
-            throw error;
+            return Promise.reject(error);
         });
     }
     /*
@@ -4158,74 +4169,6 @@ class Helpers {
 
 /***/ }),
 
-/***/ "./src/index.ts":
-/*!**********************!*\
-  !*** ./src/index.ts ***!
-  \**********************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "DefaultThingPos": () => (/* reexport safe */ _common_src_thConstants__WEBPACK_IMPORTED_MODULE_1__.DefaultThingPos),
-/* harmony export */   "ThingDeletedStates": () => (/* reexport safe */ _common_src_thConstants__WEBPACK_IMPORTED_MODULE_1__.ThingDeletedStates),
-/* harmony export */   "ThingKind": () => (/* reexport safe */ _common_src_thConstants__WEBPACK_IMPORTED_MODULE_1__.ThingKind),
-/* harmony export */   "ThingUserChangeClaims": () => (/* reexport safe */ _common_src_thConstants__WEBPACK_IMPORTED_MODULE_1__.ThingUserChangeClaims),
-/* harmony export */   "ThingUserReadClaims": () => (/* reexport safe */ _common_src_thConstants__WEBPACK_IMPORTED_MODULE_1__.ThingUserReadClaims),
-/* harmony export */   "ThingUserRoles": () => (/* reexport safe */ _common_src_thConstants__WEBPACK_IMPORTED_MODULE_1__.ThingUserRoles),
-/* harmony export */   "ThingUserStates": () => (/* reexport safe */ _common_src_thConstants__WEBPACK_IMPORTED_MODULE_1__.ThingUserStates),
-/* harmony export */   "ThingUserVisibility": () => (/* reexport safe */ _common_src_thConstants__WEBPACK_IMPORTED_MODULE_1__.ThingUserVisibility),
-/* harmony export */   "validateThingDeletedStatus": () => (/* reexport safe */ _common_src_thConstants__WEBPACK_IMPORTED_MODULE_1__.validateThingDeletedStatus),
-/* harmony export */   "validateThingUserChangeClaims": () => (/* reexport safe */ _common_src_thConstants__WEBPACK_IMPORTED_MODULE_1__.validateThingUserChangeClaims),
-/* harmony export */   "validateThingUserReadClaims": () => (/* reexport safe */ _common_src_thConstants__WEBPACK_IMPORTED_MODULE_1__.validateThingUserReadClaims),
-/* harmony export */   "validateThingUserRoles": () => (/* reexport safe */ _common_src_thConstants__WEBPACK_IMPORTED_MODULE_1__.validateThingUserRoles),
-/* harmony export */   "validateThingUserStatus": () => (/* reexport safe */ _common_src_thConstants__WEBPACK_IMPORTED_MODULE_1__.validateThingUserStatus),
-/* harmony export */   "validateThingUserVisibility": () => (/* reexport safe */ _common_src_thConstants__WEBPACK_IMPORTED_MODULE_1__.validateThingUserVisibility),
-/* harmony export */   "EmailDTO": () => (/* reexport safe */ _common_src_dtos__WEBPACK_IMPORTED_MODULE_2__.EmailDTO),
-/* harmony export */   "RegisterByOnlyEmailDTO": () => (/* reexport safe */ _common_src_dtos__WEBPACK_IMPORTED_MODULE_2__.RegisterByOnlyEmailDTO),
-/* harmony export */   "RegisterByOnlyEmailStatus": () => (/* reexport safe */ _common_src_dtos__WEBPACK_IMPORTED_MODULE_2__.RegisterByOnlyEmailStatus),
-/* harmony export */   "ThingDTO": () => (/* reexport safe */ _common_src_dtos__WEBPACK_IMPORTED_MODULE_2__.ThingDTO),
-/* harmony export */   "UserDTO": () => (/* reexport safe */ _common_src_dtos__WEBPACK_IMPORTED_MODULE_2__.UserDTO),
-/* harmony export */   "UserInfoDTO": () => (/* reexport safe */ _common_src_dtos__WEBPACK_IMPORTED_MODULE_2__.UserInfoDTO),
-/* harmony export */   "RealtimeConnectionStates": () => (/* reexport safe */ _realtimeConnectors__WEBPACK_IMPORTED_MODULE_3__.RealtimeConnectionStates),
-/* harmony export */   "RealtimeConnector": () => (/* reexport safe */ _realtimeConnectors__WEBPACK_IMPORTED_MODULE_3__.RealtimeConnector),
-/* harmony export */   "SocketIORealtimeConnector": () => (/* reexport safe */ _realtimeConnectors__WEBPACK_IMPORTED_MODULE_3__.SocketIORealtimeConnector),
-/* harmony export */   "Helpers": () => (/* reexport safe */ _helpers__WEBPACK_IMPORTED_MODULE_4__.Helpers),
-/* harmony export */   "HttpRequestCanceler": () => (/* reexport safe */ _helpers__WEBPACK_IMPORTED_MODULE_4__.HttpRequestCanceler),
-/* harmony export */   "AccountDataContext": () => (/* reexport safe */ _accountDataContext__WEBPACK_IMPORTED_MODULE_6__.AccountDataContext),
-/* harmony export */   "AccountManager": () => (/* reexport safe */ _accountManager__WEBPACK_IMPORTED_MODULE_7__.AccountManager),
-/* harmony export */   "Thing": () => (/* reexport safe */ _thing__WEBPACK_IMPORTED_MODULE_8__.Thing),
-/* harmony export */   "ThingsDataContext": () => (/* reexport safe */ _thingsDataContext__WEBPACK_IMPORTED_MODULE_9__.ThingsDataContext),
-/* harmony export */   "ThingsManager": () => (/* reexport safe */ _thingsManager__WEBPACK_IMPORTED_MODULE_10__.ThingsManager)
-/* harmony export */ });
-/* harmony import */ var promise_prototype_finally__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! promise.prototype.finally */ "./node_modules/promise.prototype.finally/index.js");
-/* harmony import */ var promise_prototype_finally__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(promise_prototype_finally__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _common_src_thConstants__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../common/src/thConstants */ "../common/src/thConstants.js");
-/* harmony import */ var _common_src_dtos__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../common/src/dtos */ "../common/src/dtos.js");
-/* harmony import */ var _realtimeConnectors__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./realtimeConnectors */ "./src/realtimeConnectors.ts");
-/* harmony import */ var _helpers__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./helpers */ "./src/helpers.ts");
-/* harmony import */ var _endPointAddress__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./endPointAddress */ "./src/endPointAddress.ts");
-/* harmony import */ var _accountDataContext__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./accountDataContext */ "./src/accountDataContext.ts");
-/* harmony import */ var _accountManager__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./accountManager */ "./src/accountManager.ts");
-/* harmony import */ var _thing__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./thing */ "./src/thing.ts");
-/* harmony import */ var _thingsDataContext__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./thingsDataContext */ "./src/thingsDataContext.ts");
-/* harmony import */ var _thingsManager__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./thingsManager */ "./src/thingsManager.ts");
-
-(0,promise_prototype_finally__WEBPACK_IMPORTED_MODULE_0__.shim)(); //https://stackoverflow.com/questions/35876549/typescript-type-definition-for-promise-prototype-finally
-
-
-
-
-
-
-
-
-
-
-
-
-/***/ }),
-
 /***/ "./src/realtimeConnectors.ts":
 /*!***********************************!*\
   !*** ./src/realtimeConnectors.ts ***!
@@ -4311,7 +4254,7 @@ class SocketIORealtimeConnector extends RealtimeConnector {
         if (this.authHook)
             fullUrl += "?" + this.authHook();
         // ToDo: Add support for options of socketio
-        this.socket = socket_io_client__WEBPACK_IMPORTED_MODULE_1__(fullUrl);
+        this.socket = (0,socket_io_client__WEBPACK_IMPORTED_MODULE_1__.io)(fullUrl);
         this.socket.on("error", (error) => this.on_error(error));
         this.socket.on("connect_error", (error) => this.on_connect_error(error));
         this.socket.on("connect", () => this.on_connect());
@@ -4533,7 +4476,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "ThingsManager": () => (/* binding */ ThingsManager)
 /* harmony export */ });
-/* harmony import */ var ___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! . */ "./src/index.ts");
+/* harmony import */ var _thing__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./thing */ "./src/thing.ts");
 
 // Info: ThingsManager have state
 class ThingsManager {
@@ -4602,7 +4545,7 @@ class ThingsManager {
         try {
             thingsDTOsDataSet = await this.thingsDataContext.getThings(parameter, canceler);
             for (let i = 0; i < thingsDTOsDataSet.things.length; i++) {
-                var thing = new ___WEBPACK_IMPORTED_MODULE_0__.Thing(thingsDTOsDataSet.things[i]);
+                var thing = new _thing__WEBPACK_IMPORTED_MODULE_0__.Thing(thingsDTOsDataSet.things[i]);
                 things.push(thing);
             }
         }
@@ -4648,7 +4591,7 @@ class ThingsManager {
     // Only wrappers
     async getThing(thingId) {
         const thingDTO = await this.thingsDataContext.getThing(thingId);
-        return new ___WEBPACK_IMPORTED_MODULE_0__.Thing(thingDTO);
+        return new _thing__WEBPACK_IMPORTED_MODULE_0__.Thing(thingDTO);
     }
     async putThingValue(thingId, asCmd, value) {
         return await this.thingsDataContext.putThingValue(thingId, asCmd, value);
@@ -4670,9 +4613,9 @@ module.exports = __WEBPACK_EXTERNAL_MODULE_axios__;
 /***/ }),
 
 /***/ "socket.io-client":
-/*!**********************************************************************************************************************************!*\
-  !*** external {"amd":"socket.io-client","global":"io","root":"io","commonjs":"socket.io-client","commonjs2":"socket.io-client"} ***!
-  \**********************************************************************************************************************************/
+/*!********************************************************************************************************************!*\
+  !*** external {"root":"io","amd":"socket.io-client","commonjs":"socket.io-client","commonjs2":"socket.io-client"} ***!
+  \********************************************************************************************************************/
 /***/ ((module) => {
 
 "use strict";
@@ -4770,12 +4713,73 @@ module.exports = __WEBPACK_EXTERNAL_MODULE_socket_io_client__;
 /******/ 	})();
 /******/ 	
 /************************************************************************/
-/******/ 	
-/******/ 	// startup
-/******/ 	// Load entry module and return exports
-/******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	var __webpack_exports__ = __webpack_require__("./src/index.ts");
-/******/ 	
+var __webpack_exports__ = {};
+// This entry need to be wrapped in an IIFE because it need to be in strict mode.
+(() => {
+"use strict";
+/*!**********************!*\
+  !*** ./src/index.ts ***!
+  \**********************/
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "DefaultThingPos": () => (/* reexport safe */ _common_src_thConstants__WEBPACK_IMPORTED_MODULE_1__.DefaultThingPos),
+/* harmony export */   "ThingDeletedStates": () => (/* reexport safe */ _common_src_thConstants__WEBPACK_IMPORTED_MODULE_1__.ThingDeletedStates),
+/* harmony export */   "ThingKind": () => (/* reexport safe */ _common_src_thConstants__WEBPACK_IMPORTED_MODULE_1__.ThingKind),
+/* harmony export */   "ThingUserChangeClaims": () => (/* reexport safe */ _common_src_thConstants__WEBPACK_IMPORTED_MODULE_1__.ThingUserChangeClaims),
+/* harmony export */   "ThingUserReadClaims": () => (/* reexport safe */ _common_src_thConstants__WEBPACK_IMPORTED_MODULE_1__.ThingUserReadClaims),
+/* harmony export */   "ThingUserRoles": () => (/* reexport safe */ _common_src_thConstants__WEBPACK_IMPORTED_MODULE_1__.ThingUserRoles),
+/* harmony export */   "ThingUserStates": () => (/* reexport safe */ _common_src_thConstants__WEBPACK_IMPORTED_MODULE_1__.ThingUserStates),
+/* harmony export */   "ThingUserVisibility": () => (/* reexport safe */ _common_src_thConstants__WEBPACK_IMPORTED_MODULE_1__.ThingUserVisibility),
+/* harmony export */   "validateThingDeletedStatus": () => (/* reexport safe */ _common_src_thConstants__WEBPACK_IMPORTED_MODULE_1__.validateThingDeletedStatus),
+/* harmony export */   "validateThingUserChangeClaims": () => (/* reexport safe */ _common_src_thConstants__WEBPACK_IMPORTED_MODULE_1__.validateThingUserChangeClaims),
+/* harmony export */   "validateThingUserReadClaims": () => (/* reexport safe */ _common_src_thConstants__WEBPACK_IMPORTED_MODULE_1__.validateThingUserReadClaims),
+/* harmony export */   "validateThingUserRoles": () => (/* reexport safe */ _common_src_thConstants__WEBPACK_IMPORTED_MODULE_1__.validateThingUserRoles),
+/* harmony export */   "validateThingUserStatus": () => (/* reexport safe */ _common_src_thConstants__WEBPACK_IMPORTED_MODULE_1__.validateThingUserStatus),
+/* harmony export */   "validateThingUserVisibility": () => (/* reexport safe */ _common_src_thConstants__WEBPACK_IMPORTED_MODULE_1__.validateThingUserVisibility),
+/* harmony export */   "EmailDTO": () => (/* reexport safe */ _common_src_dtos__WEBPACK_IMPORTED_MODULE_2__.EmailDTO),
+/* harmony export */   "RegisterByOnlyEmailDTO": () => (/* reexport safe */ _common_src_dtos__WEBPACK_IMPORTED_MODULE_2__.RegisterByOnlyEmailDTO),
+/* harmony export */   "RegisterByOnlyEmailStatus": () => (/* reexport safe */ _common_src_dtos__WEBPACK_IMPORTED_MODULE_2__.RegisterByOnlyEmailStatus),
+/* harmony export */   "ThingDTO": () => (/* reexport safe */ _common_src_dtos__WEBPACK_IMPORTED_MODULE_2__.ThingDTO),
+/* harmony export */   "UserDTO": () => (/* reexport safe */ _common_src_dtos__WEBPACK_IMPORTED_MODULE_2__.UserDTO),
+/* harmony export */   "UserInfoDTO": () => (/* reexport safe */ _common_src_dtos__WEBPACK_IMPORTED_MODULE_2__.UserInfoDTO),
+/* harmony export */   "RealtimeConnectionStates": () => (/* reexport safe */ _realtimeConnectors__WEBPACK_IMPORTED_MODULE_3__.RealtimeConnectionStates),
+/* harmony export */   "RealtimeConnector": () => (/* reexport safe */ _realtimeConnectors__WEBPACK_IMPORTED_MODULE_3__.RealtimeConnector),
+/* harmony export */   "SocketIORealtimeConnector": () => (/* reexport safe */ _realtimeConnectors__WEBPACK_IMPORTED_MODULE_3__.SocketIORealtimeConnector),
+/* harmony export */   "Helpers": () => (/* reexport safe */ _helpers__WEBPACK_IMPORTED_MODULE_4__.Helpers),
+/* harmony export */   "HttpRequestCanceler": () => (/* reexport safe */ _helpers__WEBPACK_IMPORTED_MODULE_4__.HttpRequestCanceler),
+/* harmony export */   "AccountDataContext": () => (/* reexport safe */ _accountDataContext__WEBPACK_IMPORTED_MODULE_6__.AccountDataContext),
+/* harmony export */   "AccountManager": () => (/* reexport safe */ _accountManager__WEBPACK_IMPORTED_MODULE_7__.AccountManager),
+/* harmony export */   "Thing": () => (/* reexport safe */ _thing__WEBPACK_IMPORTED_MODULE_8__.Thing),
+/* harmony export */   "ThingsDataContext": () => (/* reexport safe */ _thingsDataContext__WEBPACK_IMPORTED_MODULE_9__.ThingsDataContext),
+/* harmony export */   "ThingsManager": () => (/* reexport safe */ _thingsManager__WEBPACK_IMPORTED_MODULE_10__.ThingsManager)
+/* harmony export */ });
+/* harmony import */ var promise_prototype_finally__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! promise.prototype.finally */ "./node_modules/promise.prototype.finally/index.js");
+/* harmony import */ var promise_prototype_finally__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(promise_prototype_finally__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _common_src_thConstants__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../common/src/thConstants */ "../common/src/thConstants.mjs");
+/* harmony import */ var _common_src_dtos__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../common/src/dtos */ "../common/src/dtos.mjs");
+/* harmony import */ var _realtimeConnectors__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./realtimeConnectors */ "./src/realtimeConnectors.ts");
+/* harmony import */ var _helpers__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./helpers */ "./src/helpers.ts");
+/* harmony import */ var _endPointAddress__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./endPointAddress */ "./src/endPointAddress.ts");
+/* harmony import */ var _accountDataContext__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./accountDataContext */ "./src/accountDataContext.ts");
+/* harmony import */ var _accountManager__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./accountManager */ "./src/accountManager.ts");
+/* harmony import */ var _thing__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./thing */ "./src/thing.ts");
+/* harmony import */ var _thingsDataContext__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./thingsDataContext */ "./src/thingsDataContext.ts");
+/* harmony import */ var _thingsManager__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./thingsManager */ "./src/thingsManager.ts");
+
+(0,promise_prototype_finally__WEBPACK_IMPORTED_MODULE_0__.shim)(); //https://stackoverflow.com/questions/35876549/typescript-type-definition-for-promise-prototype-finally
+
+
+
+
+
+
+
+
+
+
+
+})();
+
 /******/ 	return __webpack_exports__;
 /******/ })()
 ;

@@ -1,7 +1,7 @@
 "use strict";
 
-const mongoose = require("mongoose");
-const bcrypt = require("bcryptjs");
+import mongoose from "mongoose";
+import bcrypt from "bcryptjs";
 
 const userSchema = mongoose.Schema({
 	_id     : mongoose.Schema.Types.ObjectId,
@@ -45,16 +45,16 @@ userSchema.methods.comparePassword = function comparePassword(candidatePassword,
 	return bcrypt.compareSync(candidatePassword, this.password);
 };
 
-const User = mongoose.model("User", userSchema);
+export const User = mongoose.model("User", userSchema);
 
-exports.find = filter => User.find(filter).exec();
+export const find = filter => User.find(filter).exec();
 
 /**
  * Returns a user if it finds one, otherwise returns null if a user is not found.
  * @param   {String}   _id - The unique id of the user to find
  * @returns {Promise} resolved user if found, otherwise resolves undefined
  */
-exports.findUserById = _id => User.findById(_id).exec();
+export const findUserById = _id => User.findById(_id).exec();
 
 /**
  * Returns a user if it finds one, otherwise returns null if a user is not found.
@@ -62,7 +62,7 @@ exports.findUserById = _id => User.findById(_id).exec();
  * @param   {Function} done     - The user if found, otherwise returns undefined
  * @returns {Promise} resolved user if found, otherwise resolves undefined
  */
-exports.findUserByUsername =
+export const findUserByUsername =
 		username => User.findOne({ $or: [{ username }, { "emails.email": { $in: [username] } }] }).exec();
 
 /**
@@ -71,9 +71,8 @@ exports.findUserByUsername =
  * @param   {Function} done     	- The user if found, otherwise returns undefined
  * @returns {Promise} resolved user if found, otherwise resolves undefined
  */
-exports.findUserByMasterApiKey =
+export const findUserByMasterApiKey =
 	masterApiKey => User.findOne({ "masterApiKey": masterApiKey }).exec();
 
-exports.save = user => user.save(user);
+export const save = user => user.save(user);
 
-exports.User = User;

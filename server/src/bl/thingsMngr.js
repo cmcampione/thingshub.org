@@ -1,13 +1,12 @@
 "use strict";
 
-const httpStatusCodes = require("http-status-codes");
-const utils = require("../utils");
-const { v4: uuid } = require("uuid");
-const thConstants = require("../../../common/src/thConstants");
-const UserInfoDTO = require("../../../common/src/dtos").UserInfoDTO;
-const ThingDTO = require("../../../common/src/dtos").ThingDTO;
-const usersManager = require("../bl/usersMngr");
-const thingModel = require("../models/Thing");
+import httpStatusCodes from "http-status-codes";
+import * as utils from "../utils.js";
+import { v4 as uuid } from "uuid";
+import * as thConstants from "../../../common/src/thConstants.mjs";
+import { UserInfoDTO, ThingDTO } from "../../../common/src/dtos.mjs";
+import * as usersManager from "../bl/usersMngr.js";
+import * as thingModel from "../models/Thing.js";
 
 function findThingById(id) { return thingModel.findThingById(id);}
 function countThings(query) { return thingModel.countThings(query);}
@@ -123,7 +122,7 @@ function checkThingAccess(user, thing, deletedStatus, userRole, userStatus, user
 
 // Not optimized using the CheckThingAccess function.
 // It does not get optimized because staying so you have a capillary control of where it eventually snaps the error
-async function getThing(user, thingId, deletedStatus, userRole, userStatus, userVisibility) {
+async function _getThing(user, thingId, deletedStatus, userRole, userStatus, userVisibility) {
 
 	if (!thingId)
 		throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Thing's Id not valid", 37);
@@ -182,7 +181,7 @@ async function getThing(user, thingId, deletedStatus, userRole, userStatus, user
 	throw new utils.ErrorCustom(httpStatusCodes.FORBIDDEN, "Unauthorized user", 44);
 }
 
-async function getThings(user, parentThingId, thingFilter, valueFilter, orderBy, skip, top) {
+async function _getThings(user, parentThingId, thingFilter, valueFilter, orderBy, skip, top) {
 
 	let paging = utils.validateAndFixInputPaging(skip, top);
 
@@ -238,7 +237,7 @@ async function getThings(user, parentThingId, thingFilter, valueFilter, orderBy,
 	let parentThing = null;
 	if (parentThingId) {
 		
-		parentThing = await getThing(user, parentThingId, thConstants.ThingDeletedStates.Ok, 
+		parentThing = await _getThing(user, parentThingId, thConstants.ThingDeletedStates.Ok, 
 			thConstants.ThingUserRoles.NoMatter, thConstants.ThingUserStates.Ok, thConstants.ThingUserVisibility.Visible);
 		mainThingsQuery["$and"].push({parentsThingsIds: { $elemMatch: {userId: user ? user._id : null, parentThingId }}} );
 	}
@@ -478,27 +477,27 @@ async function createThingDTO(user, parentThing, thing, isSuperAdministrator) {
 }
 
 // User may be null because it is anonymous or it is a SuperAdministrator who has no relationship with Thing
-exports.getThing = async (user, thingId, deletedStatus) => {
+export const getThing = async (user, thingId, deletedStatus) => {
 
 	if (!thingId)
 		throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Thing's Id can't be null", 47);
 
 	// ToDo: Check why is used thConstants.ThingUserStates.WaitForAuth
-	var thing = await getThing(user, thingId, deletedStatus, thConstants.ThingUserRoles.NoMatter,
+	var thing = await _getThing(user, thingId, deletedStatus, thConstants.ThingUserRoles.NoMatter,
 		user ? thConstants.ThingUserStates.Ok | thConstants.ThingUserStates.WaitForAuth : thConstants.ThingUserStates.NoMatter,
 		thConstants.ThingUserVisibility.NoMatter);
 
 	return await createThingDTO(user, null, thing, user.isSuperAdministrator);
 };
 
-exports.getThings = async (user, parentThingId, thingFilter, valueFilter, orderBy, skip, top) => {
+export const getThings = async (user, parentThingId, thingFilter, valueFilter, orderBy, skip, top) => {
 
 	let paging = utils.validateAndFixInputPaging(skip, top);
 
-	return await getThings(user, parentThingId, thingFilter, valueFilter, orderBy, paging.skip, paging.top);
+	return await _getThings(user, parentThingId, thingFilter, valueFilter, orderBy, paging.skip, paging.top);
 };
 
-exports.createThing = async (user, thingDTO) => {
+export const createThing = async (user, thingDTO) => {
 
 	if (!user)
 		throw new utils.ErrorCustom(httpStatusCodes.UNAUTHORIZED,
@@ -580,7 +579,7 @@ exports.createThing = async (user, thingDTO) => {
 	};
 };
 
-exports.updateThing = async (user, thingId, thingDTO) => {
+export const updateThing = async (user, thingId, thingDTO) => {
 	// TODO: It might be nice try clearing the two lines below and enable the function that anonymous users can change the Thing obviously by respecting Claims and Roles
 	if (!user)
 		throw new utils.ErrorCustom(httpStatusCodes.UNAUTHORIZED, httpStatusCodes.getStatusText(httpStatusCodes.UNAUTHORIZED), 54);
@@ -588,7 +587,7 @@ exports.updateThing = async (user, thingId, thingDTO) => {
 	if (!thingId)
 		throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Thing's Id can't be null", 55);
 
-	var thing = await getThing(user, thingId, thConstants.ThingDeletedStates.Ok, 
+	var thing = await _getThing(user, thingId, thConstants.ThingDeletedStates.Ok, 
 		thConstants.ThingUserRoles.Administrator, thConstants.ThingUserStates.Ok, thConstants.ThingUserVisibility.Visible);
 
 	if (!thingDTO)
@@ -781,7 +780,7 @@ exports.updateThing = async (user, thingId, thingDTO) => {
 	};
 };
 
-exports.updateThingValue = async (user, thingId, value, asCmd) => {
+export const updateThingValue = async (user, thingId, value, asCmd) => {
 
 	if (!thingId)
 		throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Thing's Id can't be null", 104);
@@ -790,7 +789,7 @@ exports.updateThingValue = async (user, thingId, value, asCmd) => {
 	if (!user)
 		throw new utils.ErrorCustom(httpStatusCodes.UNAUTHORIZED, "Unauthorized user", 105);
 
-	var thing = await getThing(user, thingId, thConstants.ThingDeletedStates.Ok, 
+	var thing = await _getThing(user, thingId, thConstants.ThingDeletedStates.Ok, 
 		thConstants.ThingUserRoles.NoMatter, thConstants.ThingUserStates.Ok, thConstants.ThingUserVisibility.Visible);
 
 	var loggedInThingUserClaims = getThingUserClaims(user, thing);

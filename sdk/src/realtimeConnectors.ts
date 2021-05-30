@@ -1,5 +1,5 @@
 import axios from "axios";
-import * as io from 'socket.io-client';
+import { io, Socket } from 'socket.io-client';
 
 export const enum RealtimeConnectionStates {
     Connecting = 0,
@@ -7,7 +7,6 @@ export const enum RealtimeConnectionStates {
     Reconnecting = 2,
     Disconnected = 4
 }
-
 export class RealtimeConnector {
 
     protected connectionStatus : RealtimeConnectionStates = RealtimeConnectionStates.Disconnected;
@@ -58,7 +57,7 @@ export class RealtimeConnector {
 
 export class SocketIORealtimeConnector extends RealtimeConnector {
     
-    private socket : SocketIOClient.Socket | null = null;
+    private socket : Socket | null = null;
     
     constructor(url : string,
         authHook : () => string,

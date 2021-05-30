@@ -1,30 +1,32 @@
 "use strict";
 
-const fs      			= require("fs");
-const path    			= require("path");
-const dotenv  			= require("dotenv");
-const httpStatusCodes 	= require("http-status-codes");
-const https   			= require("https");
-const express 			= require("express");
+import fs from "fs";
+import path from "path";
+import dotenv from "dotenv";
+import httpStatusCodes from "http-status-codes";
+import https from "https";
+import express from "express";
 // const session 			= require("express-session");
 // const MongoStore 		= require("connect-mongo")(session);
-const bodyParser 		= require("body-parser");
-const passport 			= require("passport");
-const LocalStrategy 	= require("passport-local").Strategy;
-const LocalApiStrategy 	= require("passport-localapikey-update").Strategy;
-const BearerStrategy	= require("passport-http-bearer").Strategy;
-const BasicStrategy		= require("passport-http").BasicStrategy;
-const mongoose  		= require("mongoose");
-const cors 				= require("cors");
+// const bodyParser 		= require("body-parser");
+import passport from "passport";
+import { Strategy as LocalStrategy } from "passport-local";
+import { Strategy as LocalApiStrategy } from "passport-localapikey-update";
+import { Strategy as BearerStrategy } from "passport-http-bearer";
+import { BasicStrategy } from "passport-http";
+import mongoose from "mongoose";
+import cors from "cors";
 
-const logger			= require("./logger");
-const utils				= require("./utils");
-const usersManager		= require("./bl/usersMngr");
-const RealtimeNotifier 	= require("./realtimeNotifier");
+import { logger } from "./logger.js";
+import * as utils from "./utils.js";
+import * as usersManager from "./bl/usersMngr.js";
+import { RealtimeNotifier } from "./realtimeNotifier.js";
+
+const __dirname = path.resolve(); 
 
 // Env configuration
 
-const configPath = path.join(__dirname, "../", "thingsHub.env");
+const configPath = path.join(__dirname, "./", "thingsHub.env");
 dotenv.config({ path: configPath });
 
 // DB Connection
@@ -165,13 +167,13 @@ app.get("/api", async function (req, res) {
 	res.status(200).send(msg);
 });
 
-const AccountController = require(__dirname + "/controllers/accountController");
+import { router as AccountController } from  "./controllers/accountController.js";
 app.use("/api/account", AccountController);
 
-const ThingsController = require(__dirname + "/controllers/thingsController");
+import { router as ThingsController } from "./controllers/thingsController.js";
 app.use("/api/things", ThingsController);
 
-const LogController = require(__dirname + "/controllers/logController");
+import { router as LogController } from "./controllers/logController.js";
 app.use("/api/log", LogController);
 
 // Errors support
@@ -209,8 +211,8 @@ app.use((err, req, res, next) => {
 // openssl req -new -key privatekey.pem -out certrequest.csr
 // openssl x509 -req -in certrequest.csr -signkey privatekey.pem -out certificate.pem
 const options = {
-	key  : fs.readFileSync(path.join(__dirname, "../certs/privatekey.pem")),
-	cert : fs.readFileSync(path.join(__dirname, "../certs/certificate.pem"))
+	key  : fs.readFileSync(path.join(__dirname, "./certs/privatekey.pem")),
+	cert : fs.readFileSync(path.join(__dirname, "./certs/certificate.pem"))
 };
 const httpsServer = https.createServer(options, app);
 

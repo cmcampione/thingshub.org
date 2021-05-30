@@ -1,10 +1,11 @@
 "use strict";
 
-const httpStatusCodes = require("http-status-codes");
+import httpStatusCodes from "http-status-codes";
+import { Server as io } from "socket.io";
 
-const logger = require("./logger");
-const utils = require("./utils");
-const usersManager = require("./bl/usersMngr");
+import { logger } from "./logger.js";
+import * as utils from "./utils.js";
+import * as usersManager from "./bl/usersMngr.js";
 
 // Realtime communication support
 
@@ -29,7 +30,7 @@ class ClientsConnectorSocketIO extends IClientsConnector {
 		let self = this;
 		this.connections = new Map();
 
-		this.io = require("socket.io")(server, {
+		this.io = new io(server, {
 			cors: {
 				origin: "*",
 				methods: ["GET", "POST"]
@@ -155,7 +156,7 @@ class ClientsConnectorSocketIO extends IClientsConnector {
 		}
 	}
 }
-class RealtimeNotifier {
+export class RealtimeNotifier {
 
 	static initialize(server) {
 		RealtimeNotifier.ClientsConnectors = []; // List of ClientsConnectors
@@ -187,5 +188,3 @@ class RealtimeNotifier {
 		});
 	}
 }
-
-module.exports = RealtimeNotifier;

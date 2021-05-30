@@ -1,20 +1,20 @@
 "use strict";
 
-const path  			= require("path");
-const nodemailer 		= require("nodemailer");
-const httpStatusCodes 	= require("http-status-codes");
-const express 			= require("express");
-const passport 			= require("passport");
-const {param, body, validationResult}	= require("express-validator");
+import path from "path";
+import nodemailer from "nodemailer";
+import httpStatusCodes from "http-status-codes";
+import express from "express";
+import passport from "passport";
+import { param, body, validationResult } from "express-validator";
 
-const ejs 				= require("ejs");
+import ejs from	"ejs";
 
-const utils 			= require("../utils.js");
-const usersMngr 		= require("../bl/usersMngr.js");
-const usersPendingMngr 	= require("../bl/usersPendingMngr.js");
-const dtos 				= require("../../../common/src/dtos");
+import * as utils from "../utils.js";
+import * as usersMngr from "../bl/usersMngr.js";
+import * as usersPendingMngr from "../bl/usersPendingMngr.js";
+import * as dtos from "../../../common/src/dtos.mjs";
 
-const router = express.Router();
+export const router = express.Router();
 
 // create reusable transporter object using the default SMTP transport
 let transporter = null;
@@ -258,5 +258,3 @@ router.get("/logout", async function (req, res, next) {
 
 	})(req, res, next);
 });
-
-module.exports = router;

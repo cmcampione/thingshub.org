@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import * as thingshub from 'thingshub-js-sdk';
+import { HttpRequestCanceler } from 'thingshub-js-sdk';
 import { ThingsService } from '../things.service';
 
 @Component({
@@ -13,7 +13,7 @@ import { ThingsService } from '../things.service';
 })
 export class ThingsComponent implements OnInit, OnDestroy {
 
-  private canceler = new thingshub.HttpRequestCanceler();
+  private canceler = new HttpRequestCanceler();
   public things: thingshub.Thing[];
 
   constructor(private readonly thingsService: ThingsService) {

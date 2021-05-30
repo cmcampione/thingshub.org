@@ -1,9 +1,10 @@
 "use strict";
 
-const moment = require("moment");
-const fs = require("fs");
-const path = require("path");
-const { createLogger, format, transports } = require("winston");
+import moment from "moment";
+import fs from "fs";
+import path from "path";
+import winston from "winston";
+const { createLogger, format, transports } = winston;
 
 const env = process.env.NODE_ENV || "development";
 const logDir = "log";
@@ -19,7 +20,7 @@ const timezoneUTC = () => {
 	return moment().utc().format("YYYY-MM-DD HH:mm:ss");
 };
 
-const logger = createLogger({
+export const logger = createLogger({
 	// change level if in dev environment versus production
 	level: env === "production" ? "info" : "debug",
 	format: format.combine(
@@ -47,4 +48,3 @@ const logger = createLogger({
 	]
 });
 
-module.exports = logger;

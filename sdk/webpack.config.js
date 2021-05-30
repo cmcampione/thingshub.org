@@ -15,10 +15,10 @@ module.exports = {
 		globalObject: "this" // Useful for node e DOM compatility
 	},
 	externals: {
-		"socket.io-client": { 
-			amd: "socket.io-client", 
-			global: "io", // TODO: Can be unuseful?
+		"socket.io-client":
+		{ 			
 			root: "io",
+			amd: "socket.io-client", 
 			commonjs: "socket.io-client", 
 			commonjs2: "socket.io-client" 
 		},
@@ -26,12 +26,16 @@ module.exports = {
 	},
 	resolve: {
 		// Add `.ts` and `.tsx` as a resolvable extension.
-		extensions: [".webpack.js", ".web.js", ".js", ".ts", ".tsx"]
+		extensions: [".webpack.js", ".web.js", ".js", ".ts", ".tsx", ".mjs"]
 	},
 	module: {
 		rules: [
 			// all files with a `.ts` or `.tsx` extension will be handled by `ts-loader`
-			{ test: /\.tsx?$/, loader: "ts-loader" }
+			{
+				test: /\.tsx?$/,
+				loader: "ts-loader",
+				exclude: /node_modules/ 
+			}
 		]
 	},
 	plugins: [		
@@ -40,7 +44,6 @@ module.exports = {
 				scripts: [".\\node_modules\\.bin\\dts-bundle-generator -o ./dist/thingshub.d.ts ./src/index.ts  --umd-module-name thingshub"]
 			}
 		}),
-		// ToDo: Not executed in correct order
 		// Useful to avoid publish in npm repo
 		new FileManagerPlugin({
 			events: {
@@ -51,12 +54,14 @@ module.exports = {
 						{ source: "./dist/thingshub.js", destination: "../clients/PeraColta/node_modules/thingshub-js-sdk/" },
 						{ source: "./dist/thingshub.js.map", destination: "../clients/PeraColta/node_modules/thingshub-js-sdk/" },
 						{ source: "./dist/thingshub.d.ts", destination: "../clients/PeraColta/node_modules/thingshub-js-sdk/" },
+						{ source: "./dist/index.html", destination: "../clients/PeraColta/node_modules/thingshub-js-sdk/" },
 
 						{ source: "./dist/package.json", destination: "../clients/ThingsMonitor/node_modules/thingshub-js-sdk/" },
 						{ source: "./dist/README.md", destination: "../clients/ThingsMonitor/node_modules/thingshub-js-sdk/" },
 						{ source: "./dist/thingshub.js", destination: "../clients/ThingsMonitor/node_modules/thingshub-js-sdk/" },
 						{ source: "./dist/thingshub.js.map", destination: "../clients/ThingsMonitor/node_modules/thingshub-js-sdk/" },
-						{ source: "./dist/thingshub.d.ts", destination: "../clients/ThingsMonitor/node_modules/thingshub-js-sdk/" }
+						{ source: "./dist/thingshub.d.ts", destination: "../clients/ThingsMonitor/node_modules/thingshub-js-sdk/" },
+						{ source: "./dist/index.html", destination: "../clients/ThingsMonitor/node_modules/thingshub-js-sdk/" },
 					]
 				}
 			}
