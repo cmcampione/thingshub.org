@@ -1,7 +1,9 @@
 import { HttpRequestCanceler, ItemsRange, HttpFailResult } from "./helpers";
 import { ThingsGetParams, ThingsDTOsDataSet, ThingsDataContext } from "./thingsDataContext";
 import { RealtimeConnector } from "./realtimeConnectors";
-import { Thing, ThingUserReadClaims, ThingUserChangeClaims, ThingDeletedStates, ThingDTO } from ".";
+import { Thing } from "./thing";
+import { ThingUserReadClaims, ThingUserChangeClaims, ThingDeletedStates } from "../../common/src/thConstants";
+import { ThingDTO } from "../../common/src/dtos";
 
 export interface ThingClaims {
 

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import * as thingshub from 'thingshub-js-sdk';
+import { SocketIORealtimeConnector } from 'thingshub-js-sdk';
 import { endPointAddress } from './utils';
 import { AccountService } from './account.service';
 import { Subject } from 'rxjs';
@@ -26,7 +26,7 @@ export class RealTimeConnectorService {
 
   // ToDo: Could be injected to chance connection type
   // tslint:disable-next-line: member-ordering
-  public readonly realTimeConnectorRaw = new thingshub.SocketIORealtimeConnector(
+  public readonly realTimeConnectorRaw = new SocketIORealtimeConnector(
     endPointAddress.server,
     this.accountService.getSecurityToken,
     this.onError, this.onConnectError, this.onStateChanged);

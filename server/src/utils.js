@@ -1,17 +1,18 @@
 "use strict";
 
-const httpStatusCodes 	= require("http-status-codes");
-const fs   				= require("fs");
-const path 				= require("path");
-const { v4: uuid } 		= require("uuid");
-const jwt  				= require("jsonwebtoken");
-const logger			= require("./logger");
+import httpStatusCodes from "http-status-codes";
+import fs from "fs";
+import path from "path";
+import { v4 as uuid } from "uuid";
+import jwt from "jsonwebtoken";
+import { logger } from "./logger.js";
+import { UserDTO } from "../../common/src/dtos.mjs";
 
-const UserDTO 			= require("../../common/src/dtos").UserDTO;
+const __dirname = path.resolve();   
 
 // Errors support
 
-class ErrorCustom {
+export class ErrorCustom {
 	constructor(statusCode, message, internalCode) {
 		this.statusCode = statusCode;
 		this.message = {
@@ -28,19 +29,18 @@ class ErrorCustom {
 		};
 	}
 }
-exports.ErrorCustom = ErrorCustom;
 
 // DTOs support
 
-exports.MappingModelAndDTO = class MappingModelAndDTO {
+export class MappingModelAndDTO {
 	static toUserDTO(user, fullInfos) {
 		const userDTO = new UserDTO(user, fullInfos);
 
 		return userDTO;
 	}
-};
+}
 
-function validateAndFixInputPaging(skip, top) {
+export function validateAndFixInputPaging(skip, top) {
 	if (!skip)
 		skip = 0;
 	let maxPagSize = parseInt(process.env.GET_THINGS_MAX_PAGESIZE);
@@ -50,15 +50,14 @@ function validateAndFixInputPaging(skip, top) {
 		throw new ErrorCustom(httpStatusCodes.BAD_REQUEST, "Bad Paging range", 51);
 	return { skip, top };
 }
-exports.validateAndFixInputPaging = validateAndFixInputPaging;
 
 // JWT support
 
 /** Private certificate used for signing JSON WebTokens */
-const privateKey = fs.readFileSync(path.join(__dirname, "../certs/privatekey.pem"));
+const privateKey = fs.readFileSync(path.join(__dirname, "./certs/privatekey.pem"));
 
 /** Public certificate used for verification.  Note: you could also use the private key */
-const publicKey = fs.readFileSync(path.join(__dirname, "../certs/certificate.pem"));
+const publicKey = fs.readFileSync(path.join(__dirname, "./certs/certificate.pem"));
 
 /**
  * Creates a signed JSON WebToken and returns it.  Utilizes the private certificate to create
@@ -70,7 +69,7 @@ const publicKey = fs.readFileSync(path.join(__dirname, "../certs/certificate.pem
  * @param  {String} sub - The subject or identity of the token.
  * @return {String} The JWT Token
  */
-exports.createToken = ({ exp = 3600, sub = "", name = "" } = {}) => {
+export const createToken = ({ exp = 3600, sub = "", name = "" } = {}) => {
 	// Info: Used floor as showed in specifications
 	const iat = Math.floor(Date.now() / 1000);
 	const token = jwt.sign({
@@ -92,4 +91,4 @@ exports.createToken = ({ exp = 3600, sub = "", name = "" } = {}) => {
  * @throws  {Error} Error if the token could not be verified
  * @returns {Object} The token decoded and verified
  */
-exports.verifyToken = token => jwt.verify(token, publicKey);
+export const verifyToken = token => jwt.verify(token, publicKey);

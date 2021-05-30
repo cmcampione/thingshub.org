@@ -1,15 +1,15 @@
 "use strict";
 
-const httpStatusCodes 	= require("http-status-codes");
-const passport 			= require("passport");
-const express 			= require("express");
+import httpStatusCodes from "http-status-codes";
+import passport from "passport";
+import express from "express";
 
-const utils 			= require("../utils.js");
-const logModel		    = require("../models/Log.js");
+import * as utils from "../utils.js";
+import * as logModel from "../models/Log.js";
 
-const RealtimeNotifier 	= require("../realtimeNotifier");
+import { RealtimeNotifier } from "../realtimeNotifier.js";
 
-const router = express.Router();
+export const router = express.Router();
 
 router.post("/", async function (req, res, next){
 	passport.authenticate(["localapikey", "bearer"], { session: false }, async function(err, user, info) {
@@ -44,4 +44,3 @@ router.post("/", async function (req, res, next){
 	})(req, res, next);
 });
 
-module.exports = router;

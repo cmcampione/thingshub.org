@@ -1,8 +1,8 @@
 "use strict";
 
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
-const thConstants = require("../../../common/src/thConstants");
+import * as thConstants from "../../../common/src/thConstants.mjs";
 
 const thingSchema = mongoose.Schema({
 	
@@ -57,18 +57,16 @@ const thingSchema = mongoose.Schema({
 	}]
 });
 
-const Thing = mongoose.model("Thing", thingSchema);
+export const Thing = mongoose.model("Thing", thingSchema);
 
 /**
  * Returns a thing if it finds one, otherwise returns null if a user is not found.
  * @param   {String}   _id - The unique id of the user to find
  * @returns {Promise} resolved user if found, otherwise resolves undefined
  */
-exports.findThingById = _id => Thing.findById(_id).exec();
+export const findThingById = _id => Thing.findById(_id).exec();
 
-exports.countThings = (query) => Thing.find(query).count().exec();
-exports.findThings = (query, orderBy, skip, top) => Thing.find(query).sort(orderBy).skip(skip).limit(top).exec();
+export const countThings = (query) => Thing.find(query).count().exec();
+export const findThings = (query, orderBy, skip, top) => Thing.find(query).sort(orderBy).skip(skip).limit(top).exec();
 
-exports.save = thing => thing.save(thing);
-
-exports.Thing = Thing;
+export const save = thing => thing.save(thing);

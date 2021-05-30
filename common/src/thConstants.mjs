@@ -1,13 +1,12 @@
 "use strict";
 
-const ThingDeletedStates = {
+export const ThingDeletedStates = {
 	NoMatter  : 0,  // Interna state. Do not useful for external usage
 	Ok        : 1,
 	Deleted   : 2
 };
-exports.ThingDeletedStates = ThingDeletedStates;
 
-exports.validateThingDeletedStatus = function validateThingDeletedStatus(deletedStatus) {
+export function validateThingDeletedStatus(deletedStatus) {
 	switch(deletedStatus) {
 	case ThingDeletedStates.NoMatter:
 	case ThingDeletedStates.Ok:
@@ -15,17 +14,16 @@ exports.validateThingDeletedStatus = function validateThingDeletedStatus(deleted
 		return true;
 	}
 	return false;
-};
+}
 
 // The User can not have more Roles in the same time
-const ThingUserRoles = {
+export const ThingUserRoles = {
 	NoMatter      : 0,  // Internal state. Do not use for external use like filter
 	Administrator : 1,
 	User          : 2
 };
-exports.ThingUserRoles = ThingUserRoles;
 
-exports.validateThingUserRoles = function validateThingUserRoles(userRole) {
+export function validateThingUserRoles(userRole) {
 	switch(userRole) {
 	case ThingUserRoles.NoMatter:
 	case ThingUserRoles.Administrator:
@@ -33,18 +31,17 @@ exports.validateThingUserRoles = function validateThingUserRoles(userRole) {
 		return true;
 	}
 	return false;
-};
+}
 
 // The User can not have more Status at same time
-const ThingUserStates = {
+export const ThingUserStates = {
 	NoMatter    : 0,  // Internal state. Do not use for external use like filter
 	Ok          : 1,
 	WaitForAuth : 2,
 	Deleted     : 4
 };
-exports.ThingUserStates = ThingUserStates;
 
-exports.validateThingUserStatus = function validateThingUserStatus(userStatus) {
+export function validateThingUserStatus(userStatus) {
 	switch(userStatus) {
 	case ThingUserStates.NoMatter:
 	case ThingUserStates.Ok:
@@ -53,16 +50,15 @@ exports.validateThingUserStatus = function validateThingUserStatus(userStatus) {
 		return true;
 	}
 	return false;
-};
+}
 
-const ThingUserVisibility = {
+export const ThingUserVisibility = {
 	NoMatter  : 0,  // Internal state. Do not use for external use like filter
 	Visible       : 1,
 	Hidden        : 2
 };
-exports.ThingUserVisibility = ThingUserVisibility;
 
-exports.validateThingUserVisibility = function validateThingUserVisibility(visibility) {
+export function validateThingUserVisibility(visibility) {
 	switch(visibility) {
 	case ThingUserVisibility.NoMatter:
 	case ThingUserVisibility.Visible:
@@ -70,11 +66,11 @@ exports.validateThingUserVisibility = function validateThingUserVisibility(visib
 		return true;
 	}
 	return false;
-};
+}
 
 // Do not have validation function since are bitwise values
 
-const ThingUserReadClaims = {
+export const ThingUserReadClaims = {
 	NoClaims: 0,
 
 	CanReadCreationDate: 2,
@@ -106,13 +102,12 @@ ThingUserReadClaims.CanReadThingUserRights | ThingUserReadClaims.CanReadThingUse
 ThingUserReadClaims.CanReadThingUserStatus | ThingUserReadClaims.CanReadThingUserReadClaims | ThingUserReadClaims.CanReadPublicReadClaims |
 ThingUserReadClaims.CanReadPublicChangeClaims | ThingUserReadClaims.CanReadEveryoneReadClaims | ThingUserReadClaims.CanReadEveryoneChangeClaims;
 
-exports.ThingUserReadClaims = ThingUserReadClaims;
-exports.validateThingUserReadClaims = (userReadClaims) => {
+export function validateThingUserReadClaims(userReadClaims) {
 	return userReadClaims <= ThingUserReadClaims.AllClaims && userReadClaims >= ThingUserReadClaims.NoClaims;
-};
+}
 
 // Do not have validation function since are bitwise values
-const ThingUserChangeClaims = {
+export const ThingUserChangeClaims = {
 	NoClaims: 0,
 
 	CanDeleteThing: 1,
@@ -152,18 +147,14 @@ ThingUserChangeClaims.CanChangeThingUserStatus | ThingUserChangeClaims.CanChange
 ThingUserChangeClaims.CanChangePublicReadClaims | ThingUserChangeClaims.CanChangePublicChangeClaims | ThingUserChangeClaims.CanChangeEveryoneReadClaims | ThingUserChangeClaims.CanChangeEveryoneChangeClaims |
 ThingUserChangeClaims.CanAddChildrenThing | ThingUserChangeClaims.CanRemoveChildrenThing;
 
-exports.ThingUserChangeClaims = ThingUserChangeClaims;
-exports.validateThingUserChangeClaims = (userChangeClaims) => {
+export function validateThingUserChangeClaims(userChangeClaims) {
 	return userChangeClaims <= ThingUserChangeClaims.AllClaims && userChangeClaims >= ThingUserChangeClaims.NoClaims;
-};
+}
 
-exports.ThingKind = {
+export const ThingKind = {
 	NoMatter: "0",
 	genericId : "1",
 	genericTxt : "the bees are laborious"
 };
 
-const DefaultThingPos = Number.MAX_SAFE_INTEGER;
-exports.DefaultThingPos = DefaultThingPos;
-
-
+export const DefaultThingPos = Number.MAX_SAFE_INTEGER;

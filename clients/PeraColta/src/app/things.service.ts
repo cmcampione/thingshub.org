@@ -1,5 +1,5 @@
 import { Injectable, OnDestroy, Inject, isDevMode  } from '@angular/core';
-import { Thing, ThingUserReadClaims, ThingUserChangeClaims, ThingsDataContext, ThingsManager } from 'thingshub-js-sdk';
+import { ThingUserReadClaims, ThingUserChangeClaims, ThingsDataContext, ThingsManager, Thing } from 'thingshub-js-sdk';
 import { endPointAddress } from './utils';
 import { RealTimeConnectorService } from './real-time-connector.service';
 

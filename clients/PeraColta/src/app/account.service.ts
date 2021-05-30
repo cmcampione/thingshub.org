@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs';
-import { AccountUserData, AccountActionControl, AccountManager } from 'thingshub-js-sdk';
+import { AccountUserData, AccountActionControl, AccountManager} from 'thingshub-js-sdk';
 import { endPointAddress } from './utils';
 
 @Injectable({

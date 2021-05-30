@@ -1,19 +1,16 @@
-// import { thConstants } from "zlib";
-
 "use strict";
 
-const httpStatusCodes 	= require("http-status-codes");
-const express 			= require("express");
-const passport 			= require("passport");
+import httpStatusCodes from "http-status-codes";
+import express from "express";
+import passport from "passport";
 
-const utils 			= require("../utils.js");
-const logger			= require("../logger");
-const thConstants 		= require("../../../common/src/thConstants");
-const thingsMngr		= require("../bl/thingsMngr");
-const RealtimeNotifier 	= require("../realtimeNotifier");
+import * as utils from "../utils.js";
+import  { logger } from "../logger.js";
+import * as thConstants from "../../../common/src/thConstants.mjs";
+import * as thingsMngr from "../bl/thingsMngr.js";
+import { RealtimeNotifier } from "../realtimeNotifier.js";
 
-
-const router 			= express.Router();
+export const router = express.Router();
 
 router.get("/:id", function(req, res, next) {
 	passport.authenticate(["localapikey", "bearer"], { session: false }, async function(err, user, info) {
@@ -236,5 +233,3 @@ router.put("/:id/cmd", async function (req, res, next) {
 		}
 	})(req, res, next);
 });
-
-module.exports = router;
