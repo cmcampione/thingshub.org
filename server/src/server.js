@@ -34,8 +34,9 @@ dotenv.config({ path: configPath });
 mongoose.Promise = global.Promise;
 
 mongoose.connect(process.env.MONGODB_URI, 
-	{ 
-		//useMongoClient: true,
+	{
+		useNewUrlParser: true,
+		useUnifiedTopology: true,
 		auth: {authSource: process.env.MONGODB_AUTHSOURCE},
 		user: process.env.MONGODB_USER,
 		pass: process.env.MONGODB_PASSWORD
