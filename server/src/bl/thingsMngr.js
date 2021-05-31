@@ -31,37 +31,39 @@ function getThingUserRights(userId, username, thing) {
 	return thingUserRights;
 }
 
-// All paths return to something. It never returns null except for exceptions
+// All paths return something. It never returns null except for exceptions
 // The User may be null as anonymous. If User is anonymous returns Thing's PublicClaims
 function getThingUserClaims(user, thing, isSuperAdministrator) {
 
 	if (!thing)
 		throw new utils.ErrorCustom(httpStatusCodes.INTERNAL_SERVER_ERROR, "Thing can't be null", 26);
 
-	let thingUserClaimsAndRights = {
+	let thingUserClaims = {
 		read    : thing.publicReadClaims,
 		change  : thing.publicChangeClaims
 	};
 
 	if (user) {
-		thingUserClaimsAndRights.read   = thingUserClaimsAndRights.read   | thing.everyoneReadClaims;
-		thingUserClaimsAndRights.change = thingUserClaimsAndRights.change | thing.everyoneChangeClaims;
+		if (isSuperAdministrator)
+		{
+			thingUserClaims.read   = thConstants.ThingUserReadClaims.AllClaims;
+			thingUserClaims.change = thConstants.ThingUserChangeClaims.AllClaims;
+
+			return thingUserClaims;
+		}
+
+		thingUserClaims.read   = thingUserClaims.read   | thing.everyoneReadClaims;
+		thingUserClaims.change = thingUserClaims.change | thing.everyoneChangeClaims;
 
 		var thingUserRights = getThingUserRights(user._id, user.username, thing);
 		if (thingUserRights)
 		{
-			thingUserClaimsAndRights.read   = thingUserClaimsAndRights.read   | thingUserRights.userReadClaims;
-			thingUserClaimsAndRights.change = thingUserClaimsAndRights.change | thingUserRights.userChangeClaims;
-		}
-
-		if (isSuperAdministrator)
-		{
-			thingUserClaimsAndRights.read   = thConstants.ThingUserReadClaims.AllClaims;
-			thingUserClaimsAndRights.change = thConstants.ThingUserChangeClaims.AllClaims;
+			thingUserClaims.read   = thingUserClaims.read   | thingUserRights.userReadClaims;
+			thingUserClaims.change = thingUserClaims.change | thingUserRights.userChangeClaims;
 		}
 	}
 
-	return thingUserClaimsAndRights;
+	return thingUserClaims;
 }
 
 function checkThingAccess(user, thing, deletedStatus, userRole, userStatus, userVisibility) {
@@ -785,7 +787,7 @@ export const updateThingValue = async (user, thingId, value, asCmd) => {
 	if (!thingId)
 		throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Thing's Id can't be null", 104);
 
-	// TODO: It might be nice try clearing the two lines below and enable the function that anonymous users can change the Thing obviously by respecting Claims and Roles
+	// ToDo: It might be nice try clearing the two lines below and enable the function that anonymous users can change the Thing obviously by respecting Claims and Roles
 	if (!user)
 		throw new utils.ErrorCustom(httpStatusCodes.UNAUTHORIZED, "Unauthorized user", 105);
 
@@ -793,16 +795,11 @@ export const updateThingValue = async (user, thingId, value, asCmd) => {
 		thConstants.ThingUserRoles.NoMatter, thConstants.ThingUserStates.Ok, thConstants.ThingUserVisibility.Visible);
 
 	var loggedInThingUserClaims = getThingUserClaims(user, thing);
-
 	if ((loggedInThingUserClaims.change & thConstants.ThingUserChangeClaims.CanChangeValue) == 0)
 		throw new utils.ErrorCustom(httpStatusCodes.FORBIDDEN, "Unauthorized user", 106);
 
-	// Do not compare value value :-) because is an object
+	// Do not compare value value :-) because it is an object
 	if (value != null) {
-		
-		if ((loggedInThingUserClaims.change & thConstants.ThingUserChangeClaims.CanChangeValue) == 0)
-			throw new utils.ErrorCustom(httpStatusCodes.FORBIDDEN, "User can not changes Thing's value", 107);
-
 		let usersIdsToNotify = await getUsersIdsToNotify(thing, true);
 
 		if (asCmd == false) {

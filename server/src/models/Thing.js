@@ -22,6 +22,7 @@ const thingSchema = mongoose.Schema({
 	everyoneReadClaims    : { type: Number, default : thConstants.ThingUserReadClaims.NoClaims },
 	everyoneChangeClaims  : { type: Number, default : thConstants.ThingUserChangeClaims.NoClaims },
 
+	// ToDo
 	valueClaims : [{
 		fieldName		: String,
 		publicReadClaims: { type: Boolean, default : false },
@@ -41,6 +42,7 @@ const thingSchema = mongoose.Schema({
 		userReadClaims    : { type: Number, default : thConstants.ThingUserReadClaims.NoClaims },
 		userChangeClaims  : { type: Number, default : thConstants.ThingUserChangeClaims.NoClaims },
 
+		// ToDo
 		valueClaims : [{
 			fieldName		: String,
 			userReadClaims: { type: Boolean, default : false },

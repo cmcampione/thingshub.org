@@ -89,11 +89,11 @@ router.post("/", async function (req, res, next){
 
 			let thingDTO = req.body;
 			if (!thingDTO)
-				throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "The body message is empty", 92);
+				return next(utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "The body message is empty", 92));
 
 			let blResult = await thingsMngr.createThing(user, thingDTO);
 			if (!blResult || !blResult.usersIdsToNotify || !blResult.thingDTO)
-				throw new utils.ErrorCustom(httpStatusCodes.INTERNAL_SERVER_ERROR, "Result not valid", 100);
+				return next(utils.ErrorCustom(httpStatusCodes.INTERNAL_SERVER_ERROR, "Result not valid", 100));
 
 			RealtimeNotifier.onCreateThing(blResult.usersIdsToNotify, blResult.thingDTO);
 
@@ -101,10 +101,9 @@ router.post("/", async function (req, res, next){
 
 		}  catch (e)  {
 			if (e instanceof utils.ErrorCustom) {
-				next(e);
-				return;
+				return next(e);
 			}
-			next(new utils.ErrorCustom(httpStatusCodes.INTERNAL_SERVER_ERROR, e.message, 23));
+			return next(new utils.ErrorCustom(httpStatusCodes.INTERNAL_SERVER_ERROR, e.message, 23));
 		}
 	})(req, res, next);
 });
@@ -157,13 +156,12 @@ router.put("/:id", async function (req, res, next){
 // Update Thing Value
 router.put("/:id/value", async function (req, res, next) {
 	await passport.authenticate(["localapikey", "bearer"], { session: false }, async function(err, user, info) {
-		try {
-			
+		try {			
 			if (err)
-				return next(err); 
+				throw err; 
 
 			if (!user)
-				return next(new utils.ErrorCustom(httpStatusCodes.UNAUTHORIZED, httpStatusCodes.getStatusText(httpStatusCodes.UNAUTHORIZED), 104));
+				throw new utils.ErrorCustom(httpStatusCodes.UNAUTHORIZED, httpStatusCodes.getStatusText(httpStatusCodes.UNAUTHORIZED), 104);
 
 			let thingId = req.params.id;
 			if (!thingId)
@@ -179,57 +177,56 @@ router.put("/:id/value", async function (req, res, next) {
 			// logger.info("PUT ../api/things/" + thingId + " Value: " + JSON.stringify(value),{ code: 130 });
 
 			let blResult = await thingsMngr.updateThingValue(user, thingId, value, false);
-			if (!blResult)
-				return; // ToDo: According to the restful paradigm what should the PUT return?
+			if (!blResult) // Nothing to notify
+				return; // ToDo: According to the restful paradigm, what should the PUT return?
 
 			RealtimeNotifier.onUpdateThingValue(blResult, thingId, value, false);
 
-			// ToDo: According to the restful paradigm what should the PUT return?
-			res.json(value);
-
+			res.json(value); // ToDo: According to the restful paradigm, what should the PUT return?
 		}  catch (e)  {
 			if (e instanceof utils.ErrorCustom) {
 				next(e);
 				return;
 			}
 			next(new utils.ErrorCustom(httpStatusCodes.INTERNAL_SERVER_ERROR, e.message, 89));
+			return;
 		}
 	})(req, res, next);
 });
 
 // Send Thing Command
 router.put("/:id/cmd", async function (req, res, next) {
-	await passport.authenticate(["localapikey", "bearer"], { session: false }, async function(err, user, info) {
-		try {
-			if (err)
-				return next(err); 
+	await passport.authenticate(["localapikey", "bearer"], { session: false }, 
+		async function(err, user, info) {
+			try {
+				if (err)
+					throw err;
 
-			if (!user)
-				return next(new utils.ErrorCustom(httpStatusCodes.UNAUTHORIZED, httpStatusCodes.getStatusText(httpStatusCodes.UNAUTHORIZED), 113));
+				if (!user)
+					throw new utils.ErrorCustom(httpStatusCodes.UNAUTHORIZED, httpStatusCodes.getStatusText(httpStatusCodes.UNAUTHORIZED), 113);
 
-			let thingId = req.params.id;
-			if (!thingId)
-				throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Thing's Id can't be null", 114);
+				let thingId = req.params.id;
+				if (!thingId)
+					throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "Thing's Id can't be null", 114);
 
-			let value = req.body;
-			if (!value)
-				throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "The body message is empty", 115);
+				let value = req.body;
+				if (!value)
+					throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "The body message is empty", 115);
 
-			let blResult = await thingsMngr.updateThingValue(user, thingId, value, true);
-			if (!blResult)
-				return; // TODO: According to the restful paradigm what should the PUT return?
+				let blResult = await thingsMngr.updateThingValue(user, thingId, value, true);
+				if (!blResult)
+					return; // ToDo: According to the restful paradigm, what should the PUT return?
 
-			RealtimeNotifier.onUpdateThingValue(blResult, thingId, value, true);
-
-			// TODO: According to the restful paradigm what should the PUT return?
-			res.json(value);
-
-		}  catch (e)  {
-			if (e instanceof utils.ErrorCustom) {
-				next(e);
+				RealtimeNotifier.onUpdateThingValue(blResult, thingId, value, true);
+				
+				res.json(value); // ToDo: According to the restful paradigm, what should the PUT return?
+			}  catch(e)  {
+				if (e instanceof utils.ErrorCustom) {
+					next(e);
+					return;
+				}
+				next(new utils.ErrorCustom(httpStatusCodes.INTERNAL_SERVER_ERROR, e.message, 116));
 				return;
 			}
-			next(new utils.ErrorCustom(httpStatusCodes.INTERNAL_SERVER_ERROR, e.message, 116));
-		}
-	})(req, res, next);
+		})(req, res, next);
 });

@@ -68,7 +68,7 @@ export function validateThingUserVisibility(visibility) {
 	return false;
 }
 
-// Do not have validation function since are bitwise values
+// Does not have validation function since are bitwise values
 
 export const ThingUserReadClaims = {
 	NoClaims: 0,
@@ -106,7 +106,7 @@ export function validateThingUserReadClaims(userReadClaims) {
 	return userReadClaims <= ThingUserReadClaims.AllClaims && userReadClaims >= ThingUserReadClaims.NoClaims;
 }
 
-// Do not have validation function since are bitwise values
+// Does not have validation function since are bitwise values
 export const ThingUserChangeClaims = {
 	NoClaims: 0,
 

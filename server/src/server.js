@@ -179,8 +179,9 @@ app.use("/api/log", LogController);
 
 // Errors support
 
+// Handles not found error
 app.use(function(req, res, next) {
-	throw new utils.ErrorCustom(httpStatusCodes.NOT_FOUND, httpStatusCodes.getStatusText(httpStatusCodes.NOT_FOUND), 1);
+	next(new utils.ErrorCustom(httpStatusCodes.NOT_FOUND, httpStatusCodes.getStatusText(httpStatusCodes.NOT_FOUND), 1));
 });
 
 // Catch all for error messages.  Instead of a stack
