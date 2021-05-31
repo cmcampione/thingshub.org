@@ -4296,9 +4296,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "Thing": () => (/* binding */ Thing)
 /* harmony export */ });
-/* harmony import */ var _common_src_thConstants__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../common/src/thConstants */ "../common/src/thConstants.mjs");
-//import * as thConstants from "../../common/src/thConstants";
-
 class Thing {
     constructor(thingDTO) {
         this.childrenSkip = 0;
@@ -4309,17 +4306,17 @@ class Thing {
         this.name = "";
         this.kind = "";
         this.pos = 0;
-        this.deletedStatus = _common_src_thConstants__WEBPACK_IMPORTED_MODULE_0__.ThingDeletedStates.NoMatter;
+        this.deletedStatus = 0 /* NoMatter */;
         this.deletedDateTime = null;
-        this.publicReadClaims = _common_src_thConstants__WEBPACK_IMPORTED_MODULE_0__.ThingUserReadClaims.NoClaims;
-        this.publicChangeClaims = _common_src_thConstants__WEBPACK_IMPORTED_MODULE_0__.ThingUserChangeClaims.NoClaims;
-        this.everyoneReadClaims = _common_src_thConstants__WEBPACK_IMPORTED_MODULE_0__.ThingUserReadClaims.NoClaims;
-        this.everyoneChangeClaims = _common_src_thConstants__WEBPACK_IMPORTED_MODULE_0__.ThingUserChangeClaims.NoClaims;
-        this.userStatus = _common_src_thConstants__WEBPACK_IMPORTED_MODULE_0__.ThingUserStates.NoMatter;
-        this.userRole = _common_src_thConstants__WEBPACK_IMPORTED_MODULE_0__.ThingUserRoles.NoMatter;
-        this.userVisibility = _common_src_thConstants__WEBPACK_IMPORTED_MODULE_0__.ThingUserVisibility.NoMatter;
-        this.userReadClaims = _common_src_thConstants__WEBPACK_IMPORTED_MODULE_0__.ThingUserReadClaims.NoClaims;
-        this.userChangeClaims = _common_src_thConstants__WEBPACK_IMPORTED_MODULE_0__.ThingUserChangeClaims.NoClaims;
+        this.publicReadClaims = 0 /* NoClaims */;
+        this.publicChangeClaims = 0 /* NoClaims */;
+        this.everyoneReadClaims = 0 /* NoClaims */;
+        this.everyoneChangeClaims = 0 /* NoClaims */;
+        this.userStatus = 0 /* NoMatter */;
+        this.userRole = 0 /* NoMatter */;
+        this.userVisibility = 0 /* NoMatter */;
+        this.userReadClaims = 0 /* NoClaims */;
+        this.userChangeClaims = 0 /* NoClaims */;
         this.usersInfos = [];
         this.value = {};
         if (thingDTO) {
@@ -4480,8 +4477,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "ThingsManager": () => (/* binding */ ThingsManager)
 /* harmony export */ });
 /* harmony import */ var _thing__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./thing */ "./src/thing.ts");
-/* harmony import */ var _common_src_thConstants__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../common/src/thConstants */ "../common/src/thConstants.mjs");
-
 
 // Info: ThingsManager have state
 class ThingsManager {
@@ -4507,7 +4502,7 @@ class ThingsManager {
         };
         this.getThingsParams = {
             parentThingId: null,
-            thingFilter: { $and: [{ kind: this.thingKind }, { deletedStatus: _common_src_thConstants__WEBPACK_IMPORTED_MODULE_1__.ThingDeletedStates.Ok }] },
+            thingFilter: { $and: [{ kind: this.thingKind }, { deletedStatus: 1 /* Ok */ }] },
             top: 10,
             skip: 0,
             orderBy: null,
@@ -4515,7 +4510,7 @@ class ThingsManager {
         };
         this.getChindrenThingsParams = {
             parentThingId: null,
-            thingFilter: { deletedStatus: _common_src_thConstants__WEBPACK_IMPORTED_MODULE_1__.ThingDeletedStates.Ok },
+            thingFilter: { deletedStatus: 1 /* Ok */ },
             top: 10,
             skip: 0,
             orderBy: null,

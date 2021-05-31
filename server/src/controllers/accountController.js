@@ -14,6 +14,8 @@ import * as usersMngr from "../bl/usersMngr.js";
 import * as usersPendingMngr from "../bl/usersPendingMngr.js";
 import * as dtos from "../../../common/src/dtos.mjs";
 
+const __dirname = path.resolve();
+
 export const router = express.Router();
 
 // create reusable transporter object using the default SMTP transport
@@ -45,7 +47,7 @@ async function SendConfirmationEmailByOnlyEmail(email, culture, confirmationToke
 	}
 
 	const html = await new Promise((resolve, reject) => {
-		var ejsFile = path.join(__dirname, "../views/confirmByOnlyEmail-" + culture + ".ejs");
+		var ejsFile = path.join(__dirname, "src/views/confirmByOnlyEmail-" + culture + ".ejs");
 		ejs.renderFile(ejsFile, {
 			title: process.env.APPLICATION_NAME,
 			confirmByOnlyEmailUrl : ConfirmationByOnlyEmailUrl,
