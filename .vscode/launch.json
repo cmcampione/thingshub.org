@@ -14,7 +14,8 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "Launch ThingsHub Server",            
+            "name": "Launch ThingsHub Server",
+            "cwd":"${workspaceFolder}\\server",
             "program": "${workspaceFolder}\\server\\src\\server.js",
             "outputCapture": "std"
         },
