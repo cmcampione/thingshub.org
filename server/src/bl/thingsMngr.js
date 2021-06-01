@@ -14,8 +14,8 @@ function findThings(query, orderBy, skip, top) { return thingModel.findThings(qu
 
 // First search is by userId after it searchs by username
 // Can return null
-function getThingUserRights(userId, username, thing) {
-
+function getThingUserRights(userId, username, thing)
+{
 	if (!userId && !username)
 		throw new utils.ErrorCustom(httpStatusCodes.INTERNAL_SERVER_ERROR, "userId or usernane must be not empty", 28);
 	if (!thing)

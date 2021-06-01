@@ -213,16 +213,16 @@ router.post("/login",
 		passport.authenticate(["local", "basic"], { session: false }, async function(err, user, info) {
 			try {
 				if (err) { 
-					return next(err); 
+					throw err; 
 				}
 				if (!user) { 
-					return next(new utils.ErrorCustom(httpStatusCodes.UNAUTHORIZED, httpStatusCodes.getStatusText(httpStatusCodes.UNAUTHORIZED), 107));
+					throw new utils.ErrorCustom(httpStatusCodes.UNAUTHORIZED, httpStatusCodes.getStatusText(httpStatusCodes.UNAUTHORIZED), 107);
 				}
 
 				res.json({ 
 					access_token: utils.createToken({ 
 						sub : user._id.toString(), 
-						exp : 60, 
+						exp : parseInt(process.env.TOKEN_EXPIRATION),
 						name: user.name }),
 					token_type: "bearer"
 				});
@@ -233,23 +233,22 @@ router.post("/login",
 					return;
 				}
 				next(new utils.ErrorCustom(httpStatusCodes.INTERNAL_SERVER_ERROR, e.message, 108));
+				return;
 			}
 
 		})(req, res, next);
 	});
 
+// ToDo: Is it necessary the authentication?
 router.get("/logout", async function (req, res, next) {
 	passport.authenticate(["bearer"], { session: false }, async function(err, user, info) {
 		try {
-			if (err) { 
-				return next(err); 
-			}
-			if (!user) { 
-				return next(new utils.ErrorCustom(httpStatusCodes.UNAUTHORIZED, httpStatusCodes.getStatusText(httpStatusCodes.UNAUTHORIZED), 109));
-			}
+			if (err)
+				throw new err;
+			if (!user)
+				throw new utils.ErrorCustom(httpStatusCodes.UNAUTHORIZED, httpStatusCodes.getStatusText(httpStatusCodes.UNAUTHORIZED), 109);
 			req.logout();
 			res.send("");
-
 		}  catch (e)  {
 			if (e instanceof utils.ErrorCustom) {
 				next(e);
