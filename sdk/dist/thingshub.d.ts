@@ -137,7 +137,7 @@ export declare const enum RealtimeConnectionStates {
 export declare class RealtimeConnector {
 	protected connectionStatus: RealtimeConnectionStates;
 	protected url: string;
-	protected authHook: null | (() => string);
+	protected authHook: null | (() => string | null);
 	protected errorHook: null | ((error: any) => void);
 	protected stateChangedHook: null | ((newState: RealtimeConnectionStates) => void);
 	protected connectErrorHook: null | ((error: any) => void);
@@ -146,12 +146,12 @@ export declare class RealtimeConnector {
 	unsubscribe(): void;
 	setHook(_eventName: string, _hook: (...msg: any[]) => void): void;
 	remHook(_eventName: any, _hook: (...msg: any[]) => void): void;
-	constructor(url: string, authHook: () => string, errorHook: (error: any) => void, connectErrorHook: (error: any) => void, stateChangedHook: (change: RealtimeConnectionStates) => void);
+	constructor(url: string, authHook: () => string | null, errorHook: (error: any) => void, connectErrorHook: (error: any) => void, stateChangedHook: (change: RealtimeConnectionStates) => void);
 	api(): Promise<any | any>;
 }
 export declare class SocketIORealtimeConnector extends RealtimeConnector {
 	private socket;
-	constructor(url: string, authHook: () => string, errorHook: (error: any) => void, connectErrorHook: (error: any) => void, stateChangedHook: (change: RealtimeConnectionStates) => void);
+	constructor(url: string, authHook: () => string | null, errorHook: (error: any) => void, connectErrorHook: (error: any) => void, stateChangedHook: (change: RealtimeConnectionStates) => void);
 	private on_error;
 	private on_connect_error;
 	private on_connect;
@@ -327,6 +327,23 @@ export declare class ThingsManager {
 	getThing(thingId: string): Promise<Thing>;
 	putThingValue(thingId: string, asCmd: boolean, value: any): Promise<any>;
 }
+declare class thingsHub {
+	private endPointAddress;
+	private accountManager;
+	private thingsDatacontext;
+	private realTimeConnector;
+	private thingsManager;
+	private thingsManagerClaims;
+	private onError;
+	private onConnectError;
+	private onStateChanged;
+	mainThing: Thing;
+	httpRequestCanceler: HttpRequestCanceler;
+	constructor(address: string, apiKey: string);
+	on(eventName: string, hook: (...msg: any[]) => void): this;
+	get(): this;
+}
+export declare const th: (address: string, apiKey: string) => thingsHub;
 
 export as namespace thingshub;
 
