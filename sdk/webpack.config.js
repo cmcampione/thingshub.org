@@ -64,10 +64,7 @@ module.exports = {
 						{ source: "./dist/index.html", destination: "../clients/ThingsMonitor/node_modules/thingshub-js-sdk/" },
 
 						{ source: "./dist/package.json", destination: "../" },
-						{ source: "./dist/README.md", destination: "../" },
 						{ source: "./dist/thingshub.js", destination: "../" },
-						{ source: "./dist/thingshub.js.map", destination: "../" },
-						{ source: "./dist/thingshub.d.ts", destination: "../" },
 						{ source: "./dist/index.html", destination: "../" },
 						{ source: "./dist/index2.html", destination: "../" },
 					]
