@@ -12,3 +12,4 @@ export * from "./accountManager";
 export * from "./thing";
 export * from "./thingsDataContext";
 export * from "./thingsManager";
+export * from "./th";

@@ -13,7 +13,7 @@ export class RealtimeConnector {
 
     protected url: string = "";//   https://servername:port/route
     
-    protected authHook: null | (() => string) = null;
+    protected authHook: null | (() => string | null) = null;
 
     protected errorHook: null | ((error: any) => void) = null;
     protected stateChangedHook: null | ((newState: RealtimeConnectionStates) => void) = null;
@@ -35,7 +35,7 @@ export class RealtimeConnector {
     public remHook(_eventName : any, _hook : (...msg: any[]) => void) : void {}
 
     constructor(url : string,
-        authHook : () => string,
+        authHook : () => string | null,
         errorHook : (error: any) => void,
         connectErrorHook : (error: any) => void,
         stateChangedHook : (change: RealtimeConnectionStates) => void) {
@@ -60,7 +60,7 @@ export class SocketIORealtimeConnector extends RealtimeConnector {
     private socket : Socket | null = null;
     
     constructor(url : string,
-        authHook : () => string,
+        authHook : () => string | null,
         errorHook : (error: any) => void,
         connectErrorHook : (error: any) => void,
         stateChangedHook : (change: RealtimeConnectionStates) => void) {
