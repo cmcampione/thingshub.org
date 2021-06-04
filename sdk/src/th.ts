@@ -61,6 +61,10 @@ class thingsHub {
         this.realTimeConnector.setHook(eventName, hook)
         return this
     }
+    public off(eventName : string, hook : (...msg: any[]) => void) {
+        this.realTimeConnector.remHook(eventName, hook)
+        return this
+    }
     public get() {
         this.thingsManager.getMoreThings(this.httpRequestCanceler).then()
         return this
