@@ -4309,7 +4309,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 class thingsHub {
-    constructor(address, apiKey) {
+    constructor(address, apiKey, thingsKind) {
         this.endPointAddress = {
             server: "https://api.thingshub.org:3000",
             api: "https://api.thingshub.org:3000/api"
@@ -4332,7 +4332,7 @@ class thingsHub {
         this.realTimeConnector.subscribe(); // There is an automatic reconnection
         this.mainThing = new _thing__WEBPACK_IMPORTED_MODULE_3__.Thing();
         this.thingsDatacontext = new _thingsDataContext__WEBPACK_IMPORTED_MODULE_1__.ThingsDataContext(this.endPointAddress);
-        this.thingsManager = new _thingsManager__WEBPACK_IMPORTED_MODULE_4__.ThingsManager(this.mainThing, "first thing", this.thingsManagerClaims, this.thingsDatacontext, this.realTimeConnector);
+        this.thingsManager = new _thingsManager__WEBPACK_IMPORTED_MODULE_4__.ThingsManager(this.mainThing, thingsKind, this.thingsManagerClaims, this.thingsDatacontext, this.realTimeConnector);
         this.httpRequestCanceler = new _helpers__WEBPACK_IMPORTED_MODULE_5__.HttpRequestCanceler();
     }
     on(eventName, hook) {
@@ -4344,7 +4344,7 @@ class thingsHub {
         return this;
     }
 }
-const th = (address, apiKey) => new thingsHub(address, apiKey);
+const th = (address, apiKey, thingsKind = "first thing") => new thingsHub(address, apiKey, thingsKind);
 
 
 /***/ }),

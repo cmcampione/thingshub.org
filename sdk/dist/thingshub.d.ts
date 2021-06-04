@@ -339,11 +339,11 @@ declare class thingsHub {
 	private onStateChanged;
 	mainThing: Thing;
 	httpRequestCanceler: HttpRequestCanceler;
-	constructor(address: string, apiKey: string);
+	constructor(address: string, apiKey: string, thingsKind: string);
 	on(eventName: string, hook: (...msg: any[]) => void): this;
 	get(): this;
 }
-export declare const th: (address: string, apiKey: string) => thingsHub;
+export declare const th: (address: string, apiKey: string, thingsKind?: string) => thingsHub;
 
 export as namespace thingshub;
 
