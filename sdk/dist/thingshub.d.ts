@@ -337,7 +337,8 @@ declare class thingsHub {
 	private onError;
 	private onConnectError;
 	private onStateChanged;
-	mainThing: Thing;
+	private mainThing;
+	things: Thing[];
 	httpRequestCanceler: HttpRequestCanceler;
 	constructor(address: string, apiKey: string, thingsKind: string);
 	on(eventName: string, hook: (...msg: any[]) => void): this;

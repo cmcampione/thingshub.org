@@ -4331,6 +4331,7 @@ class thingsHub {
         this.realTimeConnector = new _realtimeConnectors__WEBPACK_IMPORTED_MODULE_2__.SocketIORealtimeConnector(this.endPointAddress.server, this.accountManager.getSecurityToken, this.onError, this.onConnectError, this.onStateChanged);
         this.realTimeConnector.subscribe(); // There is an automatic reconnection
         this.mainThing = new _thing__WEBPACK_IMPORTED_MODULE_3__.Thing();
+        this.things = this.mainThing.children;
         this.thingsDatacontext = new _thingsDataContext__WEBPACK_IMPORTED_MODULE_1__.ThingsDataContext(this.endPointAddress);
         this.thingsManager = new _thingsManager__WEBPACK_IMPORTED_MODULE_4__.ThingsManager(this.mainThing, thingsKind, this.thingsManagerClaims, this.thingsDatacontext, this.realTimeConnector);
         this.httpRequestCanceler = new _helpers__WEBPACK_IMPORTED_MODULE_5__.HttpRequestCanceler();

@@ -79,12 +79,10 @@ router.get("/", function(req, res, next) {
 router.post("/", async function (req, res, next){
 	passport.authenticate(["localapikey", "bearer"], { session: false }, async function(err, user, info) {
 		try {
-			if (err) { 
+			if (err)
 				throw err;
-			}
-			if (!user) { 
+			if (!user)
 				throw new utils.ErrorCustom(httpStatusCodes.UNAUTHORIZED, httpStatusCodes.getStatusText(httpStatusCodes.UNAUTHORIZED), 22);
-			}
 
 			let thingDTO = req.body;
 			if (!thingDTO)
