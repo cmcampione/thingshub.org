@@ -32,8 +32,11 @@ class thingsHub {
     private onConnectError = (error: any) => console.log(error)
     private onStateChanged = (change: any) => console.log(change)
 
-    public mainThing: Thing
-    public httpRequestCanceler: HttpRequestCanceler
+    private mainThing: Thing
+
+    public things: Thing[]
+
+    private httpRequestCanceler: HttpRequestCanceler
 
     constructor(address: string, apiKey: string, thingsKind: string) {
         this.endPointAddress.server = address + ":3000"
@@ -46,6 +49,7 @@ class thingsHub {
         this.realTimeConnector.subscribe(); // There is an automatic reconnection
 
         this.mainThing = new Thing();
+        this.things = this.mainThing.children;
         this.thingsDatacontext = new ThingsDataContext(this.endPointAddress)
         this.thingsManager = new ThingsManager(this.mainThing, thingsKind, 
             this.thingsManagerClaims, this.thingsDatacontext, this.realTimeConnector)
@@ -59,6 +63,11 @@ class thingsHub {
     }
     public get() {
         this.thingsManager.getMoreThings(this.httpRequestCanceler).then()
+        return this
+    }
+
+    public cancel() {
+        this.httpRequestCanceler.cancel()
         return this
     }
 }
