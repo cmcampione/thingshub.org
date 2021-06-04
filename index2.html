@@ -20,7 +20,7 @@
 
     <script>
 
-        var th = thingshub.th("https://api.thingshub.org", "491e94d9-9041-4e5e-b6cb-9dad91bbf63d")
+        var th = thingshub.th("https://api.thingshub.org", "491e94d9-9041-4e5e-b6cb-9dad91bbf63d", "Home appliance")
             .on("onUpdateThingValue", (thingId, value, asCmd) => console.log(thingId, value, asCmd))
             .get()
 

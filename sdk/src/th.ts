@@ -35,7 +35,7 @@ class thingsHub {
     public mainThing: Thing
     public httpRequestCanceler: HttpRequestCanceler
 
-    constructor(address: string, apiKey: string) {
+    constructor(address: string, apiKey: string, thingsKind: string) {
         this.endPointAddress.server = address + ":3000"
         this.endPointAddress.api = address + ":3000/api"
 
@@ -47,7 +47,7 @@ class thingsHub {
 
         this.mainThing = new Thing();
         this.thingsDatacontext = new ThingsDataContext(this.endPointAddress)
-        this.thingsManager = new ThingsManager(this.mainThing, "first thing", 
+        this.thingsManager = new ThingsManager(this.mainThing, thingsKind, 
             this.thingsManagerClaims, this.thingsDatacontext, this.realTimeConnector)
 
         this.httpRequestCanceler = new HttpRequestCanceler()
@@ -63,4 +63,4 @@ class thingsHub {
     }
 }
 
-export const th = (address: string, apiKey: string): thingsHub => new thingsHub(address, apiKey) 
+export const th = (address: string, apiKey: string, thingsKind: string = "first thing"): thingsHub => new thingsHub(address, apiKey, thingsKind) 

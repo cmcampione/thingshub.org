@@ -15,9 +15,8 @@ export const router = express.Router();
 router.get("/:id", function(req, res, next) {
 	passport.authenticate(["localapikey", "bearer"], { session: false }, async function(err, user, info) {
 		try {
-			if (err) { 
-				return next(err); 
-			}
+			if (err)
+				throw err;
 
 			let thingId = req.params.id;
 			if (!thingId)
@@ -28,13 +27,13 @@ router.get("/:id", function(req, res, next) {
 				throw new utils.ErrorCustom(httpStatusCodes.INTERNAL_SERVER_ERROR, "Result not valid", 99);
 
 			res.json(blResult);
-
 		}  catch (e)  {
 			if (e instanceof utils.ErrorCustom) {
 				next(e);
 				return;
 			}
 			next(new utils.ErrorCustom(httpStatusCodes.INTERNAL_SERVER_ERROR, e.message, 50));
+			return;
 		}
 	})(req, res, next);
 });
@@ -43,10 +42,10 @@ router.get("/", function(req, res, next) {
 	passport.authenticate(["localapikey", "bearer"], { session: false }, async function(err, user, info) {
 		try {
 			if (err) { 
-				return next(err); 
+				throw err;
 			}
 			if (!user) { 
-				return next(new utils.ErrorCustom(httpStatusCodes.UNAUTHORIZED, httpStatusCodes.getStatusText(httpStatusCodes.UNAUTHORIZED), 10));
+				throw new utils.ErrorCustom(httpStatusCodes.UNAUTHORIZED, httpStatusCodes.getStatusText(httpStatusCodes.UNAUTHORIZED), 10);
 			}
 
 			let parentThingId = req.query.parentThingId;
@@ -64,14 +63,14 @@ router.get("/", function(req, res, next) {
 
 			res.setHeader("Content-Range", "Items " + blResult.top + "-" + skip + "/" + blResult.totalItems);
 
-			res.json(blResult.thingsDTO);
-			
+			res.json(blResult.thingsDTO);			
 		}  catch (e)  {
 			if (e instanceof utils.ErrorCustom) {
 				next(e);
 				return;
 			}
 			next(new utils.ErrorCustom(httpStatusCodes.INTERNAL_SERVER_ERROR, e.message, 8));
+			return;
 		}
 	})(req, res, next);
 });
@@ -81,29 +80,30 @@ router.post("/", async function (req, res, next){
 	passport.authenticate(["localapikey", "bearer"], { session: false }, async function(err, user, info) {
 		try {
 			if (err) { 
-				return next(err); 
+				throw err;
 			}
 			if (!user) { 
-				return next(new utils.ErrorCustom(httpStatusCodes.UNAUTHORIZED, httpStatusCodes.getStatusText(httpStatusCodes.UNAUTHORIZED), 22));
+				throw new utils.ErrorCustom(httpStatusCodes.UNAUTHORIZED, httpStatusCodes.getStatusText(httpStatusCodes.UNAUTHORIZED), 22);
 			}
 
 			let thingDTO = req.body;
 			if (!thingDTO)
-				return next(utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "The body message is empty", 92));
+				throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "The body message is empty", 92);
 
 			let blResult = await thingsMngr.createThing(user, thingDTO);
 			if (!blResult || !blResult.usersIdsToNotify || !blResult.thingDTO)
-				return next(utils.ErrorCustom(httpStatusCodes.INTERNAL_SERVER_ERROR, "Result not valid", 100));
+				throw new utils.ErrorCustom(httpStatusCodes.INTERNAL_SERVER_ERROR, "Result not valid", 100);
 
 			RealtimeNotifier.onCreateThing(blResult.usersIdsToNotify, blResult.thingDTO);
 
 			res.json(blResult.thingDTO);
-
 		}  catch (e)  {
 			if (e instanceof utils.ErrorCustom) {
-				return next(e);
+				next(e);
+				return;
 			}
-			return next(new utils.ErrorCustom(httpStatusCodes.INTERNAL_SERVER_ERROR, e.message, 23));
+			next(new utils.ErrorCustom(httpStatusCodes.INTERNAL_SERVER_ERROR, e.message, 23));
+			return;
 		}
 	})(req, res, next);
 });
@@ -113,10 +113,10 @@ router.put("/:id", async function (req, res, next){
 	passport.authenticate(["localapikey", "bearer"], { session: false }, async function(err, user, info) {
 		try {
 			if (err)
-				return next(err); 
+				throw err;
 
 			if (!user)
-				return next(new utils.ErrorCustom(httpStatusCodes.UNAUTHORIZED, httpStatusCodes.getStatusText(httpStatusCodes.UNAUTHORIZED), 88));
+				throw new utils.ErrorCustom(httpStatusCodes.UNAUTHORIZED, httpStatusCodes.getStatusText(httpStatusCodes.UNAUTHORIZED), 88);
 
 			let thingId = req.params.id;
 			if (!thingId)
@@ -149,6 +149,7 @@ router.put("/:id", async function (req, res, next){
 				return;
 			}
 			next(new utils.ErrorCustom(httpStatusCodes.INTERNAL_SERVER_ERROR, e.message, 89));
+			return;
 		}
 	})(req, res, next);
 });
