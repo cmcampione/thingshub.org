@@ -26,6 +26,7 @@ import { SensorsModule } from './sensors/sensors.module';
 
 import { environment } from '../environments/environment';
 import { appReducer } from './app.reducer';
+import { ThingComponent } from './things/thing/thing.component';
 
 @NgModule({
   declarations: [
@@ -33,6 +34,7 @@ import { appReducer } from './app.reducer';
     LoginComponent,
     MapComponent,
     Sensors0Component,
+    ThingComponent,
     ThingsComponent,
     ContentPageComponent],
   entryComponents: [],

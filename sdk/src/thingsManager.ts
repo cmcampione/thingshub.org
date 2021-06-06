@@ -33,9 +33,12 @@ export class ThingsManager {
         private thingsDataContext: ThingsDataContext,
         private realtimeConnector: RealtimeConnector
     ) {
+        let thingFilter = this.thingKind ? {$and: [{kind: this.thingKind}, {deletedStatus: ThingDeletedStates.Ok}]} :
+        { deletedStatus: ThingDeletedStates.Ok };
+
         this.getThingsParams = {
             parentThingId: null,// Overrided by thingsManager
-            thingFilter: {$and: [{kind: this.thingKind}, {deletedStatus: ThingDeletedStates.Ok}]},
+            thingFilter: thingFilter,
             top: 10,
             skip: 0, // Overrided by thingsManager
             orderBy: null,

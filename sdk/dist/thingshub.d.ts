@@ -237,7 +237,7 @@ export declare class Thing {
 	childrenTotalItems: number;
 	children: Thing[];
 	id: string;
-	creationDateTime: Date | null;
+	creationDate: Date | null;
 	name: string;
 	kind: string;
 	pos: number;
@@ -339,10 +339,12 @@ declare class thingsHub {
 	private onStateChanged;
 	private mainThing;
 	things: Thing[];
-	httpRequestCanceler: HttpRequestCanceler;
+	private httpRequestCanceler;
 	constructor(address: string, apiKey: string, thingsKind: string);
 	on(eventName: string, hook: (...msg: any[]) => void): this;
+	off(eventName: string, hook: (...msg: any[]) => void): this;
 	get(): this;
+	cancel(): this;
 }
 export declare const th: (address: string, apiKey: string, thingsKind?: string) => thingsHub;
 

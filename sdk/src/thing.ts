@@ -15,7 +15,7 @@ export class Thing {
 
     public id: string = ""
     
-    public creationDateTime: Date | null = null
+    public creationDate: Date | null = null
 
     public name: string = ""
 

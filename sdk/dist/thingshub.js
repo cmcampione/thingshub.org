@@ -4340,8 +4340,16 @@ class thingsHub {
         this.realTimeConnector.setHook(eventName, hook);
         return this;
     }
+    off(eventName, hook) {
+        this.realTimeConnector.remHook(eventName, hook);
+        return this;
+    }
     get() {
         this.thingsManager.getMoreThings(this.httpRequestCanceler).then();
+        return this;
+    }
+    cancel() {
+        this.httpRequestCanceler.cancel();
         return this;
     }
 }
@@ -4367,7 +4375,7 @@ class Thing {
         this.childrenTotalItems = Number.MAX_SAFE_INTEGER;
         this.children = [];
         this.id = "";
-        this.creationDateTime = null;
+        this.creationDate = null;
         this.name = "";
         this.kind = "";
         this.pos = 0;
@@ -4565,9 +4573,11 @@ class ThingsManager {
                 return;
             thing.value = value;
         };
+        let thingFilter = this.thingKind ? { $and: [{ kind: this.thingKind }, { deletedStatus: 1 /* Ok */ }] } :
+            { deletedStatus: 1 /* Ok */ };
         this.getThingsParams = {
             parentThingId: null,
-            thingFilter: { $and: [{ kind: this.thingKind }, { deletedStatus: 1 /* Ok */ }] },
+            thingFilter: thingFilter,
             top: 10,
             skip: 0,
             orderBy: null,
