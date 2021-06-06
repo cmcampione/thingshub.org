@@ -195,7 +195,7 @@ async (req, res, next) => {
 		user = await usersMngr.createUser(email, name, password, userPending.registrationDate, true,
 			confirmationToken, Date.now());
 
-		// TODO: If "usersPendingMngr.deleteUser" fails, a pending User remains in usersMngr
+		// ToDo: If "usersPendingMngr.deleteUser" fails, a pending User remains in usersMngr
 		await usersPendingMngr.deleteUser(userPending);
 
 		res.json(utils.MappingModelAndDTO.toUserDTO(user, false));

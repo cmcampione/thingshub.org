@@ -453,7 +453,7 @@ async function createThingDTO(user, parentThing, thing, isSuperAdministrator) {
 		userVisibility : thConstants.ThingUserVisibility.Visible,
 		userReadClaims : loggedInThingUserClaims.read,
 		userChangeClaims : loggedInThingUserClaims.change,
-		// TODO: Is it useful? Test during shortPin implementation
+		// ToDo: Is it useful? Test during shortPin implementation
 		shortPin : 0
 	};
 
@@ -547,7 +547,7 @@ export const createThing = async (user, thingDTO) => {
 	let thing = new thingModel.Thing();
 
 	thing._id = thingId;
-	thing.creationDate = thingDTO.creationDateTime ? thingDTO.creationDate : Date.now();
+	thing.creationDate = thingDTO.creationDate ? thingDTO.creationDate : Date.now();
 	thing.name = thingDTO.name;
 	thing.kind = thingDTO.kind;
 	thing.description = thingDTO.description;

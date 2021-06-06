@@ -1,4 +1,5 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
+import { IonInfiniteScroll } from '@ionic/angular';
 import { HttpRequestCanceler } from 'thingshub-js-sdk';
 import { ThingsService } from '../things.service';
 
@@ -7,11 +8,14 @@ import { ThingsService } from '../things.service';
   templateUrl: './things.component.html',
   styleUrls: ['./things.component.css'],
   providers: [
-    { provide: 'thingKind', useValue: 'Home appliance' },
+    { provide: 'thingKind', useValue: null },
     ThingsService,
   ]
 })
 export class ThingsComponent implements OnInit, OnDestroy {
+
+  // ToDo: It will beuseful when in the future we could need to call "this.infiniteScroll.disabled"
+  @ViewChild(IonInfiniteScroll) infiniteScroll: IonInfiniteScroll;
 
   private canceler = new HttpRequestCanceler();
   public things: thingshub.Thing[];
@@ -28,11 +32,12 @@ export class ThingsComponent implements OnInit, OnDestroy {
     this.thingsService.done();
   }
 
-  public async recall() {
+  public async loadData(event) {
       try {
         await this.thingsService.thingsManager.getMoreThings(this.canceler);
       } catch (e) {
         console.log(e);
       }
+      event.target.complete();
   }
 }
