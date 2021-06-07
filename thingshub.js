@@ -4380,7 +4380,7 @@ class Thing {
         this.kind = "";
         this.pos = 0;
         this.deletedStatus = 0 /* NoMatter */;
-        this.deletedDateTime = null;
+        this.deletedDate = null;
         this.publicReadClaims = 0 /* NoClaims */;
         this.publicChangeClaims = 0 /* NoClaims */;
         this.everyoneReadClaims = 0 /* NoClaims */;

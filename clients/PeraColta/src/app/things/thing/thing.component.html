@@ -1,13 +1,24 @@
-<ion-item>
-  <ion-label>
-    <h1>{{thing.name}}</h1>
+
+  <ion-label style="max-width:max-content;">
+    <ion-label style="display: inline;">Name: </ion-label>
+    <input value={{thing.name}} [disabled] = "!CanChangeThingName" [readonly]="!CanChangeThingName">
+  
     <p>{{thing.id}}</p>
     <p>{{thing.kind}}</p>
     <p>{{thing.creationDate}}</p>
-    <p>Public Read Access: {{thing.publicReadClaims}}</p>
-    <p>Public Write Access: {{thing.publicChangeClaims}}</p>
-    <p>Authenticated Read Access: {{thing.everyoneReadClaims}}</p>
-    <p>Authenticated Write Access: {{thing.everyoneChangeClaims}}</p>
+    <p>Delete status: {{thing.deletedStatus}}</p>
+    <p>Delete Date: {{thing.deletedDate}}</p>
+    <p>Position: {{thing.pos}}</p>
+    <p>Public Read Claims: {{thing.publicReadClaims}}</p>
+    <p>Public Write Claims: {{thing.publicChangeClaims}}</p>
+    <p>Authenticated Read Claims: {{thing.everyoneReadClaims}}</p>
+    <p>Authenticated Write Claims: {{thing.everyoneChangeClaims}}</p>
+    <p>User Read Claims: {{thing.userReadClaims}}</p>
+    <p>User Write Claims: {{thing.userChangeClaims}}</p>
+    <p>User Status: {{thing.userStatus}}</p>
+    <p>User Role: {{thing.userRole}}</p>
+    <p>User Visibility: {{thing.userVisibility}}</p>
+    
   </ion-label>
-</ion-item>
+
 

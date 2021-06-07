@@ -242,7 +242,7 @@ export declare class Thing {
 	kind: string;
 	pos: number;
 	deletedStatus: ThingDeletedStates;
-	deletedDateTime: Date | null;
+	deletedDate: Date | null;
 	publicReadClaims: ThingUserReadClaims;
 	publicChangeClaims: ThingUserChangeClaims;
 	everyoneReadClaims: ThingUserReadClaims;

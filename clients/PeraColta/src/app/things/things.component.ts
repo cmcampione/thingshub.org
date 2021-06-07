@@ -14,7 +14,7 @@ import { ThingsService } from '../things.service';
 })
 export class ThingsComponent implements OnInit, OnDestroy {
 
-  // ToDo: It will beuseful when in the future we could need to call "this.infiniteScroll.disabled"
+  // ToDo: It will be useful when in the future we could need to call "this.infiniteScroll.disabled"
   @ViewChild(IonInfiniteScroll) infiniteScroll: IonInfiniteScroll;
 
   private canceler = new HttpRequestCanceler();

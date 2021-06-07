@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { Thing } from 'thingshub-js-sdk';
+import { ThingUserChangeClaims, Thing, ThingUserReadClaims } from 'thingshub-js-sdk';
 
 @Component({
   selector: 'app-thing',
@@ -13,5 +13,14 @@ export class ThingComponent implements OnInit {
   constructor() { }
 
   ngOnInit() {}
+/*
+  public get CanReadThingName() {
+    return (this.thing.userReadClaims & ThingUserReadClaims.CanReadName) !== 0 && 
+      (this.thing.userChangeClaims & ThingUserChangeClaims.CanChangeName) === 0
+  }
+*/
+  public get CanChangeThingName() {
+    return (this.thing.userChangeClaims & ThingUserChangeClaims.CanChangeName) !== 0
+  }
 
 }
