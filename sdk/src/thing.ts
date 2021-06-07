@@ -24,7 +24,7 @@ export class Thing {
     public pos: number = 0
 
     public deletedStatus : ThingDeletedStates = ThingDeletedStates.NoMatter
-    public deletedDateTime : Date | null = null
+    public deletedDate : Date | null = null
 
     public publicReadClaims : ThingUserReadClaims = ThingUserReadClaims.NoClaims
     public publicChangeClaims : ThingUserChangeClaims = ThingUserChangeClaims.NoClaims
