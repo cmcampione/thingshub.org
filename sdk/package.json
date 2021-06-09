@@ -18,7 +18,7 @@
     "axios": "^0.21.1",
     "g": "^2.0.1",
     "jwt-decode": "^3.1.2",
-    "npm": "^7.14.0",
+    "npm": "^7.16.0",
     "promise.prototype.finally": "^3.1.2",
     "qs": "^6.10.1",
     "socket.io-client": "^4.1.2"
@@ -29,9 +29,9 @@
     "@types/qs": "^6.9.6",
     "dts-bundle-generator": "^5.9.0",
     "filemanager-webpack-plugin": "^5.0.0",
-    "ts-loader": "^9.2.2",
-    "webpack": "^5.37.1",
-    "webpack-cli": "^4.7.0",
+    "ts-loader": "^9.2.3",
+    "webpack": "^5.38.1",
+    "webpack-cli": "^4.7.2",
     "webpack-dev-server": "^3.11.2",
     "webpack-shell-plugin-next": "^2.2.2"
   }

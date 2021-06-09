@@ -65,6 +65,7 @@ module.exports = {
 
 						{ source: "./dist/package.json", destination: "../" },
 						{ source: "./dist/thingshub.js", destination: "../" },
+						{ source: "./dist/thingshub.js.map", destination: "../" },
 						{ source: "./dist/index.html", destination: "../" },
 						{ source: "./dist/index2.html", destination: "../" },
 					]

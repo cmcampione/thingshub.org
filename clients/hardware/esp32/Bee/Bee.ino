@@ -14,6 +14,30 @@
 #include "AntiTheft.h"
 #include "SocketIOMngr.h"
 
+//
+const char* root_ca =
+    "-----BEGIN CERTIFICATE-----\n"
+    "MIIDSjCCAjKgAwIBAgIQRK+wgNajJ7qJMDmGLvhAazANBgkqhkiG9w0BAQUFADA/\n"
+    "MSQwIgYDVQQKExtEaWdpdGFsIFNpZ25hdHVyZSBUcnVzdCBDby4xFzAVBgNVBAMT\n"
+    "DkRTVCBSb290IENBIFgzMB4XDTAwMDkzMDIxMTIxOVoXDTIxMDkzMDE0MDExNVow\n"
+    "PzEkMCIGA1UEChMbRGlnaXRhbCBTaWduYXR1cmUgVHJ1c3QgQ28uMRcwFQYDVQQD\n"
+    "Ew5EU1QgUm9vdCBDQSBYMzCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEB\n"
+    "AN+v6ZdQCINXtMxiZfaQguzH0yxrMMpb7NnDfcdAwRgUi+DoM3ZJKuM/IUmTrE4O\n"
+    "rz5Iy2Xu/NMhD2XSKtkyj4zl93ewEnu1lcCJo6m67XMuegwGMoOifooUMM0RoOEq\n"
+    "OLl5CjH9UL2AZd+3UWODyOKIYepLYYHsUmu5ouJLGiifSKOeDNoJjj4XLh7dIN9b\n"
+    "xiqKqy69cK3FCxolkHRyxXtqqzTWMIn/5WgTe1QLyNau7Fqckh49ZLOMxt+/yUFw\n"
+    "7BZy1SbsOFU5Q9D8/RhcQPGX69Wam40dutolucbY38EVAjqr2m7xPi71XAicPNaD\n"
+    "aeQQmxkqtilX4+U9m5/wAl0CAwEAAaNCMEAwDwYDVR0TAQH/BAUwAwEB/zAOBgNV\n"
+    "HQ8BAf8EBAMCAQYwHQYDVR0OBBYEFMSnsaR7LHH62+FLkHX/xBVghYkQMA0GCSqG\n"
+    "SIb3DQEBBQUAA4IBAQCjGiybFwBcqR7uKGY3Or+Dxz9LwwmglSBd49lZRNI+DT69\n"
+    "ikugdB/OEIKcdBodfpga3csTS7MgROSR6cz8faXbauX+5v3gTt23ADq1cEmv8uXr\n"
+    "AvHRAosZy5Q6XkjEGB5YGV8eAlrwDPGxrancWYaLbumR9YbK+rlmM6pZW87ipxZz\n"
+    "R8srzJmwN0jP41ZL9c8PDHIyh8bwRLtTcm1D9SZImlJnt1ir/md2cXjbDaJWFBM5\n"
+    "JDGFoqgCWjBH4d1QB7wCCZAA62RjYJsWvIjJEubSfZGL+T0yjWW06XyxV3bqxbYo\n"
+    "Ob8VZRzI9neWagqNdwvYkQsEjgfbKbYK7p2CNTUQ\n"
+    "-----END CERTIFICATE-----\n";
+
+//
 const int sensorsCapacity = 1024;
 
 //
@@ -109,12 +133,9 @@ typedef sensor_collection::const_iterator sensor_const_iterator;
 //
 class BeeStatus
 {
+  // ToDo: Implement a DevicesManager
 public:
-  static const char* thingCnfg;
-  static const char* thingValue;
-private:
   static device_collection devices;
-  static sensor_collection sensors;
 private:
   static void setupDevicesVarius()
   {
@@ -188,10 +209,11 @@ private:
       devices[1000].pAntiTheft = new AntiTheft(mainAntiTheftCnfg);
     }
   }
+public:
   static void setupDevices()
   {    
-    // setupDevicesVarius();
-    setupDevicesAntiTheaf();
+    setupDevicesVarius();
+    // setupDevicesAntiTheaf();
     
     for (device_const_iterator it = devices.begin(); it != devices.end(); it++)
     {
@@ -226,293 +248,6 @@ private:
       DPRINTF("BEESTATUS - Device id: %d Kind: %d - Kind not found\n", it->first, device.kind);
 #endif
     }
-  }
-private:
-  static void setupSensorsVarius() 
-  {  
-    { // Telecomando 1 Apri
-      sensors["8171288"].name = "Telecomando 1 Apri";
-      sensors["8171288"].deviceId = 4;
-
-      SetPoint setPoint;
-      setPoint.min = 1;
-      setPoint.max = 1;
-
-      SetPointItem setPointOnBoardLed;
-      setPointOnBoardLed.deviceId = 2;
-      setPointOnBoardLed.itemId = 2; // ToDo: Could be not necessary
-      setPointOnBoardLed.force = false; // Set value equal to 1
-      setPointOnBoardLed.forceValue = LOW;
-      setPointOnBoardLed.toggle = false;
-      setPoint.setPointItems.push_back(setPointOnBoardLed);
-
-      SetPointItem setPointBuzzer;
-      setPointBuzzer.deviceId = 23;
-      setPointBuzzer.itemId = 23; // ToDo: Could be not necessary
-      setPointBuzzer.force = true;
-      setPointBuzzer.forceValue = 5; //128
-      setPointBuzzer.toggle = false;
-      setPoint.setPointItems.push_back(setPointBuzzer);
-
-      sensors["8171288"].setPoints.push_back(setPoint);
-    }
-
-    { // Telecomando 1 Chiudi
-      sensors["8171284"].name = "Telecomando 1 Chiudi";
-      sensors["8171284"].deviceId = 4;
-
-      SetPoint setPoint;
-      setPoint.min = 1;
-      setPoint.max = 1;
-
-      SetPointItem setPointOnBoardLed;
-      setPointOnBoardLed.deviceId = 2;
-      setPointOnBoardLed.itemId = 2; // ToDo: Could be not necessary
-      setPointOnBoardLed.force = true;
-      setPointOnBoardLed.forceValue = LOW;
-      setPointOnBoardLed.toggle = false;
-      setPoint.setPointItems.push_back(setPointOnBoardLed);
-
-      SetPointItem setPointBuzzer;
-      setPointBuzzer.deviceId = 23;
-      setPointBuzzer.itemId = 23; // ToDo: Could be not necessary
-      setPointBuzzer.force = true;
-      setPointBuzzer.forceValue = 0;
-      setPointBuzzer.toggle = false;
-      setPoint.setPointItems.push_back(setPointBuzzer);
-
-      sensors["8171284"].setPoints.push_back(setPoint);
-    }
-
-    { // Pir Salone
-      sensors["31669624"].name = "Pir Salone";
-      sensors["31669624"].deviceId = 4;
-      sensors["31669624"].prior = true;
-
-      SetPoint setPointLedOn;
-      setPointLedOn.min = 1;
-      setPointLedOn.max = 1;
-
-      SetPointItem setPointItem2LedOn;
-      setPointItem2LedOn.deviceId = 2;
-      setPointItem2LedOn.itemId = 2; // ToDo: Could be not necessary
-      setPointItem2LedOn.force = false;
-      setPointItem2LedOn.forceValue = HIGH;
-      setPointItem2LedOn.toggle = false;
-
-      setPointLedOn.setPointItems.push_back(setPointItem2LedOn);
-
-      sensors["31669624"].setPoints.push_back(setPointLedOn);
-
-      SetPoint setPointLedOff;
-      setPointLedOff.min = 0;
-      setPointLedOff.max = 0;
-
-      SetPointItem setPointItem2LedOff;
-      setPointItem2LedOff.deviceId = 2;
-      setPointItem2LedOff.itemId = 2; // ToDo: Could be not necessary
-      setPointItem2LedOff.force = true;
-      setPointItem2LedOff.forceValue = LOW;
-      setPointItem2LedOff.toggle = false;
-
-      setPointLedOff.setPointItems.push_back(setPointItem2LedOff);
-
-      sensors["31669624"].setPoints.push_back(setPointLedOff);
-    }
-
-    { // Contatto Filare
-      sensors["7271203"].name = "Contatto Filare";
-      sensors["7271203"].deviceId = 4;
-      sensors["7271203"].prior = true;
-
-      SetPoint setPointLedOn;
-      setPointLedOn.min = 1;
-      setPointLedOn.max = 1;
-
-      SetPointItem setPointItem2LedOn;
-      setPointItem2LedOn.deviceId = 2;
-      setPointItem2LedOn.itemId = 2; // ToDo: Could be not necessary
-      setPointItem2LedOn.force = false;
-      setPointItem2LedOn.forceValue = HIGH;
-      setPointItem2LedOn.toggle = false;
-
-      setPointLedOn.setPointItems.push_back(setPointItem2LedOn);
-
-      sensors["7271203"].setPoints.push_back(setPointLedOn);
-
-      SetPoint setPointLedOff;
-      setPointLedOff.min = 0;
-      setPointLedOff.max = 0;
-
-      SetPointItem setPointItem2LedOff;
-      setPointItem2LedOff.deviceId = 2;
-      setPointItem2LedOff.itemId = 2; // ToDo: Could be not necessary
-      setPointItem2LedOff.force = true;
-      setPointItem2LedOff.forceValue = LOW;
-      setPointItem2LedOff.toggle = false;
-
-      setPointLedOff.setPointItems.push_back(setPointItem2LedOff);
-
-      sensors["7271203"].setPoints.push_back(setPointLedOff);
-    }
-
-    { // Sensore fumi
-      sensors["7830832"].name = "Sensore Fumi";
-      sensors["7830832"].deviceId = 4;
-      sensors["7830832"].prior = true;
-
-      SetPoint setPointLedOn;
-      setPointLedOn.min = 1;
-      setPointLedOn.max = 1;
-
-      SetPointItem setPointItem2LedOn;
-      setPointItem2LedOn.deviceId = 2;
-      setPointItem2LedOn.itemId = 2; // ToDo: Could be not necessary
-      setPointItem2LedOn.force = false;
-      setPointItem2LedOn.forceValue = HIGH;
-      setPointItem2LedOn.toggle = false;
-
-      setPointLedOn.setPointItems.push_back(setPointItem2LedOn);
-
-      sensors["7830832"].setPoints.push_back(setPointLedOn);
-
-      SetPoint setPointLedOff;
-      setPointLedOff.min = 0;
-      setPointLedOff.max = 0;
-
-      SetPointItem setPointItem2LedOff;
-      setPointItem2LedOff.deviceId =2;
-      setPointItem2LedOff.itemId = 2; // ToDo: Could be not necessary
-      setPointItem2LedOff.force = true;
-      setPointItem2LedOff.forceValue = LOW;
-      setPointItem2LedOff.toggle = false;
-
-      setPointLedOff.setPointItems.push_back(setPointItem2LedOff);
-
-      sensors["7830832"].setPoints.push_back(setPointLedOff);
-    }
-
-    { // Luminosità 01
-      sensors["PhotoResistor-01"].name = "Luminosità 01";
-      sensors["PhotoResistor-01"].deviceId = 34;
-
-      SetPoint setPointLedOn;
-      setPointLedOn.min = 0;
-      setPointLedOn.max = 250;
-
-      SetPointItem setPointItem5LedOn;
-      setPointItem5LedOn.deviceId = 5;
-      setPointItem5LedOn.itemId = 5; // ToDo: Could be not necessary
-      setPointItem5LedOn.force = true;
-      setPointItem5LedOn.forceValue = HIGH;
-      setPointItem5LedOn.toggle = false;
-
-      setPointLedOn.setPointItems.push_back(setPointItem5LedOn);
-
-      sensors["PhotoResistor-01"].setPoints.push_back(setPointLedOn);
-
-      SetPoint setPointLedOff;
-      setPointLedOff.min = 251;
-      setPointLedOff.max = 4095;
-
-      SetPointItem setPointItem5LedOff;
-      setPointItem5LedOff.deviceId = 5;
-      setPointItem5LedOff.itemId = 5; // ToDo: Could be not necessary
-      setPointItem5LedOff.force = true;
-      setPointItem5LedOff.forceValue = LOW;
-      setPointItem5LedOff.toggle = false;
-
-      setPointLedOff.setPointItems.push_back(setPointItem5LedOff);
-
-      sensors["PhotoResistor-01"].setPoints.push_back(setPointLedOff);
-    }
-
-    { // Temperatura 01
-      sensors["Temperatura-01"].name = "Temperatura 01";
-      sensors["Temperatura-01"].deviceId = 35;
-    }
-  }
-  static void setupSensorsAntiTheaf()
-  {
-    { // AntiTheaf - ArmedUnarmed
-      sensors["MAT-AUSTATE"].name = "Antifurto Principale - ArmatoDisarmato";
-      sensors["MAT-AUSTATE"].deviceId = 1000;
-      sensors["MAT-AUSTATE"].prior = true;
-    }
-    { // AntiTheaf - ArmedUnarmedLocal
-      sensors["MAT-AULSTATE"].name = "Antifurto Principale - ArmatoDisarmato Local";
-      sensors["MAT-AULSTATE"].deviceId = 1000;
-      sensors["MAT-AUSTATE"].prior = true;
-    }
-    { // AntiTheaf - ArmedUnarmedRemote
-      sensors["MAT-AURSTATE"].name = "Antifurto Principale - ArmatoDisarmato Remote";
-      sensors["MAT-AURSTATE"].deviceId = 1000;
-      sensors["MAT-AUSTATE"].prior = true;
-
-      SetPoint setPoint;
-      setPoint.min = LOW;
-      setPoint.max = HIGH;
-      // setPoint.prior = true // It's not necessary because sensor.prior is already used
-      
-      SetPointItem setPointRemoteArmUnarmItem;
-      setPointRemoteArmUnarmItem.deviceId = 1000;
-      setPointRemoteArmUnarmItem.itemId = "MAT-AURSTATE";
-      setPointRemoteArmUnarmItem.force = false;
-      setPointRemoteArmUnarmItem.forceValue = LOW;
-      setPointRemoteArmUnarmItem.toggle = false;
-      setPoint.setPointItems.push_back(setPointRemoteArmUnarmItem);
-
-      sensors["MAT-AURSTATE"].setPoints.push_back(setPoint);
-    }
-    { // AntiTheaf - AlarmState
-      sensors["MAT-ALSTATE"].name = "Antifurto Principale - Allarme on-off";
-      sensors["MAT-ALSTATE"].deviceId = 1000;
-      sensors["MAT-ALSTATE"].prior = true;
-    }
-    { // AntiTheaf - Porte balcone
-      sensors["MAT-IASTATE"].name = "Antifurto Principale - Porte balcone aperte-chiuse";
-      sensors["MAT-IASTATE"].deviceId = 1000;
-      sensors["MAT-IASTATE"].prior = true;
-    }
-    { // AntiTheaf - Porte balcone valore
-      sensors["MAT-IASTATE-VALUE"].name = "Antifurto Principale - Porte balcone aperte-chiuse valore";
-      sensors["MAT-IASTATE-VALUE"].deviceId = 1000;
-      sensors["MAT-IASTATE-VALUE"].prior = false;
-    }
-    { // AntiTheaf - Porta ingresso
-      sensors["MAT-DASTATE"].name = "Antifurto Principale - Porta ingresso aperta-chiusa";
-      sensors["MAT-DASTATE"].deviceId = 1000;
-      sensors["MAT-DASTATE"].prior = true;
-    }
-    { // AntiTheaf - Anti Tamper
-      sensors["MAT-AASTATE"].name = "Antifurto Principale - Anti Tamper aperto-chiuso";
-      sensors["MAT-AASTATE"].deviceId = 1000;
-      sensors["MAT-AASTATE"].prior = true;
-    }
-  }
-private:  
-  static void setupSensors()
-  {
-    { // Diagnostic
-      sensors["DIAG-HTTP-CALL-PREV-HTTPCODE"].name = "httcode prima di questa chiamata HTTP";
-      sensors["DIAG-HTTP-CALL-PREV-HTTPCODE"].deviceId = 1001;
-      sensors["DIAG-HTTP-CALL-PREV-HTTPCODE"].prior = true;
-    }
-
-    { // Diagnostic
-      sensors["DIAG-HTTP-CALL-PREV-TIMING"].name = "Tempo trascorso prima di questa chiamata HTTP";
-      sensors["DIAG-HTTP-CALL-PREV-TIMING"].deviceId = 1001;
-      sensors["DIAG-HTTP-CALL-PREV-TIMING"].prior = false;
-    }
-
-    // setupSensorsVarius();
-    setupSensorsAntiTheaf();
-  }
-public:
-  static void setup()
-  {
-    setupDevices();
-    setupSensors();
   }
 private:
   static void setItemValue(int deviceId, const char* itemId, int value)
@@ -645,7 +380,15 @@ private:
     return prior;
   }
 private:
-  static bool setSensorsValueFromDeviceId(int deviceId, int value)
+  sensor_collection sensors;
+private:
+  String thingCnfgId; // ToDo: To manage
+public:
+  void setSensors(const sensor_collection& sensors) {
+    this->sensors = sensors;
+  }
+public:
+  bool setSensorsValueFromDeviceId(int deviceId, int value)
   {
     bool prior = false;
     for (sensor_iterator it = sensors.begin(); it != sensors.end(); it++)
@@ -668,7 +411,7 @@ private:
     return prior;
   }
 public:
-  static bool setSensorValue(const char* sensorId, int value)
+  bool setSensorValue(const char* sensorId, int value)
   {
     if (sensors.find(sensorId) == sensors.end()) 
     {
@@ -678,10 +421,10 @@ public:
       return false;
     }
     Sensor& sensor = sensors[sensorId];
-
+/*  ToDo: To check for RC Sensors
     if (sensor.value == value)
       return false;
-      
+*/      
     sensor.now    = true;
     sensor.millis = millis();
     sensor.value  = value;
@@ -691,70 +434,7 @@ public:
     return (sensor.prior || prior);
   }
 public:
-  static bool loop()
-  {
-    bool prior = false;
-    for (device_const_iterator it = devices.begin(); it != devices.end(); it++)
-    {
-      int deviceId          = it->first;
-      const Device& device  = it->second;
-#ifdef DEBUG_BEESTATUS_VERBOSE
-      // DPRINTF("BEESTATUS - Elaborating Device Id: %d Kind: %d\n", deviceId, device.kind);
-#endif
-      if (device.kind == Device::Kind::DigitalOutput)
-      {
-        continue;
-      }
-      if (device.kind == Device::Kind::PWM)
-      {
-        continue;
-      }
-      if (device.kind == Device::Kind::AnalogicInput)
-      {
-        int value = analogRead(device.pin);
-#ifdef DEBUG_BEESTATUS_VERBOSE
-        DPRINTF("BEESTATUS - Read Device id: %d Kind: %d analogic value: %d\n", deviceId, device.kind, value);
-#endif
-        bool lPrior = setSensorsValueFromDeviceId(deviceId, value);
-        if (prior == false)
-          prior = lPrior;        
-        continue;
-      }
-      if (device.kind == Device::Kind::RC)
-      {
-        if (RCSensorsManager::available() == false)
-          continue;
-
-        long sensorId = RCSensorsManager::getReceivedValue();
-        String sensorIdStr(sensorId);
-#ifdef DEBUG_BEESTATUS
-        DPRINTF("BEESTATUS - Read Device Id: %d Kind: %d Item Id: %s\n", deviceId, device.kind, sensorIdStr.c_str());
-#endif
-        bool lPrior = setSensorValue(sensorIdStr.c_str(), HIGH);
-        if (prior == false)
-          prior = lPrior;
-        continue;
-      }
-      if (device.kind == Device::Kind::AntiTheft) {
-        device.pAntiTheft->loop();
-        for (AntiTheft::const_iterator it = device.pAntiTheft->begin(); it != device.pAntiTheft->end(); it++) {
-          String      sensorId     = it->first;
-          const int*  sensorValue  = it->second;
-
-          bool lPrior = setSensorValue(sensorId.c_str(), *sensorValue);
-          if (prior == false)
-            prior = lPrior;
-        }
-        continue;
-      }
-#ifdef DEBUG_BEESTATUS
-      DPRINTF("BEESTATUS - Device Id: %d Kind: %d Device kind not elaborate\n", deviceId, device.kind);
-#endif
-    }
-    return prior;
-  }
-public:
-  static void toJson(StaticJsonDocument<sensorsCapacity>& doc)
+  void toJson(StaticJsonDocument<sensorsCapacity>& doc) const
   {
     // Sensor model sample
     /*
@@ -783,7 +463,7 @@ public:
 #endif
     doc.clear();
     JsonArray sensorsNode = doc.createNestedArray("sensors");
-    for (sensor_iterator it = sensors.begin(); it != sensors.end(); it++)
+    for (sensor_const_iterator it = sensors.begin(); it != sensors.end(); it++)
     {
       Sensor& sensorValue = it->second;
 
@@ -810,38 +490,434 @@ public:
 #endif
   }
 };
-const char* BeeStatus::thingCnfg = "";
-const char* BeeStatus::thingValue = "f4c3c80b-d561-4a7b-80a5-f4805fdab9bb"; // AntiTheft
-// const char* BeeStatus::thingValue = "73e545e2-6be9-4281-bd48-ab82c9b792f3"; // Various sensors
-
 device_collection BeeStatus::devices;
-sensor_collection BeeStatus::sensors;
+
+// const char* BeeStatus::thingValue = "f4c3c80b-d561-4a7b-80a5-f4805fdab9bb"; // AntiTheft
 
 //
-const char* root_ca =
-    "-----BEGIN CERTIFICATE-----\n"
-    "MIIDSjCCAjKgAwIBAgIQRK+wgNajJ7qJMDmGLvhAazANBgkqhkiG9w0BAQUFADA/\n"
-    "MSQwIgYDVQQKExtEaWdpdGFsIFNpZ25hdHVyZSBUcnVzdCBDby4xFzAVBgNVBAMT\n"
-    "DkRTVCBSb290IENBIFgzMB4XDTAwMDkzMDIxMTIxOVoXDTIxMDkzMDE0MDExNVow\n"
-    "PzEkMCIGA1UEChMbRGlnaXRhbCBTaWduYXR1cmUgVHJ1c3QgQ28uMRcwFQYDVQQD\n"
-    "Ew5EU1QgUm9vdCBDQSBYMzCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEB\n"
-    "AN+v6ZdQCINXtMxiZfaQguzH0yxrMMpb7NnDfcdAwRgUi+DoM3ZJKuM/IUmTrE4O\n"
-    "rz5Iy2Xu/NMhD2XSKtkyj4zl93ewEnu1lcCJo6m67XMuegwGMoOifooUMM0RoOEq\n"
-    "OLl5CjH9UL2AZd+3UWODyOKIYepLYYHsUmu5ouJLGiifSKOeDNoJjj4XLh7dIN9b\n"
-    "xiqKqy69cK3FCxolkHRyxXtqqzTWMIn/5WgTe1QLyNau7Fqckh49ZLOMxt+/yUFw\n"
-    "7BZy1SbsOFU5Q9D8/RhcQPGX69Wam40dutolucbY38EVAjqr2m7xPi71XAicPNaD\n"
-    "aeQQmxkqtilX4+U9m5/wAl0CAwEAAaNCMEAwDwYDVR0TAQH/BAUwAwEB/zAOBgNV\n"
-    "HQ8BAf8EBAMCAQYwHQYDVR0OBBYEFMSnsaR7LHH62+FLkHX/xBVghYkQMA0GCSqG\n"
-    "SIb3DQEBBQUAA4IBAQCjGiybFwBcqR7uKGY3Or+Dxz9LwwmglSBd49lZRNI+DT69\n"
-    "ikugdB/OEIKcdBodfpga3csTS7MgROSR6cz8faXbauX+5v3gTt23ADq1cEmv8uXr\n"
-    "AvHRAosZy5Q6XkjEGB5YGV8eAlrwDPGxrancWYaLbumR9YbK+rlmM6pZW87ipxZz\n"
-    "R8srzJmwN0jP41ZL9c8PDHIyh8bwRLtTcm1D9SZImlJnt1ir/md2cXjbDaJWFBM5\n"
-    "JDGFoqgCWjBH4d1QB7wCCZAA62RjYJsWvIjJEubSfZGL+T0yjWW06XyxV3bqxbYo\n"
-    "Ob8VZRzI9neWagqNdwvYkQsEjgfbKbYK7p2CNTUQ\n"
-    "-----END CERTIFICATE-----\n";
+typedef std::map<String, BeeStatus>           beeStatus_collection;
+typedef beeStatus_collection::iterator        beeStatus_iterator;
+typedef beeStatus_collection::const_iterator  beeStatus_const_iterator;
 
-// HTTPClient
-unsigned long restCallInterval = 0;
+class BeesManager {
+  private:
+    static beeStatus_collection beesStatus;
+/* setupSensorsVarius 
+  {
+    { // Pir Salone
+      sensors["31669624"].name = "Pir Salone";
+      sensors["31669624"].deviceId = 4;
+      sensors["31669624"].prior = true;
+
+      SetPoint setPointLedOn;
+      setPointLedOn.min = 1;
+      setPointLedOn.max = 1;
+
+      SetPointItem setPointItem2LedOn;
+      setPointItem2LedOn.deviceId = 2;
+      setPointItem2LedOn.itemId = 2; // ToDo: Could be not necessary
+      setPointItem2LedOn.force = false;
+      setPointItem2LedOn.forceValue = HIGH;
+      setPointItem2LedOn.toggle = false;
+
+      setPointLedOn.setPointItems.push_back(setPointItem2LedOn);
+
+      sensors["31669624"].setPoints.push_back(setPointLedOn);
+
+      SetPoint setPointLedOff;
+      setPointLedOff.min = 0;
+      setPointLedOff.max = 0;
+
+      SetPointItem setPointItem2LedOff;
+      setPointItem2LedOff.deviceId = 2;
+      setPointItem2LedOff.itemId = 2; // ToDo: Could be not necessary
+      setPointItem2LedOff.force = true;
+      setPointItem2LedOff.forceValue = LOW;
+      setPointItem2LedOff.toggle = false;
+
+      setPointLedOff.setPointItems.push_back(setPointItem2LedOff);
+
+      sensors["31669624"].setPoints.push_back(setPointLedOff);
+    }
+
+    { // Contatto Filare
+      sensors["7271203"].name = "Contatto Filare";
+      sensors["7271203"].deviceId = 4;
+      sensors["7271203"].prior = true;
+
+      SetPoint setPointLedOn;
+      setPointLedOn.min = 1;
+      setPointLedOn.max = 1;
+
+      SetPointItem setPointItem2LedOn;
+      setPointItem2LedOn.deviceId = 2;
+      setPointItem2LedOn.itemId = 2; // ToDo: Could be not necessary
+      setPointItem2LedOn.force = false;
+      setPointItem2LedOn.forceValue = HIGH;
+      setPointItem2LedOn.toggle = false;
+
+      setPointLedOn.setPointItems.push_back(setPointItem2LedOn);
+
+      sensors["7271203"].setPoints.push_back(setPointLedOn);
+
+      SetPoint setPointLedOff;
+      setPointLedOff.min = 0;
+      setPointLedOff.max = 0;
+
+      SetPointItem setPointItem2LedOff;
+      setPointItem2LedOff.deviceId = 2;
+      setPointItem2LedOff.itemId = 2; // ToDo: Could be not necessary
+      setPointItem2LedOff.force = true;
+      setPointItem2LedOff.forceValue = LOW;
+      setPointItem2LedOff.toggle = false;
+
+      setPointLedOff.setPointItems.push_back(setPointItem2LedOff);
+
+      sensors["7271203"].setPoints.push_back(setPointLedOff);
+    }
+
+    { // Sensore fumi
+      sensors["7830832"].name = "Sensore Fumi";
+      sensors["7830832"].deviceId = 4;
+      sensors["7830832"].prior = true;
+
+      SetPoint setPointLedOn;
+      setPointLedOn.min = 1;
+      setPointLedOn.max = 1;
+
+      SetPointItem setPointItem2LedOn;
+      setPointItem2LedOn.deviceId = 2;
+      setPointItem2LedOn.itemId = 2; // ToDo: Could be not necessary
+      setPointItem2LedOn.force = false;
+      setPointItem2LedOn.forceValue = HIGH;
+      setPointItem2LedOn.toggle = false;
+
+      setPointLedOn.setPointItems.push_back(setPointItem2LedOn);
+
+      sensors["7830832"].setPoints.push_back(setPointLedOn);
+
+      SetPoint setPointLedOff;
+      setPointLedOff.min = 0;
+      setPointLedOff.max = 0;
+
+      SetPointItem setPointItem2LedOff;
+      setPointItem2LedOff.deviceId =2;
+      setPointItem2LedOff.itemId = 2; // ToDo: Could be not necessary
+      setPointItem2LedOff.force = true;
+      setPointItem2LedOff.forceValue = LOW;
+      setPointItem2LedOff.toggle = false;
+
+      setPointLedOff.setPointItems.push_back(setPointItem2LedOff);
+
+      sensors["7830832"].setPoints.push_back(setPointLedOff);
+    }
+  }
+*/    
+/* setupSensorsAntiTheaf
+  {
+    { // AntiTheaf - ArmedUnarmed
+      sensors["MAT-AUSTATE"].name = "Antifurto Principale - ArmatoDisarmato";
+      sensors["MAT-AUSTATE"].deviceId = 1000;
+      sensors["MAT-AUSTATE"].prior = true;
+    }
+    { // AntiTheaf - ArmedUnarmedLocal
+      sensors["MAT-AULSTATE"].name = "Antifurto Principale - ArmatoDisarmato Local";
+      sensors["MAT-AULSTATE"].deviceId = 1000;
+      sensors["MAT-AUSTATE"].prior = true;
+    }
+    { // AntiTheaf - ArmedUnarmedRemote
+      sensors["MAT-AURSTATE"].name = "Antifurto Principale - ArmatoDisarmato Remote";
+      sensors["MAT-AURSTATE"].deviceId = 1000;
+      sensors["MAT-AUSTATE"].prior = true;
+
+      SetPoint setPoint;
+      setPoint.min = LOW;
+      setPoint.max = HIGH;
+      // setPoint.prior = true // It's not necessary because sensor.prior is already used
+      
+      SetPointItem setPointRemoteArmUnarmItem;
+      setPointRemoteArmUnarmItem.deviceId = 1000;
+      setPointRemoteArmUnarmItem.itemId = "MAT-AURSTATE";
+      setPointRemoteArmUnarmItem.force = false;
+      setPointRemoteArmUnarmItem.forceValue = LOW;
+      setPointRemoteArmUnarmItem.toggle = false;
+      setPoint.setPointItems.push_back(setPointRemoteArmUnarmItem);
+
+      sensors["MAT-AURSTATE"].setPoints.push_back(setPoint);
+    }
+    { // AntiTheaf - AlarmState
+      sensors["MAT-ALSTATE"].name = "Antifurto Principale - Allarme on-off";
+      sensors["MAT-ALSTATE"].deviceId = 1000;
+      sensors["MAT-ALSTATE"].prior = true;
+    }
+    { // AntiTheaf - Porte balcone
+      sensors["MAT-IASTATE"].name = "Antifurto Principale - Porte balcone aperte-chiuse";
+      sensors["MAT-IASTATE"].deviceId = 1000;
+      sensors["MAT-IASTATE"].prior = true;
+    }
+    { // AntiTheaf - Porte balcone valore
+      sensors["MAT-IASTATE-VALUE"].name = "Antifurto Principale - Porte balcone aperte-chiuse valore";
+      sensors["MAT-IASTATE-VALUE"].deviceId = 1000;
+      sensors["MAT-IASTATE-VALUE"].prior = false;
+    }
+    { // AntiTheaf - Porta ingresso
+      sensors["MAT-DASTATE"].name = "Antifurto Principale - Porta ingresso aperta-chiusa";
+      sensors["MAT-DASTATE"].deviceId = 1000;
+      sensors["MAT-DASTATE"].prior = true;
+    }
+    { // AntiTheaf - Anti Tamper
+      sensors["MAT-AASTATE"].name = "Antifurto Principale - Anti Tamper aperto-chiuso";
+      sensors["MAT-AASTATE"].deviceId = 1000;
+      sensors["MAT-AASTATE"].prior = true;
+    }
+  }
+*/  
+private:    
+    void setupVariusSensors() {
+      { // 73e545e2-6be9-4281-bd48-ab82c9b792f3
+        sensor_collection sensors;
+        {// Telecomando 1 Apri
+          sensors["8171288"].name = "Telecomando 1 Apri";
+          sensors["8171288"].deviceId = 4;
+
+          SetPoint setPoint;
+          setPoint.min = 1;
+          setPoint.max = 1;
+
+          SetPointItem setPointOnBoardLed;
+          setPointOnBoardLed.deviceId = 2;
+          setPointOnBoardLed.itemId = 2; // ToDo: Could be not necessary
+          setPointOnBoardLed.force = false; // Set value equal to 1
+          setPointOnBoardLed.forceValue = LOW;
+          setPointOnBoardLed.toggle = false;
+          setPoint.setPointItems.push_back(setPointOnBoardLed);
+
+          SetPointItem setPointBuzzer;
+          setPointBuzzer.deviceId = 23;
+          setPointBuzzer.itemId = 23; // ToDo: Could be not necessary
+          setPointBuzzer.force = true;
+          setPointBuzzer.forceValue = 5; //128
+          setPointBuzzer.toggle = false;
+          setPoint.setPointItems.push_back(setPointBuzzer);
+
+          sensors["8171288"].setPoints.push_back(setPoint);
+        }
+        {// Telecomando 1 Chiudi
+          sensors["8171284"].name = "Telecomando 1 Chiudi";
+          sensors["8171284"].deviceId = 4;
+    
+          SetPoint setPoint;
+          setPoint.min = 1;
+          setPoint.max = 1;
+    
+          SetPointItem setPointOnBoardLed;
+          setPointOnBoardLed.deviceId = 2;
+          setPointOnBoardLed.itemId = 2; // ToDo: Could be not necessary
+          setPointOnBoardLed.force = true;
+          setPointOnBoardLed.forceValue = LOW;
+          setPointOnBoardLed.toggle = false;
+          setPoint.setPointItems.push_back(setPointOnBoardLed);
+    
+          SetPointItem setPointBuzzer;
+          setPointBuzzer.deviceId = 23;
+          setPointBuzzer.itemId = 23; // ToDo: Could be not necessary
+          setPointBuzzer.force = true;
+          setPointBuzzer.forceValue = 0;
+          setPointBuzzer.toggle = false;
+          setPoint.setPointItems.push_back(setPointBuzzer);
+    
+          sensors["8171284"].setPoints.push_back(setPoint);
+        }
+        BeeStatus bee;
+        bee.setSensors(sensors);
+        beesStatus["73e545e2-6be9-4281-bd48-ab82c9b792f3"] = bee;
+      }
+      { // 12d209ee-dea6-417a-a4e2-e5130be7fdbc
+        sensor_collection sensors;
+        { // Luminosità 01
+          sensors["PhotoResistor-01"].name = "Luminosità 01";
+          sensors["PhotoResistor-01"].deviceId = 34;
+
+          SetPoint setPointLedOn;
+          setPointLedOn.min = 0;
+          setPointLedOn.max = 250;
+
+          SetPointItem setPointItem5LedOn;
+          setPointItem5LedOn.deviceId = 5;
+          setPointItem5LedOn.itemId = 5; // ToDo: Could be not necessary
+          setPointItem5LedOn.force = true;
+          setPointItem5LedOn.forceValue = HIGH;
+          setPointItem5LedOn.toggle = false;
+
+          setPointLedOn.setPointItems.push_back(setPointItem5LedOn);
+
+          sensors["PhotoResistor-01"].setPoints.push_back(setPointLedOn);
+
+          SetPoint setPointLedOff;
+          setPointLedOff.min = 251;
+          setPointLedOff.max = 4095;
+
+          SetPointItem setPointItem5LedOff;
+          setPointItem5LedOff.deviceId = 5;
+          setPointItem5LedOff.itemId = 5; // ToDo: Could be not necessary
+          setPointItem5LedOff.force = true;
+          setPointItem5LedOff.forceValue = LOW;
+          setPointItem5LedOff.toggle = false;
+
+          setPointLedOff.setPointItems.push_back(setPointItem5LedOff);
+
+          sensors["PhotoResistor-01"].setPoints.push_back(setPointLedOff);
+        }
+        { // Temperatura 01
+          sensors["Temperatura-01"].name = "Temperatura 01";
+          sensors["Temperatura-01"].deviceId = 35;
+        }
+        BeeStatus bee;
+        bee.setSensors(sensors);
+        beesStatus["12d209ee-dea6-417a-a4e2-e5130be7fdbc"] = bee;
+      }
+    }
+  public:
+    static void setup() {
+#ifdef DEBUG_BEESTATUS
+      DPRINTF("BEESTATUS - Start setup()\n");
+#endif      
+      BeeStatus::setupDevices();
+
+      setupVariusSensors();
+#ifdef DEBUG_BEESTATUS
+      DPRINTF("BEESTATUS - End setup()\n");
+#endif       
+    }
+  public:
+    static bool setSensorValue(const char* thingId, const char* sensorId, int value) {
+      beeStatus_iterator it = beesStatus.find(thingId);
+      if (it == beesStatus.end()) 
+      {
+  #ifdef DEBUG_BEESTATUS
+        DPRINTF("BEESTATUS - BeeStatus id: %s not found\n", thingId);
+  #endif
+        return false;
+      }
+      BeeStatus& beeStatus = it->second;
+      return beeStatus.setSensorValue(sensorId, value);
+    }
+  private:
+    static bool setSensorsValueFromDeviceId(int deviceId, int value) {
+      bool prior = false;
+      for (beeStatus_iterator it = beesStatus.begin(); it != beesStatus.end(); it++) {
+        BeeStatus& beeStatus = it->second;
+        bool priorL = beeStatus.setSensorsValueFromDeviceId(deviceId, value);
+        if (prior == false)
+          prior = priorL;
+      }
+      return prior;
+    }
+    static bool setSensorsValue(const char* sensorId, int value) {
+      bool prior = false;
+      for (beeStatus_iterator it = beesStatus.begin(); it != beesStatus.end(); it++) {
+        BeeStatus& beeStatus = it->second;
+        bool priorL = beeStatus.setSensorValue(sensorId, value);
+        if (prior == false)
+          prior = priorL;
+      }
+      return prior;
+    }
+  public:    
+    static bool loop() {
+      bool prior = false;
+      for (device_const_iterator it = BeeStatus::devices.begin(); it != BeeStatus::devices.end(); it++)
+      {
+        int deviceId          = it->first;
+        const Device& device  = it->second;
+#ifdef DEBUG_BEESTATUS_VERBOSE
+        DPRINTF("BEESTATUS - Elaborating Device Id: %d Kind: %d\n", deviceId, device.kind);
+#endif
+        if (device.kind == Device::Kind::DigitalOutput)
+        {
+          continue;
+        }
+        if (device.kind == Device::Kind::PWM)
+        {
+          continue;
+        }
+        if (device.kind == Device::Kind::AnalogicInput)
+        {
+          int value = analogRead(device.pin);
+  #ifdef DEBUG_BEESTATUS_VERBOSE
+          DPRINTF("BEESTATUS - Read Device id: %d Kind: %d analogic value: %d\n", deviceId, device.kind, value);
+  #endif
+          bool lPrior = setSensorsValueFromDeviceId(deviceId, value);
+          if (prior == false)
+            prior = lPrior;        
+          continue;
+        }
+        if (device.kind == Device::Kind::RC)
+        {
+          if (RCSensorsManager::available() == false)
+            continue;
+
+          long sensorId = RCSensorsManager::getReceivedValue();
+          String sensorIdStr(sensorId);
+#ifdef DEBUG_BEESTATUS_VERBOSE
+          DPRINTF("BEESTATUS - Read Device Id: %d Kind: %d Item Id: %s\n", deviceId, device.kind, sensorIdStr.c_str());
+#endif
+          bool lPrior = setSensorsValue(sensorIdStr.c_str(), HIGH);
+          if (prior == false)
+            prior = lPrior;
+          continue;
+        }
+        if (device.kind == Device::Kind::AntiTheft) {
+          device.pAntiTheft->loop();
+          for (AntiTheft::const_iterator it = device.pAntiTheft->begin(); it != device.pAntiTheft->end(); it++) {
+            const String& sensorId     = it->first;
+            const int*    sensorValue  = it->second;
+
+            bool lPrior = setSensorsValue(sensorId.c_str(), *sensorValue);
+            if (prior == false)
+              prior = lPrior;
+          }
+          continue;
+        }
+#ifdef DEBUG_BEESTATUS
+        DPRINTF("BEESTATUS - Device Id: %d Kind: %d Device kind not elaborate\n", deviceId, device.kind);
+#endif
+      }
+      return prior;
+    }
+  public:
+    static void updateServer() {
+      for (beeStatus_iterator it = beesStatus.begin(); it != beesStatus.end(); it++) {
+        BeeStatus& beeStatus = it->second;
+
+        HTTPClient http;
+        
+        String url = String("/api/things/") + String(it->first) + String("/value");
+        http.begin("api.thingshub.org", 3000, url, root_ca); // Specify the URL and certificate    
+        http.addHeader("thapikey", "491e94d9-9041-4e5e-b6cb-9dad91bbf63d");
+        http.addHeader("Content-Type", "application/json");
+
+        StaticJsonDocument<sensorsCapacity> doc;
+        beeStatus.toJson(doc);
+    
+        String jsonDoc;
+        serializeJson(doc, jsonDoc);
+        int httpCode = http.PUT(jsonDoc);
+        if (httpCode > 0)
+        {
+          // Check for the returning code
+          String payload = http.getString();
+#ifdef DEBUG_RESTCALL
+          DPRINT("RestCall return payload : ");
+          DPRINTLN(payload);
+#endif
+        }
+    
+        http.end(); //Free resources
+      }
+    }
+};
+beeStatus_collection BeesManager::beesStatus;
 
 /////////////////////////////
 
@@ -891,15 +967,6 @@ void onUpdateThingValue(const StaticJsonDocument<msgCapacity>& jMsg)
 #endif
 
   const char* thingId = jMsg[1];
-  // Only one thing for this bee
-  if (strcmp(thingId, BeeStatus::thingValue) != 0)
-  {
-#ifdef DEBUG_SOCKETIOMANAGER
-    DPRINTLN("DEBUG_SOCKETIOMANAGER - onUpdateThingValue: strcmp(thingId, BeeStatus::thing) != 0");
-    DPRINTLN("DEBUG_SOCKETIOMANAGER - onUpdateThingValue: Command end");
-#endif
-    return;
-  }
 
   auto beeObj = jMsg[2].as<JsonObject>();
   if (!beeObj.containsKey("sensors"))
@@ -927,7 +994,7 @@ void onUpdateThingValue(const StaticJsonDocument<msgCapacity>& jMsg)
 #ifdef DEBUG_SOCKETIOMANAGER
     DPRINTF("DEBUG_SOCKETIOMANAGER - onUpdateThingValue: Sensor Id: %s Value: %d\n", sensorId.c_str(), value);
 #endif
-    BeeStatus::setSensorValue(sensorId.c_str(), value);
+    BeesManager::setSensorValue(thingId, sensorId.c_str(), value);
   }
 
 #ifdef DEBUG_SOCKETIOMANAGER
@@ -938,11 +1005,8 @@ void onUpdateThingValue(const StaticJsonDocument<msgCapacity>& jMsg)
 void setup()
 {
   Serial.begin(115200);
-  // BeeStatus setup
-  BeeStatus::setup();
-  // WiFi setup
+  BeesManager::setup();
   WiFiManager::connect();
-  // OTA
   ArduinoOTA
     .onStart([]() {
       String type;
@@ -969,137 +1033,26 @@ void setup()
       else if (error == OTA_END_ERROR) DPRINTLN("End Failed");
     });
   ArduinoOTA.begin();
-  // SocketIO setup
   SocketIOManager::on("onUpdateThingValue", onUpdateThingValue);
   SocketIOManager::beginSocketSSLWithCA("api.thingshub.org", 3000, "/socket.io/?EIO=4&token=491e94d9-9041-4e5e-b6cb-9dad91bbf63d", root_ca, "arduino");  
 }
 
+unsigned long updateServerInterval = 0;
 void loop()
 {
-#ifdef DEBUG_TIMING
-  unsigned long mainBefore = millis();
-#endif
-#if defined(DEBUG_TIMING) || defined(DEBUG_REST_TIMING)
-  unsigned long before = 0;
-  unsigned long after = 0;
-#endif
-  //
-#ifdef DEBUG_TIMING
-  before = millis();
-  DPRINTF("BeeStatus::loop() before: %lu - ", before);
-#endif
-  bool prior = BeeStatus::loop();
-#ifdef DEBUG_TIMING
-  after = millis();
-  DPRINTF("after: %lu - diff: %lu\n", after, after - before);
-#endif
-  // Check if wifi is ok, eventually try reconnecting every "WiFiManager::check_wifi_interval" milliseconds
-#ifdef DEBUG_TIMING
-  before = millis();
-  DPRINTF("WiFiManager::loop() before: %lu - ", before);
-#endif
-  WiFiManager::loop();
-#ifdef DEBUG_TIMING
-  after = millis();
-  DPRINTF("after: %lu - diff: %lu\n", after, after - before);
-#endif
+  bool prior = BeesManager::loop();
+  WiFiManager::loop();// Check if wifi is ok, eventually try reconnecting every "WiFiManager::check_wifi_interval" milliseconds
   if (WiFi.status() != WL_CONNECTED)
     return;
-  //
-#ifdef DEBUG_TIMING
-  before = millis();
-  DPRINTF("ArduinoOTA.handle() before: %lu - ", before);
-#endif
   ArduinoOTA.handle();
-#ifdef DEBUG_TIMING
-  after = millis();
-  DPRINTF("ArduinoOTA.handle() after: %lu - diff: %lu\n", after, after - before);
-#endif   
-  //
-  if ((prior == true) || (millis() - restCallInterval >= 5000))
+  if ((prior == true) || (millis() - updateServerInterval >= 5000))
   {
-    StaticJsonDocument<sensorsCapacity> doc;
-    BeeStatus::toJson(doc);
-/*
-    {
-#ifdef DEBUG_REST_TIMING
-      before = millis();
-      DPRINTF("SocketIOManager::sendEVENT() before: %lu - ", before);
-#endif      
-      DynamicJsonDocument event(1024);
-      JsonArray array = event.to<JsonArray>();
-
-      array.add("log");
-      JsonObject param1 = array.createNestedObject();
-      param1["value"] = doc;
-
-      String output;
-      serializeJson(event, output);
-
-      SocketIOManager::sendEVENT(output.c_str());
-
-#ifdef DEBUG_REST_TIMING
-      after = millis();
-      DPRINTF("after: %lu - diff: %lu\n", after, after - before);
-#endif      
-    }
-*/    
-    HTTPClient http;
-    String url = String("/api/things/") + String(BeeStatus::thingValue) + String("/value");
-    http.begin("api.thingshub.org", 3000, url, root_ca); // Specify the URL and certificate    
-    http.addHeader("thapikey", "491e94d9-9041-4e5e-b6cb-9dad91bbf63d");
-    http.addHeader("Content-Type", "application/json");
-
-    String jsonDoc;
-    serializeJson(doc, jsonDoc);
-#ifdef DEBUG_REST_TIMING
-    before = millis();
-    DPRINTF("HTTPCall::loop() before: %lu - ", before);
-#endif
-    int httpCode = http.PUT(jsonDoc);
-#ifdef DEBUG_RESTCALL
-    DPRINTF("RestCall Http return code : %d\n", httpCode);
-#endif
-    if (httpCode > 0)
-    {
-      // Check for the returning code
-      String payload = http.getString();
-#ifdef DEBUG_RESTCALL
-      DPRINT("RestCall return payload : ");
-      DPRINTLN(payload);
-#endif
-#ifdef DEBUG_REST_TIMING
-      BeeStatus::setSensorValue("DIAG-HTTP-CALL-PREV-HTTPCODE", httpCode);
-#endif
-    }
-
-    http.end(); //Free resources
-
-    restCallInterval = millis();
-
-#ifdef DEBUG_REST_TIMING
-    after = millis();
-    DPRINTF("after: %lu - diff: %lu\n", after, after - before);
-    BeeStatus::setSensorValue("DIAG-HTTP-CALL-PREV-TIMING", after - before);
-#endif 
-/*
-    DPRINT("getFreeHeap : ");
-    DPRINTLN(ESP.getFreeHeap());
-*/    
+    BeesManager::updateServer();
+    updateServerInterval = millis();
   }
-  //
-#ifdef DEBUG_TIMING
-  before = millis();
-  DPRINTF("SocketIOManager::loop() before: %lu - ", before);
-#endif
   SocketIOManager::loop();
-#ifdef DEBUG_TIMING
-  after = millis();
-  DPRINTF("after: %lu - diff: %lu\n", after, after - before);
-#endif
-#ifdef DEBUG_TIMING
-  after = millis();
-  DPRINTF("Main::loop() before: %lu - after: %lu - diff: %lu\n",mainBefore, after, after - mainBefore);
-  DPRINTLN("---------------------------------------------------------------------------------");
-#endif
+/*
+  DPRINT("getFreeHeap : ");
+  DPRINTLN(ESP.getFreeHeap());
+*/
 }
