@@ -434,7 +434,7 @@ public:
     return (sensor.prior || prior);
   }
 public:
-  void toJson(StaticJsonDocument<sensorsCapacity>& doc) const
+  void toJson(StaticJsonDocument<sensorsCapacity>& doc)
   {
     // Sensor model sample
     /*
@@ -463,7 +463,7 @@ public:
 #endif
     doc.clear();
     JsonArray sensorsNode = doc.createNestedArray("sensors");
-    for (sensor_const_iterator it = sensors.begin(); it != sensors.end(); it++)
+    for (sensor_iterator it = sensors.begin(); it != sensors.end(); it++)
     {
       Sensor& sensorValue = it->second;
 
@@ -673,8 +673,8 @@ class BeesManager {
   }
 */  
 private:    
-    void setupVariusSensors() {
-      { // 73e545e2-6be9-4281-bd48-ab82c9b792f3
+    static void setupVariusSensors() {
+      { // Telecomando
         sensor_collection sensors;
         {// Telecomando 1 Apri
           sensors["8171288"].name = "Telecomando 1 Apri";
@@ -732,7 +732,7 @@ private:
         bee.setSensors(sensors);
         beesStatus["73e545e2-6be9-4281-bd48-ab82c9b792f3"] = bee;
       }
-      { // 12d209ee-dea6-417a-a4e2-e5130be7fdbc
+      { // Luminosità, Temperatura
         sensor_collection sensors;
         { // Luminosità 01
           sensors["PhotoResistor-01"].name = "Luminosità 01";
@@ -779,15 +779,8 @@ private:
     }
   public:
     static void setup() {
-#ifdef DEBUG_BEESTATUS
-      DPRINTF("BEESTATUS - Start setup()\n");
-#endif      
       BeeStatus::setupDevices();
-
       setupVariusSensors();
-#ifdef DEBUG_BEESTATUS
-      DPRINTF("BEESTATUS - End setup()\n");
-#endif       
     }
   public:
     static bool setSensorValue(const char* thingId, const char* sensorId, int value) {
@@ -905,14 +898,13 @@ private:
         int httpCode = http.PUT(jsonDoc);
         if (httpCode > 0)
         {
+#ifdef DEBUG_RESTCALL          
           // Check for the returning code
           String payload = http.getString();
-#ifdef DEBUG_RESTCALL
           DPRINT("RestCall return payload : ");
           DPRINTLN(payload);
 #endif
-        }
-    
+        }    
         http.end(); //Free resources
       }
     }
