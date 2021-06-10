@@ -12,6 +12,9 @@
   #define DPRINTLN(...)   //now defines a blank line
 #endif
 
+// #define ANTITHEFT
+#define VARIUS_SENSORS
+
 //#define DEBUG_BEESTATUS
 //#define DEBUG_BEESTATUS_VERBOSE
 //#define DEBUG_RCSENSORSMANAGER
