@@ -33,18 +33,20 @@ export class SensorsValueService implements OnDestroy {
     public async getAll(): Promise<ReadonlyArray<SensorValue>> {
         await this.thingsService.thingsManager.getMoreThings(null);// ToDo: why null?
         const sensorsValue: SensorValue[] = [];
-        this.things.forEach(thing =>
-            thing.value.sensors.forEach((sensorRaw: SensorValueRaw) => {
-                // ToDo: Try to use spread operator
-                const sensor: SensorValue = {
-                    thingId: thing.id,
-                    id: sensorRaw.id,
-                    now: sensorRaw.now,
-                    millis: sensorRaw.millis,
-                    value: sensorRaw.value
-                }
-                sensorsValue.push(sensor);
-            }))
+        this.things.forEach(thing => {
+            if (thing.value && thing.value.sensors)
+                thing.value.sensors.forEach((sensorRaw: SensorValueRaw) => {
+                    // ToDo: Try to use spread operator
+                    const sensor: SensorValue = {
+                        thingId: thing.id,
+                        id: sensorRaw.id,
+                        now: sensorRaw.now,
+                        millis: sensorRaw.millis,
+                        value: sensorRaw.value
+                    }
+                    sensorsValue.push(sensor);
+                })
+        })
         return sensorsValue;
     }
 

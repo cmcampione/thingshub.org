@@ -1,7 +1,7 @@
 #ifndef _BuildDefine_h_
 #define _BuildDefine_h_
 
-#define DEBUG
+//#define DEBUG
 #ifdef DEBUG
   #define DPRINT(...)    Serial.print(__VA_ARGS__)     //DPRINT is a macro, debug print
   #define DPRINTF(...)   Serial.printf(__VA_ARGS__)     //DPRINT is a macro, debug print
