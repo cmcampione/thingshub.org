@@ -724,7 +724,7 @@ class BeesManager {
         }
         BeeStatus bee;
         bee.setSensors(sensors);
-        beesStatus["To Create"] = bee;      
+        beesStatus["80c44c01-65cc-46de-9ee1-95493abb16a6"] = bee;      
       }
     }
 #endif
@@ -795,7 +795,7 @@ class BeesManager {
         }
         BeeStatus bee;
         bee.setSensors(sensors);
-        beesStatus["To create"] = bee;
+        beesStatus["041d065d-8354-4bac-b34b-221fc6619c14"] = bee;
       }
     }
 #endif

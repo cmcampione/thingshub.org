@@ -15,15 +15,19 @@
       <app-login></app-login>
     </div>
     <ion-grid *ngIf="isLoggedIn">
+<!--
       <ion-row>
         <ion-col>
           <app-things></app-things>
         </ion-col>
-      </ion-row>      
+      </ion-row>
+-->      
       <ion-row>
+<!--        
         <ion-col>
           <app-map></app-map>
         </ion-col>
+-->        
         <ion-col *ngIf="(sensorsCount$ | async) !== 0">
           <app-sensors></app-sensors>
         </ion-col>
