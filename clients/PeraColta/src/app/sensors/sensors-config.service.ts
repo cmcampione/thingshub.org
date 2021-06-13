@@ -32,25 +32,26 @@ export class SensorsConfigService implements OnDestroy {
     public async getAll(): Promise<ReadonlyArray<SensorConfig>> {
         await this.thingsService.thingsManager.getMoreThings(null);// ToDo: why null?
         const sensorsConfig: SensorConfig[] = [];
-        this.things.forEach(thing =>
-            thing.value.sensorsConfig.forEach((sensorConfigRaw: SensorConfigRaw) => {
-                // ToDo: Try to use spread operator
-                const sensorConfig: SensorConfig = {
-                    thingId: thing.id,
-                    id: sensorConfigRaw.id,
-                    relateThing: thing.value.relateThing,
-                    name: sensorConfigRaw.name,
-                    kind: sensorConfigRaw.kind,
-                    kindType: sensorConfigRaw.kindType,
-                    redValueMin: sensorConfigRaw.redValueMin,
-                    redValueMax: sensorConfigRaw.redValueMax,
-                    greenValueMin: sensorConfigRaw.greenValueMin,
-                    greenValueMax: sensorConfigRaw.greenValueMax,
-                    min: sensorConfigRaw.min,
-                    max: sensorConfigRaw.max
-                }
-                sensorsConfig.push(sensorConfig);
-            }))
+        this.things.forEach(thing => {
+            if (thing.value && thing.value.sensorsConfig)
+                thing.value.sensorsConfig.forEach((sensorConfigRaw: SensorConfigRaw) => {
+                    // ToDo: Try to use spread operator
+                    const sensorConfig: SensorConfig = {
+                        thingId: thing.id,
+                        id: sensorConfigRaw.id,
+                        relateThing: thing.value.relateThing,
+                        name: sensorConfigRaw.name,
+                        kind: sensorConfigRaw.kind,
+                        kindType: sensorConfigRaw.kindType,
+                        redValueMin: sensorConfigRaw.redValueMin,
+                        redValueMax: sensorConfigRaw.redValueMax,
+                        greenValueMin: sensorConfigRaw.greenValueMin,
+                        greenValueMax: sensorConfigRaw.greenValueMax,
+                        min: sensorConfigRaw.min,
+                        max: sensorConfigRaw.max
+                    }
+                    sensorsConfig.push(sensorConfig);})
+                })
         return sensorsConfig;
     }
 }
