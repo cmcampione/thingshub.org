@@ -47,6 +47,7 @@ struct PWM
   int channel;
   int res;
 };
+
 struct Device
 {
   Device() : pAntiTheft(NULL), kind(Device::Kind::Undefined) {
@@ -393,7 +394,7 @@ class BeeStatus
   private:
     String thingCnfgId; // ToDo: To manage
   public:
-    void setSensors(const sensor_collection& sensors) {
+    void setup(const sensor_collection& sensors) {
       this->sensors = sensors;
     }
   public:
@@ -568,7 +569,7 @@ class BeesManager {
           sensors["8171284"].setPoints.push_back(setPoint);
         }
         BeeStatus bee;
-        bee.setSensors(sensors);
+        bee.setup(sensors);
         beesStatus["73e545e2-6be9-4281-bd48-ab82c9b792f3"] = bee;
       }
       { // Luminosità, Temperatura
@@ -612,7 +613,7 @@ class BeesManager {
           sensors["Temperatura-01"].deviceId = 35;
         }
         BeeStatus bee;
-        bee.setSensors(sensors);
+        bee.setup(sensors);
         beesStatus["12d209ee-dea6-417a-a4e2-e5130be7fdbc"] = bee;
       }
       { // Pir Salone, Contatto filare, Sensore fumi
@@ -723,7 +724,7 @@ class BeesManager {
           sensors["7830832"].setPoints.push_back(setPointLedOff);
         }
         BeeStatus bee;
-        bee.setSensors(sensors);
+        bee.setup(sensors);
         beesStatus["80c44c01-65cc-46de-9ee1-95493abb16a6"] = bee;      
       }
     }
@@ -763,7 +764,7 @@ class BeesManager {
           sensors["MAT-AURSTATE"].setPoints.push_back(setPoint);
         }
         BeeStatus bee;
-        bee.setSensors(sensors);
+        bee.setup(sensors);
         beesStatus["f4c3c80b-d561-4a7b-80a5-f4805fdab9bb"] = bee;
       }
       { // States
@@ -794,7 +795,7 @@ class BeesManager {
           sensors["MAT-AASTATE"].prior = true;
         }
         BeeStatus bee;
-        bee.setSensors(sensors);
+        bee.setup(sensors);
         beesStatus["041d065d-8354-4bac-b34b-221fc6619c14"] = bee;
       }
     }
