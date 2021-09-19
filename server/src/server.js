@@ -37,7 +37,7 @@ mongoose.connect(process.env.MONGODB_URI,
 	{
 		useNewUrlParser: true,
 		useUnifiedTopology: true,
-		auth: {authSource: process.env.MONGODB_AUTHSOURCE},
+		authSource: process.env.MONGODB_AUTHSOURCE,
 		user: process.env.MONGODB_USER,
 		pass: process.env.MONGODB_PASSWORD
 	}).catch(err => {

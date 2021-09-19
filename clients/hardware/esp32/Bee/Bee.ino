@@ -203,9 +203,9 @@ class BeeStatus
           "MAT-AULSTATE", "MAT-AURSTATE",
           "MAT-IASTATE", 4, 16, HIGH,
           "MAT-IASTATE-VALUE",
-          //"MAT-DASTATE", 17,  5, HIGH,   // don't run
+          //"MAT-DASTATE", 17,  5, HIGH,   // does not work
           "MAT-DASTATE", 17, 23, HIGH, // run
-          //"MAT-DASTATE", 17,  3, HIGH, // don't run
+          //"MAT-DASTATE", 17,  3, HIGH, // does not work
           "MAT-AASTATE", 18, 19, HIGH,
           10000,
           10000,
