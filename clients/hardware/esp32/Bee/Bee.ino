@@ -14,28 +14,42 @@
 #include "AntiTheft.h"
 #include "SocketIOMngr.h"
 
-//
-const char* root_ca =
-    "-----BEGIN CERTIFICATE-----\n"
-    "MIIDSjCCAjKgAwIBAgIQRK+wgNajJ7qJMDmGLvhAazANBgkqhkiG9w0BAQUFADA/\n"
-    "MSQwIgYDVQQKExtEaWdpdGFsIFNpZ25hdHVyZSBUcnVzdCBDby4xFzAVBgNVBAMT\n"
-    "DkRTVCBSb290IENBIFgzMB4XDTAwMDkzMDIxMTIxOVoXDTIxMDkzMDE0MDExNVow\n"
-    "PzEkMCIGA1UEChMbRGlnaXRhbCBTaWduYXR1cmUgVHJ1c3QgQ28uMRcwFQYDVQQD\n"
-    "Ew5EU1QgUm9vdCBDQSBYMzCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEB\n"
-    "AN+v6ZdQCINXtMxiZfaQguzH0yxrMMpb7NnDfcdAwRgUi+DoM3ZJKuM/IUmTrE4O\n"
-    "rz5Iy2Xu/NMhD2XSKtkyj4zl93ewEnu1lcCJo6m67XMuegwGMoOifooUMM0RoOEq\n"
-    "OLl5CjH9UL2AZd+3UWODyOKIYepLYYHsUmu5ouJLGiifSKOeDNoJjj4XLh7dIN9b\n"
-    "xiqKqy69cK3FCxolkHRyxXtqqzTWMIn/5WgTe1QLyNau7Fqckh49ZLOMxt+/yUFw\n"
-    "7BZy1SbsOFU5Q9D8/RhcQPGX69Wam40dutolucbY38EVAjqr2m7xPi71XAicPNaD\n"
-    "aeQQmxkqtilX4+U9m5/wAl0CAwEAAaNCMEAwDwYDVR0TAQH/BAUwAwEB/zAOBgNV\n"
-    "HQ8BAf8EBAMCAQYwHQYDVR0OBBYEFMSnsaR7LHH62+FLkHX/xBVghYkQMA0GCSqG\n"
-    "SIb3DQEBBQUAA4IBAQCjGiybFwBcqR7uKGY3Or+Dxz9LwwmglSBd49lZRNI+DT69\n"
-    "ikugdB/OEIKcdBodfpga3csTS7MgROSR6cz8faXbauX+5v3gTt23ADq1cEmv8uXr\n"
-    "AvHRAosZy5Q6XkjEGB5YGV8eAlrwDPGxrancWYaLbumR9YbK+rlmM6pZW87ipxZz\n"
-    "R8srzJmwN0jP41ZL9c8PDHIyh8bwRLtTcm1D9SZImlJnt1ir/md2cXjbDaJWFBM5\n"
-    "JDGFoqgCWjBH4d1QB7wCCZAA62RjYJsWvIjJEubSfZGL+T0yjWW06XyxV3bqxbYo\n"
-    "Ob8VZRzI9neWagqNdwvYkQsEjgfbKbYK7p2CNTUQ\n"
-    "-----END CERTIFICATE-----\n";
+// https://arduino-esp8266.readthedocs.io/en/latest/faq/a02-my-esp-crashes.html
+// Don’t use const char * with literals. Instead, use const char[] PROGMEM. This is particularly true if you intend to, e.g.: embed html strings.
+// https://thingpulse.com/embed-binary-data-on-esp32/
+static const char root_ca[] PROGMEM = R"=====(
+-----BEGIN CERTIFICATE-----
+MIIFazCCA1OgAwIBAgIRAIIQz7DSQONZRGPgu2OCiwAwDQYJKoZIhvcNAQELBQAw
+TzELMAkGA1UEBhMCVVMxKTAnBgNVBAoTIEludGVybmV0IFNlY3VyaXR5IFJlc2Vh
+cmNoIEdyb3VwMRUwEwYDVQQDEwxJU1JHIFJvb3QgWDEwHhcNMTUwNjA0MTEwNDM4
+WhcNMzUwNjA0MTEwNDM4WjBPMQswCQYDVQQGEwJVUzEpMCcGA1UEChMgSW50ZXJu
+ZXQgU2VjdXJpdHkgUmVzZWFyY2ggR3JvdXAxFTATBgNVBAMTDElTUkcgUm9vdCBY
+MTCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBAK3oJHP0FDfzm54rVygc
+h77ct984kIxuPOZXoHj3dcKi/vVqbvYATyjb3miGbESTtrFj/RQSa78f0uoxmyF+
+0TM8ukj13Xnfs7j/EvEhmkvBioZxaUpmZmyPfjxwv60pIgbz5MDmgK7iS4+3mX6U
+A5/TR5d8mUgjU+g4rk8Kb4Mu0UlXjIB0ttov0DiNewNwIRt18jA8+o+u3dpjq+sW
+T8KOEUt+zwvo/7V3LvSye0rgTBIlDHCNAymg4VMk7BPZ7hm/ELNKjD+Jo2FR3qyH
+B5T0Y3HsLuJvW5iB4YlcNHlsdu87kGJ55tukmi8mxdAQ4Q7e2RCOFvu396j3x+UC
+B5iPNgiV5+I3lg02dZ77DnKxHZu8A/lJBdiB3QW0KtZB6awBdpUKD9jf1b0SHzUv
+KBds0pjBqAlkd25HN7rOrFleaJ1/ctaJxQZBKT5ZPt0m9STJEadao0xAH0ahmbWn
+OlFuhjuefXKnEgV4We0+UXgVCwOPjdAvBbI+e0ocS3MFEvzG6uBQE3xDk3SzynTn
+jh8BCNAw1FtxNrQHusEwMFxIt4I7mKZ9YIqioymCzLq9gwQbooMDQaHWBfEbwrbw
+qHyGO0aoSCqI3Haadr8faqU9GY/rOPNk3sgrDQoo//fb4hVC1CLQJ13hef4Y53CI
+rU7m2Ys6xt0nUW7/vGT1M0NPAgMBAAGjQjBAMA4GA1UdDwEB/wQEAwIBBjAPBgNV
+HRMBAf8EBTADAQH/MB0GA1UdDgQWBBR5tFnme7bl5AFzgAiIyBpY9umbbjANBgkq
+hkiG9w0BAQsFAAOCAgEAVR9YqbyyqFDQDLHYGmkgJykIrGF1XIpu+ILlaS/V9lZL
+ubhzEFnTIZd+50xx+7LSYK05qAvqFyFWhfFQDlnrzuBZ6brJFe+GnY+EgPbk6ZGQ
+3BebYhtF8GaV0nxvwuo77x/Py9auJ/GpsMiu/X1+mvoiBOv/2X/qkSsisRcOj/KK
+NFtY2PwByVS5uCbMiogziUwthDyC3+6WVwW6LLv3xLfHTjuCvjHIInNzktHCgKQ5
+ORAzI4JMPJ+GslWYHb4phowim57iaztXOoJwTdwJx4nLCgdNbOhdjsnvzqvHu7Ur
+TkXWStAmzOVyyghqpZXjFaH3pO3JLF+l+/+sKAIuvtd7u+Nxe5AW0wdeRlN8NwdC
+jNPElpzVmbUq4JUagEiuTDkHzsxHpFKVK7q4+63SM1N95R1NbdWhscdCb+ZAJzVc
+oyi3B43njTOQ5yOf+1CceWxG1bQVs5ZufpsMljq4Ui0/1lvh+wjChP4kqKOJ2qxq
+4RgqsahDYVvTH9w7jXbyLeiNdd8XM2w9U/t7y0Ff/9yi0GE44Za4rF2LN9d11TPA
+mRGunUHBcnWEvgJBQl9nJEiU0Zsnvgc/ubhPgXRR4Xq37Z0j4r7g1SgEEzwxA57d
+emyPxgcYxn/eR44/KJ4EBs+lVDR3veyJm+kXQ99b21/+jh5Xos1AnX5iItreGCc=
+-----END CERTIFICATE-----
+)=====";
 
 //
 const int sensorsCapacity = 1024;
@@ -50,38 +64,38 @@ struct PWM
 
 struct Device
 {
-  Device() : pAntiTheft(NULL), kind(Device::Kind::Undefined) {
-  }
-  ~Device() {
-    if (pAntiTheft != NULL)
-      delete pAntiTheft;
-  }
+    Device() : pAntiTheft(NULL), kind(Device::Kind::Undefined) {
+    }
+    ~Device() {
+      if (pAntiTheft != NULL)
+        delete pAntiTheft;
+    }
   public:
     enum class Kind {
-        Undefined = 0,        
-        AnalogicInput,
-        DigitalOutput,
-        PWM,
-        RC,        
-        AntiTheft
-      };
-  
-  Kind kind;              
+      Undefined = 0,
+      AnalogicInput,
+      DigitalOutput,
+      PWM,
+      RC,
+      AntiTheft
+    };
 
-  int pin;               // Valid only for kind == AnalogicInput, DigitalOutput, PWM, RC
-  PWM pwm;               // Valid only for kind == "PWM"
-  AntiTheft* pAntiTheft; // Valid only for kind == "AntiTheft"
+    Kind kind;
 
-  int min, max;          // Useful to check range value and to toggle the state
+    int pin;               // Valid only for kind == AnalogicInput, DigitalOutput, PWM, RC
+    PWM pwm;               // Valid only for kind == "PWM"
+    AntiTheft* pAntiTheft; // Valid only for kind == "AntiTheft"
 
-  int value;  
+    int min, max;          // Useful to check range value and to toggle the state
+
+    int value;
 };
 typedef std::map<int, Device> device_collection;
 typedef device_collection::const_iterator device_const_iterator;
 
 struct SetPointItem
 {
-  SetPointItem() : deviceId(0), force(false), toggle(false) 
+  SetPointItem() : deviceId(0), force(false), toggle(false)
   {}
   int     deviceId;
 
@@ -97,16 +111,16 @@ typedef setPointItem_collection::const_iterator setPointItem_const_iterator;
 
 struct SetPoint
 {
-  int min;
-  int max;
+    int min;
+    int max;
 
-  bool prior;
+    bool prior;
 
-  setPointItem_collection setPointItems;
+    setPointItem_collection setPointItems;
 
   public:
     SetPoint() : min(0), max(0), prior(false) {
-  }
+    }
 };
 typedef std::vector<SetPoint> setPoint_collection;
 typedef setPoint_collection::const_iterator setPoint_const_iterator;
@@ -134,7 +148,7 @@ typedef sensor_collection::const_iterator sensor_const_iterator;
 //
 class BeeStatus
 {
-  // ToDo: Implement a DevicesManager
+// ToDo: Implement a DevicesManager
 #pragma region DevicesManager
   public:
     static device_collection devices;
@@ -202,7 +216,6 @@ class BeeStatus
           "MAT-AUSTATE", 15,  2, HIGH,
           "MAT-AULSTATE", "MAT-AURSTATE",
           "MAT-IASTATE", 4, 16, HIGH,
-          "MAT-IASTATE-VALUE",
           //"MAT-DASTATE", 17,  5, HIGH,   // does not work
           "MAT-DASTATE", 17, 23, HIGH, // run
           //"MAT-DASTATE", 17,  3, HIGH, // does not work
@@ -218,12 +231,12 @@ class BeeStatus
   public:
     static void setupDevices()
     {
-#ifdef VARIUS_SENSORS     
+#ifdef VARIUS_SENSORS
       setupDevicesVarius();
 #endif
-#ifdef ANTITHEFT    
+#ifdef ANTITHEFT
       setupDevicesAntiTheaf();
-#endif    
+#endif
       for (device_const_iterator it = devices.begin(); it != devices.end(); it++)
       {
         const Device& device = it->second;
@@ -253,9 +266,9 @@ class BeeStatus
           device.pAntiTheft->setup();
           continue;
         }
-  #ifdef DEBUG_BEESTATUS
-        DPRINTF("BEESTATUS - Device id: %d Kind: %d - Kind not found\n", it->first, device.kind);
-  #endif
+#ifdef DEBUG_BEESTATUS
+        DPRINTF("BeeStatus::setupDevices - Device id: %d Kind: %d - Kind not found\n", it->first, device.kind);
+#endif
       }
     }
   private:
@@ -263,21 +276,21 @@ class BeeStatus
     {
       if (devices.find(deviceId) == devices.end())
       {
-  #ifdef DEBUG_BEESTATUS
-        DPRINTF("BEESTATUS - Device Id: %d not found\n", deviceId);
-  #endif
+#ifdef DEBUG_BEESTATUS
+        DPRINTF("BeeStatus::setItemValue - Device Id: %d not found\n", deviceId);
+#endif
         return;
       }
 
       Device& device = devices[deviceId];
-      
+
       if (device.kind == Device::Kind::RC || device.kind == Device::Kind::AnalogicInput)
       {
-  #ifdef DEBUG_BEESTATUS
-        DPRINTF("BEESTATUS - Device Id: %d Kind: %d - Device is not set for write\n", deviceId, device.kind);
-  #endif
+#ifdef DEBUG_BEESTATUS
+        DPRINTF("BeeStatus::setItemValue - Device Id: %d Kind: %d - Device is not set for write\n", deviceId, device.kind);
+#endif
         return;
-      }    
+      }
       if (device.kind == Device::Kind::AntiTheft) {// No need to check prev value and range because it is like an "external" device
         device.pAntiTheft->setState(itemId, value);
         // No need to store value in value field
@@ -289,11 +302,11 @@ class BeeStatus
       }
       if (value < device.min || value > device.max)
       {
-  #ifdef DEBUG_BEESTATUS
-        DPRINTF("BEESTATUS - Device Id: %d Value: %d - Value is out of range\n", deviceId, value);
-  #endif
+#ifdef DEBUG_BEESTATUS
+        DPRINTF("BeeStatus::setItemValue - Device Id: %d Value: %d - Value is out of range\n", deviceId, value);
+#endif
         return;
-      }   
+      }
       if (device.kind == Device::Kind::DigitalOutput)
       {
         digitalWrite(device.pin, value);
@@ -304,31 +317,31 @@ class BeeStatus
       {
         ledcWrite(device.pwm.channel, value);
         device.value = value;
-  #ifdef DEBUG_BEESTATUS
-        DPRINTF("BEESTATUS - Device Id: %d Kind: %d PWM value: %d\n", deviceId, device.kind, value);
-  #endif      
+#ifdef DEBUG_BEESTATUS
+        DPRINTF("BeeStatus::setItemValue - Device Id: %d Kind: %d PWM value: %d\n", deviceId, device.kind, value);
+#endif
         return;
-      }   
-  #ifdef DEBUG_BEESTATUS
-      DPRINTF("BEESTATUS - Device Id: %d Kind: %d not recognized\n", deviceId, device.kind);
-  #endif
+      }
+#ifdef DEBUG_BEESTATUS
+      DPRINTF("BeeStatus::setItemValue - Device Id: %d Kind: %d not recognized\n", deviceId, device.kind);
+#endif
     }
     static void toggleItemValue(int deviceId, const char* itemId)
     {
       if (devices.find(deviceId) == devices.end())
       {
-  #ifdef DEBUG_BEESTATUS
+#ifdef DEBUG_BEESTATUS
         DPRINTF("BEESTATUS - Device Id: %d not found\n", deviceId);
-  #endif
+#endif
         return;
       }
 
       Device& device = devices[deviceId];
       if (device.kind == Device::Kind::RC || device.kind == Device::Kind::AnalogicInput)
       {
-  #ifdef DEBUG_BEESTATUS
-        DPRINTF("BEESTATUS - Device Id: %d Kind: %d - Device is not set for write\n", deviceId, device.kind);
-  #endif
+#ifdef DEBUG_BEESTATUS
+        DPRINTF("BeeStatus::toggleItemValue - Device Id: %d Kind: %d - Device is not set for write\n", deviceId, device.kind);
+#endif
         return;
       }
 
@@ -350,9 +363,9 @@ class BeeStatus
         device.value = value;
         return;
       }
-  #ifdef DEBUG_BEESTATUS
-      DPRINTF("BEESTATUS - Device Id: %d Kind: %d - Kind not recognized\n", deviceId, device.kind);
-  #endif
+#ifdef DEBUG_BEESTATUS
+      DPRINTF("BeeStatus::toggleItemValue - Device Id: %d Kind: %d - Kind not recognized\n", deviceId, device.kind);
+#endif
     }
   private:
     static bool checkSetPoints(const setPoint_collection& setPoints, int value)
@@ -371,9 +384,9 @@ class BeeStatus
             const SetPointItem& setPointItem = *item;
             if (setPointItem.force == true)
             {
-  #ifdef DEBUG_BEESTATUS_VERBOSE
-              DPRINTF("BEESTATUS - SetPointItemDevice Id: %d Value: %d forced\n", setPointItem.deviceId, setPointItem.forceValue);
-  #endif
+#ifdef DEBUG_BEESTATUS_VERBOSE
+              DPRINTF("BeeStatus::checkSetPoints - SetPointItemDevice Id: %d Value: %d forced\n", setPointItem.deviceId, setPointItem.forceValue);
+#endif
               setItemValue(setPointItem.deviceId, setPointItem.itemId.c_str(), setPointItem.forceValue);
               continue;
             }
@@ -388,7 +401,7 @@ class BeeStatus
       }
       return prior;
     }
-#pragma endregion DevicesManager 
+#pragma endregion DevicesManager
   private:
     sensor_collection sensors;
   private:
@@ -396,6 +409,16 @@ class BeeStatus
   public:
     void setup(const sensor_collection& sensors) {
       this->sensors = sensors;
+#ifdef DEBUG_BEESTATUS
+      for (sensor_const_iterator it = sensors.begin(); it != sensors.end(); it++)
+      {
+        DPRINTF("BeeStatus::setup::sensors - Sensor id: %s\n", it->first);
+      }
+      for (sensor_const_iterator it = this->sensors.begin(); it != this->sensors.end(); it++)
+      {
+        DPRINTF("BeeStatus::setup::this->sensors - Sensor id: %s\n", it->first);        
+      }
+#endif
     }
   public:
     bool setSensorsValueFromDeviceId(int deviceId, int value)
@@ -423,18 +446,25 @@ class BeeStatus
   public:
     bool setSensorValue(const char* sensorId, int value)
     {
-      if (sensors.find(sensorId) == sensors.end()) 
+#ifdef DEBUG_BEESTATUS      
+      for (sensor_iterator it = sensors.begin(); it != sensors.end(); it++)
       {
-  #ifdef DEBUG_BEESTATUS
-        DPRINTF("BEESTATUS - Sensor id: %s not found\n", sensorId);
-  #endif
+        DPRINTF("BeeStatus::setSensorValue - Sensor id: %s\n", it->first);   
+      }
+#endif
+      sensor_iterator it = sensors.find(sensorId);
+      if (it == sensors.end())
+      {
+#ifdef DEBUG_BEESTATUS
+        DPRINTF("BeeStatus::setSensorValue - Sensor id: %s not found\n", sensorId);
+#endif
         return false;
       }
-      Sensor& sensor = sensors[sensorId];
-  /*  ToDo: To check for RC Sensors
+      Sensor& sensor = it->second;
+      /*  ToDo: To check for RC Sensors */
       if (sensor.value == value)
         return false;
-  */      
+  
       sensor.now    = true;
       sensor.millis = millis();
       sensor.value  = value;
@@ -444,7 +474,7 @@ class BeeStatus
       return (sensor.prior || prior);
     }
   public:
-    void toJson(StaticJsonDocument<sensorsCapacity>& doc)
+    void toJson(DynamicJsonDocument& doc)
     {
       // Sensor model sample
       /*
@@ -465,7 +495,7 @@ class BeeStatus
               ....
             ]
           }
-        */
+      */
 #ifdef DEBUG_BEESTATUS_VERBOSE
       // Declare a buffer to hold the result
       char output[sensorsCapacity]; // To check
@@ -487,7 +517,7 @@ class BeeStatus
 
 #ifdef DEBUG_BEESTATUS_VERBOSE
         serializeJson(sensor, output);
-        DPRINT("BEESTATUS - ");
+        DPRINT("BeeStatus::toJson - ");
         DPRINT(count++);
         DPRINT(": ");
         DPRINTLN(output);
@@ -496,7 +526,7 @@ class BeeStatus
 #ifdef DEBUG_BEESTATUS_VERBOSE
       // Produce a minified JSON document
       serializeJson(doc, output);
-      DPRINTLN(output);
+      DPRINTF("BeeStatus::toJson - %s\n", output);
 #endif
     }
 };
@@ -516,7 +546,7 @@ class BeesManager {
     static void setupVariusSensors() {
       { // Telecomando
         sensor_collection sensors;
-        {// Telecomando 1 Apri
+        { // Telecomando 1 Apri
           sensors["8171288"].name = "Telecomando 1 Apri";
           sensors["8171288"].deviceId = 4;
 
@@ -542,14 +572,14 @@ class BeesManager {
 
           sensors["8171288"].setPoints.push_back(setPoint);
         }
-        {// Telecomando 1 Chiudi
+        { // Telecomando 1 Chiudi
           sensors["8171284"].name = "Telecomando 1 Chiudi";
           sensors["8171284"].deviceId = 4;
-    
+
           SetPoint setPoint;
           setPoint.min = 1;
           setPoint.max = 1;
-    
+
           SetPointItem setPointOnBoardLed;
           setPointOnBoardLed.deviceId = 2;
           setPointOnBoardLed.itemId = 2; // ToDo: Could be not necessary
@@ -557,7 +587,7 @@ class BeesManager {
           setPointOnBoardLed.forceValue = LOW;
           setPointOnBoardLed.toggle = false;
           setPoint.setPointItems.push_back(setPointOnBoardLed);
-    
+
           SetPointItem setPointBuzzer;
           setPointBuzzer.deviceId = 23;
           setPointBuzzer.itemId = 23; // ToDo: Could be not necessary
@@ -565,7 +595,7 @@ class BeesManager {
           setPointBuzzer.forceValue = 0;
           setPointBuzzer.toggle = false;
           setPoint.setPointItems.push_back(setPointBuzzer);
-    
+
           sensors["8171284"].setPoints.push_back(setPoint);
         }
         BeeStatus bee;
@@ -713,7 +743,7 @@ class BeesManager {
           setPointLedOff.max = 0;
 
           SetPointItem setPointItem2LedOff;
-          setPointItem2LedOff.deviceId =2;
+          setPointItem2LedOff.deviceId = 2;
           setPointItem2LedOff.itemId = 2; // ToDo: Could be not necessary
           setPointItem2LedOff.force = true;
           setPointItem2LedOff.forceValue = LOW;
@@ -725,7 +755,7 @@ class BeesManager {
         }
         BeeStatus bee;
         bee.setup(sensors);
-        beesStatus["80c44c01-65cc-46de-9ee1-95493abb16a6"] = bee;      
+        beesStatus["80c44c01-65cc-46de-9ee1-95493abb16a6"] = bee;
       }
     }
 #endif
@@ -752,7 +782,7 @@ class BeesManager {
           setPoint.min = LOW;
           setPoint.max = HIGH;
           // setPoint.prior = true // It's not necessary because sensor.prior is already used
-          
+
           SetPointItem setPointRemoteArmUnarmItem;
           setPointRemoteArmUnarmItem.deviceId = 1000;
           setPointRemoteArmUnarmItem.itemId = "MAT-AURSTATE";
@@ -766,9 +796,15 @@ class BeesManager {
         BeeStatus bee;
         bee.setup(sensors);
         beesStatus["f4c3c80b-d561-4a7b-80a5-f4805fdab9bb"] = bee;
-      }
+      }     
+
       { // States
         sensor_collection sensors;
+        { // AntiTheaf - Anti Tamper
+          sensors["MAT-AASTATE"].name = "Antifurto Principale - Anti Tamper aperto-chiuso";
+          sensors["MAT-AASTATE"].deviceId = 1000;
+          sensors["MAT-AASTATE"].prior = true;
+        }
         { // AntiTheaf - AlarmState
           sensors["MAT-ALSTATE"].name = "Antifurto Principale - Allarme on-off";
           sensors["MAT-ALSTATE"].deviceId = 1000;
@@ -778,46 +814,38 @@ class BeesManager {
           sensors["MAT-IASTATE"].name = "Antifurto Principale - Porte balcone aperte-chiuse";
           sensors["MAT-IASTATE"].deviceId = 1000;
           sensors["MAT-IASTATE"].prior = true;
-        }
-        { // AntiTheaf - Porte balcone valore
-          sensors["MAT-IASTATE-VALUE"].name = "Antifurto Principale - Porte balcone aperte-chiuse valore";
-          sensors["MAT-IASTATE-VALUE"].deviceId = 1000;
-          sensors["MAT-IASTATE-VALUE"].prior = false;
-        }
+        }       
         { // AntiTheaf - Porta ingresso
           sensors["MAT-DASTATE"].name = "Antifurto Principale - Porta ingresso aperta-chiusa";
           sensors["MAT-DASTATE"].deviceId = 1000;
           sensors["MAT-DASTATE"].prior = true;
         }
-        { // AntiTheaf - Anti Tamper
-          sensors["MAT-AASTATE"].name = "Antifurto Principale - Anti Tamper aperto-chiuso";
-          sensors["MAT-AASTATE"].deviceId = 1000;
-          sensors["MAT-AASTATE"].prior = true;
-        }
+                  
         BeeStatus bee;
         bee.setup(sensors);
         beesStatus["041d065d-8354-4bac-b34b-221fc6619c14"] = bee;
       }
+      
     }
 #endif
   public:
     static void setup() {
       BeeStatus::setupDevices();
-#ifdef VARIUS_SENSORS      
+#ifdef VARIUS_SENSORS
       setupVariusSensors();
 #endif
 #ifdef ANTITHEFT
-    setupAntitheft();
+      setupAntitheft();
 #endif
-  }    
+    }
   public:
     static bool setSensorValue(const char* thingId, const char* sensorId, int value) {
       beeStatus_iterator it = beesStatus.find(thingId);
-      if (it == beesStatus.end()) 
+      if (it == beesStatus.end())
       {
-  #ifdef DEBUG_BEESTATUS
-        DPRINTF("BEESTATUS - BeeStatus id: %s not found\n", thingId);
-  #endif
+#ifdef DEBUG_BEESTATUS
+        DPRINTF("BeesManager::loop - BeeStatus id: %s not found\n", thingId);
+#endif
         return false;
       }
       BeeStatus& beeStatus = it->second;
@@ -844,7 +872,7 @@ class BeesManager {
       }
       return prior;
     }
-  public:    
+  public:
     static bool loop() {
       bool prior = false;
       for (device_const_iterator it = BeeStatus::devices.begin(); it != BeeStatus::devices.end(); it++)
@@ -852,7 +880,7 @@ class BeesManager {
         int deviceId          = it->first;
         const Device& device  = it->second;
 #ifdef DEBUG_BEESTATUS_VERBOSE
-        DPRINTF("BEESTATUS - Elaborating Device Id: %d Kind: %d\n", deviceId, device.kind);
+        DPRINTF("BeesManager::loop - Elaborating Device Id: %d Kind: %d\n", deviceId, device.kind);
 #endif
         if (device.kind == Device::Kind::DigitalOutput)
         {
@@ -865,12 +893,12 @@ class BeesManager {
         if (device.kind == Device::Kind::AnalogicInput)
         {
           int value = analogRead(device.pin);
-  #ifdef DEBUG_BEESTATUS_VERBOSE
+#ifdef DEBUG_BEESTATUS_VERBOSE
           DPRINTF("BEESTATUS - Read Device id: %d Kind: %d analogic value: %d\n", deviceId, device.kind, value);
-  #endif
+#endif
           bool lPrior = setSensorsValueFromDeviceId(deviceId, value);
           if (prior == false)
-            prior = lPrior;        
+            prior = lPrior;
           continue;
         }
         if (device.kind == Device::Kind::RC)
@@ -881,7 +909,7 @@ class BeesManager {
           long sensorId = RCSensorsManager::getReceivedValue();
           String sensorIdStr(sensorId);
 #ifdef DEBUG_BEESTATUS_VERBOSE
-          DPRINTF("BEESTATUS - Read Device Id: %d Kind: %d Item Id: %s\n", deviceId, device.kind, sensorIdStr.c_str());
+          DPRINTF("BeesManager::loop - Read Device Id: %d Kind: %d Item Id: %s\n", deviceId, device.kind, sensorIdStr.c_str());
 #endif
           bool lPrior = setSensorsValue(sensorIdStr.c_str(), HIGH);
           if (prior == false)
@@ -901,43 +929,73 @@ class BeesManager {
           continue;
         }
 #ifdef DEBUG_BEESTATUS
-        DPRINTF("BEESTATUS - Device Id: %d Kind: %d Device kind not elaborate\n", deviceId, device.kind);
+        DPRINTF("BeesManager::loop - Device Id: %d Kind: %d Device kind not elaborate\n", deviceId, device.kind);
 #endif
       }
       return prior;
     }
+  private:
+    static char urlBuffer[1024] PROGMEM;
+    static DynamicJsonDocument doc;
+    static char jsonDoc[1024] PROGMEM;
   public:
     static void updateServer() {
+#ifdef DEBUG_RESTCALL
+        DPRINTLN("----------------------------------------------------------------------------------------");
+        DPRINTLN("BeesManager::updateServer - enter in updateServer");
+#endif     
+      HTTPClient http;
       for (beeStatus_iterator it = beesStatus.begin(); it != beesStatus.end(); it++) {
         BeeStatus& beeStatus = it->second;
-
-        HTTPClient http;
         
+// A sequence of String concatenations causes many allocations/deallocations/reallocations, which makes “holes” in the memory map
+/*
         String url = String("/api/things/") + String(it->first) + String("/value");
-        http.begin("api.thingshub.org", 3000, url, root_ca); // Specify the URL and certificate    
+*/
+        sprintf(urlBuffer,"/api/things/%s/value",it->first.c_str());
+#ifdef DEBUG_RESTCALL
+        DPRINTF("BeesManager::updateServer - urlBuffer = %s\n", urlBuffer);
+#endif        
+        http.begin("api.thingshub.org", 3000, urlBuffer, root_ca); // Specify the URL and certificate
         http.addHeader("thapikey", "491e94d9-9041-4e5e-b6cb-9dad91bbf63d");
         http.addHeader("Content-Type", "application/json");
 
-        StaticJsonDocument<sensorsCapacity> doc;
         beeStatus.toJson(doc);
-    
-        String jsonDoc;
+
+        // String jsonDoc;
         serializeJson(doc, jsonDoc);
+#ifdef DEBUG_RESTCALL
+        DPRINTF("BeesManager::updateServer - before http.PUT() - %s\n", jsonDoc);
+#endif        
         int httpCode = http.PUT(jsonDoc);
+#ifdef DEBUG_RESTCALL
+        DPRINTF("BeesManager::updateServer - http code after http.PUT() - %d\n", httpCode);
+#endif        
         if (httpCode > 0)
         {
-#ifdef DEBUG_RESTCALL          
+#ifdef DEBUG_RESTCALL
           // Check for the returning code
-          String payload = http.getString();
-          DPRINT("RestCall return payload : ");
-          DPRINTLN(payload);
+          DPRINTF("BeesManager::updateServer - RestCall return payload : %s\n", http.getString().c_str());
 #endif
-        }    
+        }
+#ifdef DEBUG_RESTCALL
+        DPRINTLN("BeesManager::updateServer - before http.end()");      
+#endif        
         http.end(); //Free resources
+#ifdef DEBUG_RESTCALL
+        DPRINTLN("BeesManager::updateServer - after http.end()");      
+#endif       
       }
+#ifdef DEBUG_RESTCALL
+        DPRINTLN("BeesManager::updateServer - exit from updateServer");
+        DPRINTLN("----------------------------------------------------------------------------------------");
+#endif         
     }
 };
 beeStatus_collection BeesManager::beesStatus;
+char BeesManager::urlBuffer[1024] PROGMEM = "";
+DynamicJsonDocument BeesManager::doc(sensorsCapacity);
+char BeesManager::jsonDoc[1024] PROGMEM = "";
 
 /////////////////////////////
 
@@ -988,7 +1046,7 @@ void onUpdateThingValue(const StaticJsonDocument<msgCapacity>& jMsg)
 
   const char* thingId = jMsg[1];
 
-  auto beeObj = jMsg[2].as<JsonObject>();
+  auto beeObj = jMsg[2].as<JsonObjectConst>();
   if (!beeObj.containsKey("sensors"))
   {
 #ifdef DEBUG_SOCKETIOMANAGER
@@ -998,7 +1056,7 @@ void onUpdateThingValue(const StaticJsonDocument<msgCapacity>& jMsg)
     return;
   }
 
-  auto sensors = beeObj["sensors"].as<JsonArray>();
+  auto sensors = beeObj["sensors"].as<JsonArrayConst>();
   for (auto sensor : sensors)
   {
     if (!sensor.containsKey("id"))
@@ -1028,51 +1086,95 @@ void setup()
   BeesManager::setup();
   WiFiManager::connect();
   ArduinoOTA
-    .onStart([]() {
-      String type;
-      if (ArduinoOTA.getCommand() == U_FLASH)
-        type = "sketch";
-      else // U_SPIFFS
-        type = "filesystem";
+  .onStart([]() {
+    String type;
+    if (ArduinoOTA.getCommand() == U_FLASH)
+      type = "sketch";
+    else // U_SPIFFS
+      type = "filesystem";
 
-      // NOTE: if updating SPIFFS this would be the place to unmount SPIFFS using SPIFFS.end()
-      DPRINTLN("Start updating " + type);
-    })
-    .onEnd([]() {
-      DPRINTLN("\nEnd");
-    })
-    .onProgress([](unsigned int progress, unsigned int total) {
-      DPRINTF("Progress: %u%%\r", (progress / (total / 100)));
-    })
-    .onError([](ota_error_t error) {
-      DPRINTF("Error[%u]: ", error);
-      if (error == OTA_AUTH_ERROR) DPRINTLN("Auth Failed");
-      else if (error == OTA_BEGIN_ERROR) DPRINTLN("Begin Failed");
-      else if (error == OTA_CONNECT_ERROR) DPRINTLN("Connect Failed");
-      else if (error == OTA_RECEIVE_ERROR) DPRINTLN("Receive Failed");
-      else if (error == OTA_END_ERROR) DPRINTLN("End Failed");
-    });
+    // NOTE: if updating SPIFFS this would be the place to unmount SPIFFS using SPIFFS.end()
+    DPRINTLN("Start updating " + type);
+  })
+  .onEnd([]() {
+    DPRINTLN("\nEnd");
+  })
+  .onProgress([](unsigned int progress, unsigned int total) {
+    DPRINTF("Progress: %u%%\r", (progress / (total / 100)));
+  })
+  .onError([](ota_error_t error) {
+    DPRINTF("Error[%u]: ", error);
+    if (error == OTA_AUTH_ERROR) DPRINTLN("Auth Failed");
+    else if (error == OTA_BEGIN_ERROR) DPRINTLN("Begin Failed");
+    else if (error == OTA_CONNECT_ERROR) DPRINTLN("Connect Failed");
+    else if (error == OTA_RECEIVE_ERROR) DPRINTLN("Receive Failed");
+    else if (error == OTA_END_ERROR) DPRINTLN("End Failed");
+  });
   ArduinoOTA.begin();
+/*  
   SocketIOManager::on("onUpdateThingValue", onUpdateThingValue);
-  SocketIOManager::beginSocketSSLWithCA("api.thingshub.org", 3000, "/socket.io/?EIO=4&token=491e94d9-9041-4e5e-b6cb-9dad91bbf63d", root_ca, "arduino");  
+  SocketIOManager::beginSocketSSLWithCA("api.thingshub.org", 3000, "/socket.io/?EIO=4&token=491e94d9-9041-4e5e-b6cb-9dad91bbf63d", root_ca, "arduino");
+*/  
 }
 
 unsigned long updateServerInterval = 0;
 void loop()
 {
+#ifdef DEBUG_MEMORY_DIAG
+  DPRINTLN("loop - before -----------------------------------------------------------------------");
+
+  DPRINTF("getHeapSize : %d\n", ESP.getHeapSize());
+  DPRINTF("getFreeHeap : %d\n", ESP.getFreeHeap());
+  DPRINTF("getMinFreeHeap : %d\n", ESP.getMinFreeHeap());
+  DPRINTF("getMaxAllocHeap : %d\n", ESP.getMaxAllocHeap());
+
+  DPRINTF("getPsramSize : %d\n", ESP.getPsramSize());
+  DPRINTF("getFreePsram : %d\n", ESP.getFreePsram());
+  DPRINTF("getMaxAllocPsram : %d\n", ESP.getMaxAllocPsram());
+
+  DPRINTF("getChipRevision : %d\n", ESP.getChipRevision());
+  DPRINTF("getChipModel : %d\n", ESP.getChipModel());
+  DPRINTF("getChipCores : %d\n", ESP.getChipCores());
+  DPRINTF("getSdkVersion : %d\n", ESP.getSdkVersion());
+
+  DPRINTF("getFlashChipSize : %d\n", ESP.getFlashChipSize());
+  DPRINTF("getFlashChipSpeed : %d\n", ESP.getFlashChipSpeed());
+  DPRINTF("getFlashChipMode : %d\n", ESP.getFlashChipMode());
+#endif
+
   bool prior = BeesManager::loop();
   WiFiManager::loop();// Check if wifi is ok, eventually try reconnecting every "WiFiManager::check_wifi_interval" milliseconds
   if (WiFi.status() != WL_CONNECTED)
     return;
   ArduinoOTA.handle();
   if ((prior == true) || (millis() - updateServerInterval >= 5000))
-  {
-    BeesManager::updateServer();
+  {   
+    BeesManager::updateServer(); 
     updateServerInterval = millis();
   }
-  SocketIOManager::loop();
-/*
-  DPRINT("getFreeHeap : ");
-  DPRINTLN(ESP.getFreeHeap());
-*/
+  // SocketIOManager::loop();
+
+#ifdef DEBUG_MEMORY_DIAG
+  DPRINTLN("loop - after -----------------------------------------------------------------------");
+
+  DPRINTF("getHeapSize : %d\n", ESP.getHeapSize());
+  DPRINTF("getFreeHeap : %d\n", ESP.getFreeHeap());
+  DPRINTF("getMinFreeHeap : %d\n", ESP.getMinFreeHeap());
+  DPRINTF("getMaxAllocHeap : %d\n", ESP.getMaxAllocHeap());
+
+  DPRINTF("getPsramSize : %d\n", ESP.getPsramSize());
+  DPRINTF("getFreePsram : %d\n", ESP.getFreePsram());
+  DPRINTF("getMaxAllocPsram : %d\n", ESP.getMaxAllocPsram());
+
+  DPRINTF("getChipRevision : %d\n", ESP.getChipRevision());
+  DPRINTF("getChipModel : %d\n", ESP.getChipModel());
+  DPRINTF("getChipCores : %d\n", ESP.getChipCores());
+  DPRINTF("getSdkVersion : %d\n", ESP.getSdkVersion());
+
+  DPRINTF("getFlashChipSize : %d\n", ESP.getFlashChipSize());
+  DPRINTF("getFlashChipSpeed : %d\n", ESP.getFlashChipSpeed());
+  DPRINTF("getFlashChipMode : %d\n", ESP.getFlashChipMode());
+
+#endif
+
 }

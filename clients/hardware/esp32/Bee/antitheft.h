@@ -22,8 +22,6 @@ struct AntiTheftConfig {
   int InstantAlarmContactPin;
   int InstantAlarmContactOpenValue;
 
-  String InstantAlarmStateValueId;
-
   String DelayedAlarmStateId;
   int DelayedAlarmLedPin;
   int DelayedAlarmContactPin;
@@ -70,9 +68,7 @@ class AntiTheft {
     int _armedUnarmedStateLocalPrev;
     int _armedUnarmedStateRemotePrev;
   private:
-    int _instantAlarmState;     // HIGH == Open,  LOW == Close
-    int _instantAlarmStateValue;
-
+    int _instantAlarmState;     // HIGH == Open,  LOW == Close    
     int _delayedAlarmState;     // HIGH == Open,  LOW == Close
     int _antiTamperAlarmState;  // HIGH == Open,  LOW == Close
   private:    
@@ -97,7 +93,6 @@ class AntiTheft {
       _statesIds[_config.ArmedUnarmedStateLocalId]  = &_armedUnarmedStateLocal;
       _statesIds[_config.ArmedUnarmedStateRemoteId] = &_armedUnarmedStateRemote;
       _statesIds[_config.InstantAlarmStateId]       = &_instantAlarmState;
-      _statesIds[_config.InstantAlarmStateValueId]  = &_instantAlarmStateValue;
       _statesIds[_config.DelayedAlarmStateId]       = &_delayedAlarmState;
       _statesIds[_config.AntiTamperAlarmStateId]    = &_antiTamperAlarmState;
     }
@@ -106,7 +101,7 @@ class AntiTheft {
       if (_statesIds.find(stateId) == _statesIds.end())
       {
   #ifdef DEBUG_BEESTATUS
-        DPRINTF("BEESTATUS - StateId: %d not found\n", stateId);
+        DPRINTF("AntiTheft::setState - StateId: %d not found\n", stateId);
   #endif
         return;
       }
@@ -159,8 +154,6 @@ class AntiTheft {
 
       _instantAlarmState = digitalRead(_config.InstantAlarmContactPin) == _config.InstantAlarmContactOpenValue ? HIGH : LOW;
       digitalWrite(_config.InstantAlarmLedPin, _instantAlarmState);
-
-      _instantAlarmStateValue = analogRead(_config.InstantAlarmContactPin);
       
       _delayedAlarmState = digitalRead(_config.DelayedAlarmContactPin) == _config.DelayedAlarmContactOpenValue ? HIGH : LOW;
       digitalWrite(_config.DelayedAlarmLedPin, _delayedAlarmState);
