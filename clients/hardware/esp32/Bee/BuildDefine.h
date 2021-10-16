@@ -1,7 +1,7 @@
 #ifndef _BuildDefine_h_
 #define _BuildDefine_h_
 
-//#define DEBUG
+#define DEBUG
 #ifdef DEBUG
   #define DPRINT(...)    Serial.print(__VA_ARGS__)     //DPRINT is a macro, debug print
   #define DPRINTF(...)   Serial.printf(__VA_ARGS__)     //DPRINT is a macro, debug print
@@ -12,16 +12,17 @@
   #define DPRINTLN(...)   //now defines a blank line
 #endif
 
-// #define ANTITHEFT
-#define VARIUS_SENSORS
+#define ANTITHEFT
+//#define VARIUS_SENSORS
 
 //#define DEBUG_BEESTATUS
 //#define DEBUG_BEESTATUS_VERBOSE
 //#define DEBUG_RCSENSORSMANAGER
 //#define DEBUG_SOCKETIOMANAGER
-//#define DEBUG_RESTCALL
+#define DEBUG_RESTCALL
 //#define DEBUG_TIMING
 //#define DEBUG_REST_TIMING
+//#define DEBUG_MEMORY_DIAG
 
 #define WIFISETUPEXTERNAL
 
