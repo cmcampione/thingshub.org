@@ -52,8 +52,9 @@ emyPxgcYxn/eR44/KJ4EBs+lVDR3veyJm+kXQ99b21/+jh5Xos1AnX5iItreGCc=
 )=====";
 
 //
-const int sensorsCapacity = 1024;
-
+const int sensorsJsonDocCapacity = 512;
+const int sensorsBufferCapacity = 512;
+const int urlBufferCapacity = 512;
 //
 struct PWM
 {
@@ -146,7 +147,7 @@ typedef sensor_collection::iterator sensor_iterator;
 typedef sensor_collection::const_iterator sensor_const_iterator;
 
 //
-class BeeStatus
+class BeeStatus // Represent a Thing
 {
 // ToDo: Implement a DevicesManager
 #pragma region DevicesManager
@@ -402,6 +403,7 @@ class BeeStatus
       return prior;
     }
 #pragma endregion DevicesManager
+
   private:
     sensor_collection sensors;
   private:
@@ -474,7 +476,7 @@ class BeeStatus
       return (sensor.prior || prior);
     }
   public:
-    void toJson(DynamicJsonDocument& doc)
+    void toJson(DynamicJsonDocument& sensorsJsonDoc)
     {
       // Sensor model sample
       /*
@@ -498,11 +500,11 @@ class BeeStatus
       */
 #ifdef DEBUG_BEESTATUS_VERBOSE
       // Declare a buffer to hold the result
-      char output[sensorsCapacity]; // To check
+      char output[sensorsBufferCapacity];
       int count = 0;
 #endif
-      doc.clear();
-      JsonArray sensorsNode = doc.createNestedArray("sensors");
+      sensorsJsonDoc.clear();
+      JsonArray sensorsNode = sensorsJsonDoc.createNestedArray("sensors");
       for (sensor_iterator it = sensors.begin(); it != sensors.end(); it++)
       {
         Sensor& sensorValue = it->second;
@@ -525,7 +527,7 @@ class BeeStatus
       }
 #ifdef DEBUG_BEESTATUS_VERBOSE
       // Produce a minified JSON document
-      serializeJson(doc, output);
+      serializeJson(sensorsJsonDoc, output);
       DPRINTF("BeeStatus::toJson - %s\n", output);
 #endif
     }
@@ -935,9 +937,9 @@ class BeesManager {
       return prior;
     }
   private:
-    static char urlBuffer[1024] PROGMEM;
-    static DynamicJsonDocument doc;
-    static char jsonDoc[1024] PROGMEM;
+    static char urlBuffer[urlBufferCapacity] PROGMEM;
+    static DynamicJsonDocument sensorsJsonDoc;
+    static char sensorsBuffer[sensorsBufferCapacity] PROGMEM;
   public:
     static void updateServer() {
 #ifdef DEBUG_RESTCALL
@@ -960,14 +962,14 @@ class BeesManager {
         http.addHeader("thapikey", "491e94d9-9041-4e5e-b6cb-9dad91bbf63d");
         http.addHeader("Content-Type", "application/json");
 
-        beeStatus.toJson(doc);
+        beeStatus.toJson(sensorsJsonDoc);
 
-        // String jsonDoc;
-        serializeJson(doc, jsonDoc);
+        // String sensorsBuffer;
+        serializeJson(sensorsJsonDoc, sensorsBuffer);
 #ifdef DEBUG_RESTCALL
-        DPRINTF("BeesManager::updateServer - before http.PUT() - %s\n", jsonDoc);
+        DPRINTF("BeesManager::updateServer - before http.PUT() - %s\n", sensorsBuffer);
 #endif        
-        int httpCode = http.PUT(jsonDoc);
+        int httpCode = http.PUT(sensorsBuffer);
 #ifdef DEBUG_RESTCALL
         DPRINTF("BeesManager::updateServer - http code after http.PUT() - %d\n", httpCode);
 #endif        
@@ -987,15 +989,15 @@ class BeesManager {
 #endif       
       }
 #ifdef DEBUG_RESTCALL
-        DPRINTLN("BeesManager::updateServer - exit from updateServer");
-        DPRINTLN("----------------------------------------------------------------------------------------");
+      DPRINTLN("BeesManager::updateServer - exit from updateServer");
+      DPRINTLN("----------------------------------------------------------------------------------------");
 #endif         
     }
 };
 beeStatus_collection BeesManager::beesStatus;
-char BeesManager::urlBuffer[1024] PROGMEM = "";
-DynamicJsonDocument BeesManager::doc(sensorsCapacity);
-char BeesManager::jsonDoc[1024] PROGMEM = "";
+char BeesManager::urlBuffer[urlBufferCapacity] PROGMEM = "";
+DynamicJsonDocument BeesManager::sensorsJsonDoc(sensorsJsonDocCapacity);
+char BeesManager::sensorsBuffer[sensorsBufferCapacity] PROGMEM = "";
 
 /////////////////////////////
 
