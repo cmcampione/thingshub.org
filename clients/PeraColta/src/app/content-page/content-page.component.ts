@@ -4,7 +4,7 @@ import { RealTimeConnectorService } from '../real-time-connector.service';
 import * as thingshub from 'thingshub-js-sdk';
 import { Subscription } from 'rxjs';
 import { select, Store } from '@ngrx/store';
-import { selectSensorsCount as selectSensorsCount } from '../sensors/sensors.selectors';
+import { selectSensorsCount} from '../sensors/sensors.selectors';
 import { getAllSensorsConfig } from '../sensors/sensors-config.actions';
 import { getAllSensorsValue } from '../sensors/sensors-value.actions';
 
@@ -77,7 +77,7 @@ export class ContentPageComponent implements OnInit, OnDestroy {
     }
   };
 
-  constructor(private readonly store: Store,
+  constructor(private readonly store: Store<{}>,
     private accountService: AccountService,
     private realTimeConnector: RealTimeConnectorService) {
       this.subscriptionIsLoggedIn = this.accountService.isLoggedIn$.subscribe(this.checkLogin);

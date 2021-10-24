@@ -17,7 +17,8 @@
     "lib": [
       "es2018",
       "dom"
-    ]
+    ],
+    "skipLibCheck": true // It's bad forced option. To remove in the next update
   },
   "angularCompilerOptions": {
     "fullTemplateTypeCheck": true,
