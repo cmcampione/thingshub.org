@@ -52,7 +52,7 @@ const defaultAlertEmail = process.env.DEFAULT_ALERT_EMAIL;
 const ThingsConfigs = new Map([
 	["f4c3c80b-d561-4a7b-80a5-f4805fdab9bb", {// My home
 		config: {
-			configThingId: "fb9071b5-133a-4716-86c6-4e14d798a2d1", // My Home - Config
+			configThingId: "041d065d-8354-4bac-b34b-221fc6619c14", // My Home - Config
 			thingKind: "Home appliance", // Home appliance
 			onUpdateThingValueInterval: 20 * 1000, // 10 seconds - Bees pull every 5 seconds		
 			emails: [defaultAlertEmail],
@@ -135,9 +135,9 @@ const ThingsConfigs = new Map([
 ]);
 */
 const ThingsConfigs = new Map([
-	["f4c3c80b-d561-4a7b-80a5-f4805fdab9bb", {// My home
+	["041d065d-8354-4bac-b34b-221fc6619c14", {// My home
 		config: {
-			configThingId: "fb9071b5-133a-4716-86c6-4e14d798a2d1", // My Home - Config
+			configThingId: "",
 			thingKind: "Home appliance", // Home appliance
 			onUpdateThingValueInterval: 20 * 1000, // 20 seconds - Bees pull every 5 seconds		
 			emails: [defaultAlertEmail],
@@ -147,14 +147,6 @@ const ThingsConfigs = new Map([
 			sensors: new Map([
 				["MAT-ALSTATE", {
 					sensorName: "In allarme",
-					onUpdateThingValueAlarmValue: 1
-				}],
-				["MAT-AURSTATE", {
-					sensorName: "Antifurto Armato da remoto",
-					onUpdateThingValueAlarmValue: 1
-				}],
-				["MAT-AUSTATE", {
-					sensorName: "Antifurto Armato",
 					onUpdateThingValueAlarmValue: 1
 				}],
 				["MAT-DASTATE", {
@@ -176,16 +168,6 @@ const ThingsConfigs = new Map([
 			inAlarmForDelay: false,
 			sensors: new Map([
 				["MAT-ALSTATE", {
-					inAlarmForAlarm: false,
-					emailAlarmSending: false,
-					emailAlarmSent: false
-				}],
-				["MAT-AURSTATE", {
-					inAlarmForAlarm: false,
-					emailAlarmSending: false,
-					emailAlarmSent: false
-				}],
-				["MAT-AUSTATE", {
 					inAlarmForAlarm: false,
 					emailAlarmSending: false,
 					emailAlarmSent: false
