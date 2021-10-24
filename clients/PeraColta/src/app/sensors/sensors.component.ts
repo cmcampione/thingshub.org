@@ -31,7 +31,7 @@ export class SensorsComponent implements OnInit, OnDestroy {
 
   private sensorsCount = 0;
   public sensorsCount$ = this.store.pipe(select(selectSensorsCount));
-  private readonly subscriptionsensorsCount: Subscription = null;
+  private readonly subscriptionSensorsCount: Subscription = null;
 
   private readonly onUpdateThingValue = (thingId: string, value: any, asCmd: boolean): void => {
     if (asCmd)
@@ -51,11 +51,11 @@ export class SensorsComponent implements OnInit, OnDestroy {
     });
   }
 
-  constructor(private readonly store: Store,
+  constructor(private readonly store: Store<{}>,
     public readonly realTimeConnector: RealTimeConnectorService) {
       // Info: Here I'm already loggedin so is possible to register an event handler
       this.realTimeConnector.realTimeConnectorRaw.setHook('onUpdateThingValue', this.onUpdateThingValue);
-      this.subscriptionsensorsCount = this.sensorsCount$.subscribe(v => this.sensorsCount = v);
+      this.subscriptionSensorsCount = this.sensorsCount$.subscribe(v => this.sensorsCount = v);
   }
   // Info: Called every time component is shown
   ngOnInit() {
@@ -77,7 +77,7 @@ export class SensorsComponent implements OnInit, OnDestroy {
     // ToDo: Arrive after the real-time connector is unsubscribed
     this.realTimeConnector.realTimeConnectorRaw.remHook('onUpdateThingValue', this.onUpdateThingValue);
     this.canceler.cancel();
-    this.subscriptionsensorsCount.unsubscribe();
+    this.subscriptionSensorsCount.unsubscribe();
   }
 
   // https://netbasal.com/angular-2-improve-performance-with-trackby-cc147b5104e5
