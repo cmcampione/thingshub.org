@@ -207,7 +207,7 @@ class BeeStatus // Represent a Thing
       }
     }
 #endif
-#ifdef ANTITHEFT
+#if defined(ANTITHEFT) || defined(ANTITHEFT_TEST)
     static void setupDevicesAntiTheaf()
     {
       { // Device 1000 - Main AntiTheaf
@@ -235,7 +235,7 @@ class BeeStatus // Represent a Thing
 #ifdef VARIUS_SENSORS
       setupDevicesVarius();
 #endif
-#ifdef ANTITHEFT
+#if defined(ANTITHEFT) || defined(ANTITHEFT_TEST)
       setupDevicesAntiTheaf();
 #endif
       for (device_const_iterator it = devices.begin(); it != devices.end(); it++)
@@ -761,7 +761,7 @@ class BeesManager {
       }
     }
 #endif
-#ifdef ANTITHEFT
+#if defined(ANTITHEFT) || defined(ANTITHEFT_TEST)
     static void setupAntitheft() {
       { // Commands
         sensor_collection sensors;
@@ -797,7 +797,12 @@ class BeesManager {
         }
         BeeStatus bee;
         bee.setup(sensors);
+#ifdef ANTITHEFT        
         beesStatus["f4c3c80b-d561-4a7b-80a5-f4805fdab9bb"] = bee;
+#endif
+#ifdef ANTITHEFT_TEST
+        beesStatus["f6be37c4-ef19-4322-8115-2ec485819c59"] = bee;
+#endif
       }     
 
       { // States
@@ -825,7 +830,12 @@ class BeesManager {
                   
         BeeStatus bee;
         bee.setup(sensors);
+#ifdef ANTITHEFT
         beesStatus["041d065d-8354-4bac-b34b-221fc6619c14"] = bee;
+#endif
+#ifdef ANTITHEFT_TEST
+        beesStatus["983f743a-ae31-45ba-a781-a7fe0e0985fe"] = bee;
+#endif
       }
       
     }
@@ -1014,10 +1024,12 @@ void onUpdateThingValue(const StaticJsonDocument<msgCapacity>& jMsg)
 #endif
     return;
   }
-  if (!jMsg.is<JsonArray>())
+  if (!jMsg.is<JsonArrayConst>())
   {
 #ifdef DEBUG_SOCKETIOMANAGER
     DPRINTLN("DEBUG_SOCKETIOMANAGER - onUpdateThingValue: !jMsg.is<JsonArray>()");
+    serializeJson(jMsg, Serial);
+    DPRINTLN("");
     DPRINTLN("DEBUG_SOCKETIOMANAGER - onUpdateThingValue: end");
 #endif
     return;
@@ -1026,6 +1038,8 @@ void onUpdateThingValue(const StaticJsonDocument<msgCapacity>& jMsg)
   {
 #ifdef DEBUG_SOCKETIOMANAGER
     DPRINTLN("DEBUG_SOCKETIOMANAGER - onUpdateThingValue: jMsg.size() != 4");
+    serializeJson(jMsg, Serial);
+    DPRINTLN("");
     DPRINTLN("DEBUG_SOCKETIOMANAGER - onUpdateThingValue: end");
 #endif
     return;
@@ -1037,6 +1051,8 @@ void onUpdateThingValue(const StaticJsonDocument<msgCapacity>& jMsg)
   {
 #ifdef DEBUG_SOCKETIOMANAGER
     DPRINTLN("DEBUG_SOCKETIOMANAGER - onUpdateThingValue: !asCmd");
+    serializeJson(jMsg, Serial);
+    DPRINTLN("");
     DPRINTLN("DEBUG_SOCKETIOMANAGER - onUpdateThingValue: end");
 #endif
     return;
@@ -1113,10 +1129,9 @@ void setup()
     else if (error == OTA_END_ERROR) DPRINTLN("End Failed");
   });
   ArduinoOTA.begin();
-/*  
+  
   SocketIOManager::on("onUpdateThingValue", onUpdateThingValue);
-  SocketIOManager::beginSocketSSLWithCA("api.thingshub.org", 3000, "/socket.io/?EIO=4&token=491e94d9-9041-4e5e-b6cb-9dad91bbf63d", root_ca, "arduino");
-*/  
+  SocketIOManager::beginSocketSSLWithCA("api.thingshub.org", 3000, "/socket.io/?EIO=4&token=491e94d9-9041-4e5e-b6cb-9dad91bbf63d", root_ca, "arduino");  
 }
 
 unsigned long updateServerInterval = 0;
@@ -1154,7 +1169,7 @@ void loop()
     BeesManager::updateServer(); 
     updateServerInterval = millis();
   }
-  // SocketIOManager::loop();
+  SocketIOManager::loop();
 
 #ifdef DEBUG_MEMORY_DIAG
   DPRINTLN("loop - after -----------------------------------------------------------------------");
