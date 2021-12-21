@@ -1069,6 +1069,8 @@ void onUpdateThingValue(const StaticJsonDocument<msgCapacity>& jMsg)
   {
 #ifdef DEBUG_SOCKETIOMANAGER
     DPRINTLN("DEBUG_SOCKETIOMANAGER - onUpdateThingValue: !beeObj.containsKey('sensors')");
+    serializeJson(jMsg, Serial);
+    DPRINTLN("");
     DPRINTLN("DEBUG_SOCKETIOMANAGER - onUpdateThingValue: Command end");
 #endif
     return;
