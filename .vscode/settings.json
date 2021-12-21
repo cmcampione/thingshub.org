@@ -9,5 +9,6 @@
         "vector": "cpp"
     },
     "C_Cpp.intelliSenseEngineFallback": "Enabled",
-    "C_Cpp.dimInactiveRegions": false
+    "C_Cpp.dimInactiveRegions": false,
+    "cmake.configureOnOpen": false
 }
