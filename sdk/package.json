@@ -28,11 +28,11 @@
     "@types/promise.prototype.finally": "^2.0.4",
     "@types/qs": "^6.9.7",
     "dts-bundle-generator": "^6.2.0",
-    "filemanager-webpack-plugin": "^2.0.5",
+    "filemanager-webpack-plugin": "^6.1.7",
     "ts-loader": "^9.2.6",
     "webpack": "^5.65.0",
     "webpack-cli": "^4.9.1",
-    "webpack-dev-server": "^4.6.0",
+    "webpack-dev-server": "^4.7.1",
     "webpack-shell-plugin-next": "^2.2.2"
   }
 }
