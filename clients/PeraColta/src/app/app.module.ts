@@ -29,44 +29,45 @@ import { appReducer } from './app.reducer';
 import { ThingComponent } from './things/thing/thing.component';
 
 @NgModule({
-  declarations: [
-    AppComponent,
-    LoginComponent,
-    MapComponent,
-    Sensors0Component,
-    ThingComponent,
-    ThingsComponent,
-    ContentPageComponent],
-  entryComponents: [],
-  imports: [
-    BrowserModule,
-    IonicModule.forRoot(),
-    AppRoutingModule,
-    FormsModule,
-    AgmCoreModule.forRoot({
-      apiKey: 'AIzaSyD11pjYHyE0ekfygLBNJhvL1FgUp9-twkQ'
-    }),
-    StoreModule.forRoot({}, {
-      // https://ngrx.io/guide/store/configuration/runtime-checks
-      runtimeChecks: {
-        strictStateImmutability: true,
-        strictActionImmutability: true,
-        strictStateSerializability: true,
-        strictActionSerializability: true,
-        strictActionWithinNgZone: true,
-        strictActionTypeUniqueness: true,
-    }}),
-    StoreDevtoolsModule.instrument({ maxAge: 25, logOnly: environment.production }),
-    EffectsModule.forRoot(), // The EffectsModule.forRoot() method must be added to your AppModule imports
-                             // even if you don't register any root-level effects.
-                             // https://ngrx.io/guide/effects
-    SensorsModule
-  ],
-  providers: [
-    StatusBar,
-    SplashScreen,
-    { provide: RouteReuseStrategy, useClass: IonicRouteStrategy }
-  ],
-  bootstrap: [AppComponent]
+    declarations: [
+        AppComponent,
+        LoginComponent,
+        MapComponent,
+        Sensors0Component,
+        ThingComponent,
+        ThingsComponent,
+        ContentPageComponent
+    ],
+    imports: [
+        BrowserModule,
+        IonicModule.forRoot(),
+        AppRoutingModule,
+        FormsModule,
+        AgmCoreModule.forRoot({
+            apiKey: 'AIzaSyD11pjYHyE0ekfygLBNJhvL1FgUp9-twkQ'
+        }),
+        StoreModule.forRoot({}, {
+            // https://ngrx.io/guide/store/configuration/runtime-checks
+            runtimeChecks: {
+                strictStateImmutability: true,
+                strictActionImmutability: true,
+                strictStateSerializability: true,
+                strictActionSerializability: true,
+                strictActionWithinNgZone: true,
+                strictActionTypeUniqueness: true,
+            }
+        }),
+        StoreDevtoolsModule.instrument({ maxAge: 25, logOnly: environment.production }),
+        EffectsModule.forRoot(), // The EffectsModule.forRoot() method must be added to your AppModule imports
+        // even if you don't register any root-level effects.
+        // https://ngrx.io/guide/effects
+        SensorsModule
+    ],
+    providers: [
+        StatusBar,
+        SplashScreen,
+        { provide: RouteReuseStrategy, useClass: IonicRouteStrategy }
+    ],
+    bootstrap: [AppComponent]
 })
 export class AppModule {}
