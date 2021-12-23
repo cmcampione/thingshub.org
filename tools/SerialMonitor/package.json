@@ -15,10 +15,10 @@
     "url": "https://github.com/cmcampione/thingshub.org.git"
   },
   "dependencies": {
-    "dotenv": "^8.2.0",
+    "dotenv": "^10.0.0",
     "ejs": "^3.1.6",
     "moment": "^2.29.1",
-    "serialport": "^9.0.7",
+    "serialport": "^9.2.8",
     "winston": "^3.3.3"
   }
 }
