@@ -22,7 +22,7 @@ import { ThingsComponent } from './things/things.component';
 import { Sensors0Component } from './sensors0/sensors0.component';
 import { ContentPageComponent } from './content-page/content-page.component';
 
-import { SensorsModule } from './sensors/sensors.module';
+import { SensorsModule } from './sensors1/sensors.module';
 
 import { environment } from '../environments/environment';
 import { appReducer } from './app.reducer';

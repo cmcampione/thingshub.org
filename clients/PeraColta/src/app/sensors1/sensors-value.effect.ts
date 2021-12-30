@@ -3,7 +3,7 @@ import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { EMPTY, from } from 'rxjs';
 import { map, mergeMap, catchError, tap } from 'rxjs/operators';
 import { SensorsValueService } from './sensors-value.service';
-import { GET_ALL_SENSORS_VALUE, GET_ALL_SENSORS_VALUE_SUCCESS } from '../sensors/sensors-value.actions';
+import { GET_ALL_SENSORS_VALUE, GET_ALL_SENSORS_VALUE_SUCCESS } from './sensors-value.actions';
 import { RESET_APP_STATE } from '../app.actions';
 
 @Injectable()

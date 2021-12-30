@@ -1,6 +1,6 @@
 import { createAction, props } from '@ngrx/store';
 import { RESET_APP_STATE } from '../app.actions';
-import { SensorValue } from '../sensors/sensor-value.model';
+import { SensorValue } from './sensor-value.model';
 
 export const GET_ALL_SENSORS_VALUE          = '[Sensors Value] Load Sensors Value';
 export const GET_ALL_SENSORS_VALUE_SUCCESS  = '[Sensors Value] Sensors Value Loaded Success';
