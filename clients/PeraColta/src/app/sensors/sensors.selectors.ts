@@ -1,5 +1,4 @@
 import { createSelector, createFeatureSelector } from '@ngrx/store';
-import { SensorsState } from './sensors.state';
 import { SensorValue } from '../sensors/sensor-value.model';
 import { SensorConfig, SensorKind, SensorKindType } from '../sensors/sensor-config.model';
 import { Sensor } from '../sensors/sensor.model';
@@ -8,11 +7,9 @@ export const SensorsValueFeatureName = 'sensorsValue';
 export const SensorsConfigFeatureName = 'sensorsConfig';
 
 const selectSensorsValue = createFeatureSelector<
-    SensorsState,
     ReadonlyArray<SensorValue>>(SensorsValueFeatureName);
 
 const selectSensorsConfig = createFeatureSelector<
-    SensorsState,
     ReadonlyArray<SensorConfig>>(SensorsConfigFeatureName);
 
 export const selectSensors = createSelector(
