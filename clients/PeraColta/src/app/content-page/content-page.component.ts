@@ -4,9 +4,9 @@ import { RealTimeConnectorService } from '../real-time-connector.service';
 import * as thingshub from 'thingshub-js-sdk';
 import { Subscription } from 'rxjs';
 import { select, Store } from '@ngrx/store';
-import { selectSensorsCount} from '../sensors/sensors.selectors';
-import { getAllSensorsConfig } from '../sensors/sensors-config.actions';
-import { getAllSensorsValue } from '../sensors/sensors-value.actions';
+import { selectSensorsCount} from '../sensors1/sensors.selectors';
+import { getAllSensorsConfig } from '../sensors1/sensors-config.actions';
+import { getAllSensorsValue } from '../sensors1/sensors-value.actions';
 
 @Component({
   selector: 'app-home',

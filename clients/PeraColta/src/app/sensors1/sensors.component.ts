@@ -1,8 +1,8 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { HttpRequestCanceler } from 'thingshub-js-sdk';
 import { select, Store } from '@ngrx/store';
-import { selectSensors, selectSensorsCount } from '../sensors/sensors.selectors';
-import { setSensorValue } from '../sensors/sensors-value.actions';
+import { selectSensors, selectSensorsCount } from './sensors.selectors';
+import { setSensorValue } from './sensors-value.actions';
 import { RealTimeConnectorService } from '../real-time-connector.service';
 import { SensorValue } from './sensor-value.model';
 import { Sensor } from './sensor.model';

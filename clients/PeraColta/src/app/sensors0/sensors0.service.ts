@@ -1,5 +1,5 @@
 import { Injectable, OnDestroy } from '@angular/core';
-import { Sensor } from '../sensors/sensor.model';
+import { Sensor } from './sensor.model';
 import { ThingsService } from '../things.service';
 import { Thing, HttpRequestCanceler } from 'thingshub-js-sdk';
 
@@ -63,9 +63,7 @@ export class Sensors0Service implements OnDestroy {
             id: sensorRaw.id,
             now: sensorRaw.now,
             millis: sensorRaw.millis,
-            value: sensorRaw.value,
-            sensorConfig: null,
-            sensorValue: null
+            value: sensorRaw.value
           }
           this.sensors.push(sensor);
         })
