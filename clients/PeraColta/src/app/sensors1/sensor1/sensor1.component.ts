@@ -1,20 +1,20 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { SensorKind, SensorKindType } from '../sensor-config.model';
-import { Sensor } from '../sensor.model';
-import { SensorsValueService } from '../sensors-value.service';
+import { Sensor1Kind, Sensor1KindType } from '../sensor1-config.model';
+import { Sensor1 } from '../sensor1.model';
+import { SensorsValueService } from '../sensors1-value.service';
 
 @Component({
-  selector: 'app-sensor',
-  templateUrl: './sensor.component.html',
-  styleUrls: ['./sensor.component.scss'],
+  selector: 'app-sensor1',
+  templateUrl: './sensor1.component.html',
+  styleUrls: ['./sensor1.component.scss'],
 })
-export class SensorComponent implements OnInit {
+export class Sensor1Component implements OnInit {
 
-  @Input() sensor: Sensor;
+  @Input() sensor: Sensor1;
 
   // https://stackoverflow.com/questions/44045311/cannot-approach-typescript-enum-within-html
-  SensorKind = SensorKind;
-  SensorKindType = SensorKindType;
+  SensorKind = Sensor1Kind;
+  SensorKindType = Sensor1KindType;
 
   constructor(private readonly sensorsValueService: SensorsValueService) {
 

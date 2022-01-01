@@ -1,8 +1,11 @@
 import { Injectable, OnDestroy } from '@angular/core';
+
 import { Thing, HttpRequestCanceler } from 'thingshub-js-sdk';
-import { SensorValue } from './sensor-value.model';
+import { Sensor } from './sensor.model';
+import { ThingSensor } from './thing-sensor.model';
 import { ThingsSensorsValueService } from './things-sensors-value.service';
 
+// ToDo: Move up
 interface SensorValueRaw {
     id: string;
     now: boolean;
@@ -11,7 +14,7 @@ interface SensorValueRaw {
 }
 
 @Injectable()
-export class SensorsValueService implements OnDestroy {
+export class ThingsSensorsService implements OnDestroy {
 
     private things: Thing[] = [];// It will be only a ref to this.thingsService.mainThing.children
 
@@ -30,28 +33,36 @@ export class SensorsValueService implements OnDestroy {
         this.thingsService.done();
     }
 
-    public async getAll(): Promise<ReadonlyArray<SensorValue>> {
+    public async getAll(): Promise<ReadonlyArray<ThingSensor>> {
         await this.thingsService.thingsManager.getMoreThings(null);// ToDo: why null?
-        const sensorsValue: SensorValue[] = [];
+        const thingsSensors: ThingSensor[] = [];
         this.things.forEach(thing => {
+            const thingSensor: ThingSensor = {
+                id: thing.id,
+                name: thing.name,
+                sensors: []
+            }
             if (thing.value && thing.value.sensors)
                 thing.value.sensors.forEach((sensorRaw: SensorValueRaw) => {
                     // ToDo: Try to use spread operator
-                    const sensor: SensorValue = {
-                        thingId: thing.id,
+                    const sensor: Sensor = {
                         id: sensorRaw.id,
-                        now: sensorRaw.now,
-                        millis: sensorRaw.millis,
-                        value: sensorRaw.value
+                        sensorConfig: null,
+                        sensorValue: {
+                            now: sensorRaw.now,
+                            millis: sensorRaw.millis,
+                            value: sensorRaw.value
+                        }
                     }
-                    sensorsValue.push(sensor);
+                    thingSensor.sensors.push(sensor);
                 })
+            thingsSensors.push(thingSensor);
         })
-        return sensorsValue;
+        return thingsSensors;
     }
 
-    public async setSensorValue(sensorValue : SensorValue, value: any): Promise<any> {
-        const thing: Thing = this.searchThingById(sensorValue.thingId);
+    public async setSensorValue(thingSensor : ThingSensor, value: any): Promise<any> {
+        const thing: Thing = this.searchThingById(thingSensor.id);
         if (!thing)
             return; // Sanity check
         const sensorsValueRaw = { sensors: [value] }

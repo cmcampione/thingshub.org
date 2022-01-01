@@ -1,12 +1,14 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Subscription } from 'rxjs';
+import { select, Store } from '@ngrx/store';
+
 import { AccountService } from '../account.service';
 import { RealTimeConnectorService } from '../real-time-connector.service';
 import * as thingshub from 'thingshub-js-sdk';
-import { Subscription } from 'rxjs';
-import { select, Store } from '@ngrx/store';
-import { selectSensorsCount} from '../sensors1/sensors.selectors';
-import { getAllSensorsConfig } from '../sensors1/sensors-config.actions';
-import { getAllSensorsValue } from '../sensors1/sensors-value.actions';
+
+import { selectSensors1Count} from '../sensors1/sensors1.selectors';
+import { getAllSensorsConfig } from '../sensors1/sensors1-config.actions';
+import { getAllSensorsValue } from '../sensors1/sensors1-value.actions';
 
 @Component({
   selector: 'app-home',
@@ -30,7 +32,7 @@ export class ContentPageComponent implements OnInit, OnDestroy {
   private readonly subscriptionRealTimeConnector: Subscription = null;
 
   private sensorsCount = 0;
-  public sensorsCount$ = this.store.pipe(select(selectSensorsCount));
+  public sensorsCount$ = this.store.pipe(select(selectSensors1Count));
   private readonly subscriptionsensorsCount: Subscription = null;
 
   private readonly checkLogin = (isLoggedIn: boolean) => {

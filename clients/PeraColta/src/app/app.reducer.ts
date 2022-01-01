@@ -1,4 +1,4 @@
-import { createReducer, on, select } from '@ngrx/store';
+import { createReducer, on } from '@ngrx/store';
 import { resetAppState } from './app.actions';
 
 export const initialState: {} = {};

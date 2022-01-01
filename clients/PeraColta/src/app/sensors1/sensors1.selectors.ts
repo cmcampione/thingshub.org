@@ -1,29 +1,29 @@
 import { createSelector, createFeatureSelector } from '@ngrx/store';
-import { SensorValue } from './sensor-value.model';
-import { SensorConfig, SensorKind, SensorKindType } from './sensor-config.model';
-import { Sensor } from './sensor.model';
+import { Sensor1Value } from './sensor1-value.model';
+import { Sensor1Config, Sensor1Kind, Sensor1KindType } from './sensor1-config.model';
+import { Sensor1 } from './sensor1.model';
 
-export const SensorsValueFeatureName = 'sensorsValue';
-export const SensorsConfigFeatureName = 'sensorsConfig';
+export const Sensors1ValueFeatureName = 'sensors1Value';
+export const Sensors1ConfigFeatureName = 'sensors1Config';
 
-const selectSensorsValue = createFeatureSelector<
-    ReadonlyArray<SensorValue>>(SensorsValueFeatureName);
+const selectSensors1Value = createFeatureSelector<
+    ReadonlyArray<Sensor1Value>>(Sensors1ValueFeatureName);
 
-const selectSensorsConfig = createFeatureSelector<
-    ReadonlyArray<SensorConfig>>(SensorsConfigFeatureName);
+const selectSensors1Config = createFeatureSelector<
+    ReadonlyArray<Sensor1Config>>(Sensors1ConfigFeatureName);
 
-export const selectSensors = createSelector(
-    selectSensorsValue,
-    selectSensorsConfig,
-    (sensorsValue : ReadonlyArray<SensorValue>, sensorsConfig : ReadonlyArray<SensorConfig>) : ReadonlyArray<Sensor> => {
+export const selectSensors1 = createSelector(
+    selectSensors1Value,
+    selectSensors1Config,
+    (sensorsValue : ReadonlyArray<Sensor1Value>, sensorsConfig : ReadonlyArray<Sensor1Config>) : ReadonlyArray<Sensor1> => {
         return sensorsValue.map((sensorValueRaw) => {
-            let sensorConfigRaw: SensorConfig = {
+            let sensorConfigRaw: Sensor1Config = {
                 thingId: null,
                 name: 'No name',
                 id: sensorValueRaw.id,
                 relateThing: null,
-                kind: SensorKind.Undefined,
-                kindType: SensorKindType.Undefined,
+                kind: Sensor1Kind.Undefined,
+                kindType: Sensor1KindType.Undefined,
                 redValueMin: 0,
                 redValueMax: 0,
                 greenValueMin: 0,
@@ -51,9 +51,9 @@ export const selectSensors = createSelector(
         }});
     });
 
-export const selectSensorsCount = createSelector(
-    selectSensors,
-    (sensors: ReadonlyArray<Sensor>) => sensors.length)
+export const selectSensors1Count = createSelector(
+    selectSensors1,
+    (sensors: ReadonlyArray<Sensor1>) => sensors.length)
 
 /* ToDo: To remove
 export const selectSensor = createSelector(
