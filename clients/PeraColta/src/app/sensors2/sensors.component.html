@@ -1,8 +1,8 @@
 <ion-card>
   <ion-card-header>
-    <ion-card-title>My Home - New Sensors</ion-card-title>
+    <ion-card-title>{{ thingSensor.name }}</ion-card-title>
   </ion-card-header>
-  <ion-list *ngFor="let sensor of sensors$ | async; trackBy: trackByFn">   
-    <app-sensor [sensor]="sensor"></app-sensor>    
+  <ion-list *ngFor="let sensor of thingSensor.sensors">   
+    <app-sensor [sensor]="sensor"></app-sensor>
   </ion-list>
 </ion-card>

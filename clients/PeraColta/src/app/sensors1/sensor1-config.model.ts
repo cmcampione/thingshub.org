@@ -1,24 +1,24 @@
 //
 
-export enum SensorKind {
+export enum Sensor1Kind {
     Undefined = 0,
     Analogic,
     Digital
 }
 
-export enum SensorKindType {
+export enum Sensor1KindType {
     Undefined = 0,
     Input,
     Output,
     InputOutput
 }
-export interface SensorConfig {
+export interface Sensor1Config {
     thingId: string;
     id: string;
     relateThing: string;
     name: string;
-    kind: SensorKind;
-    kindType: SensorKindType;
+    kind: Sensor1Kind;
+    kindType: Sensor1KindType;
     redValueMin: number;
     redValueMax: number;
     greenValueMin: number;

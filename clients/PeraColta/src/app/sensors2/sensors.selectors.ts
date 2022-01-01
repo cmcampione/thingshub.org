@@ -1,70 +1,47 @@
 import { createSelector, createFeatureSelector } from '@ngrx/store';
-import { SensorValue } from './sensor-value.model';
 import { SensorConfig, SensorKind, SensorKindType } from './sensor-config.model';
-import { Sensor } from './sensor.model';
+import { ThingSensor } from './thing-sensor.model';
 
-export const SensorsValueFeatureName = 'sensorsValue';
 export const SensorsConfigFeatureName = 'sensorsConfig';
-
-const selectSensorsValue = createFeatureSelector<
-    ReadonlyArray<SensorValue>>(SensorsValueFeatureName);
+export const ThingsSensorsFeatureName = 'thingsSensors'
 
 const selectSensorsConfig = createFeatureSelector<
     ReadonlyArray<SensorConfig>>(SensorsConfigFeatureName);
 
-export const selectSensors = createSelector(
-    selectSensorsValue,
+const _selectThingsSensors = createFeatureSelector<
+    ReadonlyArray<ThingSensor>>(ThingsSensorsFeatureName);
+
+export const selectThingsSensors = createSelector(
+    _selectThingsSensors,
     selectSensorsConfig,
-    (sensorsValue : ReadonlyArray<SensorValue>, sensorsConfig : ReadonlyArray<SensorConfig>) : ReadonlyArray<Sensor> => {
-        return sensorsValue.map((sensorValueRaw) => {
-            let sensorConfigRaw: SensorConfig = {
-                thingId: null,
-                name: 'No name',
-                id: sensorValueRaw.id,
-                relateThing: null,
-                kind: SensorKind.Undefined,
-                kindType: SensorKindType.Undefined,
-                redValueMin: 0,
-                redValueMax: 0,
-                greenValueMin: 0,
-                greenValueMax: 0,
-                min: 0,
-                max: 0
-            }
-            const sc = sensorsConfig.find(sensorConfig => sensorValueRaw.id === sensorConfig.id &&
-                sensorConfig.relateThing === sensorValueRaw.thingId);
-            if (sc)
-                sensorConfigRaw = sc;
-            return {
-                thingId: sensorValueRaw.thingId,
-                id: sensorValueRaw.id, // It's equal to sensorConfigRaw.id
-
-                // ToDo: To remove
-                name: sensorConfigRaw.name,
-                now: sensorValueRaw.now,
-                millis: sensorValueRaw.millis,
-                value: sensorValueRaw.value,
-
-                //
-                sensorConfig: sensorConfigRaw,
-                sensorValue: sensorValueRaw
-        }});
+    (thingsSensors : ReadonlyArray<ThingSensor>, sensorsConfig : ReadonlyArray<SensorConfig>) : ReadonlyArray<ThingSensor> => {
+        return thingsSensors.map(thingSensor => {
+            thingSensor.sensors.forEach(sensor => {
+                let sensorConfigDef: SensorConfig = {
+                    thingId: null,
+                    name: 'No name',
+                    id: sensor.id,
+                    relateThing: null,
+                    kind: SensorKind.Undefined,
+                    kindType: SensorKindType.Undefined,
+                    redValueMin: 0,
+                    redValueMax: 0,
+                    greenValueMin: 0,
+                    greenValueMax: 0,
+                    min: 0,
+                    max: 0
+                }
+                const sc = sensorsConfig.find(sensorConfig => sensor.id === sensorConfig.id &&
+                    sensorConfig.relateThing === thingSensor.id);
+                if (sc)
+                    sensorConfigDef = sc;
+                sensor.sensorConfig = sensorConfigDef;
+            });
+            return thingSensor
+        });
     });
 
-export const selectSensorsCount = createSelector(
-    selectSensors,
-    (sensors: ReadonlyArray<Sensor>) => sensors.length)
+export const selectThingsSensorsCount = createSelector(
+    selectThingsSensors,
+    (thingsSensors: ReadonlyArray<ThingSensor>) => thingsSensors.length)
 
-/* ToDo: To remove
-export const selectSensor = createSelector(
-    selectSensorsValue,
-    (sensorsValue: Array<SensorValue>, props : { thingId: string, sensorsId: string }) =>
-        sensorsValue.find((sensorValue) => props.thingId === sensorValue.thingId && props.sensorId === sensorValue.id)
-)
-
-export const selectSensor = (thingId: string, sensorId: string) => createSelector(
-    selectSensorsValue,
-    (sensorsValue: Array<SensorValue>) =>
-        sensorsValue.find(sensorValue => thingId === sensorValue.thingId && sensorId === sensorValue.id)
-)
-*/

@@ -1,7 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { SensorKind, SensorKindType } from '../sensor-config.model';
 import { Sensor } from '../sensor.model';
-import { SensorsValueService } from '../sensors-value.service';
 
 @Component({
   selector: 'app-sensor',
@@ -16,7 +15,7 @@ export class SensorComponent implements OnInit {
   SensorKind = SensorKind;
   SensorKindType = SensorKindType;
 
-  constructor(private readonly sensorsValueService: SensorsValueService) {
+  constructor() {
 
   }
 
@@ -41,7 +40,7 @@ export class SensorComponent implements OnInit {
       value: $event.detail.value
     }
     try {
-      await this.sensorsValueService.setSensorValue(this.sensor.sensorValue, value)
+      // await this.sensorsValueService.setSensorValue(this.sensor.sensorValue, value)
     }
     catch(error) {
       // ToDo: During 401 error we don't have to notify nothing, but for different error we should notify some error message

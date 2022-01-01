@@ -1,0 +1,8 @@
+<ion-card>
+  <ion-card-header>
+    <ion-card-title>Sensors</ion-card-title>
+  </ion-card-header>
+  <ion-list *ngFor="let thingSensor of thingsSensors$ | async; trackBy: trackByFn">   
+    <app-sensors [thingSensor] = "thingSensor"></app-sensors>    
+  </ion-list>
+</ion-card>

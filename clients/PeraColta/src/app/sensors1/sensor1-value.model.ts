@@ -1,4 +1,4 @@
-export interface SensorValue {
+export interface Sensor1Value {
     thingId: string;
     id: string;
     now: boolean;

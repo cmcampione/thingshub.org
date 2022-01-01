@@ -1,9 +1,9 @@
 import { createReducer, on } from '@ngrx/store';
 import { resetAppState } from '../app.actions';
-import { SensorConfig } from './sensor-config.model';
-import { getAllSensorsConfig, getAllSensorsConfigSuccess } from './sensors-config.actions';
+import { Sensor1Config } from './sensor1-config.model';
+import { getAllSensorsConfig, getAllSensorsConfigSuccess } from './sensors1-config.actions';
 
-export const initialState: ReadonlyArray<SensorConfig> = [];
+export const initialState: ReadonlyArray<Sensor1Config> = [];
 
 export const sensorsConfigReducer = createReducer(
     initialState,

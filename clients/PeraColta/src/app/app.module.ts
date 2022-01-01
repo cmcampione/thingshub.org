@@ -18,15 +18,16 @@ import { AppRoutingModule } from './app-routing.module';
 
 import { LoginComponent } from './login/login.component';
 import { MapComponent } from './map/map.component';
+import { ThingComponent } from './things/thing/thing.component';
 import { ThingsComponent } from './things/things.component';
 import { Sensors0Component } from './sensors0/sensors0.component';
 import { ContentPageComponent } from './content-page/content-page.component';
 
-import { SensorsModule } from './sensors1/sensors.module';
+import { Sensors1Module } from './sensors1/sensors1.module';
+import { Sensors2Module } from './sensors2/sensors.module';
 
 import { environment } from '../environments/environment';
 import { appReducer } from './app.reducer';
-import { ThingComponent } from './things/thing/thing.component';
 
 @NgModule({
     declarations: [
@@ -61,7 +62,8 @@ import { ThingComponent } from './things/thing/thing.component';
         EffectsModule.forRoot(), // The EffectsModule.forRoot() method must be added to your AppModule imports
         // even if you don't register any root-level effects.
         // https://ngrx.io/guide/effects
-        SensorsModule
+        Sensors1Module,
+        Sensors2Module
     ],
     providers: [
         StatusBar,
