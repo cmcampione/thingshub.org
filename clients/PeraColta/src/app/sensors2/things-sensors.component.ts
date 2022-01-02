@@ -80,6 +80,6 @@ export class ThingsSensorsComponent implements OnInit, OnDestroy {
   // https://netbasal.com/angular-2-improve-performance-with-trackby-cc147b5104e5
   trackByFn(index, item: ThingSensor) {
     // ToDo: Maybe need thingId?
-    return item.id;
+    return item.thingId;
   }
 }

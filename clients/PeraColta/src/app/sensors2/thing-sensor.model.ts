@@ -1,7 +1,7 @@
-import { Sensor } from "./sensor.model";
+import { Sensor } from './sensor.model';
 
 export interface ThingSensor {
-    id: string;
+    thingId: string;
     name: string;
     sensors: Sensor[];
 }

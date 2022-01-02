@@ -7,7 +7,7 @@ import { SensorsConfigEffects } from './sensors-config.effect';
 import { ThingsSensorsEffects } from './things-sensors.effect';
 import { SensorsConfigService } from './sensors-config.service';
 import { ThingsSensorsConfigService } from './things-sensors-config.service';
-import { ThingsSensorsValueService } from './things-sensors-value.service';
+import { ThingsSensorsThingService } from './things-sensors-thing.service';
 import { sensorsConfigReducer } from './sensors-config.reducer';
 import { thingsSensorsReducer } from './things-sensors.reducer';
 import { SensorComponent } from './sensor/sensor.component';
@@ -22,16 +22,16 @@ import { ThingsSensorsService } from './things-sensors.service';
   imports: [
     CommonModule,
     StoreModule.forFeature(SensorsConfigFeatureName, sensorsConfigReducer),
-    // StoreModule.forFeature(ThingsSensorsFeatureName, thingsSensorsReducer),
+    StoreModule.forFeature(ThingsSensorsFeatureName, thingsSensorsReducer),
 
     EffectsModule.forFeature([SensorsConfigEffects, ThingsSensorsEffects])
   ],
   exports: [ThingsSensorsComponent],
   providers: [
     ThingsSensorsConfigService, // It's necessary for Effect bootstrap
-    ThingsSensorsValueService,  // It's necessary for Effect bootstrap
-    SensorsConfigService,       // It's necessary for Effect bootstrap
-    ThingsSensorsService        // It's necessary for Effect bootstrap
+    ThingsSensorsThingService,  // It's necessary for Effect bootstrap
+    ThingsSensorsService,
+    SensorsConfigService       // It's necessary for Effect bootstrap
   ]
 })
 export class Sensors2Module { }
