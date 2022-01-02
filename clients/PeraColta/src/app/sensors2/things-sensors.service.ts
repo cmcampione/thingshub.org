@@ -1,9 +1,10 @@
 import { Injectable, OnDestroy } from '@angular/core';
 
 import { Thing, HttpRequestCanceler } from 'thingshub-js-sdk';
+import { SensorKind, SensorKindType } from './sensor-config.model';
 import { Sensor } from './sensor.model';
 import { ThingSensor } from './thing-sensor.model';
-import { ThingsSensorsValueService } from './things-sensors-value.service';
+import { ThingsSensorsThingService } from './things-sensors-thing.service';
 
 // ToDo: Move up
 interface SensorValueRaw {
@@ -18,7 +19,7 @@ export class ThingsSensorsService implements OnDestroy {
 
     private things: Thing[] = [];// It will be only a ref to this.thingsService.mainThing.children
 
-    constructor(public readonly thingsService: ThingsSensorsValueService) {
+    constructor(public readonly thingsService: ThingsSensorsThingService) {
         this.things = this.thingsService.mainThing.children;
     }
 
@@ -38,7 +39,7 @@ export class ThingsSensorsService implements OnDestroy {
         const thingsSensors: ThingSensor[] = [];
         this.things.forEach(thing => {
             const thingSensor: ThingSensor = {
-                id: thing.id,
+                thingId: thing.id,
                 name: thing.name,
                 sensors: []
             }
@@ -47,7 +48,20 @@ export class ThingsSensorsService implements OnDestroy {
                     // ToDo: Try to use spread operator
                     const sensor: Sensor = {
                         id: sensorRaw.id,
-                        sensorConfig: null,
+                        sensorConfig: {
+                            thingId: null,
+                            name: 'No name',
+                            id: sensorRaw.id,
+                            relateThing: thing.id,
+                            kind: SensorKind.Undefined,
+                            kindType: SensorKindType.Undefined,
+                            redValueMin: 0,
+                            redValueMax: 0,
+                            greenValueMin: 0,
+                            greenValueMax: 0,
+                            min: 0,
+                            max: 0
+                        },
                         sensorValue: {
                             now: sensorRaw.now,
                             millis: sensorRaw.millis,
@@ -62,7 +76,7 @@ export class ThingsSensorsService implements OnDestroy {
     }
 
     public async setSensorValue(thingSensor : ThingSensor, value: any): Promise<any> {
-        const thing: Thing = this.searchThingById(thingSensor.id);
+        const thing: Thing = this.searchThingById(thingSensor.thingId);
         if (!thing)
             return; // Sanity check
         const sensorsValueRaw = { sensors: [value] }

@@ -7,11 +7,11 @@ export const GET_ALL_THINGS_SENSORS          = '[Things Sensors Value] Load Thin
 export const GET_ALL_THINGS_SENSORS_SUCCESS  = '[Things Sensors Value] Things Sensors Loaded Success';
 export const SET_THING_SENSOR_VALUE          = '[Thing Sensors Value] Select Thing Sensor';
 
-export const getAllThingsSensorsValue = createAction(
+export const getAllThingsSensors = createAction(
     GET_ALL_THINGS_SENSORS
 );
 
-export const getAllThingsSensorsValueSuccess = createAction(
+export const getAllThingsSensorsSuccess = createAction(
     GET_ALL_THINGS_SENSORS_SUCCESS,
     props<{ payload: ThingSensor[] }>()
 );

@@ -7,8 +7,11 @@ import { RealTimeConnectorService } from '../real-time-connector.service';
 import * as thingshub from 'thingshub-js-sdk';
 
 import { selectSensors1Count} from '../sensors1/sensors1.selectors';
-import { getAllSensorsConfig } from '../sensors1/sensors1-config.actions';
+import { getAllSensors1Config } from '../sensors1/sensors1-config.actions';
 import { getAllSensorsValue } from '../sensors1/sensors1-value.actions';
+import { selectThingsSensorsCount } from '../sensors2/sensors.selectors';
+import { getAllSensorsConfig } from '../sensors2/sensors-config.actions';
+import { getAllThingsSensors } from '../sensors2/things-sensors.actions';
 
 @Component({
   selector: 'app-home',
@@ -33,7 +36,11 @@ export class ContentPageComponent implements OnInit, OnDestroy {
 
   private sensorsCount = 0;
   public sensorsCount$ = this.store.pipe(select(selectSensors1Count));
-  private readonly subscriptionsensorsCount: Subscription = null;
+  private readonly subscriptionSensorsCount: Subscription = null;
+
+  private thingsSensorsCount = 0;
+  public thingsSensorsCount$ = this.store.pipe(select(selectThingsSensorsCount));
+  private readonly subscriptionThingsSensorsCount: Subscription = null;
 
   private readonly checkLogin = (isLoggedIn: boolean) => {
     this.isLoggedIn = isLoggedIn;
@@ -49,8 +56,19 @@ export class ContentPageComponent implements OnInit, OnDestroy {
         // https://ngrx.io/guide/store/reducers
 
         // Below methods are here because we need to know the number of sensors before SensorsComponent is displayed
-        this.store.dispatch(getAllSensorsConfig()); // It is syncronous as abose comment
+        this.store.dispatch(getAllSensors1Config()); // It is syncronous as abose comment
         this.store.dispatch(getAllSensorsValue());  // It is syncronous as abose comment
+      }
+      if (this.thingsSensorsCount === 0) {
+        // Reducers are pure functions in that they produce the same output for a given input.
+        // They are without side effects and handle each state transition synchronously.
+        // Each reducer function takes the latest Action dispatched, the current state,
+        // and determines whether to return a newly modified state or the original state.
+        // https://ngrx.io/guide/store/reducers
+
+        // Below methods are here because we need to know the number of sensors before SensorsComponent is displayed
+        this.store.dispatch(getAllSensorsConfig()); // It is syncronous as abose comment
+        this.store.dispatch(getAllThingsSensors());  // It is syncronous as abose comment
       }
     } else {
       // ToDo: Arrive before other components can remove the hooks from the real-time connector
@@ -84,7 +102,8 @@ export class ContentPageComponent implements OnInit, OnDestroy {
     private realTimeConnector: RealTimeConnectorService) {
       this.subscriptionIsLoggedIn = this.accountService.isLoggedIn$.subscribe(this.checkLogin);
       this.subscriptionRealTimeConnector = this.realTimeConnector.connectionStatus$.subscribe(this.setConnectionIcon);
-      this.subscriptionsensorsCount = this.sensorsCount$.subscribe(v => this.sensorsCount = v);
+      this.subscriptionSensorsCount = this.sensorsCount$.subscribe(v => this.sensorsCount = v);
+      this.subscriptionThingsSensorsCount = this.thingsSensorsCount$.subscribe(v => this.thingsSensorsCount = v);
   }
 
   ngOnInit() {
@@ -102,8 +121,19 @@ export class ContentPageComponent implements OnInit, OnDestroy {
         // https://ngrx.io/guide/store/reducers
 
         // Below methods are here because we need to know the number of sensors before SensorsComponent is displayed
-        this.store.dispatch(getAllSensorsConfig()); // It is syncronous as abose comment
+        this.store.dispatch(getAllSensors1Config()); // It is syncronous as abose comment
         this.store.dispatch(getAllSensorsValue());  // It is syncronous as abose comment
+      }
+      if (this.thingsSensorsCount === 0) {
+        // Reducers are pure functions in that they produce the same output for a given input.
+        // They are without side effects and handle each state transition synchronously.
+        // Each reducer function takes the latest Action dispatched, the current state,
+        // and determines whether to return a newly modified state or the original state.
+        // https://ngrx.io/guide/store/reducers
+
+        // Below methods are here because we need to know the number of sensors before SensorsComponent is displayed
+        this.store.dispatch(getAllSensorsConfig()); // It is syncronous as abose comment
+        this.store.dispatch(getAllThingsSensors());  // It is syncronous as abose comment
       }
     }
   }
@@ -114,7 +144,8 @@ export class ContentPageComponent implements OnInit, OnDestroy {
     if (this.isLoggedIn) {
       this.realTimeConnector.realTimeConnectorRaw.unsubscribe();
     }
-    this.subscriptionsensorsCount.unsubscribe();
+    this.subscriptionThingsSensorsCount.unsubscribe();
+    this.subscriptionSensorsCount.unsubscribe();
     this.subscriptionRealTimeConnector.unsubscribe();
     this.subscriptionIsLoggedIn.unsubscribe();
   }
