@@ -1,5 +1,5 @@
 import { createSelector, createFeatureSelector } from '@ngrx/store';
-import { SensorConfig, SensorKind, SensorKindType } from './sensor-config.model';
+import { SensorConfig } from './sensor-config.model';
 import { Sensor } from './sensor.model';
 import { ThingSensor } from './thing-sensor.model';
 
@@ -17,7 +17,8 @@ export const selectThingsSensors = createSelector(
         return thingsSensors.map(thingSensor => {
 
             const newSensors = thingSensor.sensors.map(sensor => {
-                const newSensor: Sensor = { ...sensor };
+                // ToDo: use lodash for better deep copy
+                const newSensor: Sensor = { ...sensor, sensorValue: { ...sensor.sensorValue }, sensorConfig: { ...sensor.sensorConfig} };
                 const sc = sensorsConfig.find(sensorConfig => sensor.id === sensorConfig.id &&
                     sensorConfig.relateThing === thingSensor.thingId)
                 if (sc)

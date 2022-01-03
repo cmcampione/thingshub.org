@@ -8,8 +8,6 @@ export const initialState: ReadonlyArray<SensorConfig> = [];
 export const sensorsConfigReducer = createReducer(
     initialState,
     on(getAllSensorsConfig, state => state),
-    on(getAllSensorsConfigSuccess, (state, { payload }) => {
-        return [...payload]
-    }), // [...payload] clone the array
+    on(getAllSensorsConfigSuccess, (state, { payload }) => payload),
     on(resetAppState, state => initialState)
 );
