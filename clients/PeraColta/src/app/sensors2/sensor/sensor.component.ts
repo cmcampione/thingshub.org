@@ -1,6 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { SensorKind, SensorKindType } from '../sensor-config.model';
 import { Sensor } from '../sensor.model';
+import { ThingsSensorsValueService } from '../things-sensors-value.service';
 
 @Component({
   selector: 'app-sensor',
@@ -15,7 +16,7 @@ export class SensorComponent implements OnInit {
   SensorKind = SensorKind;
   SensorKindType = SensorKindType;
 
-  constructor() {
+  constructor(private thingsSensorsService: ThingsSensorsValueService) {
 
   }
 

@@ -4,7 +4,7 @@ import { Thing, HttpRequestCanceler } from 'thingshub-js-sdk';
 import { SensorKind, SensorKindType } from './sensor-config.model';
 import { Sensor } from './sensor.model';
 import { ThingSensor } from './thing-sensor.model';
-import { ThingsSensorsThingService } from './things-sensors-thing.service';
+import { ThingsSensorsValueService } from './things-sensors-value.service';
 
 // ToDo: Move up
 interface SensorValueRaw {
@@ -19,7 +19,7 @@ export class ThingsSensorsService implements OnDestroy {
 
     private things: Thing[] = [];// It will be only a ref to this.thingsService.mainThing.children
 
-    constructor(public readonly thingsService: ThingsSensorsThingService) {
+    constructor(public readonly thingsService: ThingsSensorsValueService) {
         this.things = this.thingsService.mainThing.children;
     }
 
