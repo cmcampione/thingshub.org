@@ -1,7 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { SensorKind, SensorKindType } from '../sensor-config.model';
 import { Sensor } from '../sensor.model';
-import { ThingsSensorsValueService } from '../things-sensors-value.service';
+import { ThingsSensorsService } from '../things-sensors.service';
 
 @Component({
   selector: 'app-sensor',
@@ -10,13 +10,14 @@ import { ThingsSensorsValueService } from '../things-sensors-value.service';
 })
 export class SensorComponent implements OnInit {
 
+  @Input() thingId: string;
   @Input() sensor: Sensor;
 
   // https://stackoverflow.com/questions/44045311/cannot-approach-typescript-enum-within-html
   SensorKind = SensorKind;
   SensorKindType = SensorKindType;
 
-  constructor(private thingsSensorsService: ThingsSensorsValueService) {
+  constructor(private thingsSensorsService: ThingsSensorsService) {
 
   }
 
@@ -41,7 +42,7 @@ export class SensorComponent implements OnInit {
       value: $event.detail.value
     }
     try {
-      // await this.sensorsValueService.setSensorValue(this.sensor.sensorValue, value)
+      await this.thingsSensorsService.setSensorValue(this.thingId, value)
     }
     catch(error) {
       // ToDo: During 401 error we don't have to notify nothing, but for different error we should notify some error message

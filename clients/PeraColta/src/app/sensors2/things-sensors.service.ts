@@ -75,8 +75,8 @@ export class ThingsSensorsService implements OnDestroy {
         return thingsSensors;
     }
 
-    public async setSensorValue(thingSensor : ThingSensor, value: any): Promise<any> {
-        const thing: Thing = this.searchThingById(thingSensor.thingId);
+    public async setSensorValue(thingId: string, value: any): Promise<any> {
+        const thing: Thing = this.searchThingById(thingId);
         if (!thing)
             return; // Sanity check
         const sensorsValueRaw = { sensors: [value] }
