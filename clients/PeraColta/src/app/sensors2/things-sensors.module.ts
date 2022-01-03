@@ -3,16 +3,16 @@ import { CommonModule } from '@angular/common';
 import { EffectsModule } from '@ngrx/effects';
 import { StoreModule } from '@ngrx/store';
 
-import { SensorsConfigEffects } from './sensors-config.effect';
+import { SensorsConfigEffects } from './config/sensors-config.effect';
 import { ThingsSensorsEffects } from './things-sensors.effect';
-import { SensorsConfigService } from './sensors-config.service';
-import { ThingsSensorsConfigService } from './things-sensors-config.service';
-import { ThingsSensorsThingService } from './things-sensors-thing.service';
-import { sensorsConfigReducer } from './sensors-config.reducer';
+import { SensorsConfigService } from './config/sensors-config.service';
+import { ThingsSensorsConfigService } from './config/things-sensors-config.service';
+import { ThingsSensorsValueService } from './things-sensors-value.service';
+import { sensorsConfigReducer } from './config/sensors-config.reducer';
 import { thingsSensorsReducer } from './things-sensors.reducer';
 import { SensorComponent } from './sensor/sensor.component';
-import { SensorsComponent } from './sensors.component';
-import { SensorsConfigFeatureName, ThingsSensorsFeatureName } from './sensors.selectors';
+import { SensorsComponent } from './sensors/sensors.component';
+import { SensorsConfigFeatureName, ThingsSensorsFeatureName } from './things-sensors.selectors';
 import { ThingsSensorsComponent } from './things-sensors.component';
 import { ThingsSensorsService } from './things-sensors.service';
 
@@ -29,9 +29,9 @@ import { ThingsSensorsService } from './things-sensors.service';
   exports: [ThingsSensorsComponent],
   providers: [
     ThingsSensorsConfigService, // It's necessary for Effect bootstrap
-    ThingsSensorsThingService,  // It's necessary for Effect bootstrap
-    ThingsSensorsService,
-    SensorsConfigService       // It's necessary for Effect bootstrap
+    ThingsSensorsValueService,  // It's necessary for Effect bootstrap
+    ThingsSensorsService,       // It's necessary for Effect bootstrap
+    SensorsConfigService        // It's necessary for Effect bootstrap
   ]
 })
-export class Sensors2Module { }
+export class ThingsSensorsModule { }

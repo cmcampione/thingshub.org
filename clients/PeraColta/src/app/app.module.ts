@@ -24,7 +24,7 @@ import { Sensors0Component } from './sensors0/sensors0.component';
 import { ContentPageComponent } from './content-page/content-page.component';
 
 import { Sensors1Module } from './sensors1/sensors1.module';
-import { Sensors2Module } from './sensors2/sensors.module';
+import { ThingsSensorsModule } from './sensors2/things-sensors.module';
 
 import { environment } from '../environments/environment';
 import { appReducer } from './app.reducer';
@@ -63,7 +63,7 @@ import { appReducer } from './app.reducer';
         // even if you don't register any root-level effects.
         // https://ngrx.io/guide/effects
         Sensors1Module,
-        Sensors2Module
+        ThingsSensorsModule
     ],
     providers: [
         StatusBar,

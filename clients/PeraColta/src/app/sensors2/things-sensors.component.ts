@@ -5,7 +5,7 @@ import { Subscription } from 'rxjs';
 import { HttpRequestCanceler } from 'thingshub-js-sdk';
 import { RealTimeConnectorService } from '../real-time-connector.service';
 import { SensorValue } from './sensor-value.model';
-import { selectThingsSensors, selectThingsSensorsCount } from './sensors.selectors';
+import { selectThingsSensors, selectThingsSensorsCount } from './things-sensors.selectors';
 import { ThingSensor } from './thing-sensor.model';
 import { setThingSensorValue } from './things-sensors.actions';
 

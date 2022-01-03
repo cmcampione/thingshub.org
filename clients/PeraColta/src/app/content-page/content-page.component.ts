@@ -9,8 +9,8 @@ import * as thingshub from 'thingshub-js-sdk';
 import { selectSensors1Count} from '../sensors1/sensors1.selectors';
 import { getAllSensors1Config } from '../sensors1/sensors1-config.actions';
 import { getAllSensorsValue } from '../sensors1/sensors1-value.actions';
-import { selectThingsSensorsCount } from '../sensors2/sensors.selectors';
-import { getAllSensorsConfig } from '../sensors2/sensors-config.actions';
+import { selectThingsSensorsCount } from '../sensors2/things-sensors.selectors';
+import { getAllSensorsConfig } from '../sensors2/config/sensors-config.actions';
 import { getAllThingsSensors } from '../sensors2/things-sensors.actions';
 
 @Component({

@@ -1,6 +1,6 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import { Thing, HttpRequestCanceler } from 'thingshub-js-sdk';
-import { SensorConfig, SensorKind, SensorKindType } from './sensor-config.model';
+import { SensorConfig, SensorKind, SensorKindType } from '../sensor-config.model';
 import { ThingsSensorsConfigService } from './things-sensors-config.service';
 
 interface SensorConfigRaw {

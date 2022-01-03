@@ -4,7 +4,7 @@ import { EMPTY, from } from 'rxjs';
 import { map, mergeMap, catchError, tap } from 'rxjs/operators';
 import { SensorsConfigService } from './sensors-config.service';
 import { GET_ALL_SENSORS_CONFIG, GET_ALL_SENSORS_CONFIG_SUCCESS } from './sensors-config.actions';
-import { RESET_APP_STATE } from '../app.actions';
+import { RESET_APP_STATE } from '../../app.actions';
 
 @Injectable()
 export class SensorsConfigEffects {
