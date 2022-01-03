@@ -17,7 +17,7 @@ import { ThingsSensorsComponent } from './things-sensors.component';
 import { ThingsSensorsService } from './things-sensors.service';
 
 @NgModule({
-  declarations: [ThingsSensorsComponent, SensorsComponent, SensorComponent], // ToDO: Is necessary to declare SensorsComponent, SensorComponent
+  declarations: [ThingsSensorsComponent, SensorsComponent, SensorComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA], // To disable some error message from ionic
   imports: [
     CommonModule,
