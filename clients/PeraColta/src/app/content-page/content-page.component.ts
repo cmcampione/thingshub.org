@@ -67,8 +67,8 @@ export class ContentPageComponent implements OnInit, OnDestroy {
         // https://ngrx.io/guide/store/reducers
 
         // Below methods are here because we need to know the number of sensors before SensorsComponent is displayed
-        this.store.dispatch(getAllSensorsConfig()); // It is syncronous as abose comment
-        this.store.dispatch(getAllThingsSensors());  // It is syncronous as abose comment
+        // this.store.dispatch(getAllSensorsConfig()); // It is syncronous as abose comment
+        // this.store.dispatch(getAllThingsSensors());  // It is syncronous as abose comment
       }
     } else {
       // ToDo: Arrive before other components can remove the hooks from the real-time connector
@@ -132,8 +132,8 @@ export class ContentPageComponent implements OnInit, OnDestroy {
         // https://ngrx.io/guide/store/reducers
 
         // Below methods are here because we need to know the number of sensors before SensorsComponent is displayed
-        this.store.dispatch(getAllSensorsConfig()); // It is syncronous as abose comment
-        this.store.dispatch(getAllThingsSensors());  // It is syncronous as abose comment
+        // this.store.dispatch(getAllSensorsConfig()); // It is syncronous as abose comment
+        // this.store.dispatch(getAllThingsSensors());  // It is syncronous as abose comment
       }
     }
   }
