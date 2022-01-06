@@ -7,7 +7,8 @@ import { RealTimeConnectorService } from '../real-time-connector.service';
 import { SensorValue } from './sensor-value.model';
 import { selectThingsSensors, selectThingsSensorsCount } from './things-sensors.selectors';
 import { ThingSensor } from './thing-sensor.model';
-import { setThingSensorValue } from './things-sensors.actions';
+import { getAllThingsSensors, setThingSensorValue } from './things-sensors.actions';
+import { getAllSensorsConfig } from './config/sensors-config.actions';
 
 // ToDo: Move up
 interface SensorValueRaw {
@@ -44,7 +45,7 @@ export class ThingsSensorsComponent implements OnInit, OnDestroy {
         millis: sensorRaw.millis,
         value: sensorRaw.value
       };
-      let sensorId = sensorRaw.id;
+      const sensorId = sensorRaw.id;
       this.store.dispatch(setThingSensorValue({ thingId, sensorId, sensorValue } ));
     });
   }
@@ -66,8 +67,8 @@ export class ThingsSensorsComponent implements OnInit, OnDestroy {
     // This check is useful during refresh of component and keep the state to avoid pagination problem
     if (this.thingsSensorsCount === 0) {
       // Below methods are commented because we need to know the number of sensors before display this component
-      // this.store.dispatch(getAllSensorsConfig()); // It is syncronous as abose comment
-      // this.store.dispatch(getAllSensorsValue());  // It is syncronous as abose comment
+      this.store.dispatch(getAllSensorsConfig()); // It is syncronous as abose comment
+      this.store.dispatch(getAllThingsSensors());  // It is syncronous as abose comment
     }
   }
   ngOnDestroy() {
@@ -79,7 +80,6 @@ export class ThingsSensorsComponent implements OnInit, OnDestroy {
 
   // https://netbasal.com/angular-2-improve-performance-with-trackby-cc147b5104e5
   trackByFn(index, item: ThingSensor) {
-    // ToDo: Maybe need thingId?
     return item.thingId;
   }
 }
