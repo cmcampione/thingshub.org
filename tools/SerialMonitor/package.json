@@ -18,7 +18,7 @@
     "dotenv": "^16.0.0",
     "ejs": "^3.1.6",
     "moment": "^2.29.2",
-    "serialport": "^9.2.8",
-    "winston": "^3.5.1"
+    "serialport": "^10.4.0",
+    "winston": "^3.7.2"
   }
 }
