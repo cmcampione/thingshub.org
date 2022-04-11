@@ -1,6 +1,6 @@
 {
   "name": "thingshub-js-sdk",
-  "version": "1.4.3",
+  "version": "1.4.4",
   "description": "",
   "main": "thingshub.js",
   "types": "thingshub.d.ts",
@@ -21,7 +21,7 @@
     "url": "https://github.com/cmcampione/thingshub.org/issues"
   },
   "dependencies": {
-    "axios": "^0.25.0",
+    "axios": "^0.26.1",
     "socket.io-client": "^4.4.1"
   },
   "homepage": "https://github.com/cmcampione/thingshub.org#readme"
