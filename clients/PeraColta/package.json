@@ -28,7 +28,7 @@
     "@ngrx/store": "^13.0.2",
     "@ngrx/store-devtools": "^13.0.2",
     "core-js": "^3.21.1",
-    "moment": "^2.29.1",
+    "moment": "^2.29.2",
     "rxjs": "~7.5.4",
     "thingshub-js-sdk": "^1.4.3",
     "tslib": "^2.3.1",
