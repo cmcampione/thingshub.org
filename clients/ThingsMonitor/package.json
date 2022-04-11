@@ -18,8 +18,8 @@
     "dotenv": "^16.0.0",
     "ejs": "^3.1.6",
     "moment": "^2.29.2",
-    "nodemailer": "^6.7.2",
+    "nodemailer": "^6.7.3",
     "thingshub-js-sdk": "^1.4.3",
-    "winston": "^3.5.1"
+    "winston": "^3.7.2"
   }
 }
