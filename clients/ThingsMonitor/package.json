@@ -16,7 +16,7 @@
   },
   "dependencies": {
     "dotenv": "^16.0.0",
-    "ejs": "^3.1.6",
+    "ejs": "^3.1.7",
     "moment": "^2.29.2",
     "nodemailer": "^6.7.3",
     "thingshub-js-sdk": "^1.4.3",
