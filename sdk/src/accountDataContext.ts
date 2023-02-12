@@ -1,5 +1,5 @@
 import * as qs from "qs"
-import axios from "axios";
+import axios, { AxiosHeaders } from "axios";
 import jwtDecode from "jwt-decode";
 import {EndPointAddress} from "./endPointAddress";
 
@@ -36,13 +36,13 @@ export class AccountDataContext {
 
             if (!accountActionControl.isAccessTokenExpired())
             {
-                config.headers = { ...config.headers, ...accountActionControl.getSecurityHeader()};
+                config.headers = { ...config.headers, ...accountActionControl.getSecurityHeader()} as AxiosHeaders;
                 return config;
             }
 
             try {
                 await accountActionControl.refreshToken();               
-                config.headers = { ...config.headers, ...accountActionControl.getSecurityHeader()};
+                config.headers = { ...config.headers, ...accountActionControl.getSecurityHeader()} as AxiosHeaders;
                 return config;
             }
             catch (e) {
