@@ -15,11 +15,13 @@
     "url": "https://github.com/cmcampione/thingshub.org.git"
   },
   "dependencies": {
-    "dotenv": "^16.0.0",
-    "ejs": "^3.1.7",
+    "-": "^0.0.1",
+    "dotenv": "^16.0.3",
+    "ejs": "^3.1.8",
+    "force": "^0.0.3",
     "moment": "^2.29.4",
-    "nodemailer": "^6.7.3",
-    "thingshub-js-sdk": "^1.4.3",
-    "winston": "^3.7.2"
+    "nodemailer": "^6.9.1",
+    "thingshub-js-sdk": "^1.4.5",
+    "winston": "^3.8.2"
   }
 }
