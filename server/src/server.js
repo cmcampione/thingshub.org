@@ -35,15 +35,17 @@ mongoose.Promise = global.Promise;
 
 mongoose.connect(process.env.MONGODB_URI, 
 	{
-		useNewUrlParser: true,
-		useUnifiedTopology: true,
-		authSource: process.env.MONGODB_AUTHSOURCE,
+		//useNewUrlParser: true,
+		//useUnifiedTopology: true,
+		//authSource: process.env.MONGODB_AUTHSOURCE,
 		user: process.env.MONGODB_USER,
 		pass: process.env.MONGODB_PASSWORD
 	}).catch(err => {
 	logger.error(err,{ code: 124 });
 	process.exit();
 });
+
+//mongodb+srv://superAdmin:<password>@cluster0.qgdd6qb.mongodb.net/?retryWrites=true&w=majority
 
 // HTTP server configuration
 
