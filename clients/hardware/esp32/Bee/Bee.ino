@@ -540,7 +540,8 @@ typedef beeStatus_collection::iterator        beeStatus_iterator;
 typedef beeStatus_collection::const_iterator  beeStatus_const_iterator;
 
 //
-class BeesManager {
+class BeesManager // Represent a Board (For example ESP32 board)
+{
   private:
     static beeStatus_collection beesStatus;
   private:
