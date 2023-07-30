@@ -194,7 +194,7 @@ const ThingsConfigs = new Map([
 		config: {
 			configThingId: "",
 			thingKind: "c3aa4d95-4cb4-415c-a251-7fe846e0fd17", // GPS
-			onUpdateThingValueInterval: 30 * 1000, // 20 seconds - GPS pull every 15 seconds		
+			onUpdateThingValueInterval: 30 * 1000, // 30 seconds - GPSs pull every 15 seconds		
 			emails: [defaultAlertEmail],
 			thingName: "My Car",
 			checkInterval: null,
@@ -322,6 +322,7 @@ async function checkAlarmForDelay(thingId) {
 
 		// Check alarm for delay
 		if (thingStatus.lastOnUpdateThingValueEvent === null || Date.now() - thingStatus.lastOnUpdateThingValueEvent > thingConfig.onUpdateThingValueInterval) {
+			logger.info(`checkAlarmForDelay: thingId = ${thingId} - Date.now() = ${Date.now()} - lastOnUpdateThingValueEvent = ${thingStatus.lastOnUpdateThingValueEvent}`, { code: 19 });
 			if (thingStatus.inAlarmForDelay === false) {
 				thingStatus.inAlarmForDelay = true;
 				await SendAlarmEmailForDelay(thingConfig.emails, thingConfig.thingName, thingConfig.onUpdateThingValueInterval);
