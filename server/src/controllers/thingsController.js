@@ -174,6 +174,8 @@ router.put("/:id/value", async function (req, res, next) {
 				throw new utils.ErrorCustom(httpStatusCodes.BAD_REQUEST, "The body message is not a valid JSON object", 131);
 
 			// logger.info("PUT ../api/things/" + thingId + " Value: " + JSON.stringify(value),{ code: 130 });
+			logger.info("PUT before thingsMngr.updateThingValue and RealtimeNotifier.onUpdateThingValue", { code: 130 });
+			logger.info("PUT ../api/things/" + thingId,{ code: 130 });
 
 			let blResult = await thingsMngr.updateThingValue(user, thingId, value, false);
 			if (!blResult) // Nothing to notify
@@ -182,6 +184,8 @@ router.put("/:id/value", async function (req, res, next) {
 			RealtimeNotifier.onUpdateThingValue(blResult, thingId, value, false);
 
 			res.json(value); // ToDo: According to the restful paradigm, what should the PUT return?
+
+			logger.info("PUT after thingsMngr.updateThingValue and RealtimeNotifier.onUpdateThingValue", { code: 130 });
 		}  catch (e)  {
 			if (e instanceof utils.ErrorCustom) {
 				next(e);
