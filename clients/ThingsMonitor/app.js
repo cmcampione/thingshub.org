@@ -139,7 +139,7 @@ const ThingsConfigs = new Map([
 		config: {
 			configThingId: "",
 			thingKind: "Home appliance", // Home appliance
-			onUpdateThingValueInterval: 20 * 1000, // 20 seconds - Bees pull every 5 seconds		
+			onUpdateThingValueInterval: 40 * 1000, // 40 seconds - Bees pull every 5 seconds		
 			emails: [defaultAlertEmail],
 			thingName: "My Home",
 			checkInterval: null,
@@ -672,6 +672,8 @@ const onUpdateThingValue = async (thingId, value, asCmd) => {
 		break;
 	}
 	}
+
+	logger.info(`onUpdateThingValue: thingId = ${thingId} - Time Lapse = ${Date.now() - thingStatus.lastOnUpdateThingValueEvent}`, { code: 20 });
 		
 	thingStatus.lastOnUpdateThingValueEvent = Date.now();
 	switch (thingConfig.thingKind) {
