@@ -1,0 +1,50 @@
+{
+    // Usare IntelliSense per informazioni sui possibili attributi.
+    // Al passaggio del mouse vengono visualizzate le descrizioni degli attributi esistenti.
+    // Per ulteriori informazioni, visitare: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",    
+    "configurations": [
+        
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Launch Tracker Server ",
+            "program": "${workspaceFolder}\\clients\\TrackerServer\\app.js"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Launch ThingsHub Server",
+            "cwd":"${workspaceFolder}\\server",
+            "program": "${workspaceFolder}\\server\\src\\server.js",
+            "outputCapture": "std"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Launch ThingsMonitor",            
+            "program": "${workspaceFolder}\\clients\\ThingsMonitor\\app.js"
+        },
+        {
+            "name": "Launch PeraColta App",
+            "type": "chrome",
+            "request": "launch",
+            "url": "http://localhost:4200/",
+            "sourceMaps": true,
+            "webRoot": "${workspaceRoot}\\clients\\PeraColta"
+        },
+        {
+            "name": "Launch SDK webpack",
+            "type": "node",
+            "request": "launch",
+            "program": "${workspaceFolder}\\sdk\\node_modules\\webpack\\bin\\webpack.js",
+            "cwd": "${workspaceRoot}\\sdk"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Launch SerialMonitor",            
+            "program": "${workspaceFolder}\\tools\\SerialMonitor\\app.js"
+        }
+    ]
+}

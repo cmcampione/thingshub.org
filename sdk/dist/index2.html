@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+
+<html lang="it">
+
+<head>
+
+    <meta charset="utf-8" />
+
+    <title>thinghub.org</title>
+
+    <style>
+    </style>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios@0.21.1/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/socket.io-client@4.1.2/dist/socket.io.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.min.js"></script>
+    
+    <script src="thingshub.js"></script>
+
+    <script>
+
+        var th = thingshub.th("https://api.thingshub.org", "491e94d9-9041-4e5e-b6cb-9dad91bbf63d", null)
+            .on("api", info => console.log(info))
+            .on("onUpdateThingValue", (thingId, value, asCmd) => console.log(thingId, value, asCmd))            
+            .get()
+
+        setInterval(() => th.get(), 5000)
+
+    </script>
+
+</head>
+<body>
+    <div id="things">
+        <ol>
+            <li v-for="thing in things">
+                {{ thing.name }} - {{ thing.kind }} - {{ thing.value }}
+            </li>
+        </ol>
+    </div>
+    <script>
+        var app = new Vue({
+        el: '#things',
+        data: {
+            things: th.things
+        }
+    })
+    </script>
+</body>
+</html>

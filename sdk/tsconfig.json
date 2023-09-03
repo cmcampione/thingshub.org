@@ -1,0 +1,34 @@
+{
+    "compilerOptions": {
+        "baseUrl": ".",
+        "outDir": "./dist",
+        "forceConsistentCasingInFileNames": true,
+        "strict": true,
+        "noImplicitReturns": true,
+        "noFallthroughCasesInSwitch": true,
+        "sourceMap": true,
+        "declaration": false,
+        //"declarationDir": ".",
+        //"outFile": "./thingshub.d.ts", // TS6082: Only 'amd' and 'system' modules are supported alongside --outFile.
+        "downlevelIteration": true,
+        "experimentalDecorators": true,
+        "moduleResolution": "node",
+        "importHelpers": true,
+        "preserveConstEnums": true,
+
+        "target": "es2020",
+        "module": "es2020",
+        "lib": [
+            "dom",
+            "es2020"
+        ]
+    },
+    "include": [
+        "../common/src/**/*",
+        "./src/**/*"
+    ],
+    "exclude": [
+        "node_modules",
+        "dist"
+    ]
+}

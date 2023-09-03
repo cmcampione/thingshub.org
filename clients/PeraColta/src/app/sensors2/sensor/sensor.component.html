@@ -1,0 +1,34 @@
+<ion-item>
+  <ion-icon [ngStyle]="{'color': iconColor}" name="desktop"
+    style="zoom:4.0; padding-right: 2%">
+  </ion-icon>
+  <ion-label style="">
+    <h1>{{sensor.sensorConfig.name}}</h1>
+    <p>{{sensor.id}}</p>
+    <p>Millis: {{sensor.sensorValue.millis}}</p>
+    <p>Now: {{sensor.sensorValue.now}}</p>
+    <p>Value: {{sensor.sensorValue.value}}</p>
+  </ion-label>
+  <ion-label style="">
+
+    <ion-range *ngIf = "(sensor.sensorConfig.kind === SensorKind.Analogic) &&
+      (sensor.sensorConfig.kindType === SensorKindType.Output || sensor.sensorConfig.kindType === SensorKindType.InputOutput)"
+        min={{sensor.sensorConfig.min}} max={{sensor.sensorConfig.max}} color="secondary">
+      <ion-label slot="start">{{sensor.sensorConfig.min}}</ion-label>
+      <ion-label slot="end">{{sensor.sensorConfig.max}}</ion-label>
+    </ion-range>
+    
+    <ion-segment *ngIf = "(sensor.sensorConfig.kind === SensorKind.Digital) &&
+      (sensor.sensorConfig.kindType === SensorKindType.Output || sensor.sensorConfig.kindType === SensorKindType.InputOutput)"
+      value = {{sensor.sensorValue.value}}
+      (ionChange)="changingValue($event)">
+      <ion-segment-button value={{sensor.sensorConfig.min}}>
+        <ion-label>Off</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value={{sensor.sensorConfig.max}}>
+        <ion-label>On</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+
+  </ion-label>
+</ion-item>

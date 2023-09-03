@@ -1,0 +1,27 @@
+{
+  "name": "thingsmonitor",
+  "version": "1.0.0",
+  "description": "ThingsMonitor - Monitoring for ThingsHub server status",
+  "main": "app.js",
+  "scripts": {
+    "start": "node ./app.js",
+    "dev": "nodemon ./app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Carmelo Campione",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cmcampione/thingshub.org.git"
+  },
+  "dependencies": {
+    "-": "^0.0.1",
+    "dotenv": "^16.0.3",
+    "ejs": "^3.1.8",
+    "force": "^0.0.3",
+    "moment": "^2.29.4",
+    "nodemailer": "^6.9.1",
+    "thingshub-js-sdk": "^1.4.5",
+    "winston": "^3.8.2"
+  }
+}
