@@ -16,12 +16,12 @@
   },
   "dependencies": {
     "-": "^0.0.1",
-    "dotenv": "^16.0.3",
-    "ejs": "^3.1.8",
+    "dotenv": "^16.3.1",
+    "ejs": "^3.1.9",
     "force": "^0.0.3",
     "moment": "^2.29.4",
-    "nodemailer": "^6.9.1",
-    "thingshub-js-sdk": "^1.4.5",
-    "winston": "^3.8.2"
+    "nodemailer": "^6.9.4",
+    "thingshub-js-sdk": "^1.4.7",
+    "winston": "^3.10.0"
   }
 }
