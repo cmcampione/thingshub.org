@@ -42,7 +42,8 @@ module.exports = {
 		new WebpackShellPluginNext({
 			onBuildEnd: {
 				scripts: [".\\node_modules\\.bin\\dts-bundle-generator -o ./dist/thingshub.d.ts ./src/index.ts  --umd-module-name thingshub"]
-			}
+			},
+			swallowError: true // Useful becase this error "node_modules/@types/ws/index.d.ts(328,18): error TS2315: Type 'Server' is not generic."
 		}),
 		// Useful to avoid publish in npm repo
 		new FileManagerPlugin({
