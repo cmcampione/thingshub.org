@@ -1106,17 +1106,52 @@ void onUpdateThingValue(const StaticJsonDocument<msgCapacity>& jMsg)
 #endif
 }
 
-void remtoLog() {
+bool convertToJson(const tm& t, JsonVariant variant) {
+  char buffer[32];
+  strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", &t);
+  return variant.set(buffer);
+}
 
+void remoteLog(const tm& ts, const char* level, int code, const char* msg) {
+
+  HTTPClient http;
+
+  http.begin("api.thingshub.org", 3000, "/api/log", root_ca); // Specify the URL and certificate
+  http.addHeader("thapikey", "491e94d9-9041-4e5e-b6cb-9dad91bbf63d");
+  http.addHeader("Content-Type", "application/json");
+
+  DynamicJsonDocument doc(1024);
+
+  doc["timestamp"]  = ts;
+  doc["level"]      = level;
+  doc["code"]       = code;
+  doc["message"]    = msg;
+
+  String body;
+  serializeJson(doc, body);
+  DPRINTF("Body = %s", body.c_str());
+  int httpCode = http.POST(body.c_str());
+  if (httpCode > 0)
+  {
+  }
+  http.end(); //Free resources
 }
 
 void setup()
 {
-  configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
-
   Serial.begin(115200);
   BeesManager::setup();
   WiFiManager::connect();
+
+  configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
+  struct tm timeinfo;
+  if(!getLocalTime(&timeinfo)){
+    Serial.println("Failed to obtain time");
+    return;
+  }
+  Serial.println(&timeinfo, "%A, %B %d %Y %H:%M:%S");
+  remoteLog(timeinfo,"info",1,"During setup");
+
   ArduinoOTA
   .onStart([]() {
     String type;
