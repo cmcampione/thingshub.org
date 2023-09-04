@@ -3,6 +3,7 @@
 
 #include <map>
 #include <vector>
+#include <time.h>
 #include <HTTPClient.h>
 #include <ESPmDNS.h>
 #include <WiFiUdp.h>
@@ -13,6 +14,10 @@
 #include "RCSensorsMngr.h"
 #include "AntiTheft.h"
 #include "SocketIOMngr.h"
+
+const char* ntpServer = "pool.ntp.org";
+const long  gmtOffset_sec = 0;
+const int   daylightOffset_sec = 0;
 
 // https://arduino-esp8266.readthedocs.io/en/latest/faq/a02-my-esp-crashes.html
 // Don’t use const char * with literals. Instead, use const char[] PROGMEM. This is particularly true if you intend to, e.g.: embed html strings.
@@ -1101,8 +1106,14 @@ void onUpdateThingValue(const StaticJsonDocument<msgCapacity>& jMsg)
 #endif
 }
 
+void remtoLog() {
+
+}
+
 void setup()
 {
+  configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
+
   Serial.begin(115200);
   BeesManager::setup();
   WiFiManager::connect();
