@@ -1108,11 +1108,23 @@ void onUpdateThingValue(const StaticJsonDocument<msgCapacity>& jMsg)
 
 bool convertToJson(const tm& t, JsonVariant variant) {
   char buffer[32];
-  strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", &t);
+  strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%SZ", &t);
   return variant.set(buffer);
 }
 
-void remoteLog(const tm& ts, const char* level, int code, const char* msg) {
+void remoteLog(const char* level, int code, const char* msg) {
+
+  struct tm timeinfo;
+  getLocalTime(&timeinfo);
+
+  DPRINT("Data e ora GMT: ");
+  DPRINTF("%04d-%02d-%02d %02d:%02d:%02d\n",
+                timeinfo.tm_year + 1900,
+                timeinfo.tm_mon + 1,
+                timeinfo.tm_mday,
+                timeinfo.tm_hour,
+                timeinfo.tm_min,
+                timeinfo.tm_sec);
 
   HTTPClient http;
 
@@ -1122,7 +1134,7 @@ void remoteLog(const tm& ts, const char* level, int code, const char* msg) {
 
   DynamicJsonDocument doc(1024);
 
-  doc["timestamp"]  = ts;
+  doc["timestamp"]  = timeinfo;
   doc["level"]      = level;
   doc["code"]       = code;
   doc["message"]    = msg;
@@ -1133,6 +1145,10 @@ void remoteLog(const tm& ts, const char* level, int code, const char* msg) {
   int httpCode = http.POST(body.c_str());
   if (httpCode > 0)
   {
+    #ifdef DEBUG_RESTCALL
+          // Check for the returning code
+          DPRINTF("remoteLog - RestCall return payload : %s\n", http.getString().c_str());
+    #endif
   }
   http.end(); //Free resources
 }
@@ -1144,13 +1160,8 @@ void setup()
   WiFiManager::connect();
 
   configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
-  struct tm timeinfo;
-  if(!getLocalTime(&timeinfo)){
-    Serial.println("Failed to obtain time");
-    return;
-  }
-  Serial.println(&timeinfo, "%A, %B %d %Y %H:%M:%S");
-  remoteLog(timeinfo,"info",1,"During setup");
+  
+  remoteLog("info",1,"During setup");
 
   ArduinoOTA
   .onStart([]() {
