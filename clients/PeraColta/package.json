@@ -28,6 +28,7 @@
     "@ngrx/store": "^16.2.0",
     "@ngrx/store-devtools": "^16.2.0",
     "core-js": "^3.32.1",
+    "date-fns": "^2.30.0",
     "moment": "^2.29.4",
     "rxjs": "~7.8.1",
     "thingshub-js-sdk": "^1.4.7",

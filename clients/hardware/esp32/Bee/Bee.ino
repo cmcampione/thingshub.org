@@ -441,7 +441,8 @@ class BeeStatus // Represent a Thing
           prior = sensor.prior;
 
         sensor.now    = true;
-        sensor.millis = millis();
+        // sensor.millis = millis();
+        sensor.millis = time(nullptr);
         sensor.value  = value;
 
         bool lPrior = checkSetPoints(sensor.setPoints, value);
@@ -473,7 +474,8 @@ class BeeStatus // Represent a Thing
         return false;
   
       sensor.now    = true;
-      sensor.millis = millis();
+      //sensor.millis = millis();
+      sensor.millis = time(nullptr);
       sensor.value  = value;
 
       bool prior = checkSetPoints(sensor.setPoints, value);
@@ -1115,9 +1117,9 @@ bool convertToJson(const tm& t, JsonVariant variant) {
 void remoteLog(const char* level, int code, const char* msg) {
 
   struct tm timeinfo;
-  getLocalTime(&timeinfo);
+  getLocalTime(&timeinfo);// UTC date and hour
 
-  DPRINT("Data e ora GMT: ");
+  DPRINT("Date and time in UTC: ");
   DPRINTF("%04d-%02d-%02d %02d:%02d:%02d\n",
                 timeinfo.tm_year + 1900,
                 timeinfo.tm_mon + 1,
