@@ -46,7 +46,7 @@ import { appReducer } from './app.reducer';
         FormsModule,
         AgmCoreModule.forRoot({
             apiKey: 'AIzaSyD11pjYHyE0ekfygLBNJhvL1FgUp9-twkQ'
-        }),
+        }),        
         StoreModule.forRoot({}, {
             // https://ngrx.io/guide/store/configuration/runtime-checks
             runtimeChecks: {
