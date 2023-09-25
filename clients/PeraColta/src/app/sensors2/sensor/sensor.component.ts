@@ -1,4 +1,4 @@
-import { format, differenceInYears, differenceInMonths, differenceInDays, differenceInHours, differenceInMinutes, differenceInSeconds } from 'date-fns';
+import { format } from 'date-fns';
 import { Component, Input, OnInit } from '@angular/core';
 import { SensorKind, SensorKindType } from '../sensor-config.model';
 import { Sensor } from '../sensor.model';
@@ -13,7 +13,6 @@ export class SensorComponent implements OnInit {
 
   @Input() thingId: string;
   @Input() sensor: Sensor;
-  dateTime: string;
 
   // https://stackoverflow.com/questions/44045311/cannot-approach-typescript-enum-within-html
   SensorKind = SensorKind;
@@ -23,14 +22,8 @@ export class SensorComponent implements OnInit {
 
   }
 
-  convertTimeTToString(timeT: number): string {
-    const date = new Date(timeT * 1000); // Moltiplica per 1000 per convertire da secondi a millisecondi
-    // ToDo: Globalizate format
-    return format(date, 'dd/MM/yyyy HH:mm:ss');
-  }
-
+  
   ngOnInit() {
-    this.dateTime = this.convertTimeTToString(this.sensor.sensorValue.millis);
   }
 
   get iconColor() : string {
@@ -43,6 +36,12 @@ export class SensorComponent implements OnInit {
       this.sensor.sensorValue.value <= this.sensor.sensorConfig.greenValueMax)
       return 'green';
     return '';
+  }
+
+  get sensorDateTime() : string {
+    const date = new Date(this.sensor.sensorValue.millis * 1000); // Moltiplica per 1000 per convertire da secondi a millisecondi
+    // ToDo: Globalizate format
+    return format(date, 'dd/MM/yyyy HH:mm:ss');
   }
 
   async changingValue($event: any) {
