@@ -1,5 +1,6 @@
-import { CUSTOM_ELEMENTS_SCHEMA, NgModule } from '@angular/core';
+import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { IonicModule } from '@ionic/angular';
 import { EffectsModule } from '@ngrx/effects';
 import { StoreModule } from '@ngrx/store';
 
@@ -18,9 +19,9 @@ import { ThingsSensorsService } from './things-sensors.service';
 
 @NgModule({
   declarations: [ThingsSensorsComponent, SensorsComponent, SensorComponent],
-  schemas: [CUSTOM_ELEMENTS_SCHEMA], // To disable some error message from ionic
   imports: [
     CommonModule,
+    IonicModule,
     StoreModule.forFeature(SensorsConfigFeatureName, sensorsConfigReducer),
     StoreModule.forFeature(ThingsSensorsFeatureName, thingsSensorsReducer),
 
