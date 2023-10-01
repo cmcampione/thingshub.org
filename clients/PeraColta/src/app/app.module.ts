@@ -1,4 +1,5 @@
 import { NgModule } from '@angular/core';
+import { HttpClientModule, HttpClientJsonpModule } from '@angular/common/http';
 import { BrowserModule } from '@angular/platform-browser';
 import { RouteReuseStrategy } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -11,7 +12,7 @@ import { IonicModule, IonicRouteStrategy } from '@ionic/angular';
 import { SplashScreen } from '@ionic-native/splash-screen/ngx';
 import { StatusBar } from '@ionic-native/status-bar/ngx';
 
-import { AgmCoreModule } from '@agm/core';
+import { GoogleMapsModule } from '@angular/google-maps';
 
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
@@ -44,9 +45,9 @@ import { appReducer } from './app.reducer';
         IonicModule.forRoot(),
         AppRoutingModule,
         FormsModule,
-        AgmCoreModule.forRoot({
-            apiKey: 'AIzaSyD11pjYHyE0ekfygLBNJhvL1FgUp9-twkQ'
-        }),        
+        GoogleMapsModule,
+        HttpClientModule,
+        HttpClientJsonpModule,
         StoreModule.forRoot({}, {
             // https://ngrx.io/guide/store/configuration/runtime-checks
             runtimeChecks: {

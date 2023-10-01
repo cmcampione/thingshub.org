@@ -1,5 +1,8 @@
 import * as moment from 'moment';
 import { Component, OnInit, OnDestroy, LOCALE_ID, Inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable, of } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
 import { ThingsDataContext } from 'thingshub-js-sdk';
 import { endPointAddress } from '../utils';
 import { RealTimeConnectorService } from '../real-time-connector.service';
@@ -11,6 +14,8 @@ import { RealTimeConnectorService } from '../real-time-connector.service';
 })
 export class MapComponent implements OnInit, OnDestroy  {
 
+  apiLoaded: Observable<boolean>;
+  
   private thingsDataContext: thingshub.ThingsDataContext;
 
   private thingKind = 'c3aa4d95-4cb4-415c-a251-7fe846e0fd17';
@@ -24,8 +29,21 @@ export class MapComponent implements OnInit, OnDestroy  {
   public lat = 51.678418;
   public lng = 7.809007;
 
+  markerPosition: google.maps.LatLngLiteral = {lat:this.lat, lng: this.lng}
+
+  options: google.maps.MapOptions = {
+    zoom: 16,
+    mapTypeId: 'hybrid'
+  };
+
   constructor(@Inject(LOCALE_ID) private locale: string,
+    httpClient: HttpClient,
     private realTimeConnector: RealTimeConnectorService) {
+      this.apiLoaded = httpClient.jsonp('https://maps.googleapis.com/maps/api/js?key=AIzaSyD11pjYHyE0ekfygLBNJhvL1FgUp9-twkQ', 'callback')
+      .pipe(
+        map(() => true),
+        catchError(() => of(false)),
+      );
     this.thingsDataContext = new ThingsDataContext(endPointAddress);
   }
 
@@ -37,6 +55,8 @@ export class MapComponent implements OnInit, OnDestroy  {
     this.surveyDateTime = moment(value.surveyDateTime).format('L LTS');
     this.lat = value.lat;
     this.lng = value.lng;
+
+    this.markerPosition = {lat:value.lat, lng: value.lng}
 
     console.log(value);
   }
