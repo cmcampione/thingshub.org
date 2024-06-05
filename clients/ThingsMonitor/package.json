@@ -20,7 +20,7 @@
     "ejs": "^3.1.10",
     "force": "^0.0.3",
     "moment": "^2.29.4",
-    "nodemailer": "^6.9.4",
+    "nodemailer": "^6.9.9",
     "thingshub-js-sdk": "^1.4.7",
     "winston": "^3.10.0"
   }
