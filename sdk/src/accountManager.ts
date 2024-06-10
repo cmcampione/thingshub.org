@@ -1,4 +1,4 @@
-import jwtDecode from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 import { EndPointAddress } from "./endPointAddress";
 import {AccountActionControl, AccountDataContext, AccountUserData} from "./accountDataContext";
 
