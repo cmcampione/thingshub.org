@@ -22,6 +22,7 @@ interface SensorValueRaw {
   selector: 'app-things-sensors',
   templateUrl: './things-sensors.component.html',
   styleUrls: ['./things-sensors.component.scss'],
+  standalone: false
 })
 export class ThingsSensorsComponent implements OnInit, OnDestroy {
 

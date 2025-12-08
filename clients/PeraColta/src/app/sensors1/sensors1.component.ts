@@ -20,7 +20,8 @@ interface SensorRaw {
 @Component({
   selector: 'app-sensors1',
   templateUrl: './sensors1.component.html',
-  styleUrls: ['./sensors1.component.css']
+  styleUrls: ['./sensors1.component.css'],
+  standalone : false
 })
 export class Sensors1Component implements OnInit, OnDestroy {
 

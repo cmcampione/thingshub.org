@@ -16,7 +16,8 @@ import { getAllThingsSensors } from '../sensors2/things-sensors.actions';
 @Component({
   selector: 'app-home',
   templateUrl: './content-page.component.html',
-  styleUrls: ['./content-page.component.scss']
+  styleUrls: ['./content-page.component.scss'],
+  standalone: false
 })
 export class ContentPageComponent implements OnInit, OnDestroy {
 

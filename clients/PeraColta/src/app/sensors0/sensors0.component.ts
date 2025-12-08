@@ -8,6 +8,7 @@ import { Sensors0Service } from './sensors0.service';
   selector: 'app-sensors0',
   templateUrl: './sensors0.component.html',
   styleUrls: ['./sensors0.component.css'],
+  standalone: false,
   providers: [
     { provide: 'thingKind', useValue: 'Home appliance' },
     ThingsService,

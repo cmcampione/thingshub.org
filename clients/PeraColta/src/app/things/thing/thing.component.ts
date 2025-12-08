@@ -5,6 +5,7 @@ import { ThingUserChangeClaims, Thing, ThingUserReadClaims } from 'thingshub-js-
   selector: 'app-thing',
   templateUrl: './thing.component.html',
   styleUrls: ['./thing.component.scss'],
+  standalone: false
 })
 export class ThingComponent implements OnInit {
 

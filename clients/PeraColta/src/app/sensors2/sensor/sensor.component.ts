@@ -8,6 +8,7 @@ import { ThingsSensorsService } from '../things-sensors.service';
   selector: 'app-sensor',
   templateUrl: './sensor.component.html',
   styleUrls: ['./sensor.component.scss'],
+  standalone: false
 })
 export class SensorComponent implements OnInit {
 

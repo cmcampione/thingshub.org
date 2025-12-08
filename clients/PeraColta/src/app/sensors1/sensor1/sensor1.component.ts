@@ -7,6 +7,7 @@ import { SensorsValueService } from '../sensors1-value.service';
   selector: 'app-sensor1',
   templateUrl: './sensor1.component.html',
   styleUrls: ['./sensor1.component.scss'],
+  standalone : false
 })
 export class Sensor1Component implements OnInit {
 

@@ -10,7 +10,8 @@ import { AccountService } from './account.service';
 @Component({
   selector: 'app-root',
   templateUrl: 'app.component.html',
-  styleUrls: ['app.component.scss']
+  styleUrls: ['app.component.scss'],
+  standalone: false
 })
 export class AppComponent implements OnInit, OnDestroy {
   private readonly subscriptionIsLoggedIn: Subscription = null;

@@ -4,7 +4,8 @@ import { ThingSensor } from '../thing-sensor.model';
 @Component({
   selector: 'app-sensors',
   templateUrl: './sensors.component.html',
-  styleUrls: ['./sensors.component.css']
+  styleUrls: ['./sensors.component.css'],
+  standalone: false
 })
 export class SensorsComponent implements OnInit, OnDestroy {
 

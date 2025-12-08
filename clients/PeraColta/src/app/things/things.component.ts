@@ -7,6 +7,7 @@ import { ThingsService } from '../things.service';
   selector: 'app-things',
   templateUrl: './things.component.html',
   styleUrls: ['./things.component.css'],
+  standalone: false,
   providers: [
     { provide: 'thingKind', useValue: null },
     ThingsService,
