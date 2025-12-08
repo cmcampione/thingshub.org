@@ -55,7 +55,7 @@ import { appReducer } from './app.reducer';
                 strictActionImmutability: true,
                 strictStateSerializability: true,
                 strictActionSerializability: true,
-                strictActionWithinNgZone: true,
+                strictActionWithinNgZone: false, // Shoud be true but causes issues with some libraries
                 strictActionTypeUniqueness: true,
             }
         }),
