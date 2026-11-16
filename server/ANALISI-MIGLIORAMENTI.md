@@ -21,6 +21,34 @@ Analisi statica del backend Node.js/Express in `server/`. I rilievi sono ordinat
 - **Indici applicativi non visibili negli schemi.** Username, email, API key e campi usati nei filtri sulle Thing sono interrogati frequentemente, ma non risultano indici espliciti. Valutare indici mirati e vincoli univoci per username/API key, dopo aver verificato e ripulito eventuali duplicati esistenti.
 - **Conteggio e recupero separati.** Il listing esegue un conteggio e poi una query paginata; valutare se il conteggio totale è sempre necessario e monitorare le query con `explain()` prima di aggiungere indici o cambiare strategia.
 
+### ACL Thing e bitmask: comportamento e prestazioni
+
+Il controllo dei permessi è principalmente basato su bitmask numeriche:
+
+- [`getThingUserClaims`](src/bl/thingsMngr.js) combina con OR (`|`) i claim pubblici, quelli per gli utenti autenticati (`everyone`) e quelli assegnati all'utente. Il super-amministratore riceve tutti i claim. I controlli puntuali in JavaScript usano AND (`&`) per verificare un singolo claim: queste operazioni hanno costo trascurabile rispetto alle query e non sono un motivo per abbandonare le bitmask.
+- [`checkThingAccess` e `_getThing`](src/bl/thingsMngr.js) applicano anche ruolo, stato e visibilità. La Thing viene caricata per ID e questi controlli avvengono in memoria.
+- [`_getThings`](src/bl/thingsMngr.js) filtra invece le liste nel database con `$bitsAnySet` sui claim pubblici/everyone e sullo stato dell'utente; poi esegue conteggio, ordinamento e paginazione. Questo è il percorso in cui le bitmask possono incidere sulle prestazioni.
+- [`Thing.js`](src/models/Thing.js) salva `usersRights` come array incorporato nella Thing. Cercare l'utente nell'array richiede inoltre scansione in memoria dell'array caricato, il cui costo cresce con il numero di diritti per Thing.
+
+**Valutazione MongoDB:** `$bitsAnySet` (come gli altri operatori bitwise di query) non può usare un indice per la parte bitwise; MongoDB può usare indici per le altre condizioni della query. Quindi un indice sul campo numerico dei claim non risolve il filtro sui bit: sulle liste il database può dover valutare il predicato per molti documenti candidati. Il costo dei bitwise non è però automaticamente un problema: dipende da quanti documenti restano candidati dopo i filtri indicizzabili e dai costi di `count`, sort e paginazione. Verificare i piani e i dati reali con `explain("executionStats")`, misurando `totalDocsExamined`, `totalKeysExamined`, `nReturned` e latenza. Riferimenti: documentazione MongoDB per [`$bitsAnySet`](https://www.mongodb.com/docs/manual/reference/operator/query/bitsAnySet/) e [`$bitsAllSet`](https://www.mongodb.com/docs/manual/reference/operator/query/bitsAllSet/).
+
+**Limite funzionale dei permessi sui campi:** i claim `CanReadName`, `CanChangeName` e analoghi controllano alcuni campi della Thing nel mapping e nell'aggiornamento. Il valore JSON (`value`) è invece autorizzato nel suo complesso tramite `CanReadValue`/`CanChangeValue`; i `valueClaims` per nome campo esistono nello schema ma sono marcati TODO e non risultano applicati dal manager. Inoltre `CanReadDescription` è definito, ma il mapping del DTO non proietta `description`. Prima di migrare o ampliare il modello ACL, va chiarito se i permessi devono coprire i campi del DTO, le singole proprietà di `value`, o entrambi, e mantenere coerenti lettura e scrittura.
+
+**Correttezza del filtro sulle ACL incorporate:** in `_getThings` i criteri su `usersRights.userId`/`username`, `userStatus` e `userVisibility` sono condizioni distinte su campi dello stesso array. Senza un unico `$elemMatch`, MongoDB può soddisfare condizioni diverse usando elementi diversi di `usersRights`. Il filtro deve vincolare identità, stato e visibilità allo stesso elemento; aggiungere un test di regressione prima di ottimizzarlo. Per esempio, un diritto visibile appartenente a un altro utente non deve rendere accessibile una Thing all'utente corrente.
+
+#### Roadmap specifica per le ACL
+
+| Fase | Attività | Criterio di completamento |
+|---|---|---|
+| A - Semantica e correttezza | Definire i casi attesi per anonimo, `everyone`, singolo utente, super-amministratore e permessi sui campi; coprire la combinazione OR dei claim e filtri per stato/visibilità con test. | Test di caratterizzazione descrivono i contratti correnti e i casi non autorizzati. |
+| B - Filtro coerente | Racchiudere identità, stato e visibilità di `usersRights` in uno stesso `$elemMatch` in `_getThings`. Verificare anche la corrispondenza tra claim dichiarati, mapping DTO e aggiornamento dei campi. | ACL di utenti diversi non si combinano; i test controllano sia l'inclusione nella lista sia i campi restituiti/modificati. |
+| C - Baseline misurata | Su dati rappresentativi, rilevare `explain("executionStats")` per liste anonime e autenticate, con e senza filtri, conteggio e ordinamento; verificare anche gli indici effettivamente presenti nel database. | Baseline registrata per selettività, documenti/chiavi esaminati e latenza, incluse query paginate e conteggio. |
+| D - Ottimizzazione a basso rischio | Rendere indicizzabili le condizioni selettive non bitwise (ad esempio l'identità utente e il parent, quando applicabile), usando `$elemMatch` e indici compatibili con gli accessi reali. Confrontare i piani prima/dopo; non aggiungere indici sui soli campi bitmask aspettandosi che accelerino `$bitsAnySet`. | Miglioramento misurabile senza regressioni sui piani, sulla correttezza o sul costo di scrittura. |
+| E - Scelta condizionata dal profilo | Se i filtri bitwise restano il collo di bottiglia, confrontare un indice multikey su grant espliciti (ad esempio elenco di permessi concessi) e/o ACL in una collezione separata indicizzata per principal e Thing. Considerare separatamente i flag pubblici/everyone. | Prototipo confrontato con lo schema attuale su dati e carico realistici; migrazione scelta solo se riduce esame/latenza al costo accettabile di spazio, aggiornamenti e complessità. |
+| F - Campi di `value` | Definire e implementare un'unica policy di lettura/scrittura per campo, oppure documentare che `value` è un'unità indivisibile. In caso di granularità, filtrare le proprietà in lettura e validare gli aggiornamenti parziali sul server; non affidarsi al client. | Test assicurano che campi non autorizzati non siano restituiti né modificabili, e che il comportamento REST sia esplicito. |
+
+**Raccomandazione:** conservare le bitmask per rappresentare e verificare i claim in memoria. Per ora non sostituirle né aggiungere indici ai campi di claim: correggere prima l'accoppiamento dell'array con `$elemMatch` e misurare il workload. Se necessario, rendere indicizzabili i grant richiesti dalle query di lista, accettando il maggior costo di spazio e manutenzione e pianificando una migrazione compatibile con i dati e i client esistenti.
+
 ## Sicurezza e validazione
 
 - **CORS permissivo.** Express e Socket.IO accettano origini non limitate. Configurare una allowlist coerente con i client previsti. Riferimenti: [`src/server.js`](src/server.js#L58), [`src/realtimeNotifier.js`](src/realtimeNotifier.js).
@@ -79,6 +107,78 @@ Client HTTP -> Express/Passport -> Controller -> BL managers -> Mongoose -> Mong
 ```
 
 Il bootstrap in [`src/server.js`](src/server.js) configura l'applicazione e avvia database, autenticazione, HTTPS e realtime. Le rotte sono nei controller, la logica applicativa nei manager `bl`, gli schemi e le query Mongoose nei modelli.
+
+### Dipendenze effettive tra i moduli
+
+Il diagramma mostra le dipendenze tra i moduli applicativi del server rilevate dagli import e dai relativi utilizzi. Le frecce vanno dal modulo che dipende verso quello importato; librerie esterne e dipendenze interne ai singoli modelli Mongoose sono omesse.
+
+```mermaid
+flowchart TD
+    Server["server.js<br/>bootstrap Express, Passport, HTTPS"]
+
+    subgraph Controllers["Controller / router Express"]
+        Account["accountController.js"]
+        Things["thingsController.js"]
+        Log["logController.js"]
+    end
+
+    subgraph BusinessLogic["Business logic (bl/)"]
+        Users["usersMngr.js"]
+        Pending["usersPendingMngr.js"]
+        ThingsMngr["thingsMngr.js"]
+    end
+
+    subgraph Models["Modelli e accesso dati (models/)"]
+        UserModel["User.js"]
+        PendingModel["UserPending.js"]
+        ThingModel["Thing.js"]
+        LogModel["Log.js"]
+    end
+
+    Realtime["RealtimeNotifier<br/>realtimeNotifier.js"]
+    Utils["utils.js"]
+    Logger["logger.js"]
+    Common["common/<br/>thConstants.mjs, dtos.mjs"]
+
+    Server --> Account
+    Server --> Things
+    Server --> Log
+    Server --> Users
+    Server --> Realtime
+    Server --> Utils
+    Server --> Logger
+
+    Account --> Users
+    Account --> Pending
+    Account --> Utils
+    Account --> Common
+
+    Things --> ThingsMngr
+    Things --> Realtime
+    Things --> Utils
+    Things --> Logger
+    Things --> Common
+
+    Log --> LogModel
+    Log --> Realtime
+    Log --> Utils
+
+    ThingsMngr --> Users
+    ThingsMngr --> ThingModel
+    ThingsMngr --> Utils
+    ThingsMngr --> Common
+
+    Users --> UserModel
+    Pending --> PendingModel
+
+    Realtime --> Users
+    Realtime --> Utils
+    Realtime --> Logger
+
+    Utils --> Logger
+    Utils --> Common
+    ThingModel --> Common
+```
 
 ### Pattern architetturali individuati
 
